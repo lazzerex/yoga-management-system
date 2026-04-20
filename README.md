@@ -1,6 +1,14 @@
 # Serenity 
 
 <p align="center">
+  
+
+<img width="703" height="355" alt="image-removebg-preview (4)" src="https://github.com/user-attachments/assets/7ab95c3b-a35b-4b73-8849-584c21489f09" />
+
+
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/Laravel-FF2D20?style=flat&logo=laravel&logoColor=white"/>
   <img src="https://img.shields.io/badge/PHP-777BB4?style=flat&logo=php&logoColor=white"/>
   <img src="https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=mysql&logoColor=white"/>
@@ -12,21 +20,33 @@
   <img src="https://img.shields.io/badge/Blade-FF2D20?style=flat&logo=laravel&logoColor=white"/>
 </p>
 
-Serenity is a Yoga Management System built with Laravel. It is designed to help yoga studios or instructors manage users, classes, attendance, and more.
+<p align="center">
+<Strong> Serenity is a Yoga Management System built with Laravel. It is designed to help yoga studios or instructors manage users, classes, attendance, and more. </Strong>
+</p>
 
----
-
-## Screenshots
 
 ## Table of Contents
 - [Features](#features)
-- [Demo](#demo)
 - [Screenshots](#screenshots)
 - [Getting Started](#getting-started)
 - [Folder Structure](#folder-structure)
 - [Tech Stack](#tech-stack)
 - [Contributing](#contributing)
 - [License](#license)
+
+## Screenshots
+
+<img width="1895" height="864" alt="image" src="https://github.com/user-attachments/assets/dce8832b-1fe0-41ee-ab43-b6841353f60b" />
+
+<img width="1883" height="859" alt="image" src="https://github.com/user-attachments/assets/da6b114a-822c-461f-90ca-69847226bc11" />
+
+<img width="1890" height="856" alt="image" src="https://github.com/user-attachments/assets/54845fff-fefd-4730-87e9-da6b286d4d51" />
+
+<img width="1892" height="854" alt="image" src="https://github.com/user-attachments/assets/c88858f8-e868-4caf-8f46-748de92a606b" />
+
+<img width="1904" height="860" alt="image" src="https://github.com/user-attachments/assets/c9e556b5-7cfe-4893-a84e-8d30c42a3968" />
+
+---
 
 ## Features
 - User authentication (Fortify)
