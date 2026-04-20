@@ -1,0 +1,69 @@
+<template>
+    <AppLayout title="Create User">
+        <section class="ym-surface ym-section">
+            <h2 class="ym-title">Create User</h2>
+            <p class="ym-subtitle">Add a new admin, coach, or member account.</p>
+            <form class="ym-form-grid" @submit.prevent="createUser">
+                <label class="ym-field">
+                    <span class="ym-label">Name</span>
+                    <input v-model="form.name" type="text" class="ym-input" autocomplete="name" />
+                    <span v-if="form.errors.name" class="ym-field-error">{{ form.errors.name }}</span>
+                </label>
+                <label class="ym-field">
+                    <span class="ym-label">Username</span>
+                    <input v-model="form.username" type="text" class="ym-input" autocomplete="username" />
+                    <span v-if="form.errors.username" class="ym-field-error">{{ form.errors.username }}</span>
+                </label>
+                <label class="ym-field">
+                    <span class="ym-label">Email</span>
+                    <input v-model="form.email" type="email" class="ym-input" autocomplete="email" />
+                    <span v-if="form.errors.email" class="ym-field-error">{{ form.errors.email }}</span>
+                </label>
+                <label class="ym-field">
+                    <span class="ym-label">Role</span>
+                    <select v-model="form.role" class="ym-select">
+                        <option value="admin">admin</option>
+                        <option value="coach">coach</option>
+                        <option value="member">member</option>
+                    </select>
+                    <span v-if="form.errors.role" class="ym-field-error">{{ form.errors.role }}</span>
+                </label>
+                <label class="ym-field">
+                    <span class="ym-label">Password</span>
+                    <input v-model="form.password" type="password" class="ym-input" autocomplete="new-password" />
+                    <span v-if="form.errors.password" class="ym-field-error">{{ form.errors.password }}</span>
+                </label>
+                <label class="ym-field">
+                    <span class="ym-label">Confirm Password</span>
+                    <input v-model="form.password_confirmation" type="password" class="ym-input" autocomplete="new-password" />
+                </label>
+                <div class="ym-actions">
+                    <button type="submit" class="ym-btn-sm" :disabled="form.processing">
+                        {{ form.processing ? 'Creating...' : 'Create User' }}
+                    </button>
+                    <Link href="/cms/admin/users" class="ym-btn-ghost">Cancel</Link>
+                </div>
+            </form>
+        </section>
+    </AppLayout>
+</template>
+
+<script setup>
+import { Link, useForm } from '@inertiajs/vue3';
+import AppLayout from '../../../Layouts/AppLayout.vue';
+
+const form = useForm({
+    name: '',
+    username: '',
+    email: '',
+    role: 'member',
+    password: '',
+    password_confirmation: '',
+});
+
+const createUser = () => {
+    form.post('/cms/admin/users', {
+        onSuccess: () => form.reset(),
+    });
+};
+</script>
