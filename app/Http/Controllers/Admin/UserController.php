@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -62,7 +63,13 @@ class UserController extends Controller {
             'password' => ['required', 'confirmed', Password::default()],
         ]);
 
-        User::create($validated);
+        $user = User::create($validated);
+
+        $this->recordAudit($request, 'create_user', $user, [
+            'username' => $user->username,
+            'email' => $user->email,
+            'role' => $user->role,
+        ]);
 
         return back()->with('success', "User {$validated['name']} created.");
     }
@@ -85,11 +92,36 @@ class UserController extends Controller {
             return back()->with('error', 'At least one admin account is required.');
         }
 
+        $nameOrEmailChanged = $user->name !== $validated['name'] || $user->email !== $validated['email'];
+        $passwordChanged = !empty($validated['password']);
+        $roleChanged = $user->role !== $validated['role'];
+        $oldName = $user->name;
+        $oldEmail = $user->email;
+        $oldRole = $user->role;
+
         if (empty($validated['password'])) {
             unset($validated['password']);
         }
 
         $user->update($validated);
+
+        if ($nameOrEmailChanged) {
+            $this->recordAudit($request, 'update_user_info', $user, [
+                'from' => ['name' => $oldName, 'email' => $oldEmail],
+                'to' => ['name' => $user->name, 'email' => $user->email],
+            ]);
+        }
+
+        if ($passwordChanged) {
+            $this->recordAudit($request, 'change_password', $user, []);
+        }
+
+        if ($roleChanged) {
+            $this->recordAudit($request, 'assign_role', $user, [
+                'from' => $oldRole,
+                'to' => $validated['role'],
+            ]);
+        }
 
         return back()->with('success', "User {$user->name} updated.");
     }
@@ -108,7 +140,13 @@ class UserController extends Controller {
             return back()->with('error', 'At least one admin account is required.');
         }
 
+        $oldRole = $user->role;
         $user->update(['role' => $validated['role']]);
+
+        $this->recordAudit($request, 'assign_role', $user, [
+            'from' => $oldRole,
+            'to' => $validated['role'],
+        ]);
 
         return back()->with('success', "Role updated for {$user->name}.");
     }
@@ -124,6 +162,7 @@ class UserController extends Controller {
         }
 
         $name = $user->name;
+        $this->recordAudit($request, 'remove_role', $user, ['role' => $user->role]);
         $user->delete();
 
         return back()->with('success', "User {$name} deleted.");
@@ -141,5 +180,16 @@ class UserController extends Controller {
         }
 
         return User::where('role', 'admin')->count() <= 1;
+    }
+
+    private function recordAudit(Request $request, string $action, User $subject, array $meta): void
+    {
+        AuditLog::create([
+            'causer_id' => $request->user()?->id,
+            'action' => $action,
+            'subject_id' => $subject->id,
+            'subject_name' => $subject->name,
+            'meta' => $meta ?: null,
+        ]);
     }
 }
