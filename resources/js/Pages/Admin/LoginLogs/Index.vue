@@ -1,12 +1,20 @@
 <template>
-    <AppLayout title="Login Logs">
+    <AppLayout title="Logs">
         <section class="ym-surface ym-section">
-            <div class="flex items-start justify-between">
+            <div class="ym-log-page-head">
                 <div>
                     <h2 class="ym-title">Login Activity</h2>
                     <p class="ym-subtitle">Recent sign-in events across all accounts.</p>
                 </div>
-                <Link href="/cms/admin/users" class="ym-btn-ghost">Users</Link>
+                <div class="ym-log-head-actions">
+                    <a href="/cms/admin/login-logs/export" class="ym-btn-outline">Export CSV</a>
+                    <Link href="/cms/admin/users" class="ym-btn-ghost">Users</Link>
+                </div>
+            </div>
+
+            <div class="ym-log-tabs">
+                <Link href="/cms/admin/login-logs" class="ym-log-tab ym-log-tab--active">Login Logs</Link>
+                <Link href="/cms/admin/audit-logs" class="ym-log-tab">Audit Logs</Link>
             </div>
 
             <div class="ym-table-wrap">
