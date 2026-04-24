@@ -18,6 +18,7 @@
                         :href="item.href"
                         :label="item.label"
                         :icon="item.icon"
+                        :icon-color="item.iconColor"
                         :badge="item.badge"
                         :active="isActive(item.activePaths)"
                         variant="sidebar"
@@ -48,24 +49,127 @@
                                 aria-label="Search"
                             />
                         </label>
-                        <span class="ym-badge">{{ userName }}</span>
-                        <button type="button" class="ym-btn-primary" @click="logout">
-                            <FontAwesomeIcon :icon="faArrowRightFromBracket" class="ym-btn-icon" />
-                            <span>Exit</span>
-                        </button>
+
+                        <div ref="notificationsRef" class="ym-header-menu-wrap">
+                            <button
+                                type="button"
+                                class="ym-icon-btn"
+                                :class="{ 'ym-icon-btn--active': notificationsOpen }"
+                                aria-label="Open notifications"
+                                aria-haspopup="menu"
+                                :aria-expanded="notificationsOpen"
+                                @click.stop="toggleNotifications"
+                            >
+                                <FontAwesomeIcon :icon="faBell" />
+                                <span class="ym-icon-dot" aria-hidden="true" />
+                            </button>
+
+                            <div v-if="notificationsOpen" class="ym-popover ym-popover-notifications" role="menu">
+                                <div class="ym-popover-head">
+                                    <p class="ym-popover-title">Notifications</p>
+                                    <button type="button" class="ym-popover-link" @click="notificationsOpen = false">
+                                        Mark all read
+                                    </button>
+                                </div>
+                                <ul class="ym-notification-list">
+                                    <li
+                                        v-for="item in notifications"
+                                        :key="item.title"
+                                        class="ym-notification-item"
+                                    >
+                                        <p class="ym-notification-title">{{ item.title }}</p>
+                                        <p class="ym-notification-time">{{ item.time }}</p>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div ref="profileMenuRef" class="ym-header-menu-wrap">
+                            <button
+                                type="button"
+                                class="ym-icon-btn"
+                                :class="{ 'ym-icon-btn--active': profileMenuOpen }"
+                                aria-label="Open quick menu"
+                                aria-haspopup="menu"
+                                :aria-expanded="profileMenuOpen"
+                                @click.stop="toggleProfileMenu"
+                            >
+                                <FontAwesomeIcon :icon="faEllipsisVertical" />
+                            </button>
+
+                            <div v-if="profileMenuOpen" class="ym-popover ym-popover-menu" role="menu">
+                                <div class="ym-profile-chip">
+                                    <span class="ym-profile-avatar">{{ userInitials }}</span>
+                                    <div>
+                                        <p class="ym-profile-name">{{ userName }}</p>
+                                        <p class="ym-profile-role">{{ roleLabel }}</p>
+                                    </div>
+                                </div>
+
+                                <button
+                                    v-for="action in quickActions"
+                                    :key="action.label"
+                                    type="button"
+                                    class="ym-menu-item"
+                                    @click="closeMenus"
+                                >
+                                    <span>{{ action.label }}</span>
+                                    <small>{{ action.hint }}</small>
+                                </button>
+
+                                <button type="button" class="ym-menu-item ym-menu-item--danger" @click="logout">
+                                    <span>Sign Out</span>
+                                    <small>End current session</small>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <nav class="ym-top-links">
                     <NavMenuLink
                         v-for="item in topMenuItems"
-                        :key="item.href"
+                        :key="item.viewKey"
                         :href="item.href"
                         :label="item.label"
-                        :icon="item.icon"
-                        :active="isActive(item.activePaths)"
+                        :active="isTopNavActive(item)"
                         variant="top"
                     />
+
+                    <div ref="dashboardActionsRef" class="ym-header-menu-wrap ym-top-links-more">
+                        <button
+                            type="button"
+                            class="ym-icon-btn ym-top-links-more-btn"
+                            :class="{ 'ym-icon-btn--active': dashboardActionsOpen }"
+                            aria-label="Open dashboard options"
+                            aria-haspopup="menu"
+                            :aria-expanded="dashboardActionsOpen"
+                            @click.stop="toggleDashboardActions"
+                        >
+                            <FontAwesomeIcon :icon="faEllipsis" />
+                        </button>
+
+                        <div v-if="dashboardActionsOpen" class="ym-popover ym-top-links-menu" role="menu">
+                            <button type="button" class="ym-menu-item" @click="triggerDashboardAction('edit-dashboard')">
+                                <span class="ym-menu-item-label">
+                                    <FontAwesomeIcon :icon="faPenToSquare" class="ym-menu-item-icon" />
+                                    Edit Dashboard
+                                </span>
+                            </button>
+                            <button type="button" class="ym-menu-item" @click="triggerDashboardAction('add-dashlet')">
+                                <span class="ym-menu-item-label">
+                                    <FontAwesomeIcon :icon="faPlus" class="ym-menu-item-icon" />
+                                    Add Dashlet
+                                </span>
+                            </button>
+                            <button type="button" class="ym-menu-item" @click="triggerDashboardAction('reset-dashboard')">
+                                <span class="ym-menu-item-label">
+                                    <FontAwesomeIcon :icon="faArrowRotateLeft" class="ym-menu-item-icon" />
+                                    Reset Layout
+                                </span>
+                            </button>
+                        </div>
+                    </div>
                 </nav>
             </header>
 
@@ -79,21 +183,24 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { router, usePage } from '@inertiajs/vue3';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
-    faArrowRightFromBracket,
-    faBookOpen,
+    faArrowRotateLeft,
+    faBell,
     faBuilding,
     faCalendarCheck,
+    faEllipsis,
+    faEllipsisVertical,
     faClockRotateLeft,
     faClipboardCheck,
     faFolderOpen,
     faHouse,
     faMagnifyingGlass,
     faMoneyBillWave,
-    faSitemap,
+    faPenToSquare,
+    faPlus,
     faUserShield,
     faUsers,
 } from '@fortawesome/free-solid-svg-icons';
@@ -121,6 +228,49 @@ const roleLabel = computed(() => {
     if (!role) return 'guest';
     return role.charAt(0).toUpperCase() + role.slice(1);
 });
+const notificationsOpen = ref(false);
+const profileMenuOpen = ref(false);
+const notificationsRef = ref(null);
+const profileMenuRef = ref(null);
+const dashboardActionsOpen = ref(false);
+const dashboardActionsRef = ref(null);
+
+const defaultTopMenuItems = [
+    { label: 'Homepage', viewKey: 'homepage', href: '/cms/dashboard' },
+    { label: 'My Schedule', viewKey: 'my-schedule', href: '/cms/dashboard?view=my-schedule' },
+    { label: 'Members', viewKey: 'members', href: '/cms/dashboard?view=members' },
+    { label: 'Attendance', viewKey: 'attendance', href: '/cms/dashboard?view=attendance' },
+    { label: 'Studio Reports', viewKey: 'studio-reports', href: '/cms/dashboard?view=studio-reports' },
+    { label: 'Financials', viewKey: 'financials', href: '/cms/dashboard?view=financials' },
+];
+
+const topMenuItems = ref(defaultTopMenuItems.map((item) => ({ ...item })));
+
+const notifications = [
+    { title: '3 new trial requests from website leads', time: '2m ago' },
+    { title: 'Teacher attendance for today was submitted', time: '14m ago' },
+    { title: 'April tuition reconciliation is almost due', time: '1h ago' },
+];
+
+const quickActions = [
+    { label: 'Profile', hint: 'View account summary' },
+    { label: 'Preferences', hint: 'Adjust workspace settings' },
+    { label: 'Last Viewed', hint: 'Jump back to recent pages' },
+    { label: 'About', hint: 'See release notes' },
+];
+
+const userInitials = computed(() => {
+    const name = userName.value?.trim();
+    if (!name) {
+        return 'GU';
+    }
+
+    return name
+        .split(/\s+/)
+        .slice(0, 2)
+        .map((part) => part.charAt(0).toUpperCase())
+        .join('');
+});
 
 const isActive = (paths) => {
     const pathList = Array.isArray(paths) ? paths : [paths];
@@ -129,51 +279,52 @@ const isActive = (paths) => {
     ));
 };
 
-const topMenuItems = computed(() => {
-    const baseItems = [
-        { label: 'Home', href: '/cms/dashboard', activePaths: ['/cms/dashboard'], icon: faHouse },
-        {
-            label: 'Ops',
-            href: '/cms/operations/yoga-center',
-            activePaths: [
-                '/cms/operations/yoga-center',
-                '/cms/operations/academy',
-                '/cms/operations/teacher-attendance',
-                '/cms/operations/file-library',
-            ],
-            icon: faSitemap,
-        },
-    ];
+const toViewKey = (value) => value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 
-    if (canAccessPlans.value) {
-        baseItems.push({
-            label: 'Plans',
-            href: '/cms/operations/lesson-planning',
-            activePaths: ['/cms/operations/lesson-planning'],
-            icon: faBookOpen,
+const normalizeTopTabs = (incomingTabs) => {
+    const normalized = incomingTabs
+        .slice(0, 6)
+        .map((tab, index) => {
+            const fallback = defaultTopMenuItems[index] ?? defaultTopMenuItems[defaultTopMenuItems.length - 1];
+            const label = (tab?.label ?? '').toString().trim() || fallback.label;
+            const fallbackKey = index === 0 ? 'homepage' : fallback.viewKey;
+            const rawViewKey = (tab?.viewKey ?? toViewKey(label)) || fallbackKey;
+            const viewKey = index === 0 ? 'homepage' : rawViewKey;
+
+            return {
+                label,
+                viewKey,
+                href: index === 0 ? '/cms/dashboard' : `/cms/dashboard?view=${viewKey}`,
+            };
         });
+
+    while (normalized.length < 6) {
+        normalized.push({ ...defaultTopMenuItems[normalized.length] });
     }
 
-    if (canAccessFees.value) {
-        baseItems.push({
-            label: 'Fees',
-            href: '/cms/operations/tuition-fees',
-            activePaths: ['/cms/operations/tuition-fees'],
-            icon: faMoneyBillWave,
-        });
+    return normalized;
+};
+
+const dashboardView = computed(() => {
+    if (!page.url.startsWith('/cms/dashboard')) {
+        return '';
     }
 
-    if (isAdmin.value) {
-        baseItems.push({
-            label: 'Admin',
-            href: '/cms/admin/users',
-            activePaths: ['/cms/admin'],
-            icon: faUserShield,
-        });
-    }
-
-    return baseItems;
+    const query = page.url.split('?')[1] ?? '';
+    return new URLSearchParams(query).get('view') ?? 'homepage';
 });
+
+const isTopNavActive = (item) => {
+    if (!page.url.startsWith('/cms/dashboard')) {
+        return false;
+    }
+
+    return dashboardView.value === item.viewKey;
+};
 
 const sidebarGroups = computed(() => {
     const groups = [
@@ -185,6 +336,7 @@ const sidebarGroups = computed(() => {
                     href: '/cms/dashboard',
                     activePaths: ['/cms/dashboard'],
                     icon: faHouse,
+                    iconColor: '#4f8bc8',
                 },
             ],
         },
@@ -196,12 +348,14 @@ const sidebarGroups = computed(() => {
                     href: '/cms/operations/yoga-center',
                     activePaths: ['/cms/operations/yoga-center'],
                     icon: faBuilding,
+                    iconColor: '#d99a34',
                 },
                 {
                     label: 'Classes',
                     href: '/cms/operations/academy',
                     activePaths: ['/cms/operations/academy'],
                     icon: faUsers,
+                    iconColor: '#3fa07e',
                 },
             ],
         },
@@ -214,6 +368,7 @@ const sidebarGroups = computed(() => {
                 href: '/cms/operations/teacher-attendance',
                 activePaths: ['/cms/operations/teacher-attendance'],
                 icon: faClipboardCheck,
+                iconColor: '#4f81cf',
             },
             {
                 label: 'Plans',
@@ -221,6 +376,7 @@ const sidebarGroups = computed(() => {
                 activePaths: ['/cms/operations/lesson-planning'],
                 badge: 'Approval',
                 icon: faCalendarCheck,
+                iconColor: '#6a78c8',
             },
         );
     }
@@ -231,6 +387,7 @@ const sidebarGroups = computed(() => {
             href: '/cms/operations/tuition-fees',
             activePaths: ['/cms/operations/tuition-fees'],
             icon: faMoneyBillWave,
+            iconColor: '#32a06f',
         });
     }
 
@@ -240,6 +397,7 @@ const sidebarGroups = computed(() => {
             href: '/cms/operations/file-library',
             activePaths: ['/cms/operations/file-library'],
             icon: faFolderOpen,
+            iconColor: '#c97846',
         });
     }
 
@@ -252,12 +410,14 @@ const sidebarGroups = computed(() => {
                     href: '/cms/admin/users',
                     activePaths: ['/cms/admin/users'],
                     icon: faUserShield,
+                    iconColor: '#5f77cf',
                 },
                 {
                     label: 'Logs',
                     href: '/cms/admin/login-logs',
                     activePaths: ['/cms/admin/login-logs'],
                     icon: faClockRotateLeft,
+                    iconColor: '#b26464',
                 },
             ],
         });
@@ -266,7 +426,90 @@ const sidebarGroups = computed(() => {
     return groups;
 });
 
+const closeMenus = () => {
+    notificationsOpen.value = false;
+    profileMenuOpen.value = false;
+    dashboardActionsOpen.value = false;
+};
+
+const toggleNotifications = () => {
+    notificationsOpen.value = !notificationsOpen.value;
+    if (notificationsOpen.value) {
+        profileMenuOpen.value = false;
+    }
+};
+
+const toggleProfileMenu = () => {
+    profileMenuOpen.value = !profileMenuOpen.value;
+    if (profileMenuOpen.value) {
+        notificationsOpen.value = false;
+        dashboardActionsOpen.value = false;
+    }
+};
+
+const toggleDashboardActions = () => {
+    dashboardActionsOpen.value = !dashboardActionsOpen.value;
+    if (dashboardActionsOpen.value) {
+        notificationsOpen.value = false;
+        profileMenuOpen.value = false;
+    }
+};
+
+const triggerDashboardAction = (action) => {
+    dashboardActionsOpen.value = false;
+
+    if (!page.url.startsWith('/cms/dashboard')) {
+        router.get('/cms/dashboard', { dashboardAction: action });
+        return;
+    }
+
+    window.dispatchEvent(new CustomEvent('ym-dashboard-action', {
+        detail: {
+            action,
+            tabs: topMenuItems.value.map((item) => ({
+                label: item.label,
+                viewKey: item.viewKey,
+                href: item.href,
+            })),
+        },
+    }));
+};
+
+const handleDashboardTabsUpdated = (event) => {
+    const incomingTabs = event?.detail?.tabs;
+    if (Array.isArray(incomingTabs)) {
+        topMenuItems.value = normalizeTopTabs(incomingTabs);
+    }
+};
+
+const handleGlobalClick = (event) => {
+    const target = event.target;
+
+    if (notificationsOpen.value && notificationsRef.value && !notificationsRef.value.contains(target)) {
+        notificationsOpen.value = false;
+    }
+
+    if (profileMenuOpen.value && profileMenuRef.value && !profileMenuRef.value.contains(target)) {
+        profileMenuOpen.value = false;
+    }
+
+    if (dashboardActionsOpen.value && dashboardActionsRef.value && !dashboardActionsRef.value.contains(target)) {
+        dashboardActionsOpen.value = false;
+    }
+};
+
+onMounted(() => {
+    document.addEventListener('click', handleGlobalClick);
+    window.addEventListener('ym-dashboard-tabs-updated', handleDashboardTabsUpdated);
+});
+
+onBeforeUnmount(() => {
+    document.removeEventListener('click', handleGlobalClick);
+    window.removeEventListener('ym-dashboard-tabs-updated', handleDashboardTabsUpdated);
+});
+
 const logout = () => {
+    closeMenus();
     router.post('/cms/logout');
 };
 </script>
