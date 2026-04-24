@@ -37,7 +37,7 @@
 ## Screenshots
 
 <p align="center">
-    <img width="1895" height="864" alt="image" src="https://github.com/user-attachments/assets/dce8832b-1fe0-41ee-ab43-b6841353f60b" />
+    <img width="1910" height="911" alt="image" src="https://github.com/user-attachments/assets/c086ced8-aa16-44d2-8db9-8155a72a8819" />
 </p>
 
 <p align="center">
