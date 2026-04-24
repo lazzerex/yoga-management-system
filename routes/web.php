@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\LoginLogController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Middleware\EnsureAdmin;
@@ -43,6 +44,9 @@ Route::prefix('cms')->group(function () {
             Route::patch('/users/{user}', [UserController::class, 'update'])->name('users.update');
             Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
             Route::get('/login-logs', [LoginLogController::class, 'index'])->name('login-logs.index');
+            Route::get('/login-logs/export', [LoginLogController::class, 'export'])->name('login-logs.export');
+            Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
+            Route::get('/audit-logs/export', [AuditLogController::class, 'export'])->name('audit-logs.export');
         });
     });
 });
