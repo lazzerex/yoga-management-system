@@ -1,7 +1,7 @@
 <template>
     <Link :href="href" :class="linkClasses">
         <span class="ym-nav-item-content">
-            <FontAwesomeIcon v-if="icon" :icon="icon" class="ym-nav-item-icon" />
+            <FontAwesomeIcon v-if="icon" :icon="icon" class="ym-nav-item-icon" :style="iconStyles" />
             <span class="ym-nav-item-text">{{ label }}</span>
         </span>
         <span v-if="badge && variant === 'sidebar'" class="ym-side-link-badge">{{ badge }}</span>
@@ -26,6 +26,10 @@ const props = defineProps({
         type: [Array, Object, String],
         default: null,
     },
+    iconColor: {
+        type: String,
+        default: '',
+    },
     active: {
         type: Boolean,
         default: false,
@@ -46,5 +50,13 @@ const linkClasses = computed(() => {
     }
 
     return ['ym-side-link', { 'ym-side-link--active': props.active }];
+});
+
+const iconStyles = computed(() => {
+    if (props.variant === 'sidebar' && props.iconColor) {
+        return { '--ym-nav-icon-color': props.iconColor };
+    }
+
+    return null;
 });
 </script>
