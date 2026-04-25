@@ -183,7 +183,7 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { router, usePage } from '@inertiajs/vue3';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
@@ -219,7 +219,8 @@ const flash = computed(() => page.props.flash ?? {});
 const userName = computed(() => page.props.auth?.user?.name ?? 'Guest');
 const userRole = computed(() => page.props.auth?.user?.role ?? 'member');
 const isAdmin = computed(() => userRole.value === 'admin');
-const canAccessPlans = computed(() => ['admin', 'coach'].includes(userRole.value));
+const isCoach = computed(() => userRole.value === 'coach');
+const isMember = computed(() => userRole.value === 'member');
 const canAccessFees = computed(() => ['admin', 'member'].includes(userRole.value));
 const canAccessTeacherOperations = computed(() => ['admin', 'coach'].includes(userRole.value));
 const canAccessFileLibrary = computed(() => ['admin', 'coach'].includes(userRole.value));
@@ -235,16 +236,40 @@ const profileMenuRef = ref(null);
 const dashboardActionsOpen = ref(false);
 const dashboardActionsRef = ref(null);
 
-const defaultTopMenuItems = [
-    { label: 'Homepage', viewKey: 'homepage', href: '/cms/dashboard' },
-    { label: 'My Schedule', viewKey: 'my-schedule', href: '/cms/dashboard?view=my-schedule' },
-    { label: 'Members', viewKey: 'members', href: '/cms/dashboard?view=members' },
-    { label: 'Attendance', viewKey: 'attendance', href: '/cms/dashboard?view=attendance' },
-    { label: 'Studio Reports', viewKey: 'studio-reports', href: '/cms/dashboard?view=studio-reports' },
-    { label: 'Financials', viewKey: 'financials', href: '/cms/dashboard?view=financials' },
-];
+const roleTopMenuDefaults = computed(() => {
+    if (isAdmin.value) {
+        return [
+            { label: 'Homepage', viewKey: 'homepage', href: '/cms/dashboard' },
+            { label: 'My Schedule', viewKey: 'my-schedule', href: '/cms/dashboard?view=my-schedule' },
+            { label: 'Members', viewKey: 'members', href: '/cms/dashboard?view=members' },
+            { label: 'Attendance', viewKey: 'attendance', href: '/cms/dashboard?view=attendance' },
+            { label: 'Studio Reports', viewKey: 'studio-reports', href: '/cms/dashboard?view=studio-reports' },
+            { label: 'Financials', viewKey: 'financials', href: '/cms/dashboard?view=financials' },
+        ];
+    }
 
-const topMenuItems = ref(defaultTopMenuItems.map((item) => ({ ...item })));
+    if (isCoach.value) {
+        return [
+            { label: 'Homepage', viewKey: 'homepage', href: '/cms/dashboard' },
+            { label: 'My Classes', viewKey: 'my-classes', href: '/cms/coach/my-classes' },
+            { label: 'My Students', viewKey: 'my-students', href: '/cms/coach/my-students' },
+            { label: 'Teaching Schedule', viewKey: 'teaching-schedule', href: '/cms/coach/my-teaching-schedule' },
+            { label: 'Attendance', viewKey: 'attendance', href: '/cms/operations/teacher-attendance' },
+            { label: 'Lesson Plans', viewKey: 'lesson-plans', href: '/cms/operations/lesson-planning' },
+        ];
+    }
+
+    return [
+        { label: 'Homepage', viewKey: 'homepage', href: '/cms/dashboard' },
+        { label: 'My Membership', viewKey: 'my-membership', href: '/cms/member/my-membership' },
+        { label: 'My Classes', viewKey: 'my-classes', href: '/cms/member/my-classes' },
+        { label: 'My Schedule', viewKey: 'my-schedule', href: '/cms/member/my-schedule' },
+        { label: 'Centers', viewKey: 'centers', href: '/cms/operations/yoga-center' },
+        { label: 'Tuition', viewKey: 'tuition', href: '/cms/operations/tuition-fees' },
+    ];
+});
+
+const topMenuItems = ref([]);
 
 const notifications = [
     { title: '3 new trial requests from website leads', time: '2m ago' },
@@ -286,10 +311,11 @@ const toViewKey = (value) => value
     .replace(/^-+|-+$/g, '');
 
 const normalizeTopTabs = (incomingTabs) => {
+    const fallbackTabs = roleTopMenuDefaults.value;
     const normalized = incomingTabs
         .slice(0, 6)
         .map((tab, index) => {
-            const fallback = defaultTopMenuItems[index] ?? defaultTopMenuItems[defaultTopMenuItems.length - 1];
+            const fallback = fallbackTabs[index] ?? fallbackTabs[fallbackTabs.length - 1];
             const label = (tab?.label ?? '').toString().trim() || fallback.label;
             const fallbackKey = index === 0 ? 'homepage' : fallback.viewKey;
             const rawViewKey = (tab?.viewKey ?? toViewKey(label)) || fallbackKey;
@@ -303,7 +329,7 @@ const normalizeTopTabs = (incomingTabs) => {
         });
 
     while (normalized.length < 6) {
-        normalized.push({ ...defaultTopMenuItems[normalized.length] });
+        normalized.push({ ...fallbackTabs[normalized.length] });
     }
 
     return normalized;
@@ -319,11 +345,15 @@ const dashboardView = computed(() => {
 });
 
 const isTopNavActive = (item) => {
-    if (!page.url.startsWith('/cms/dashboard')) {
-        return false;
+    if (item.href.startsWith('/cms/dashboard')) {
+        if (!page.url.startsWith('/cms/dashboard')) {
+            return false;
+        }
+
+        return dashboardView.value === item.viewKey;
     }
 
-    return dashboardView.value === item.viewKey;
+    return isActive(item.href);
 };
 
 const sidebarGroups = computed(() => {
@@ -398,6 +428,64 @@ const sidebarGroups = computed(() => {
             activePaths: ['/cms/operations/file-library'],
             icon: faFolderOpen,
             iconColor: '#c97846',
+        });
+    }
+
+    if (isMember.value) {
+        groups.push({
+            label: 'Member',
+            items: [
+                {
+                    label: 'My Membership',
+                    href: '/cms/member/my-membership',
+                    activePaths: ['/cms/member/my-membership'],
+                    icon: faMoneyBillWave,
+                    iconColor: '#3f8f6f',
+                },
+                {
+                    label: 'My Classes',
+                    href: '/cms/member/my-classes',
+                    activePaths: ['/cms/member/my-classes'],
+                    icon: faUsers,
+                    iconColor: '#3f7ec4',
+                },
+                {
+                    label: 'My Schedule',
+                    href: '/cms/member/my-schedule',
+                    activePaths: ['/cms/member/my-schedule'],
+                    icon: faCalendarCheck,
+                    iconColor: '#6a78c8',
+                },
+            ],
+        });
+    }
+
+    if (isCoach.value) {
+        groups.push({
+            label: 'Coach',
+            items: [
+                {
+                    label: 'My Classes',
+                    href: '/cms/coach/my-classes',
+                    activePaths: ['/cms/coach/my-classes'],
+                    icon: faUsers,
+                    iconColor: '#3f7ec4',
+                },
+                {
+                    label: 'My Students',
+                    href: '/cms/coach/my-students',
+                    activePaths: ['/cms/coach/my-students'],
+                    icon: faClipboardCheck,
+                    iconColor: '#4f81cf',
+                },
+                {
+                    label: 'Teaching Schedule',
+                    href: '/cms/coach/my-teaching-schedule',
+                    activePaths: ['/cms/coach/my-teaching-schedule'],
+                    icon: faCalendarCheck,
+                    iconColor: '#6a78c8',
+                },
+            ],
         });
     }
 
@@ -502,6 +590,10 @@ onMounted(() => {
     document.addEventListener('click', handleGlobalClick);
     window.addEventListener('ym-dashboard-tabs-updated', handleDashboardTabsUpdated);
 });
+
+watch(userRole, () => {
+    topMenuItems.value = roleTopMenuDefaults.value.map((item) => ({ ...item }));
+}, { immediate: true });
 
 onBeforeUnmount(() => {
     document.removeEventListener('click', handleGlobalClick);
