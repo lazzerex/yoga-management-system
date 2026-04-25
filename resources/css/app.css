@@ -1722,6 +1722,149 @@
         color: #2d4669;
     }
 
+    .ym-membership-banner {
+        border: 1px solid #d7e2ef;
+        background:
+            radial-gradient(circle at 85% 15%, rgba(95, 133, 182, 0.14) 0%, transparent 34%),
+            linear-gradient(140deg, #f7fafe 0%, #f3f7fc 100%);
+        border-radius: 0.55rem;
+        padding: 0.9rem 0.95rem;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 0.75rem;
+    }
+
+    .ym-week-grid {
+        margin-top: 0.8rem;
+        display: grid;
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+        gap: 0.68rem;
+    }
+
+    .ym-week-day {
+        border: 1px solid #e1e8f1;
+        background: #fbfcff;
+        border-radius: 0.52rem;
+        padding: 0.62rem;
+        display: grid;
+        gap: 0.45rem;
+    }
+
+    .ym-week-day-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 0.5rem;
+    }
+
+    .ym-week-day-name {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: #30445f;
+    }
+
+    .ym-week-day-date {
+        font-size: 0.74rem;
+        color: #7b8ba1;
+        font-weight: 600;
+    }
+
+    .ym-week-day-slots {
+        display: grid;
+        gap: 0.42rem;
+    }
+
+    .ym-week-slot {
+        border: 1px solid #dde7f2;
+        background: #ffffff;
+        border-radius: 0.46rem;
+        padding: 0.48rem 0.52rem;
+    }
+
+    .ym-week-grid--coach .ym-week-slot,
+    .ym-week-slot--coach {
+        border-color: #d4e3ef;
+        background: #f9fcff;
+    }
+
+    .ym-week-slot-time {
+        font-size: 0.73rem;
+        font-weight: 700;
+        color: #3f5f88;
+    }
+
+    .ym-week-slot-title {
+        margin-top: 0.14rem;
+        font-size: 0.83rem;
+        font-weight: 700;
+        color: #2f425c;
+        line-height: 1.2;
+    }
+
+    .ym-week-slot-meta {
+        margin-top: 0.14rem;
+        font-size: 0.75rem;
+        color: #73859d;
+        line-height: 1.2;
+    }
+
+    .ym-empty-slot {
+        font-size: 0.77rem;
+        color: #8594a8;
+        border: 1px dashed #dbe4ef;
+        border-radius: 0.42rem;
+        background: #ffffff;
+        padding: 0.44rem 0.52rem;
+        text-align: center;
+    }
+
+    @keyframes ymRevealUp {
+        from {
+            opacity: 0;
+            transform: translateY(8px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes ymStaggerIn {
+        from {
+            opacity: 0;
+            transform: translateY(7px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .ym-reveal {
+        animation: ymRevealUp 320ms ease-out both;
+    }
+
+    .ym-reveal-delay-1 {
+        animation-delay: 80ms;
+    }
+
+    .ym-reveal-delay-2 {
+        animation-delay: 140ms;
+    }
+
+    .ym-reveal-delay-3 {
+        animation-delay: 200ms;
+    }
+
+    .ym-stagger-item {
+        opacity: 0;
+        animation: ymStaggerIn 320ms ease-out both;
+        animation-delay: var(--ym-stagger, 0ms);
+    }
+
     .ym-tag {
         display: inline-flex;
         align-items: center;
@@ -1738,6 +1881,10 @@
     @media (min-width: 768px) {
         .ym-main {
             padding: 1.15rem 1.5rem 1.7rem;
+        }
+
+        .ym-week-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
         }
 
         .ym-dashlet-span-4,
@@ -1780,6 +1927,10 @@
     @media (min-width: 1024px) {
         .ym-dashlet-span-4 {
             grid-column: span 4;
+        }
+
+        .ym-week-grid {
+            grid-template-columns: repeat(7, minmax(0, 1fr));
         }
 
         .ym-dashlet-span-6 {
@@ -1874,6 +2025,23 @@
             grid-template-columns: 1fr;
             justify-items: center;
             text-align: center;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .ym-reveal,
+        .ym-stagger-item {
+            animation: none;
+            opacity: 1;
+            transform: none;
+        }
+
+        .ym-dashlet-card,
+        .ym-dashlet-move,
+        .ym-dashlet-enter-active,
+        .ym-dashlet-leave-active {
+            transition-duration: 1ms;
+            animation: none;
         }
     }
 }
