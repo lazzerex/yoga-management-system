@@ -35,6 +35,18 @@ Route::prefix('cms')->group(function () {
             });
         });
 
+        Route::middleware('role:member')->prefix('member')->name('member.')->group(function () {
+            Route::get('/my-membership', fn () => inertia('Member/MyMembership'))->name('my-membership');
+            Route::get('/my-classes', fn () => inertia('Member/MyClasses'))->name('my-classes');
+            Route::get('/my-schedule', fn () => inertia('Member/MySchedule'))->name('my-schedule');
+        });
+
+        Route::middleware('role:coach')->prefix('coach')->name('coach.')->group(function () {
+            Route::get('/my-classes', fn () => inertia('Coach/MyClasses'))->name('my-classes');
+            Route::get('/my-students', fn () => inertia('Coach/MyStudents'))->name('my-students');
+            Route::get('/my-teaching-schedule', fn () => inertia('Coach/MyTeachingSchedule'))->name('my-teaching-schedule');
+        });
+
         Route::middleware([EnsureAdmin::class])->prefix('admin')->name('admin.')->group(function () {
             Route::get('/users', [UserController::class, 'index'])->name('users.index');
             Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
