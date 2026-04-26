@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\LoginLogController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Middleware\EnsureAdmin;
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +18,7 @@ Route::prefix('cms')->group(function () {
 
     Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', fn () => inertia('Dashboard'))->name('cms.dashboard');
+        Route::get('/profile', [ProfileController::class, 'show'])->name('cms.profile.show');
 
         Route::prefix('operations')->name('operations.')->group(function () {
             Route::middleware('role:admin,coach,member')->group(function () {
