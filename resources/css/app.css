@@ -1047,6 +1047,24 @@
     .ym-dashlet-grid {
         display: grid;
         gap: 0.82rem;
+        position: relative;
+    }
+
+    .ym-dashlet-grid::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        background: radial-gradient(circle, rgba(90, 120, 155, 0.32) 1.5px, transparent 1.5px);
+        background-size: 24px 24px;
+        border-radius: 0.5rem;
+        opacity: 0;
+        transition: opacity 220ms ease;
+    }
+
+    .ym-dashlet-grid--dragging::before {
+        opacity: 1;
     }
 
     .ym-dashlet-grid-inner {
@@ -1054,6 +1072,8 @@
         grid-template-columns: repeat(12, minmax(0, 1fr));
         gap: 0.88rem;
         align-items: start;
+        position: relative;
+        z-index: 1;
     }
 
     .ym-dashlet-card {
