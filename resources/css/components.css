@@ -1,0 +1,487 @@
+@layer components {
+    .ym-surface {
+        background: var(--ym-surface);
+        border: 1px solid var(--ym-panel-border);
+        border-radius: 0.58rem;
+        box-shadow: 0 1px 1px rgba(13, 22, 35, 0.04);
+    }
+
+    .ym-section {
+        padding: 1rem;
+    }
+
+    .ym-title {
+        font-size: 1.12rem;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        color: #243145;
+    }
+
+    .ym-subtitle {
+        margin-top: 0.32rem;
+        color: #78879b;
+        font-size: 0.91rem;
+    }
+
+    .ym-badge {
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid #d8e2ee;
+        background: #ffffff;
+        color: #5c6c82;
+        border-radius: 9999px;
+        padding: 0.33rem 0.65rem;
+        font-size: 0.76rem;
+        font-weight: 600;
+        line-height: 1;
+    }
+
+    .ym-btn-primary,
+    .ym-btn-sm {
+        border: 1px solid var(--ym-primary);
+        background: var(--ym-primary);
+        color: #ffffff;
+        padding: 0.4rem 0.8rem;
+        border-radius: 0.5rem;
+        font-size: 0.82rem;
+        font-weight: 700;
+        cursor: pointer;
+        line-height: 1.15;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .ym-btn-primary:hover,
+    .ym-btn-sm:hover {
+        background: var(--ym-primary-strong);
+        border-color: var(--ym-primary-strong);
+    }
+
+    .ym-btn-outline {
+        border: 1px solid #ced8e3;
+        background: #ffffff;
+        color: #44566f;
+        padding: 0.32rem 0.66rem;
+        border-radius: 0.44rem;
+        font-size: 0.78rem;
+        font-weight: 700;
+        cursor: pointer;
+        white-space: nowrap;
+        line-height: 1.2;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .ym-btn-outline:hover {
+        background: #f3f7fc;
+    }
+
+    .ym-btn-danger {
+        border: 1px solid var(--ym-danger);
+        background: var(--ym-danger);
+        color: #ffffff;
+        padding: 0.32rem 0.66rem;
+        border-radius: 0.44rem;
+        font-size: 0.78rem;
+        font-weight: 700;
+        cursor: pointer;
+        white-space: nowrap;
+        line-height: 1.2;
+    }
+
+    .ym-btn-danger:hover {
+        background: #b74149;
+        border-color: #b74149;
+    }
+
+    .ym-btn-danger:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .ym-btn-ghost {
+        border: 1px solid #d7dfea;
+        background: #ffffff;
+        color: #5f6f84;
+        padding: 0.38rem 0.8rem;
+        border-radius: 0.5rem;
+        font-size: 0.82rem;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .ym-btn-ghost:hover {
+        background: #f2f6fb;
+        color: #2e3f56;
+    }
+
+    .ym-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(31, 41, 55, 0.34);
+        z-index: 80;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 1.2rem;
+        overflow: auto;
+    }
+
+    .ym-modal {
+        width: min(920px, 100%);
+        background: #f4f6f9;
+        border: 1px solid #d6dde7;
+        border-radius: 0.62rem;
+        box-shadow: 0 20px 44px rgba(15, 23, 42, 0.22);
+    }
+
+    .ym-modal-header {
+        padding: 0.88rem 1rem;
+        border-bottom: 1px solid #dbe3ee;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 0.6rem;
+    }
+
+    .ym-modal-title {
+        margin: 0;
+        font-size: 1.04rem;
+        font-weight: 700;
+        color: #2f4057;
+    }
+
+    .ym-modal-desc {
+        margin: 0.2rem 0 0;
+        font-size: 0.79rem;
+        color: #72839a;
+    }
+
+    .ym-modal-close {
+        border: none;
+        background: transparent;
+        color: #7a8799;
+        font-size: 1.55rem;
+        line-height: 1;
+        cursor: pointer;
+        padding: 0;
+    }
+
+    .ym-modal-body {
+        padding: 0.95rem;
+    }
+
+    .ym-alert-success {
+        background: #ecf9ee;
+        border: 1px solid #cdebcf;
+        color: #2f7b3b;
+        border-radius: 0.55rem;
+        padding: 0.65rem 0.9rem;
+        font-size: 0.86rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .ym-alert-error {
+        background: #fdf1f2;
+        border: 1px solid #f3cfd3;
+        color: #a53c48;
+        border-radius: 0.55rem;
+        padding: 0.65rem 0.9rem;
+        font-size: 0.86rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .ym-table-wrap {
+        overflow-x: auto;
+        margin-top: 0.95rem;
+    }
+
+    .ym-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.88rem;
+    }
+
+    .ym-th {
+        padding: 0.55rem 0.75rem;
+        text-align: left;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #8491a4;
+        border-bottom: 1px solid #e2e8f0;
+        background: #f8fafd;
+        white-space: nowrap;
+        text-transform: uppercase;
+        letter-spacing: 0.045em;
+    }
+
+    .ym-td {
+        padding: 0.63rem 0.75rem;
+        border-bottom: 1px solid #edf1f6;
+        color: #273447;
+        vertical-align: middle;
+    }
+
+    .ym-tr:last-child .ym-td {
+        border-bottom: none;
+    }
+
+    .ym-inline-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.38rem;
+    }
+
+    .ym-count-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 9999px;
+        background: #eef3fa;
+        color: #597190;
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 0.08rem 0.48rem;
+        margin-left: 0.35rem;
+        vertical-align: middle;
+    }
+
+    .ym-role-badge,
+    .ym-device-badge,
+    .ym-chip {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 9999px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 0.18rem 0.54rem;
+        line-height: 1.1;
+    }
+
+    .ym-role-admin {
+        background: #e4f5ea;
+        color: #2d7e40;
+    }
+
+    .ym-role-coach {
+        background: #e8f1ff;
+        color: #386eb0;
+    }
+
+    .ym-role-member {
+        background: #eef2f7;
+        color: #617184;
+    }
+
+    .ym-device-mobile {
+        background: #fff2d6;
+        color: #9f6a13;
+    }
+
+    .ym-device-desktop {
+        background: #eef2f7;
+        color: #617184;
+    }
+
+    .ym-log-page-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .ym-log-head-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .ym-log-tabs {
+        display: flex;
+        gap: 0;
+        border-bottom: 1px solid #e4ecf4;
+        margin-bottom: 1.2rem;
+    }
+
+    .ym-log-tab {
+        padding: 0.52rem 1rem;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #637a96;
+        border-bottom: 2px solid transparent;
+        text-decoration: none;
+        margin-bottom: -1px;
+        transition: color 150ms ease, border-color 150ms ease;
+    }
+
+    .ym-log-tab:hover {
+        color: #3d5a7e;
+    }
+
+    .ym-log-tab--active {
+        color: var(--ym-primary);
+        border-bottom-color: var(--ym-primary);
+    }
+
+    .ym-action-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.1rem 0.46rem;
+        border-radius: 0.28rem;
+        font-size: 0.7rem;
+        font-weight: 700;
+        white-space: nowrap;
+        line-height: 1.3;
+    }
+
+    .ym-action-badge--create {
+        background: #e6f7ef;
+        color: #1a7d4f;
+        border: 1px solid #b2e6cc;
+    }
+
+    .ym-action-badge--update {
+        background: #e8f2fc;
+        color: #1e5fa8;
+        border: 1px solid #b4d4f5;
+    }
+
+    .ym-action-badge--password {
+        background: #fff3e0;
+        color: #8a5a00;
+        border: 1px solid #f4d08a;
+    }
+
+    .ym-action-badge--role-assign {
+        background: #f3eeff;
+        color: #6331bb;
+        border: 1px solid #d4bbf7;
+    }
+
+    .ym-action-badge--role-remove {
+        background: #fdecea;
+        color: #a32a2a;
+        border: 1px solid #f4b8b0;
+    }
+
+    .ym-td--meta {
+        font-size: 0.78rem;
+        color: #6a7f9a;
+        max-width: 260px;
+    }
+
+    .ym-pagination {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        margin-top: 0.9rem;
+    }
+
+    .ym-page-link {
+        padding: 0.25rem 0.58rem;
+        border: 1px solid #d8e1ed;
+        border-radius: 0.42rem;
+        font-size: 0.79rem;
+        color: #607186;
+        text-decoration: none;
+        background: #ffffff;
+    }
+
+    .ym-page-link:hover {
+        background: #f2f6fb;
+    }
+
+    .ym-page-link--active {
+        background: #4b6694;
+        border-color: #4b6694;
+        color: #ffffff;
+        font-weight: 700;
+    }
+
+    .ym-page-link--disabled {
+        opacity: 0.45;
+        pointer-events: none;
+    }
+
+    .ym-form-grid {
+        margin-top: 0.85rem;
+        display: grid;
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+        gap: 0.8rem;
+    }
+
+    .ym-field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.34rem;
+    }
+
+    .ym-label {
+        font-size: 0.79rem;
+        font-weight: 700;
+        color: #4f6179;
+    }
+
+    .ym-input,
+    .ym-select {
+        width: 100%;
+        border: 1px solid #d8e1eb;
+        border-radius: 0.5rem;
+        padding: 0.48rem 0.64rem;
+        font-size: 0.86rem;
+        color: #223044;
+        background: #ffffff;
+    }
+
+    .ym-input:focus,
+    .ym-select:focus {
+        outline: 2px solid #8fadd8;
+        outline-offset: 1px;
+    }
+
+    .ym-field-error {
+        color: #b13c45;
+        font-size: 0.76rem;
+    }
+
+    .ym-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        margin-top: 0.25rem;
+    }
+
+    .ym-subsection-divider {
+        border-top: 1px solid #e8edf3;
+        margin-top: 1.1rem;
+        padding-top: 1rem;
+    }
+
+    .ym-subsection-title {
+        font-size: 0.92rem;
+        font-weight: 700;
+        color: #465971;
+        margin-bottom: 0.72rem;
+    }
+
+    @media (min-width: 768px) {
+        .ym-upload-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .ym-form-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .ym-actions {
+            grid-column: span 2 / span 2;
+        }
+    }
+}
