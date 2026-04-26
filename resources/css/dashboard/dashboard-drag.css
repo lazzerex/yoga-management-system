@@ -1,0 +1,96 @@
+@layer components {
+    .ym-dashlet-card {
+        overflow: hidden;
+        transition: transform 220ms ease, box-shadow 220ms ease, opacity 220ms ease;
+    }
+
+    .ym-dashlet-card:hover {
+        box-shadow: 0 8px 24px rgba(26, 37, 54, 0.08);
+    }
+
+    .ym-dashlet-card--reordering {
+        will-change: transform;
+    }
+
+    .ym-dashlet-card--dragging {
+        opacity: 0.35;
+    }
+
+    .ym-dashlet-card--placeholder {
+        border: 2px dashed #c2cedd;
+        background: #f8fafc;
+        box-shadow: none;
+        min-height: 230px;
+    }
+
+    .ym-dashlet-placeholder-inner {
+        min-height: 230px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #5b7291;
+        font-size: 0.86rem;
+        font-weight: 600;
+    }
+
+    .ym-dashlet-head {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.36rem;
+        min-width: 0;
+    }
+
+    .ym-drag-handle {
+        color: #8d99aa;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        flex-shrink: 0;
+        cursor: grab;
+    }
+
+    .ym-dashlet-card--sorting .ym-drag-handle {
+        cursor: grabbing;
+    }
+
+    .ym-dashlet-remove {
+        width: 1.72rem;
+        height: 1.72rem;
+        border: 1px solid #d4deea;
+        border-radius: 0.42rem;
+        background: #ffffff;
+        color: #6a7a8f;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+    .ym-dashlet-remove:hover {
+        background: #f6f9fd;
+        color: #3f4f65;
+    }
+
+    .ym-dashlet-remove:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+
+    .ym-dashlet-card--sorting {
+        box-shadow: 0 22px 52px rgba(20, 33, 50, 0.26);
+        transform: scale(1.03) rotate(-0.6deg);
+        will-change: transform;
+        cursor: grabbing;
+    }
+
+    .ym-dashlet-card--locked .ym-drag-handle {
+        opacity: 0.42;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .ym-dashlet-card {
+            transition-duration: 1ms;
+        }
+    }
+}
