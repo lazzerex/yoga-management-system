@@ -1,7 +1,7 @@
 <template>
     <AppLayout :title="pageTitle">
         <template v-if="isAdmin">
-            <section class="ym-dashlet-grid">
+            <section :class="['ym-dashlet-grid', { 'ym-dashlet-grid--dragging': isDraggingDashlet }]">
                 <Draggable
                     v-model="dashlets"
                     item-key="id"
