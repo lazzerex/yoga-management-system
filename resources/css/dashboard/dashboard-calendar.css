@@ -1,0 +1,89 @@
+@layer components {
+    .ym-calendar-wrap {
+        overflow: hidden;
+    }
+
+    .ym-calendar-header {
+        padding: 0.75rem 0.88rem;
+        border-bottom: 1px solid #e6ecf3;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .ym-calendar-title {
+        font-size: 0.99rem;
+        font-weight: 700;
+        color: #5b6f87;
+    }
+
+    .ym-calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+    }
+
+    .ym-calendar-day-name {
+        padding: 0.36rem 0.48rem;
+        text-align: center;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #4c5e76;
+        background: #f6f9fc;
+        border-right: 1px solid #e7edf4;
+        border-bottom: 1px solid #e7edf4;
+    }
+
+    .ym-calendar-day-name:last-child {
+        border-right: none;
+    }
+
+    .ym-calendar-cell {
+        min-height: 95px;
+        padding: 0.26rem;
+        border-right: 1px solid #e7edf4;
+        border-bottom: 1px solid #e7edf4;
+        background: #ffffff;
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+    }
+
+    .ym-calendar-cell--muted {
+        background: #f7f9fc;
+    }
+
+    .ym-calendar-cell:nth-child(7n) {
+        border-right: none;
+    }
+
+    .ym-calendar-date {
+        font-size: 0.74rem;
+        font-weight: 700;
+        color: #6a798e;
+        align-self: flex-end;
+    }
+
+    .ym-event-chip {
+        border-radius: 0.28rem;
+        font-size: 0.66rem;
+        font-weight: 700;
+        color: #ffffff;
+        padding: 0.13rem 0.3rem;
+        line-height: 1.1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .ym-event-chip--green {
+        background: #5fb37a;
+    }
+
+    .ym-event-chip--blue {
+        background: #5a93cc;
+    }
+
+    .ym-event-chip--rose {
+        background: #d08f95;
+    }
+}
