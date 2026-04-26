@@ -1,0 +1,17 @@
+:root {
+    --ym-bg-1: #f3f5f8;
+    --ym-bg-2: #eceff3;
+    --ym-surface: #ffffff;
+    --ym-sidebar: #f7f8fa;
+    --ym-sidebar-border: #dde2ea;
+    --ym-panel-border: #dce3eb;
+    --ym-text: #273447;
+    --ym-muted: #7b8798;
+    --ym-link: #4e76b6;
+    --ym-link-strong: #2f589a;
+    --ym-primary: #4f9f5f;
+    --ym-primary-strong: #3e8b4e;
+    --ym-danger: #c64f57;
+    --ym-warning: #d79a2e;
+    --ym-soft-blue: #eaf2ff;
+}
