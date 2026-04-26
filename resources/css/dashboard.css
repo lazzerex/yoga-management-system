@@ -10,24 +10,6 @@
     .ym-dashlet-grid {
         display: grid;
         gap: 0.82rem;
-        position: relative;
-    }
-
-    .ym-dashlet-grid::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-        z-index: 0;
-        background: radial-gradient(circle, rgba(90, 120, 155, 0.32) 1.5px, transparent 1.5px);
-        background-size: 24px 24px;
-        border-radius: 0.5rem;
-        opacity: 0;
-        transition: opacity 220ms ease;
-    }
-
-    .ym-dashlet-grid--dragging::before {
-        opacity: 1;
     }
 
     .ym-dashlet-grid-inner {
@@ -35,8 +17,6 @@
         grid-template-columns: repeat(12, minmax(0, 1fr));
         gap: 0.88rem;
         align-items: start;
-        position: relative;
-        z-index: 1;
     }
 
     /* Dashlet cards */
@@ -55,21 +35,12 @@
     }
 
     .ym-dashlet-card--dragging {
-        opacity: 0.34;
-        border-style: dashed;
-        border-color: #9eb6d3;
-        background:
-            radial-gradient(circle, rgba(112, 136, 164, 0.2) 1px, transparent 1px),
-            #f6fbff;
-        background-size: 12px 12px;
+        opacity: 0.35;
     }
 
     .ym-dashlet-card--placeholder {
-        border: 2px dashed #95abc7;
-        background:
-            radial-gradient(circle, rgba(112, 136, 164, 0.25) 1px, transparent 1px),
-            #f7fbff;
-        background-size: 12px 12px;
+        border: 2px dashed #c2cedd;
+        background: #f8fafc;
         box-shadow: none;
         min-height: 230px;
     }
