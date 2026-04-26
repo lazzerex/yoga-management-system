@@ -111,7 +111,7 @@
                                     :key="action.label"
                                     type="button"
                                     class="ym-menu-item"
-                                    @click="closeMenus"
+                                    @click="handleQuickAction(action)"
                                 >
                                     <span>{{ action.label }}</span>
                                     <small>{{ action.hint }}</small>
@@ -201,6 +201,7 @@ import {
     faMoneyBillWave,
     faPenToSquare,
     faPlus,
+    faUser,
     faUserShield,
     faUsers,
 } from '@fortawesome/free-solid-svg-icons';
@@ -278,7 +279,7 @@ const notifications = [
 ];
 
 const quickActions = [
-    { label: 'Profile', hint: 'View account summary' },
+    { label: 'Profile', hint: 'View account summary', href: '/cms/profile' },
     { label: 'Preferences', hint: 'Adjust workspace settings' },
     { label: 'Last Viewed', hint: 'Jump back to recent pages' },
     { label: 'About', hint: 'See release notes' },
@@ -367,6 +368,13 @@ const sidebarGroups = computed(() => {
                     activePaths: ['/cms/dashboard'],
                     icon: faHouse,
                     iconColor: '#4f8bc8',
+                },
+                {
+                    label: 'My Profile',
+                    href: '/cms/profile',
+                    activePaths: ['/cms/profile'],
+                    icon: faUser,
+                    iconColor: '#5f77cf',
                 },
             ],
         },
@@ -561,6 +569,14 @@ const triggerDashboardAction = (action) => {
             })),
         },
     }));
+};
+
+const handleQuickAction = (action) => {
+    closeMenus();
+
+    if (action?.href) {
+        router.get(action.href);
+    }
 };
 
 const handleDashboardTabsUpdated = (event) => {
