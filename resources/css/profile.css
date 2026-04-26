@@ -1,0 +1,154 @@
+@layer components {
+    .ym-profile-page-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.85rem;
+        flex-wrap: wrap;
+    }
+
+    .ym-profile-page-main {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        min-width: 0;
+    }
+
+    .ym-profile-page-avatar {
+        width: 3.05rem;
+        height: 3.05rem;
+        border-radius: 9999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.02rem;
+        font-weight: 800;
+        color: #ffffff;
+        background: linear-gradient(155deg, #4c79b7 0%, #355c98 100%);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.26);
+        flex-shrink: 0;
+    }
+
+    .ym-profile-page-tags {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        flex-wrap: wrap;
+    }
+
+    .ym-profile-field-list {
+        margin: 0;
+        display: grid;
+        gap: 0.48rem;
+    }
+
+    .ym-profile-field-row {
+        border: 1px solid #e3eaf2;
+        border-radius: 0.52rem;
+        background: #fcfdff;
+        padding: 0.58rem 0.66rem;
+        display: grid;
+        gap: 0.12rem;
+    }
+
+    .ym-profile-field-label {
+        margin: 0;
+        font-size: 0.75rem;
+        color: #7d8da1;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 700;
+    }
+
+    .ym-profile-field-value {
+        margin: 0;
+        font-size: 0.91rem;
+        color: #2f4059;
+        font-weight: 700;
+        word-break: break-word;
+    }
+
+    .ym-profile-field-value--caps {
+        text-transform: capitalize;
+    }
+
+    .ym-profile-security-grid {
+        display: grid;
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+        gap: 0.64rem;
+    }
+
+    .ym-profile-stat-card {
+        border: 1px solid #e0e8f1;
+        border-radius: 0.52rem;
+        background: #f8fbff;
+        padding: 0.68rem 0.72rem;
+    }
+
+    .ym-profile-stat-label {
+        margin: 0;
+        font-size: 0.75rem;
+        color: #8191a6;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 700;
+    }
+
+    .ym-profile-stat-value {
+        margin: 0.22rem 0 0;
+        font-size: 1.16rem;
+        color: #2c405d;
+        font-weight: 800;
+        line-height: 1.12;
+    }
+
+    .ym-profile-stat-note {
+        margin: 0.2rem 0 0;
+        font-size: 0.79rem;
+        color: #718299;
+    }
+
+    .ym-profile-login-list {
+        display: grid;
+        gap: 0.48rem;
+    }
+
+    .ym-profile-login-row {
+        border: 1px solid #e2e9f2;
+        border-radius: 0.52rem;
+        background: #ffffff;
+        padding: 0.62rem 0.72rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.7rem;
+        flex-wrap: wrap;
+    }
+
+    .ym-profile-login-title {
+        margin: 0;
+        font-size: 0.86rem;
+        color: #2f4564;
+        font-weight: 700;
+    }
+
+    .ym-profile-login-meta {
+        margin: 0.14rem 0 0;
+        font-size: 0.76rem;
+        color: #74859a;
+    }
+
+    .ym-profile-login-ip {
+        margin: 0;
+        font-size: 0.8rem;
+        color: #4e6380;
+        font-weight: 700;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    }
+
+    @media (min-width: 768px) {
+        .ym-profile-security-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+}
