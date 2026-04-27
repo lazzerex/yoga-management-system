@@ -1,154 +1,225 @@
 @layer components {
-    .ym-profile-page-head {
+    .ym-record-layout {
         display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 0.85rem;
-        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: 1rem;
     }
 
-    .ym-profile-page-main {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.75rem;
+    .ym-record-main {
+        flex: 1 1 0%;
         min-width: 0;
+        overflow: hidden;
     }
 
-    .ym-profile-page-avatar {
-        width: 3.05rem;
-        height: 3.05rem;
-        border-radius: 9999px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.02rem;
-        font-weight: 800;
-        color: #ffffff;
-        background: linear-gradient(155deg, #4c79b7 0%, #355c98 100%);
-        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.26);
-        flex-shrink: 0;
+    .ym-record-section {
+        padding: 0;
     }
 
-    .ym-profile-page-tags {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.45rem;
-        flex-wrap: wrap;
+    .ym-record-section--divided {
+        border-top: 1px solid var(--ym-panel-border);
     }
 
-    .ym-profile-field-list {
+    .ym-record-group-title {
+        padding: 0.72rem 1.1rem 0.48rem;
         margin: 0;
-        display: grid;
-        gap: 0.48rem;
-    }
-
-    .ym-profile-field-row {
-        border: 1px solid #e3eaf2;
-        border-radius: 0.52rem;
-        background: #fcfdff;
-        padding: 0.58rem 0.66rem;
-        display: grid;
-        gap: 0.12rem;
-    }
-
-    .ym-profile-field-label {
-        margin: 0;
-        font-size: 0.75rem;
-        color: #7d8da1;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.065em;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
-        font-weight: 700;
+        color: #8294ab;
     }
 
-    .ym-profile-field-value {
-        margin: 0;
-        font-size: 0.91rem;
-        color: #2f4059;
-        font-weight: 700;
-        word-break: break-word;
-    }
-
-    .ym-profile-field-value--caps {
-        text-transform: capitalize;
-    }
-
-    .ym-profile-security-grid {
+    .ym-record-row {
         display: grid;
-        grid-template-columns: repeat(1, minmax(0, 1fr));
-        gap: 0.64rem;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        border-bottom: 1px solid #edf1f6;
     }
 
-    .ym-profile-stat-card {
-        border: 1px solid #e0e8f1;
-        border-radius: 0.52rem;
-        background: #f8fbff;
-        padding: 0.68rem 0.72rem;
+    .ym-record-row--single {
+        grid-template-columns: minmax(0, 1fr);
     }
 
-    .ym-profile-stat-label {
+    .ym-record-row--last {
+        border-bottom: none;
+    }
+
+    .ym-rf {
+        padding: 0.72rem 1.1rem;
+    }
+
+    .ym-rf + .ym-rf {
+        border-left: 1px solid #edf1f6;
+    }
+
+    .ym-rf-label {
         margin: 0;
-        font-size: 0.75rem;
-        color: #8191a6;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
+        font-size: 0.71rem;
         font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.055em;
+        color: #8a99b0;
     }
 
-    .ym-profile-stat-value {
+    .ym-rf-value {
         margin: 0.22rem 0 0;
-        font-size: 1.16rem;
-        color: #2c405d;
-        font-weight: 800;
-        line-height: 1.12;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--ym-text);
+        line-height: 1.35;
     }
 
-    .ym-profile-stat-note {
-        margin: 0.2rem 0 0;
-        font-size: 0.79rem;
-        color: #718299;
+    .ym-rf-note {
+        margin: 0.18rem 0 0;
+        font-size: 0.75rem;
+        color: #8a9ab0;
+        line-height: 1.4;
     }
 
-    .ym-profile-login-list {
+    .ym-record-log-list {
+        margin: 0;
+    }
+
+    .ym-record-log-head {
         display: grid;
-        gap: 0.48rem;
+        grid-template-columns: 5.5rem 1fr 9rem;
+        gap: 0 1.2rem;
+        padding: 0.38rem 1.1rem;
+        font-size: 0.71rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.055em;
+        color: #8a99b0;
+        background: #f8fafd;
+        border-bottom: 1px solid #e5ecf3;
     }
 
-    .ym-profile-login-row {
-        border: 1px solid #e2e9f2;
-        border-radius: 0.52rem;
-        background: #ffffff;
-        padding: 0.62rem 0.72rem;
-        display: flex;
+    .ym-record-log-row {
+        display: grid;
+        grid-template-columns: 5.5rem 1fr 9rem;
+        gap: 0 1.2rem;
         align-items: center;
-        justify-content: space-between;
-        gap: 0.7rem;
-        flex-wrap: wrap;
+        padding: 0.52rem 1.1rem;
+        border-bottom: 1px solid #edf1f6;
     }
 
-    .ym-profile-login-title {
-        margin: 0;
-        font-size: 0.86rem;
-        color: #2f4564;
-        font-weight: 700;
+    .ym-record-log-row:last-child {
+        border-bottom: none;
     }
 
-    .ym-profile-login-meta {
-        margin: 0.14rem 0 0;
-        font-size: 0.76rem;
-        color: #74859a;
+    .ym-record-log-time {
+        font-size: 0.84rem;
+        color: #4a5f78;
     }
 
-    .ym-profile-login-ip {
-        margin: 0;
+    .ym-record-log-ip {
         font-size: 0.8rem;
-        color: #4e6380;
-        font-weight: 700;
+        font-weight: 600;
+        color: #4a5f78;
         font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
     }
 
-    @media (min-width: 768px) {
-        .ym-profile-security-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+    .ym-record-empty {
+        padding: 0.75rem 1.1rem;
+        margin: 0;
+        font-size: 0.86rem;
+        color: #8a9ab0;
+    }
+
+    .ym-record-aside {
+        width: 14.5rem;
+        flex-shrink: 0;
+        overflow: hidden;
+    }
+
+    .ym-record-avatar-zone {
+        padding: 1.4rem 1rem 1.1rem;
+        border-bottom: 1px solid var(--ym-panel-border);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.55rem;
+        text-align: center;
+    }
+
+    .ym-record-avatar {
+        width: 4.25rem;
+        height: 4.25rem;
+        border-radius: 9999px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        color: #ffffff;
+        background: #4b6694;
+        flex-shrink: 0;
+    }
+
+    .ym-record-avatar-name {
+        margin: 0;
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: var(--ym-text);
+        line-height: 1.3;
+    }
+
+    .ym-record-meta-list {
+        padding: 0.2rem 0;
+    }
+
+    .ym-record-meta-item {
+        padding: 0.6rem 1rem;
+        border-bottom: 1px solid #edf1f6;
+    }
+
+    .ym-record-meta-item:last-child {
+        border-bottom: none;
+    }
+
+    .ym-record-meta-val {
+        margin: 0.2rem 0 0;
+        font-size: 0.83rem;
+        font-weight: 600;
+        color: #3a4f6a;
+        line-height: 1.35;
+    }
+
+    @media (max-width: 860px) {
+        .ym-record-layout {
+            flex-direction: column;
+        }
+
+        .ym-record-aside {
+            width: 100%;
+        }
+
+        .ym-record-avatar-zone {
+            flex-direction: row;
+            text-align: left;
+            gap: 0.85rem;
+            padding: 1rem;
+        }
+    }
+
+    @media (max-width: 580px) {
+        .ym-record-row {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .ym-rf + .ym-rf {
+            border-left: none;
+            border-top: 1px solid #edf1f6;
+        }
+
+        .ym-record-log-head,
+        .ym-record-log-row {
+            grid-template-columns: 5rem 1fr;
+        }
+
+        .ym-record-log-head > span:last-child,
+        .ym-record-log-row > span:last-child {
+            display: none;
         }
     }
 }
