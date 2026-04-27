@@ -24,17 +24,19 @@ class LoginLogController extends Controller
 
         return response()->streamDownload(function () {
             $handle = fopen('php://output', 'w');
-            fputcsv($handle, ['User', 'Username', 'IP Address', 'Device', 'Time']);
+            fputcsv($handle, ['Status', 'User', 'Identifier', 'IP Address', 'Device', 'Failure Reason', 'Time']);
 
             LoginLog::with('user:id,name,username')
                 ->latest('logged_in_at')
                 ->chunk(200, function ($logs) use ($handle) {
                     foreach ($logs as $log) {
                         fputcsv($handle, [
-                            $log->user?->name ?? 'Deleted user',
-                            $log->user ? '@' . $log->user->username : '—',
+                            $log->status,
+                            $log->user?->name ?? '—',
+                            $log->attempted_identifier ?? '—',
                             $log->ip_address,
                             $log->device_type,
+                            $log->failure_reason ?? '—',
                             $log->logged_in_at?->format('Y-m-d H:i:s'),
                         ]);
                     }
