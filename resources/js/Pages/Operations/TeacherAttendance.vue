@@ -1,73 +1,75 @@
 <template>
     <AppLayout title="Teacher Attendance Tracking">
-        <section class="ym-surface ym-section">
-            <h2 class="ym-title">Attendance Snapshot</h2>
-            <p class="ym-subtitle">
-                Mocked attendance board for instructor check-ins, lateness tracking, and branch-level visibility.
-            </p>
-
-            <div class="ym-kpi-grid">
-                <article class="ym-kpi-card">
-                    <p class="ym-kpi-label">On Time</p>
-                    <p class="ym-kpi-value">21</p>
-                    <p class="ym-kpi-note">77% attendance quality</p>
-                </article>
-                <article class="ym-kpi-card">
-                    <p class="ym-kpi-label">Late</p>
-                    <p class="ym-kpi-value">4</p>
-                    <p class="ym-kpi-note">Avg delay 8 minutes</p>
-                </article>
-                <article class="ym-kpi-card">
-                    <p class="ym-kpi-label">Absent</p>
-                    <p class="ym-kpi-value">2</p>
-                    <p class="ym-kpi-note">All covered by substitutes</p>
-                </article>
+        <div class="ym-stat-strip">
+            <div class="ym-stat">
+                <p class="ym-stat-label">On Time</p>
+                <p class="ym-stat-value">21</p>
+                <p class="ym-stat-note">77% attendance quality</p>
             </div>
-        </section>
-
-        <section class="ym-surface ym-section mt-4">
-            <h3 class="ym-subsection-title">Today Attendance Board</h3>
-            <div class="ym-table-wrap mt-0">
-                <table class="ym-table">
-                    <thead>
-                        <tr>
-                            <th class="ym-th">Teacher</th>
-                            <th class="ym-th">Branch</th>
-                            <th class="ym-th">Shift</th>
-                            <th class="ym-th">Check In</th>
-                            <th class="ym-th">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="entry in attendance" :key="entry.teacher" class="ym-tr">
-                            <td class="ym-td font-medium">{{ entry.teacher }}</td>
-                            <td class="ym-td">{{ entry.branch }}</td>
-                            <td class="ym-td">{{ entry.shift }}</td>
-                            <td class="ym-td">{{ entry.checkIn }}</td>
-                            <td class="ym-td">
-                                <span
-                                    :class="[
-                                        'ym-status-pill',
-                                        entry.status === 'Late' ? 'ym-status-pill--pending' : '',
-                                        entry.status === 'On Time' ? 'ym-status-pill--started' : '',
-                                    ]"
-                                >
-                                    {{ entry.status }}
-                                </span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="ym-stat">
+                <p class="ym-stat-label">Late</p>
+                <p class="ym-stat-value">4</p>
+                <p class="ym-stat-note">Avg delay 8 minutes</p>
             </div>
+            <div class="ym-stat">
+                <p class="ym-stat-label">Absent</p>
+                <p class="ym-stat-value">2</p>
+                <p class="ym-stat-note">All covered by substitutes</p>
+            </div>
+        </div>
 
-            <p class="ym-note-banner">
-                <strong>Design Preview:</strong> Attendance actions and geolocation validation are planned but not enabled yet.
-            </p>
-        </section>
+        <div class="ym-pane">
+            <div class="ym-pane-head">
+                <div class="ym-pane-title-wrap">
+                    <FontAwesomeIcon :icon="faClipboardCheck" class="ym-pane-icon" />
+                    <h2 class="ym-pane-title">Today Attendance Board</h2>
+                </div>
+            </div>
+            <div class="ym-pane-body">
+                <div class="ym-table-wrap">
+                    <table class="ym-table">
+                        <thead>
+                            <tr>
+                                <th class="ym-th">Teacher</th>
+                                <th class="ym-th">Branch</th>
+                                <th class="ym-th">Shift</th>
+                                <th class="ym-th">Check In</th>
+                                <th class="ym-th">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="entry in attendance" :key="entry.teacher" class="ym-tr">
+                                <td class="ym-td font-medium">{{ entry.teacher }}</td>
+                                <td class="ym-td">{{ entry.branch }}</td>
+                                <td class="ym-td">{{ entry.shift }}</td>
+                                <td class="ym-td">{{ entry.checkIn }}</td>
+                                <td class="ym-td">
+                                    <span
+                                        :class="[
+                                            'ym-status-pill',
+                                            entry.status === 'Late' ? 'ym-status-pill--pending' : '',
+                                            entry.status === 'On Time' ? 'ym-status-pill--started' : '',
+                                        ]"
+                                    >
+                                        {{ entry.status }}
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="ym-info-row">
+                    <FontAwesomeIcon :icon="faCircleInfo" class="ym-info-icon" />
+                    <span>Attendance actions and geolocation validation are planned but not enabled yet.</span>
+                </div>
+            </div>
+        </div>
     </AppLayout>
 </template>
 
 <script setup>
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faCircleInfo, faClipboardCheck } from '@fortawesome/free-solid-svg-icons';
 import AppLayout from '../../Layouts/AppLayout.vue';
 
 const attendance = [
