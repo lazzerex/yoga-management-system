@@ -1,78 +1,98 @@
 <template>
     <AppLayout title="My Schedule">
-        <section class="ym-surface ym-section ym-reveal">
-            <h2 class="ym-title">Personal Weekly Calendar</h2>
-            <p class="ym-subtitle">A week-at-a-glance view of your booked sessions, reminders, and personal practice blocks.</p>
-
-            <div class="ym-week-grid">
-                <article
-                    v-for="(day, index) in weeklySchedule"
-                    :key="day.day"
-                    class="ym-week-day ym-stagger-item"
-                    :style="{ '--ym-stagger': `${index * 60}ms` }"
-                >
-                    <header class="ym-week-day-head">
-                        <p class="ym-week-day-name">{{ day.day }}</p>
-                        <p class="ym-week-day-date">{{ day.date }}</p>
-                    </header>
-
-                    <div v-if="day.sessions.length" class="ym-week-day-slots">
-                        <div v-for="session in day.sessions" :key="session.title" class="ym-week-slot">
-                            <p class="ym-week-slot-time">{{ session.time }}</p>
-                            <p class="ym-week-slot-title">{{ session.title }}</p>
-                            <p class="ym-week-slot-meta">{{ session.meta }}</p>
-                        </div>
-                    </div>
-
-                    <p v-else class="ym-empty-slot">No scheduled sessions</p>
-                </article>
+        <div class="ym-pane">
+            <div class="ym-pane-head">
+                <div class="ym-pane-title-wrap">
+                    <FontAwesomeIcon :icon="faCalendarWeek" class="ym-pane-icon" />
+                    <h2 class="ym-pane-title">Personal Weekly Calendar</h2>
+                </div>
             </div>
-        </section>
-
-        <section class="ym-grid-split mt-4">
-            <article class="ym-surface ym-section ym-reveal ym-reveal-delay-1">
-                <h3 class="ym-subsection-title">Upcoming Highlights</h3>
-                <div class="ym-list">
-                    <div
-                        v-for="(highlight, index) in highlights"
-                        :key="highlight.title"
-                        class="ym-list-item ym-stagger-item"
-                        :style="{ '--ym-stagger': `${index * 70}ms` }"
-                    >
-                        <div>
-                            <strong>{{ highlight.title }}</strong>
-                            <p class="ym-list-meta">{{ highlight.meta }}</p>
+            <div class="ym-pane-body">
+                <div class="ym-timetable-scroll">
+                    <div class="ym-timetable">
+                        <div v-for="day in weeklySchedule" :key="day.day" class="ym-timetable-col">
+                            <div class="ym-timetable-head">
+                                <p class="ym-timetable-day">{{ day.day }}</p>
+                                <p class="ym-timetable-date">{{ day.date }}</p>
+                            </div>
+                            <div class="ym-timetable-body">
+                                <div
+                                    v-for="session in day.sessions"
+                                    :key="session.title"
+                                    class="ym-timetable-slot"
+                                >
+                                    <p class="ym-timetable-time">{{ session.time }}</p>
+                                    <p class="ym-timetable-name">{{ session.title }}</p>
+                                    <p class="ym-timetable-sub">{{ session.meta }}</p>
+                                </div>
+                                <div v-if="!day.sessions.length" class="ym-timetable-empty">—</div>
+                            </div>
                         </div>
-                        <span class="ym-tag">{{ highlight.type }}</span>
                     </div>
                 </div>
-            </article>
+            </div>
+        </div>
 
-            <article class="ym-surface ym-section ym-reveal ym-reveal-delay-2">
-                <h3 class="ym-subsection-title">Weekly Focus</h3>
-                <div class="ym-list">
-                    <div v-for="focus in weeklyFocus" :key="focus.label" class="ym-list-item">
-                        <div>
-                            <strong>{{ focus.label }}</strong>
-                            <p class="ym-list-meta">{{ focus.note }}</p>
-                        </div>
-                        <span class="ym-chip">{{ focus.value }}</span>
+        <div class="ym-page-cols mt-4">
+            <div class="ym-pane">
+                <div class="ym-pane-head">
+                    <div class="ym-pane-title-wrap">
+                        <FontAwesomeIcon :icon="faBellConcierge" class="ym-pane-icon" />
+                        <h2 class="ym-pane-title">Upcoming Highlights</h2>
                     </div>
                 </div>
-                <p class="ym-note-banner mt-3">
-                    Keep at least one recovery day between high-intensity sessions for better consistency.
-                </p>
-            </article>
-        </section>
+                <div class="ym-pane-body">
+                    <div class="ym-row-list">
+                        <div v-for="highlight in highlights" :key="highlight.title" class="ym-row">
+                            <div class="ym-row-main">
+                                <p class="ym-row-title">{{ highlight.title }}</p>
+                                <p class="ym-row-meta">{{ highlight.meta }}</p>
+                            </div>
+                            <div class="ym-row-aside">
+                                <span class="ym-tag">{{ highlight.type }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ym-pane">
+                <div class="ym-pane-head">
+                    <div class="ym-pane-title-wrap">
+                        <FontAwesomeIcon :icon="faChartSimple" class="ym-pane-icon" />
+                        <h2 class="ym-pane-title">Weekly Focus</h2>
+                    </div>
+                </div>
+                <div class="ym-pane-body">
+                    <div class="ym-row-list">
+                        <div v-for="focus in weeklyFocus" :key="focus.label" class="ym-row">
+                            <div class="ym-row-main">
+                                <p class="ym-row-title">{{ focus.label }}</p>
+                                <p class="ym-row-meta">{{ focus.note }}</p>
+                            </div>
+                            <div class="ym-row-aside">
+                                <span class="ym-chip">{{ focus.value }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ym-info-row">
+                        <FontAwesomeIcon :icon="faCircleInfo" class="ym-info-icon" />
+                        <span>Keep at least one recovery day between high-intensity sessions for better consistency.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </AppLayout>
 </template>
 
 <script setup>
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faBellConcierge, faCalendarWeek, faChartSimple, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import AppLayout from '../../Layouts/AppLayout.vue';
 
 const weeklySchedule = [
     {
-        day: 'Monday',
+        day: 'Mon',
         date: 'Apr 27',
         sessions: [
             { time: '06:45', title: 'Sunrise Mobility', meta: 'Westside · Coach Lina' },
@@ -80,21 +100,21 @@ const weeklySchedule = [
         ],
     },
     {
-        day: 'Tuesday',
+        day: 'Tue',
         date: 'Apr 28',
         sessions: [
             { time: '07:00', title: 'Power Core', meta: 'Riverside · Coach Daniel' },
         ],
     },
     {
-        day: 'Wednesday',
+        day: 'Wed',
         date: 'Apr 29',
         sessions: [
             { time: '18:30', title: 'Evening Yin', meta: 'Downtown · Coach Ari' },
         ],
     },
     {
-        day: 'Thursday',
+        day: 'Thu',
         date: 'Apr 30',
         sessions: [
             { time: '07:00', title: 'Power Core', meta: 'Riverside · Coach Daniel' },
@@ -102,21 +122,21 @@ const weeklySchedule = [
         ],
     },
     {
-        day: 'Friday',
+        day: 'Fri',
         date: 'May 01',
         sessions: [
             { time: '17:45', title: 'Mobility Reset', meta: 'Downtown · Coach Lina' },
         ],
     },
     {
-        day: 'Saturday',
+        day: 'Sat',
         date: 'May 02',
         sessions: [
             { time: '09:00', title: 'Weekend Flow', meta: 'Uptown · Coach Mia' },
         ],
     },
     {
-        day: 'Sunday',
+        day: 'Sun',
         date: 'May 03',
         sessions: [],
     },
