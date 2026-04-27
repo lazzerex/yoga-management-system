@@ -1,64 +1,78 @@
 <template>
     <AppLayout title="Yoga Center Management">
-        <section class="ym-surface ym-section">
-            <h2 class="ym-title">Center Overview</h2>
-            <p class="ym-subtitle">
-                Centralized view of branches, facilities, and daily operations across the yoga center network.
-            </p>
-
-            <div class="ym-kpi-grid">
-                <article class="ym-kpi-card">
-                    <p class="ym-kpi-label">Active Students</p>
-                    <p class="ym-kpi-value">486</p>
-                    <p class="ym-kpi-note">+18 this month</p>
-                </article>
-                <article class="ym-kpi-card">
-                    <p class="ym-kpi-label">Classes Today</p>
-                    <p class="ym-kpi-value">34</p>
-                    <p class="ym-kpi-note">5 fully booked</p>
-                </article>
-                <article class="ym-kpi-card">
-                    <p class="ym-kpi-label">Active Teachers</p>
-                    <p class="ym-kpi-value">27</p>
-                    <p class="ym-kpi-note">2 substitutes assigned</p>
-                </article>
+        <div class="ym-stat-strip">
+            <div class="ym-stat">
+                <p class="ym-stat-label">Active Students</p>
+                <p class="ym-stat-value">486</p>
+                <p class="ym-stat-note">+18 this month</p>
             </div>
-        </section>
+            <div class="ym-stat">
+                <p class="ym-stat-label">Classes Today</p>
+                <p class="ym-stat-value">34</p>
+                <p class="ym-stat-note">5 fully booked</p>
+            </div>
+            <div class="ym-stat">
+                <p class="ym-stat-label">Active Teachers</p>
+                <p class="ym-stat-value">27</p>
+                <p class="ym-stat-note">2 substitutes assigned</p>
+            </div>
+        </div>
 
-        <section class="ym-grid-split mt-4">
-            <article class="ym-surface ym-section">
-                <h3 class="ym-subsection-title">Branch Performance</h3>
-                <div class="ym-list">
-                    <div v-for="branch in branches" :key="branch.name" class="ym-list-item">
-                        <div>
-                            <strong>{{ branch.name }}</strong>
-                            <p class="ym-list-meta">{{ branch.address }}</p>
-                        </div>
-                        <span class="ym-chip">{{ branch.classes }} classes</span>
+        <div class="ym-page-cols">
+            <div class="ym-pane">
+                <div class="ym-pane-head">
+                    <div class="ym-pane-title-wrap">
+                        <FontAwesomeIcon :icon="faBuilding" class="ym-pane-icon" />
+                        <h2 class="ym-pane-title">Branch Performance</h2>
                     </div>
                 </div>
-            </article>
-
-            <article class="ym-surface ym-section">
-                <h3 class="ym-subsection-title">Facility Notices</h3>
-                <div class="ym-list">
-                    <div v-for="notice in notices" :key="notice.title" class="ym-list-item">
-                        <div>
-                            <strong>{{ notice.title }}</strong>
-                            <p class="ym-list-meta">{{ notice.meta }}</p>
+                <div class="ym-pane-body">
+                    <div class="ym-row-list">
+                        <div v-for="branch in branches" :key="branch.name" class="ym-row">
+                            <div class="ym-row-main">
+                                <p class="ym-row-title">{{ branch.name }}</p>
+                                <p class="ym-row-meta">{{ branch.address }}</p>
+                            </div>
+                            <div class="ym-row-aside">
+                                <span class="ym-chip">{{ branch.classes }} classes</span>
+                            </div>
                         </div>
-                        <span class="ym-tag">{{ notice.priority }}</span>
                     </div>
                 </div>
-                <p class="ym-note-banner mt-3">
-                    <strong>Design Preview:</strong> This page is currently a visual module only and will be wired to live center data in a later phase.
-                </p>
-            </article>
-        </section>
+            </div>
+
+            <div class="ym-pane">
+                <div class="ym-pane-head">
+                    <div class="ym-pane-title-wrap">
+                        <FontAwesomeIcon :icon="faTriangleExclamation" class="ym-pane-icon" />
+                        <h2 class="ym-pane-title">Facility Notices</h2>
+                    </div>
+                </div>
+                <div class="ym-pane-body">
+                    <div class="ym-row-list">
+                        <div v-for="notice in notices" :key="notice.title" class="ym-row">
+                            <div class="ym-row-main">
+                                <p class="ym-row-title">{{ notice.title }}</p>
+                                <p class="ym-row-meta">{{ notice.meta }}</p>
+                            </div>
+                            <div class="ym-row-aside">
+                                <span class="ym-tag">{{ notice.priority }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ym-info-row">
+                        <FontAwesomeIcon :icon="faCircleInfo" class="ym-info-icon" />
+                        <span>This page will be wired to live center data in a later phase.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </AppLayout>
 </template>
 
 <script setup>
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faBuilding, faCircleInfo, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import AppLayout from '../../Layouts/AppLayout.vue';
 
 const branches = [
@@ -69,8 +83,8 @@ const branches = [
 ];
 
 const notices = [
-    { title: 'Mat storage renovation', meta: 'Downtown Studio / Apr 22', priority: 'High' },
-    { title: 'HVAC maintenance window', meta: 'Westside Branch / Apr 24', priority: 'Medium' },
-    { title: 'Equipment restock', meta: 'All branches / Apr 26', priority: 'Normal' },
+    { title: 'Mat storage renovation', meta: 'Downtown Studio · Apr 22', priority: 'High' },
+    { title: 'HVAC maintenance window', meta: 'Westside Branch · Apr 24', priority: 'Medium' },
+    { title: 'Equipment restock', meta: 'All branches · Apr 26', priority: 'Normal' },
 ];
 </script>
