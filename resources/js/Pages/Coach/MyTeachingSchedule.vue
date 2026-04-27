@@ -1,115 +1,139 @@
 <template>
     <AppLayout title="My Teaching Schedule">
-        <section class="ym-surface ym-section ym-reveal">
-            <h2 class="ym-title">Weekly Teaching Calendar</h2>
-            <p class="ym-subtitle">Your upcoming teaching blocks, branch coverage, and class focus for each day.</p>
-
-            <div class="ym-week-grid ym-week-grid--coach">
-                <article
-                    v-for="(day, index) in teachingSchedule"
-                    :key="day.day"
-                    class="ym-week-day ym-stagger-item"
-                    :style="{ '--ym-stagger': `${index * 60}ms` }"
-                >
-                    <header class="ym-week-day-head">
-                        <p class="ym-week-day-name">{{ day.day }}</p>
-                        <p class="ym-week-day-date">{{ day.date }}</p>
-                    </header>
-
-                    <div v-if="day.classes.length" class="ym-week-day-slots">
-                        <div v-for="item in day.classes" :key="item.title" class="ym-week-slot ym-week-slot--coach">
-                            <p class="ym-week-slot-time">{{ item.time }}</p>
-                            <p class="ym-week-slot-title">{{ item.title }}</p>
-                            <p class="ym-week-slot-meta">{{ item.branch }} · {{ item.students }} students</p>
-                        </div>
-                    </div>
-
-                    <p v-else class="ym-empty-slot">No classes assigned</p>
-                </article>
+        <div class="ym-pane">
+            <div class="ym-pane-head">
+                <div class="ym-pane-title-wrap">
+                    <FontAwesomeIcon :icon="faCalendarWeek" class="ym-pane-icon" />
+                    <h2 class="ym-pane-title">Weekly Teaching Calendar</h2>
+                </div>
             </div>
-        </section>
-
-        <section class="ym-grid-split mt-4">
-            <article class="ym-surface ym-section ym-reveal ym-reveal-delay-1">
-                <h3 class="ym-subsection-title">Today At A Glance</h3>
-                <div class="ym-list">
-                    <div v-for="item in todayHighlights" :key="item.title" class="ym-list-item">
-                        <div>
-                            <strong>{{ item.title }}</strong>
-                            <p class="ym-list-meta">{{ item.meta }}</p>
+            <div class="ym-pane-body">
+                <div class="ym-timetable-scroll">
+                    <div class="ym-timetable">
+                        <div v-for="day in teachingSchedule" :key="day.day" class="ym-timetable-col">
+                            <div class="ym-timetable-head">
+                                <p class="ym-timetable-day">{{ day.day }}</p>
+                                <p class="ym-timetable-date">{{ day.date }}</p>
+                            </div>
+                            <div class="ym-timetable-body">
+                                <div
+                                    v-for="item in day.classes"
+                                    :key="item.title"
+                                    class="ym-timetable-slot ym-timetable-slot--coach"
+                                >
+                                    <p class="ym-timetable-time">{{ item.time }}</p>
+                                    <p class="ym-timetable-name">{{ item.title }}</p>
+                                    <p class="ym-timetable-sub">{{ item.branch }} · {{ item.students }}</p>
+                                </div>
+                                <div v-if="!day.classes.length" class="ym-timetable-empty">—</div>
+                            </div>
                         </div>
-                        <span class="ym-tag">{{ item.badge }}</span>
                     </div>
                 </div>
-            </article>
+            </div>
+        </div>
 
-            <article class="ym-surface ym-section ym-reveal ym-reveal-delay-2">
-                <h3 class="ym-subsection-title">Teaching Load</h3>
-                <div class="ym-list">
-                    <div v-for="load in teachingLoad" :key="load.label" class="ym-list-item">
-                        <div>
-                            <strong>{{ load.label }}</strong>
-                            <p class="ym-list-meta">{{ load.note }}</p>
-                        </div>
-                        <span class="ym-chip">{{ load.value }}</span>
+        <div class="ym-page-cols mt-4">
+            <div class="ym-pane">
+                <div class="ym-pane-head">
+                    <div class="ym-pane-title-wrap">
+                        <FontAwesomeIcon :icon="faClipboardList" class="ym-pane-icon" />
+                        <h2 class="ym-pane-title">Today At A Glance</h2>
                     </div>
                 </div>
-            </article>
-        </section>
+                <div class="ym-pane-body">
+                    <div class="ym-row-list">
+                        <div v-for="item in todayHighlights" :key="item.title" class="ym-row">
+                            <div class="ym-row-main">
+                                <p class="ym-row-title">{{ item.title }}</p>
+                                <p class="ym-row-meta">{{ item.meta }}</p>
+                            </div>
+                            <div class="ym-row-aside">
+                                <span class="ym-tag">{{ item.badge }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ym-pane">
+                <div class="ym-pane-head">
+                    <div class="ym-pane-title-wrap">
+                        <FontAwesomeIcon :icon="faChartSimple" class="ym-pane-icon" />
+                        <h2 class="ym-pane-title">Teaching Load</h2>
+                    </div>
+                </div>
+                <div class="ym-pane-body">
+                    <div class="ym-row-list">
+                        <div v-for="load in teachingLoad" :key="load.label" class="ym-row">
+                            <div class="ym-row-main">
+                                <p class="ym-row-title">{{ load.label }}</p>
+                                <p class="ym-row-meta">{{ load.note }}</p>
+                            </div>
+                            <div class="ym-row-aside">
+                                <span class="ym-chip">{{ load.value }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </AppLayout>
 </template>
 
 <script setup>
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faCalendarWeek, faChartSimple, faClipboardList } from '@fortawesome/free-solid-svg-icons';
 import AppLayout from '../../Layouts/AppLayout.vue';
 
 const teachingSchedule = [
     {
-        day: 'Monday',
+        day: 'Mon',
         date: 'Apr 27',
         classes: [
-            { time: '06:45', title: 'Sunrise Mobility', branch: 'Westside', students: 18 },
-            { time: '18:30', title: 'Evening Yin', branch: 'Downtown', students: 21 },
+            { time: '06:45', title: 'Sunrise Mobility', branch: 'Westside', students: '18 students' },
+            { time: '18:30', title: 'Evening Yin', branch: 'Downtown', students: '21 students' },
         ],
     },
     {
-        day: 'Tuesday',
+        day: 'Tue',
         date: 'Apr 28',
         classes: [
-            { time: '07:00', title: 'Power Core', branch: 'Riverside', students: 24 },
-            { time: '19:30', title: 'Breathwork Lab', branch: 'Online', students: 32 },
+            { time: '07:00', title: 'Power Core', branch: 'Riverside', students: '24 students' },
+            { time: '19:30', title: 'Breathwork Lab', branch: 'Online', students: '32 students' },
         ],
     },
     {
-        day: 'Wednesday',
+        day: 'Wed',
         date: 'Apr 29',
         classes: [
-            { time: '18:30', title: 'Evening Yin', branch: 'Downtown', students: 20 },
+            { time: '18:30', title: 'Evening Yin', branch: 'Downtown', students: '20 students' },
         ],
     },
     {
-        day: 'Thursday',
+        day: 'Thu',
         date: 'Apr 30',
         classes: [
-            { time: '07:00', title: 'Power Core', branch: 'Riverside', students: 23 },
-            { time: '12:30', title: 'Prenatal Flow', branch: 'Westside', students: 14 },
+            { time: '07:00', title: 'Power Core', branch: 'Riverside', students: '23 students' },
+            { time: '12:30', title: 'Prenatal Flow', branch: 'Westside', students: '14 students' },
         ],
     },
     {
-        day: 'Friday',
+        day: 'Fri',
         date: 'May 01',
         classes: [
-            { time: '17:45', title: 'Mobility Reset', branch: 'Downtown', students: 16 },
+            { time: '17:45', title: 'Mobility Reset', branch: 'Downtown', students: '16 students' },
         ],
     },
     {
-        day: 'Saturday',
+        day: 'Sat',
         date: 'May 02',
         classes: [
-            { time: '09:00', title: 'Weekend Flow', branch: 'Uptown', students: 19 },
+            { time: '09:00', title: 'Weekend Flow', branch: 'Uptown', students: '19 students' },
         ],
     },
     {
-        day: 'Sunday',
+        day: 'Sun',
         date: 'May 03',
         classes: [],
     },
