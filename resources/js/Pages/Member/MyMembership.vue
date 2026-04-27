@@ -1,78 +1,95 @@
 <template>
     <AppLayout title="My Membership">
-        <section class="ym-surface ym-section ym-reveal">
-            <div class="ym-membership-banner">
-                <div>
-                    <p class="ym-kpi-label">Membership Card</p>
-                    <h2 class="ym-title">Premium Flow Annual</h2>
-                    <p class="ym-subtitle">Member ID YM-29814 · Started Jan 5, 2026</p>
+        <div class="ym-stat-strip">
+            <div class="ym-stat">
+                <p class="ym-stat-label">Renewal Date</p>
+                <p class="ym-stat-value">Jan 5, 2027</p>
+                <p class="ym-stat-note">Auto-renew enabled</p>
+            </div>
+            <div class="ym-stat">
+                <p class="ym-stat-label">Package Type</p>
+                <p class="ym-stat-value">Premium</p>
+                <p class="ym-stat-note">Unlimited classes + workshops</p>
+            </div>
+            <div class="ym-stat">
+                <p class="ym-stat-label">Guest Passes</p>
+                <p class="ym-stat-value">4</p>
+                <p class="ym-stat-note">Remaining this cycle</p>
+            </div>
+        </div>
+
+        <div class="ym-pane">
+            <div class="ym-pane-head">
+                <div class="ym-pane-title-wrap">
+                    <FontAwesomeIcon :icon="faIdCard" class="ym-pane-icon" />
+                    <h2 class="ym-pane-title">Membership Record</h2>
                 </div>
                 <span class="ym-status-pill ym-status-pill--started">Active</span>
             </div>
-
-            <div class="ym-kpi-grid">
-                <article class="ym-kpi-card">
-                    <p class="ym-kpi-label">Renewal Date</p>
-                    <p class="ym-kpi-value">Jan 5, 2027</p>
-                    <p class="ym-kpi-note">Auto-renew is enabled</p>
-                </article>
-                <article class="ym-kpi-card">
-                    <p class="ym-kpi-label">Package Type</p>
-                    <p class="ym-kpi-value">Premium</p>
-                    <p class="ym-kpi-note">Unlimited classes + workshops</p>
-                </article>
-                <article class="ym-kpi-card">
-                    <p class="ym-kpi-label">Remaining Guest Passes</p>
-                    <p class="ym-kpi-value">4</p>
-                    <p class="ym-kpi-note">Resets on renewal</p>
-                </article>
+            <div class="ym-pane-body">
+                <div class="ym-plan-header">
+                    <p class="ym-plan-overline">Member ID YM-29814</p>
+                    <p class="ym-plan-name">Premium Flow Annual</p>
+                    <p class="ym-plan-sub">Started Jan 5, 2026 · Renews Jan 5, 2027</p>
+                </div>
             </div>
-        </section>
+        </div>
 
-        <section class="ym-grid-split mt-4">
-            <article class="ym-surface ym-section ym-reveal ym-reveal-delay-1">
-                <h3 class="ym-subsection-title">Included Benefits</h3>
-                <div class="ym-list">
-                    <div
-                        v-for="(benefit, index) in benefits"
-                        :key="benefit.title"
-                        class="ym-list-item ym-stagger-item"
-                        :style="{ '--ym-stagger': `${index * 70}ms` }"
-                    >
-                        <div>
-                            <strong>{{ benefit.title }}</strong>
-                            <p class="ym-list-meta">{{ benefit.meta }}</p>
-                        </div>
-                        <span class="ym-chip">{{ benefit.limit }}</span>
+        <div class="ym-page-cols">
+            <div class="ym-pane">
+                <div class="ym-pane-head">
+                    <div class="ym-pane-title-wrap">
+                        <FontAwesomeIcon :icon="faListCheck" class="ym-pane-icon" />
+                        <h2 class="ym-pane-title">Included Benefits</h2>
                     </div>
                 </div>
-            </article>
-
-            <article class="ym-surface ym-section ym-reveal ym-reveal-delay-2">
-                <h3 class="ym-subsection-title">Renewal Timeline</h3>
-                <div class="ym-list">
-                    <div
-                        v-for="(checkpoint, index) in renewalTimeline"
-                        :key="checkpoint.date"
-                        class="ym-list-item ym-stagger-item"
-                        :style="{ '--ym-stagger': `${index * 70}ms` }"
-                    >
-                        <div>
-                            <strong>{{ checkpoint.date }}</strong>
-                            <p class="ym-list-meta">{{ checkpoint.note }}</p>
+                <div class="ym-pane-body">
+                    <div class="ym-row-list">
+                        <div v-for="benefit in benefits" :key="benefit.title" class="ym-row">
+                            <div class="ym-row-main">
+                                <p class="ym-row-title">{{ benefit.title }}</p>
+                                <p class="ym-row-meta">{{ benefit.meta }}</p>
+                            </div>
+                            <div class="ym-row-aside">
+                                <span class="ym-chip">{{ benefit.limit }}</span>
+                            </div>
                         </div>
-                        <span class="ym-tag">{{ checkpoint.status }}</span>
                     </div>
                 </div>
-                <p class="ym-note-banner mt-3">
-                    You are all set for auto-renewal. Update payment details any time before Dec 28, 2026.
-                </p>
-            </article>
-        </section>
+            </div>
+
+            <div class="ym-pane">
+                <div class="ym-pane-head">
+                    <div class="ym-pane-title-wrap">
+                        <FontAwesomeIcon :icon="faCalendarDays" class="ym-pane-icon" />
+                        <h2 class="ym-pane-title">Renewal Timeline</h2>
+                    </div>
+                </div>
+                <div class="ym-pane-body">
+                    <div class="ym-row-list">
+                        <div v-for="checkpoint in renewalTimeline" :key="checkpoint.date" class="ym-row">
+                            <div class="ym-row-main">
+                                <p class="ym-row-title">{{ checkpoint.date }}</p>
+                                <p class="ym-row-meta">{{ checkpoint.note }}</p>
+                            </div>
+                            <div class="ym-row-aside">
+                                <span class="ym-tag">{{ checkpoint.status }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ym-info-row">
+                        <FontAwesomeIcon :icon="faCircleInfo" class="ym-info-icon" />
+                        <span>You are set for auto-renewal. Update payment details any time before Dec 28, 2026.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </AppLayout>
 </template>
 
 <script setup>
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faCalendarDays, faCircleInfo, faIdCard, faListCheck } from '@fortawesome/free-solid-svg-icons';
 import AppLayout from '../../Layouts/AppLayout.vue';
 
 const benefits = [
