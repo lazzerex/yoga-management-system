@@ -126,14 +126,15 @@
                     </div>
                 </div>
 
-                <nav class="ym-top-links">
+                <nav v-if="isOnDashboard" class="ym-top-links">
                     <NavMenuLink
                         v-for="item in topMenuItems"
                         :key="item.viewKey"
-                        :href="item.href"
+                        :href="getTopNavHref(item)"
                         :label="item.label"
                         :active="isTopNavActive(item)"
                         variant="top"
+                        @tab-click="handleTopTabClick(item)"
                     />
 
                     <div ref="dashboardActionsRef" class="ym-header-menu-wrap ym-top-links-more">
@@ -252,25 +253,26 @@ const roleTopMenuDefaults = computed(() => {
     if (isCoach.value) {
         return [
             { label: 'Homepage', viewKey: 'homepage', href: '/cms/dashboard' },
-            { label: 'My Classes', viewKey: 'my-classes', href: '/cms/coach/my-classes' },
-            { label: 'My Students', viewKey: 'my-students', href: '/cms/coach/my-students' },
-            { label: 'Teaching Schedule', viewKey: 'teaching-schedule', href: '/cms/coach/my-teaching-schedule' },
-            { label: 'Attendance', viewKey: 'attendance', href: '/cms/operations/teacher-attendance' },
-            { label: 'Lesson Plans', viewKey: 'lesson-plans', href: '/cms/operations/lesson-planning' },
+            { label: 'Overview', viewKey: 'overview', href: '' },
+            { label: 'My Performance', viewKey: 'my-performance', href: '' },
+            { label: 'Class Stats', viewKey: 'class-stats', href: '' },
+            { label: 'Student Progress', viewKey: 'student-progress', href: '' },
+            { label: 'Earnings', viewKey: 'earnings', href: '' },
         ];
     }
 
     return [
         { label: 'Homepage', viewKey: 'homepage', href: '/cms/dashboard' },
-        { label: 'My Membership', viewKey: 'my-membership', href: '/cms/member/my-membership' },
-        { label: 'My Classes', viewKey: 'my-classes', href: '/cms/member/my-classes' },
-        { label: 'My Schedule', viewKey: 'my-schedule', href: '/cms/member/my-schedule' },
-        { label: 'Centers', viewKey: 'centers', href: '/cms/operations/yoga-center' },
-        { label: 'Tuition', viewKey: 'tuition', href: '/cms/operations/tuition-fees' },
+        { label: 'Overview', viewKey: 'overview', href: '' },
+        { label: 'My Progress', viewKey: 'my-progress', href: '' },
+        { label: 'Attendance', viewKey: 'attendance', href: '' },
+        { label: 'Payments', viewKey: 'payments', href: '' },
+        { label: 'Achievements', viewKey: 'achievements', href: '' },
     ];
 });
 
 const topMenuItems = ref([]);
+const coachMemberView = ref('homepage');
 
 const notifications = [
     { title: '3 new trial requests from website leads', time: '2m ago' },
@@ -321,12 +323,11 @@ const normalizeTopTabs = (incomingTabs) => {
             const fallbackKey = index === 0 ? 'homepage' : fallback.viewKey;
             const rawViewKey = (tab?.viewKey ?? toViewKey(label)) || fallbackKey;
             const viewKey = index === 0 ? 'homepage' : rawViewKey;
+            const href = index === 0
+                ? '/cms/dashboard'
+                : ('href' in (tab ?? {}) ? tab.href : `/cms/dashboard?view=${viewKey}`);
 
-            return {
-                label,
-                viewKey,
-                href: index === 0 ? '/cms/dashboard' : `/cms/dashboard?view=${viewKey}`,
-            };
+            return { label, viewKey, href };
         });
 
     while (normalized.length < 6) {
@@ -336,8 +337,10 @@ const normalizeTopTabs = (incomingTabs) => {
     return normalized;
 };
 
+const isOnDashboard = computed(() => page.url.startsWith('/cms/dashboard'));
+
 const dashboardView = computed(() => {
-    if (!page.url.startsWith('/cms/dashboard')) {
+    if (!isOnDashboard.value) {
         return '';
     }
 
@@ -346,15 +349,35 @@ const dashboardView = computed(() => {
 });
 
 const isTopNavActive = (item) => {
-    if (item.href.startsWith('/cms/dashboard')) {
-        if (!page.url.startsWith('/cms/dashboard')) {
-            return false;
-        }
+    if (!isOnDashboard.value) {
+        return false;
+    }
 
+    if (isAdmin.value) {
         return dashboardView.value === item.viewKey;
     }
 
-    return isActive(item.href);
+    return coachMemberView.value === item.viewKey;
+};
+
+const getTopNavHref = (item) => {
+    if (isAdmin.value) {
+        return item.href;
+    }
+
+    return '';
+};
+
+const handleTopTabClick = (item) => {
+    if (isAdmin.value) {
+        return;
+    }
+
+    coachMemberView.value = item.viewKey;
+
+    window.dispatchEvent(new CustomEvent('ym-dashboard-action', {
+        detail: { action: 'view-change', viewKey: item.viewKey },
+    }));
 };
 
 const sidebarGroups = computed(() => {
@@ -583,6 +606,7 @@ const handleDashboardTabsUpdated = (event) => {
     const incomingTabs = event?.detail?.tabs;
     if (Array.isArray(incomingTabs)) {
         topMenuItems.value = normalizeTopTabs(incomingTabs);
+        coachMemberView.value = 'homepage';
     }
 };
 
@@ -609,6 +633,7 @@ onMounted(() => {
 
 watch(userRole, () => {
     topMenuItems.value = roleTopMenuDefaults.value.map((item) => ({ ...item }));
+    coachMemberView.value = 'homepage';
 }, { immediate: true });
 
 onBeforeUnmount(() => {
