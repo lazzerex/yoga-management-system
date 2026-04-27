@@ -490,6 +490,7 @@
         display: inline-flex;
         align-items: center;
         line-height: 1.2;
+        cursor: pointer;
     }
 
     .ym-top-link:hover {
