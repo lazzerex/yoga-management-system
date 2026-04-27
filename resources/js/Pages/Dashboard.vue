@@ -131,93 +131,149 @@
         </template>
 
         <template v-else>
-            <section class="ym-surface ym-section ym-reveal">
-                <h2 class="ym-title">{{ dashboardConfig.headline }}</h2>
-                <p class="ym-subtitle">{{ dashboardConfig.subtitle }}</p>
+            <div
+                v-if="dashboardNotice"
+                class="ym-info-row"
+                style="border-radius: 0.42rem; margin-bottom: 0.75rem;"
+            >
+                <FontAwesomeIcon :icon="faCircleInfo" class="ym-info-icon" />
+                <span>{{ dashboardNotice }}</span>
+            </div>
 
-                <p v-if="dashboardNotice" class="ym-note-banner mt-3">
-                    {{ dashboardNotice }}
-                </p>
-
-                <div class="ym-kpi-grid">
-                    <article
-                        v-for="(metric, index) in dashboardConfig.metrics"
-                        :key="metric.label"
-                        class="ym-kpi-card ym-stagger-item"
-                        :style="{ '--ym-stagger': `${index * 70}ms` }"
-                    >
-                        <p class="ym-kpi-label">{{ metric.label }}</p>
-                        <p class="ym-kpi-value">{{ metric.value }}</p>
-                        <p class="ym-kpi-note">{{ metric.note }}</p>
-                    </article>
+            <template v-if="activeView === 'homepage'">
+                <div class="ym-stat-strip">
+                    <div v-for="metric in dashboardConfig.metrics" :key="metric.label" class="ym-stat">
+                        <p class="ym-stat-label">{{ metric.label }}</p>
+                        <p class="ym-stat-value">{{ metric.value }}</p>
+                        <p class="ym-stat-note">{{ metric.note }}</p>
+                    </div>
                 </div>
-            </section>
 
-            <section class="ym-grid-split mt-4">
-                <article class="ym-surface ym-section ym-reveal ym-reveal-delay-1">
-                    <h3 class="ym-subsection-title">{{ dashboardConfig.primaryPanel.title }}</h3>
-                    <div class="ym-list">
-                        <div
-                            v-for="(item, index) in dashboardConfig.primaryPanel.rows"
-                            :key="`${item.title}-${item.badge}`"
-                            class="ym-list-item ym-stagger-item"
-                            :style="{ '--ym-stagger': `${index * 70}ms` }"
-                        >
-                            <div>
-                                <strong>{{ item.title }}</strong>
-                                <p class="ym-list-meta">{{ item.meta }}</p>
+                <div class="ym-page-cols">
+                    <div class="ym-pane">
+                        <div class="ym-pane-head">
+                            <div class="ym-pane-title-wrap">
+                                <FontAwesomeIcon :icon="dashboardConfig.primaryPanel.icon" class="ym-pane-icon" />
+                                <h2 class="ym-pane-title">{{ dashboardConfig.primaryPanel.title }}</h2>
                             </div>
-                            <span :class="badgeClass(item.tone)">{{ item.badge }}</span>
+                        </div>
+                        <div class="ym-pane-body">
+                            <div class="ym-row-list">
+                                <div
+                                    v-for="item in dashboardConfig.primaryPanel.rows"
+                                    :key="item.title"
+                                    class="ym-row"
+                                >
+                                    <div class="ym-row-main">
+                                        <p class="ym-row-title">{{ item.title }}</p>
+                                        <p class="ym-row-meta">{{ item.meta }}</p>
+                                    </div>
+                                    <div class="ym-row-aside">
+                                        <span :class="badgeClass(item.tone)">{{ item.badge }}</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </article>
 
-                <article class="ym-surface ym-section ym-reveal ym-reveal-delay-2">
-                    <h3 class="ym-subsection-title">{{ dashboardConfig.secondaryPanel.title }}</h3>
-                    <div class="ym-list">
-                        <div
-                            v-for="(item, index) in dashboardConfig.secondaryPanel.rows"
-                            :key="`${item.title}-${item.badge}`"
-                            class="ym-list-item ym-stagger-item"
-                            :style="{ '--ym-stagger': `${index * 70}ms` }"
-                        >
-                            <div>
-                                <strong>{{ item.title }}</strong>
-                                <p class="ym-list-meta">{{ item.meta }}</p>
+                    <div class="ym-pane">
+                        <div class="ym-pane-head">
+                            <div class="ym-pane-title-wrap">
+                                <FontAwesomeIcon :icon="dashboardConfig.secondaryPanel.icon" class="ym-pane-icon" />
+                                <h2 class="ym-pane-title">{{ dashboardConfig.secondaryPanel.title }}</h2>
                             </div>
-                            <span :class="badgeClass(item.tone)">{{ item.badge }}</span>
+                        </div>
+                        <div class="ym-pane-body">
+                            <div class="ym-row-list">
+                                <div
+                                    v-for="item in dashboardConfig.secondaryPanel.rows"
+                                    :key="item.title"
+                                    class="ym-row"
+                                >
+                                    <div class="ym-row-main">
+                                        <p class="ym-row-title">{{ item.title }}</p>
+                                        <p class="ym-row-meta">{{ item.meta }}</p>
+                                    </div>
+                                    <div class="ym-row-aside">
+                                        <span :class="badgeClass(item.tone)">{{ item.badge }}</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </article>
-            </section>
+                </div>
 
-            <section class="ym-surface ym-section mt-4 ym-reveal ym-reveal-delay-3">
-                <h3 class="ym-subsection-title">{{ dashboardConfig.weeklyPanel.title }}</h3>
-
-                <div class="ym-week-grid">
-                    <article
-                        v-for="(day, index) in dashboardConfig.weeklyPanel.days"
-                        :key="`${day.day}-${day.date}`"
-                        class="ym-week-day ym-stagger-item"
-                        :style="{ '--ym-stagger': `${index * 55}ms` }"
-                    >
-                        <header class="ym-week-day-head">
-                            <p class="ym-week-day-name">{{ day.day }}</p>
-                            <p class="ym-week-day-date">{{ day.date }}</p>
-                        </header>
-
-                        <div v-if="day.entries.length" class="ym-week-day-slots">
-                            <div v-for="entry in day.entries" :key="entry.title" class="ym-week-slot">
-                                <p class="ym-week-slot-time">{{ entry.time }}</p>
-                                <p class="ym-week-slot-title">{{ entry.title }}</p>
-                                <p class="ym-week-slot-meta">{{ entry.meta }}</p>
+                <div class="ym-pane mt-4">
+                    <div class="ym-pane-head">
+                        <div class="ym-pane-title-wrap">
+                            <FontAwesomeIcon :icon="faCalendarWeek" class="ym-pane-icon" />
+                            <h2 class="ym-pane-title">{{ dashboardConfig.weeklyPanel.title }}</h2>
+                        </div>
+                    </div>
+                    <div class="ym-pane-body">
+                        <div class="ym-timetable-scroll">
+                            <div class="ym-timetable">
+                                <div
+                                    v-for="day in dashboardConfig.weeklyPanel.days"
+                                    :key="day.day"
+                                    class="ym-timetable-col"
+                                >
+                                    <div class="ym-timetable-head">
+                                        <p class="ym-timetable-day">{{ day.day.slice(0, 3) }}</p>
+                                        <p class="ym-timetable-date">{{ day.date }}</p>
+                                    </div>
+                                    <div class="ym-timetable-body">
+                                        <div
+                                            v-for="entry in day.entries"
+                                            :key="entry.title"
+                                            :class="['ym-timetable-slot', { 'ym-timetable-slot--coach': isCoach }]"
+                                        >
+                                            <p class="ym-timetable-time">{{ entry.time }}</p>
+                                            <p class="ym-timetable-name">{{ entry.title }}</p>
+                                            <p class="ym-timetable-sub">{{ entry.meta }}</p>
+                                        </div>
+                                        <div v-if="!day.entries.length" class="ym-timetable-empty">
+                                            {{ dashboardConfig.weeklyPanel.emptyMessage }}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-
-                        <p v-else class="ym-empty-slot">{{ dashboardConfig.weeklyPanel.emptyMessage }}</p>
-                    </article>
+                    </div>
                 </div>
-            </section>
+            </template>
+
+            <template v-else-if="currentViewConfig">
+                <div class="ym-pane">
+                    <div class="ym-pane-head">
+                        <div class="ym-pane-title-wrap">
+                            <FontAwesomeIcon :icon="currentViewConfig.icon" class="ym-pane-icon" />
+                            <h2 class="ym-pane-title">{{ currentViewConfig.title }}</h2>
+                        </div>
+                    </div>
+                    <div class="ym-pane-body">
+                        <div class="ym-row-list">
+                            <div
+                                v-for="item in currentViewConfig.rows"
+                                :key="item.title"
+                                class="ym-row"
+                            >
+                                <div class="ym-row-main">
+                                    <p class="ym-row-title">{{ item.title }}</p>
+                                    <p class="ym-row-meta">{{ item.meta }}</p>
+                                </div>
+                                <div class="ym-row-aside">
+                                    <span :class="badgeClass(item.tone)">{{ item.badge }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ym-info-row">
+                            <FontAwesomeIcon :icon="faCircleInfo" class="ym-info-icon" />
+                            <span>{{ currentViewConfig.note }}</span>
+                        </div>
+                    </div>
+                </div>
+            </template>
         </template>
 
         <Modal :show="showEditDashboardModal" title="Edit Dashboard Tabs" @close="showEditDashboardModal = false">
@@ -307,9 +363,23 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
+    faArrowTrendUp,
+    faCalendarDays,
+    faCalendarWeek,
+    faChalkboardUser,
+    faChartSimple,
+    faCircleInfo,
+    faClipboardCheck,
+    faClipboardList,
     faGripVertical,
+    faIdCard,
     faMagnifyingGlass,
+    faMoneyBillWave,
     faPlus,
+    faTableList,
+    faTrophy,
+    faUserCheck,
+    faUsers,
     faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import Draggable from 'vuedraggable';
@@ -339,6 +409,7 @@ const roleDashboard = {
         ],
         primaryPanel: {
             title: "Today's Schedule",
+            icon: faClipboardList,
             rows: [
                 { title: '07:00 Power Core', meta: 'Riverside · 24 students', badge: 'Completed', tone: 'started' },
                 { title: '12:30 Prenatal Flow', meta: 'Westside · 14 students', badge: 'Completed', tone: 'started' },
@@ -348,6 +419,7 @@ const roleDashboard = {
         },
         secondaryPanel: {
             title: 'Student Snapshot',
+            icon: faUsers,
             rows: [
                 { title: 'High Consistency Students', meta: 'Attendance above 90%', badge: '23', tone: 'started' },
                 { title: 'Follow-up Needed', meta: 'Attendance below 60%', badge: '6', tone: 'pending' },
@@ -407,7 +479,7 @@ const roleDashboard = {
                 { day: 'Sunday', date: 'May 03', entries: [] },
             ],
         },
-        tabs: ['Homepage', 'Today', 'My Classes', 'My Students', 'Schedule', 'Notes'],
+        tabs: ['Homepage', 'Overview', 'My Performance', 'Class Stats', 'Student Progress', 'Earnings'],
     },
     member: {
         pageTitle: 'Member Dashboard',
@@ -420,6 +492,7 @@ const roleDashboard = {
         ],
         primaryPanel: {
             title: 'Membership Status',
+            icon: faIdCard,
             rows: [
                 { title: 'Plan Type', meta: 'Premium Flow Annual', badge: 'Premium', tone: 'started' },
                 { title: 'Renewal Date', meta: 'Jan 5, 2027', badge: 'Auto', tone: 'default' },
@@ -429,6 +502,7 @@ const roleDashboard = {
         },
         secondaryPanel: {
             title: 'Upcoming Sessions',
+            icon: faCalendarDays,
             rows: [
                 { title: 'Evening Yin', meta: 'Today 18:30 · Downtown', badge: 'Booked', tone: 'started' },
                 { title: 'Power Core', meta: 'Tue 07:00 · Riverside', badge: 'Booked', tone: 'started' },
@@ -487,13 +561,134 @@ const roleDashboard = {
                 { day: 'Sunday', date: 'May 03', entries: [] },
             ],
         },
-        tabs: ['Homepage', 'Membership', 'My Classes', 'My Schedule', 'Progress', 'Wellness'],
+        tabs: ['Homepage', 'Overview', 'My Progress', 'Attendance', 'Payments', 'Achievements'],
     },
 };
 
 const dashboardConfig = computed(() => roleDashboard[userRole.value] ?? roleDashboard.member);
 const pageTitle = computed(() => roleDashboard[userRole.value]?.pageTitle ?? 'Dashboard');
 const dashboardNotice = ref('');
+const activeView = ref('homepage');
+const isCoach = computed(() => userRole.value === 'coach');
+
+const viewConfigs = {
+    coach: {
+        overview: {
+            title: 'Teaching Overview',
+            icon: faChartSimple,
+            note: 'Full teaching stats and activity log will be wired in a later phase.',
+            rows: [
+                { title: 'Total Sessions This Month', meta: 'Across all branches', badge: '52', tone: 'default' },
+                { title: 'New Students', meta: 'First class this month', badge: '11', tone: 'started' },
+                { title: 'Avg Class Rating', meta: 'Student feedback score', badge: '4.7 / 5', tone: 'started' },
+                { title: 'Pending Session Notes', meta: 'Overdue submissions', badge: '3', tone: 'pending' },
+            ],
+        },
+        'my-performance': {
+            title: 'My Performance',
+            icon: faChalkboardUser,
+            note: 'Performance metrics and feedback scores will be tracked here in a later phase.',
+            rows: [
+                { title: 'Punctuality Rate', meta: 'Classes started on time', badge: '96%', tone: 'started' },
+                { title: 'Student Retention', meta: 'Re-enrolled past students', badge: '78%', tone: 'started' },
+                { title: 'Avg Feedback Score', meta: 'From session reviews', badge: '4.7 / 5', tone: 'started' },
+                { title: 'Missed Sessions', meta: 'Unexcused this month', badge: '0', tone: 'default' },
+            ],
+        },
+        'class-stats': {
+            title: 'Class Statistics',
+            icon: faTableList,
+            note: 'Detailed fill rates, booking trends, and class analytics will appear here.',
+            rows: [
+                { title: 'Power Core', meta: 'Fill rate this week', badge: '24 / 24', tone: 'started' },
+                { title: 'Evening Yin', meta: 'Avg attendance (4 weeks)', badge: '91%', tone: 'started' },
+                { title: 'Prenatal Flow', meta: 'Waitlist count', badge: '0', tone: 'default' },
+                { title: 'Breathwork Lab', meta: 'Online enrollment', badge: '32 / 40', tone: 'default' },
+            ],
+        },
+        'student-progress': {
+            title: 'Student Progress',
+            icon: faUserCheck,
+            note: 'Progress tracking, assessments, and milestone records will be shown here.',
+            rows: [
+                { title: 'Assessments Due', meta: 'By end of this week', badge: '8', tone: 'pending' },
+                { title: 'Completed This Month', meta: 'Progress notes submitted', badge: '14', tone: 'started' },
+                { title: 'Students Advancing Level', meta: 'Tracked progressions', badge: '6', tone: 'started' },
+                { title: 'On Watch List', meta: 'Attendance or form concerns', badge: '3', tone: 'pending' },
+            ],
+        },
+        earnings: {
+            title: 'Earnings',
+            icon: faMoneyBillWave,
+            note: 'Session pay breakdown and earnings reports will be available here.',
+            rows: [
+                { title: 'Earnings This Month', meta: 'Calculated sessions', badge: '$1,840', tone: 'started' },
+                { title: 'Sessions Paid', meta: 'Processed payments', badge: '38', tone: 'started' },
+                { title: 'Pending Payout', meta: 'Awaiting cycle close', badge: '$420', tone: 'pending' },
+                { title: 'Year to Date', meta: 'Total 2026 earnings', badge: '$6,720', tone: 'default' },
+            ],
+        },
+    },
+    member: {
+        overview: {
+            title: 'Activity Overview',
+            icon: faChartSimple,
+            note: 'A full activity summary and trends will be available here in a later phase.',
+            rows: [
+                { title: 'Sessions This Month', meta: 'Attended vs booked', badge: '11 / 14', tone: 'started' },
+                { title: 'Current Streak', meta: 'Consecutive active weeks', badge: '5 weeks', tone: 'started' },
+                { title: 'Next Class', meta: 'Today 18:30 · Evening Yin', badge: 'Today', tone: 'pending' },
+                { title: 'Sessions Left on Goal', meta: 'Weekly target: 3 sessions', badge: '2', tone: 'default' },
+            ],
+        },
+        'my-progress': {
+            title: 'My Progress',
+            icon: faArrowTrendUp,
+            note: 'Detailed progress tracking and personal goals will be tracked here.',
+            rows: [
+                { title: 'Level Progress', meta: 'Beginner → Intermediate', badge: '68%', tone: 'started' },
+                { title: 'Sessions Completed', meta: 'All time', badge: '38', tone: 'started' },
+                { title: 'Monthly Attendance', meta: 'April 2026', badge: '11 / 14', tone: 'started' },
+                { title: 'Assessments Passed', meta: 'Skill checkpoints', badge: '3', tone: 'default' },
+            ],
+        },
+        attendance: {
+            title: 'Attendance Record',
+            icon: faClipboardCheck,
+            note: 'Full attendance history and a calendar view will be shown here.',
+            rows: [
+                { title: 'Power Core', meta: 'Apr 24 · Daniel Park', badge: 'Attended', tone: 'started' },
+                { title: 'Evening Yin', meta: 'Apr 22 · Ari Gomez', badge: 'Attended', tone: 'started' },
+                { title: 'Mobility Reset', meta: 'Apr 19 · Lina Tran', badge: 'Attended', tone: 'started' },
+                { title: 'Weekend Flow', meta: 'Apr 18 · Mia Chen', badge: 'Attended', tone: 'started' },
+            ],
+        },
+        payments: {
+            title: 'Payment Records',
+            icon: faMoneyBillWave,
+            note: 'Invoices, receipts, and full payment history will be accessible here.',
+            rows: [
+                { title: 'Apr 2026 Membership', meta: 'Premium Flow Annual', badge: 'Paid', tone: 'started' },
+                { title: 'Workshop Credit Pack', meta: 'Apr 12, 2026', badge: '$60', tone: 'default' },
+                { title: 'Mar 2026 Membership', meta: 'Auto-charged', badge: 'Paid', tone: 'started' },
+                { title: 'Guest Pass', meta: 'Mar 22, 2026', badge: 'Used', tone: 'default' },
+            ],
+        },
+        achievements: {
+            title: 'Achievements',
+            icon: faTrophy,
+            note: 'Badges, milestones, and rewards will be tracked here in a later phase.',
+            rows: [
+                { title: '5-Week Streak', meta: 'Attended at least once per week', badge: 'Earned', tone: 'started' },
+                { title: 'First Workshop', meta: 'Attended a wellness workshop', badge: 'Earned', tone: 'started' },
+                { title: '30 Sessions', meta: 'Completed 30 total sessions', badge: 'Earned', tone: 'started' },
+                { title: '10-Week Streak', meta: '10 consecutive weeks', badge: 'Locked', tone: 'default' },
+            ],
+        },
+    },
+};
+
+const currentViewConfig = computed(() => viewConfigs[userRole.value]?.[activeView.value] ?? null);
 
 const activities = [
     {
@@ -739,13 +934,14 @@ const toViewKey = (value) => value
 
 const buildDefaultDashboardTabs = (role) => {
     const config = roleDashboard[role] ?? roleDashboard.member;
+    const isAdminRole = role === 'admin';
 
     return config.tabs.map((label, index) => {
         const viewKey = index === 0 ? 'homepage' : (toViewKey(label) || `view-${index + 1}`);
         return {
             label,
             viewKey,
-            href: index === 0 ? '/cms/dashboard' : `/cms/dashboard?view=${viewKey}`,
+            href: index === 0 ? '/cms/dashboard' : (isAdminRole ? `/cms/dashboard?view=${viewKey}` : ''),
         };
     });
 };
@@ -828,7 +1024,7 @@ const normalizeDashboardTabs = (draftTabs) => draftTabs.map((tab, index) => {
     return {
         label,
         viewKey,
-        href: index === 0 ? '/cms/dashboard' : `/cms/dashboard?view=${viewKey}`,
+        href: index === 0 ? '/cms/dashboard' : (isAdmin.value ? `/cms/dashboard?view=${viewKey}` : ''),
     };
 });
 
@@ -878,6 +1074,11 @@ const handleDashboardAction = (event) => {
         return;
     }
 
+    if (action === 'view-change') {
+        activeView.value = event?.detail?.viewKey ?? 'homepage';
+        return;
+    }
+
     if (action === 'add-dashlet') {
         if (isAdmin.value) {
             showAddDashletModal.value = true;
@@ -891,6 +1092,7 @@ const handleDashboardAction = (event) => {
         if (isAdmin.value) {
             dashlets.value = buildDefaultDashlets();
         }
+        activeView.value = 'homepage';
         resetDashboardTabs();
     }
 };
