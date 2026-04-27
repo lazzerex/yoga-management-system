@@ -14,6 +14,9 @@ class LogSuccessfulLogin
 
         LoginLog::create([
             'user_id' => $event->user->id,
+            'status' => LoginLog::STATUS_SUCCESS,
+            'attempted_identifier' => $event->user->username,
+            'failure_reason' => null,
             'ip_address' => $request->ip(),
             'user_agent' => $userAgent,
             'device_type' => $this->detectDevice($userAgent),
