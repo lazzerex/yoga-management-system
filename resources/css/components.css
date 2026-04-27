@@ -371,6 +371,18 @@
         border: 1px solid #f4b8b0;
     }
 
+    .ym-action-badge--login-success {
+        background: #e6f7ef;
+        color: #1a7d4f;
+        border: 1px solid #b2e6cc;
+    }
+
+    .ym-action-badge--login-failed {
+        background: #fdecea;
+        color: #a32a2a;
+        border: 1px solid #f4b8b0;
+    }
+
     .ym-td--meta {
         font-size: 0.78rem;
         color: #6a7f9a;
