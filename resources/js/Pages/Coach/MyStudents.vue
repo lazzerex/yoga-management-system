@@ -1,67 +1,105 @@
 <template>
     <AppLayout title="My Students">
-        <section class="ym-surface ym-section ym-reveal">
-            <h2 class="ym-title">Student Roster</h2>
-            <p class="ym-subtitle">Cross-class visibility of your students, attendance consistency, and support priorities.</p>
-
-            <div class="ym-table-wrap mt-0">
-                <table class="ym-table">
-                    <thead>
-                        <tr>
-                            <th class="ym-th">Student</th>
-                            <th class="ym-th">Primary Class</th>
-                            <th class="ym-th">Attendance</th>
-                            <th class="ym-th">Last Session</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="student in students" :key="student.name" class="ym-tr">
-                            <td class="ym-td font-medium">{{ student.name }}</td>
-                            <td class="ym-td">{{ student.primaryClass }}</td>
-                            <td class="ym-td">{{ student.attendance }}</td>
-                            <td class="ym-td">{{ student.lastSession }}</td>
-                        </tr>
-                    </tbody>
-                </table>
+        <div class="ym-stat-strip">
+            <div class="ym-stat">
+                <p class="ym-stat-label">Total Students</p>
+                <p class="ym-stat-value">182</p>
+                <p class="ym-stat-note">Across all active classes</p>
             </div>
-        </section>
+            <div class="ym-stat">
+                <p class="ym-stat-label">Avg Attendance</p>
+                <p class="ym-stat-value">84%</p>
+                <p class="ym-stat-note">All classes this month</p>
+            </div>
+            <div class="ym-stat">
+                <p class="ym-stat-label">Need Follow-up</p>
+                <p class="ym-stat-value">3</p>
+                <p class="ym-stat-note">Attendance or support flags</p>
+            </div>
+        </div>
 
-        <section class="ym-grid-split mt-4">
-            <article class="ym-surface ym-section ym-reveal ym-reveal-delay-1">
-                <h3 class="ym-subsection-title">Students Needing Follow-up</h3>
-                <div class="ym-list">
-                    <div
-                        v-for="(alert, index) in followUps"
-                        :key="alert.student"
-                        class="ym-list-item ym-stagger-item"
-                        :style="{ '--ym-stagger': `${index * 70}ms` }"
-                    >
-                        <div>
-                            <strong>{{ alert.student }}</strong>
-                            <p class="ym-list-meta">{{ alert.note }}</p>
-                        </div>
-                        <span class="ym-status-pill ym-status-pill--pending">Follow-up</span>
+        <div class="ym-pane">
+            <div class="ym-pane-head">
+                <div class="ym-pane-title-wrap">
+                    <FontAwesomeIcon :icon="faUsers" class="ym-pane-icon" />
+                    <h2 class="ym-pane-title">Student Roster</h2>
+                </div>
+            </div>
+            <div class="ym-pane-body">
+                <div class="ym-table-wrap">
+                    <table class="ym-table">
+                        <thead>
+                            <tr>
+                                <th class="ym-th">Student</th>
+                                <th class="ym-th">Primary Class</th>
+                                <th class="ym-th">Attendance</th>
+                                <th class="ym-th">Last Session</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="student in students" :key="student.name" class="ym-tr">
+                                <td class="ym-td font-medium">{{ student.name }}</td>
+                                <td class="ym-td">{{ student.primaryClass }}</td>
+                                <td class="ym-td">{{ student.attendance }}</td>
+                                <td class="ym-td">{{ student.lastSession }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="ym-page-cols">
+            <div class="ym-pane">
+                <div class="ym-pane-head">
+                    <div class="ym-pane-title-wrap">
+                        <FontAwesomeIcon :icon="faTriangleExclamation" class="ym-pane-icon" />
+                        <h2 class="ym-pane-title">Students Needing Follow-up</h2>
                     </div>
                 </div>
-            </article>
-
-            <article class="ym-surface ym-section ym-reveal ym-reveal-delay-2">
-                <h3 class="ym-subsection-title">Coaching Snapshot</h3>
-                <div class="ym-list">
-                    <div v-for="metric in coachingSnapshot" :key="metric.label" class="ym-list-item">
-                        <div>
-                            <strong>{{ metric.label }}</strong>
-                            <p class="ym-list-meta">{{ metric.note }}</p>
+                <div class="ym-pane-body">
+                    <div class="ym-row-list">
+                        <div v-for="alert in followUps" :key="alert.student" class="ym-row">
+                            <div class="ym-row-main">
+                                <p class="ym-row-title">{{ alert.student }}</p>
+                                <p class="ym-row-meta">{{ alert.note }}</p>
+                            </div>
+                            <div class="ym-row-aside">
+                                <span class="ym-status-pill ym-status-pill--pending">Follow-up</span>
+                            </div>
                         </div>
-                        <span class="ym-chip">{{ metric.value }}</span>
                     </div>
                 </div>
-            </article>
-        </section>
+            </div>
+
+            <div class="ym-pane">
+                <div class="ym-pane-head">
+                    <div class="ym-pane-title-wrap">
+                        <FontAwesomeIcon :icon="faChartSimple" class="ym-pane-icon" />
+                        <h2 class="ym-pane-title">Coaching Snapshot</h2>
+                    </div>
+                </div>
+                <div class="ym-pane-body">
+                    <div class="ym-row-list">
+                        <div v-for="metric in coachingSnapshot" :key="metric.label" class="ym-row">
+                            <div class="ym-row-main">
+                                <p class="ym-row-title">{{ metric.label }}</p>
+                                <p class="ym-row-meta">{{ metric.note }}</p>
+                            </div>
+                            <div class="ym-row-aside">
+                                <span class="ym-chip">{{ metric.value }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </AppLayout>
 </template>
 
 <script setup>
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faChartSimple, faTriangleExclamation, faUsers } from '@fortawesome/free-solid-svg-icons';
 import AppLayout from '../../Layouts/AppLayout.vue';
 
 const students = [
