@@ -21,8 +21,9 @@
                 <table class="ym-table">
                     <thead>
                         <tr>
+                            <th class="ym-th">Status</th>
                             <th class="ym-th">User</th>
-                            <th class="ym-th">Username</th>
+                            <th class="ym-th">Identifier</th>
                             <th class="ym-th">IP Address</th>
                             <th class="ym-th">Device</th>
                             <th class="ym-th">Time</th>
@@ -30,8 +31,13 @@
                     </thead>
                     <tbody>
                         <tr v-for="log in logs.data" :key="log.id" class="ym-tr">
-                            <td class="ym-td font-medium">{{ log.user?.name ?? 'Deleted user' }}</td>
-                            <td class="ym-td text-neutral-500">{{ log.user ? `@${log.user.username}` : '—' }}</td>
+                            <td class="ym-td">
+                                <span :class="['ym-action-badge', statusBadgeClass(log.status)]">
+                                    {{ statusLabel(log) }}
+                                </span>
+                            </td>
+                            <td class="ym-td font-medium">{{ log.user?.name ?? '—' }}</td>
+                            <td class="ym-td text-neutral-500">{{ log.attempted_identifier ? `@${log.attempted_identifier}` : '—' }}</td>
                             <td class="ym-td font-mono text-sm">{{ log.ip_address }}</td>
                             <td class="ym-td">
                                 <span :class="['ym-device-badge', log.device_type === 'mobile' ? 'ym-device-mobile' : 'ym-device-desktop']">
@@ -65,6 +71,21 @@ import AppLayout from '../../../Layouts/AppLayout.vue';
 defineProps({
     logs: Object,
 });
+
+const FAILURE_REASON_LABELS = {
+    wrong_password: 'Wrong password',
+    user_not_found: 'User not found',
+};
+
+const statusBadgeClass = (status) =>
+    status === 'failed' ? 'ym-action-badge--login-failed' : 'ym-action-badge--login-success';
+
+const statusLabel = (log) => {
+    if (log.status === 'failed') {
+        return `Failed · ${FAILURE_REASON_LABELS[log.failure_reason] ?? log.failure_reason ?? 'Unknown'}`;
+    }
+    return 'Success';
+};
 
 const formatDate = (dateStr) => {
     if (!dateStr) return '—';
