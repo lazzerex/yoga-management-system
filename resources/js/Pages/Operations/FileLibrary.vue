@@ -1,63 +1,78 @@
 <template>
     <AppLayout title="File & Image Upload Management">
-        <section class="ym-surface ym-section">
-            <h2 class="ym-title">Media Repository</h2>
-            <p class="ym-subtitle">
-                Design blueprint for class materials, event posters, teacher resources, and student-facing documents.
-            </p>
-
-            <div class="ym-kpi-grid">
-                <article class="ym-kpi-card">
-                    <p class="ym-kpi-label">Storage Used</p>
-                    <p class="ym-kpi-value">38.4 GB</p>
-                    <p class="ym-kpi-note">of 120 GB allocated</p>
-                </article>
-                <article class="ym-kpi-card">
-                    <p class="ym-kpi-label">Files Uploaded</p>
-                    <p class="ym-kpi-value">1,286</p>
-                    <p class="ym-kpi-note">+94 this month</p>
-                </article>
-                <article class="ym-kpi-card">
-                    <p class="ym-kpi-label">Pending Review</p>
-                    <p class="ym-kpi-value">26</p>
-                    <p class="ym-kpi-note">Waiting approval tags</p>
-                </article>
+        <div class="ym-stat-strip">
+            <div class="ym-stat">
+                <p class="ym-stat-label">Storage Used</p>
+                <p class="ym-stat-value">38.4 GB</p>
+                <p class="ym-stat-note">of 120 GB allocated</p>
             </div>
-        </section>
+            <div class="ym-stat">
+                <p class="ym-stat-label">Files Uploaded</p>
+                <p class="ym-stat-value">1,286</p>
+                <p class="ym-stat-note">+94 this month</p>
+            </div>
+            <div class="ym-stat">
+                <p class="ym-stat-label">Pending Review</p>
+                <p class="ym-stat-value">26</p>
+                <p class="ym-stat-note">Waiting approval tags</p>
+            </div>
+        </div>
 
-        <section class="ym-grid-split mt-4">
-            <article class="ym-surface ym-section">
-                <h3 class="ym-subsection-title">Library Folders</h3>
-                <div class="ym-upload-grid">
-                    <article v-for="folder in folders" :key="folder.name" class="ym-upload-card">
-                        <p class="ym-upload-title">{{ folder.name }}</p>
-                        <p class="ym-upload-meta">{{ folder.files }} files / {{ folder.size }}</p>
-                        <p class="ym-upload-meta">Owner: {{ folder.owner }}</p>
-                    </article>
-                </div>
-            </article>
-
-            <article class="ym-surface ym-section">
-                <h3 class="ym-subsection-title">Recent Upload Queue</h3>
-                <div class="ym-list">
-                    <div v-for="item in uploads" :key="item.file" class="ym-list-item">
-                        <div>
-                            <strong>{{ item.file }}</strong>
-                            <p class="ym-list-meta">{{ item.by }} / {{ item.time }}</p>
-                        </div>
-                        <span :class="['ym-status-pill', item.statusClass]">{{ item.status }}</span>
+        <div class="ym-page-cols">
+            <div class="ym-pane">
+                <div class="ym-pane-head">
+                    <div class="ym-pane-title-wrap">
+                        <FontAwesomeIcon :icon="faFolderOpen" class="ym-pane-icon" />
+                        <h2 class="ym-pane-title">Library Folders</h2>
                     </div>
                 </div>
+                <div class="ym-pane-body">
+                    <div class="ym-row-list">
+                        <div v-for="folder in folders" :key="folder.name" class="ym-row">
+                            <div class="ym-row-main">
+                                <p class="ym-row-title">{{ folder.name }}</p>
+                                <p class="ym-row-meta">{{ folder.files }} files · {{ folder.owner }}</p>
+                            </div>
+                            <div class="ym-row-aside">
+                                <span class="ym-chip">{{ folder.size }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                <p class="ym-note-banner mt-3">
-                    <strong>Design Preview:</strong> Drag-and-drop uploads, permissions, and file processing are planned for implementation later.
-                </p>
-            </article>
-        </section>
+            <div class="ym-pane">
+                <div class="ym-pane-head">
+                    <div class="ym-pane-title-wrap">
+                        <FontAwesomeIcon :icon="faCloudArrowUp" class="ym-pane-icon" />
+                        <h2 class="ym-pane-title">Recent Upload Queue</h2>
+                    </div>
+                </div>
+                <div class="ym-pane-body">
+                    <div class="ym-row-list">
+                        <div v-for="item in uploads" :key="item.file" class="ym-row">
+                            <div class="ym-row-main">
+                                <p class="ym-row-title">{{ item.file }}</p>
+                                <p class="ym-row-meta">{{ item.by }} · {{ item.time }}</p>
+                            </div>
+                            <div class="ym-row-aside">
+                                <span :class="['ym-status-pill', item.statusClass]">{{ item.status }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ym-info-row">
+                        <FontAwesomeIcon :icon="faCircleInfo" class="ym-info-icon" />
+                        <span>Drag-and-drop uploads, permissions, and file processing are planned for a later phase.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </AppLayout>
 </template>
 
 <script setup>
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faCircleInfo, faCloudArrowUp, faFolderOpen } from '@fortawesome/free-solid-svg-icons';
 import AppLayout from '../../Layouts/AppLayout.vue';
 
 const folders = [
