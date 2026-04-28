@@ -22,20 +22,20 @@
                     v-model="search"
                     type="search"
                     placeholder="Search IP or identifier..."
-                    class="ym-input ym-log-search"
+                    class="ym-log-search"
                 />
-                <select v-model="status" class="ym-select ym-log-filter-select">
+                <select v-model="status" class="ym-log-filter-select">
                     <option value="">All Status</option>
                     <option value="success">Success</option>
                     <option value="failed">Failed</option>
                 </select>
-                <select v-model="device" class="ym-select ym-log-filter-select">
+                <select v-model="device" class="ym-log-filter-select">
                     <option value="">All Devices</option>
                     <option value="desktop">Desktop</option>
                     <option value="mobile">Mobile</option>
                 </select>
-                <button v-if="hasActiveFilters" @click="resetFilters" class="ym-btn-ghost ym-log-clear-btn">
-                    Clear filters
+                <button v-if="hasActiveFilters" @click="resetFilters" class="ym-log-clear-btn">
+                    Clear
                 </button>
             </div>
 
