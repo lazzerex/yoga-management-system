@@ -1,7 +1,5 @@
 @layer components {
-    .ym-calendar-wrap {
-        overflow: hidden;
-    }
+    .ym-calendar-wrap { overflow-x: auto; }
 
     .ym-calendar-header {
         padding: 0.75rem 0.88rem;
@@ -20,6 +18,7 @@
     .ym-calendar-grid {
         display: grid;
         grid-template-columns: repeat(7, minmax(0, 1fr));
+        min-width: 420px;
     }
 
     .ym-calendar-day-name {
@@ -33,9 +32,7 @@
         border-bottom: 1px solid #e7edf4;
     }
 
-    .ym-calendar-day-name:last-child {
-        border-right: none;
-    }
+    .ym-calendar-day-name:last-child { border-right: none; }
 
     .ym-calendar-cell {
         min-height: 95px;
@@ -48,13 +45,8 @@
         gap: 0.15rem;
     }
 
-    .ym-calendar-cell--muted {
-        background: #f7f9fc;
-    }
-
-    .ym-calendar-cell:nth-child(7n) {
-        border-right: none;
-    }
+    .ym-calendar-cell--muted { background: #f7f9fc; }
+    .ym-calendar-cell:nth-child(7n) { border-right: none; }
 
     .ym-calendar-date {
         font-size: 0.74rem;
@@ -75,15 +67,7 @@
         text-overflow: ellipsis;
     }
 
-    .ym-event-chip--green {
-        background: #5fb37a;
-    }
-
-    .ym-event-chip--blue {
-        background: #5a93cc;
-    }
-
-    .ym-event-chip--rose {
-        background: #d08f95;
-    }
+    .ym-event-chip--green { background: #5fb37a; }
+    .ym-event-chip--blue  { background: #5a93cc; }
+    .ym-event-chip--rose  { background: #d08f95; }
 }
