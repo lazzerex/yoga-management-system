@@ -1,10 +1,5 @@
 @layer components {
-    /* Cases / data widgets */
-
-    .ym-case-list {
-        margin-top: 0.55rem;
-        display: grid;
-    }
+    .ym-case-list { margin-top: 0.55rem; display: grid; }
 
     .ym-case-row {
         display: grid;
@@ -14,9 +9,7 @@
         padding: 0.56rem 0;
     }
 
-    .ym-case-row:last-child {
-        border-bottom: none;
-    }
+    .ym-case-row:last-child { border-bottom: none; }
 
     .ym-case-id {
         color: #5f7188;
@@ -39,8 +32,6 @@
         flex-wrap: wrap;
         gap: 0.4rem;
     }
-
-    /* Pie / lead source chart */
 
     .ym-pie-wrap {
         margin-top: 0.6rem;
@@ -65,10 +56,7 @@
         box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.65);
     }
 
-    .ym-legend {
-        display: grid;
-        gap: 0.42rem;
-    }
+    .ym-legend { display: grid; gap: 0.42rem; }
 
     .ym-legend-item {
         display: flex;
@@ -84,8 +72,6 @@
         border-radius: 9999px;
         flex-shrink: 0;
     }
-
-    /* KPI cards */
 
     .ym-kpi-grid {
         margin-top: 0.95rem;
@@ -123,12 +109,8 @@
         font-size: 0.78rem;
     }
 
-    /* Responsive */
-
     @media (min-width: 768px) {
-        .ym-kpi-grid {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-        }
+        .ym-kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
 
     @media (max-width: 760px) {
