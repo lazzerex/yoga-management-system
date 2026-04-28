@@ -14,6 +14,26 @@
                 <Link href="/cms/admin/audit-logs" class="ym-log-tab ym-log-tab--active">Audit Logs</Link>
             </div>
 
+            <div class="ym-log-filters">
+                <input
+                    v-model="search"
+                    type="search"
+                    placeholder="Search by performer or target..."
+                    class="ym-input ym-log-search"
+                />
+                <select v-model="action" class="ym-select ym-log-filter-select">
+                    <option value="">All Actions</option>
+                    <option value="create_user">Create User</option>
+                    <option value="update_user_info">Update Info</option>
+                    <option value="change_password">Change Password</option>
+                    <option value="assign_role">Assign Role</option>
+                    <option value="remove_role">Remove Role</option>
+                </select>
+                <button v-if="hasActiveFilters" @click="resetFilters" class="ym-btn-ghost ym-log-clear-btn">
+                    Clear filters
+                </button>
+            </div>
+
             <div class="ym-table-wrap">
                 <table class="ym-table">
                     <thead>
@@ -22,10 +42,16 @@
                             <th class="ym-th">Action</th>
                             <th class="ym-th">Target User</th>
                             <th class="ym-th">Details</th>
-                            <th class="ym-th">Time</th>
+                            <th class="ym-th ym-th--sortable" @click="toggleSort">
+                                Time
+                                <span class="ym-sort-icon">{{ sortDir === 'asc' ? '↑' : '↓' }}</span>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
+                        <tr v-if="logs.data.length === 0">
+                            <td colspan="5" class="ym-td ym-td--empty">No audit logs found.</td>
+                        </tr>
                         <tr v-for="log in logs.data" :key="log.id" class="ym-tr">
                             <td class="ym-td">{{ log.causer?.name ?? 'System' }}</td>
                             <td class="ym-td">
@@ -56,12 +82,45 @@
 </template>
 
 <script setup>
-import { Link } from '@inertiajs/vue3';
+import { ref, computed, watch } from 'vue';
+import { Link, router } from '@inertiajs/vue3';
 import AppLayout from '../../../Layouts/AppLayout.vue';
 
-defineProps({
+const props = defineProps({
     logs: Object,
+    filters: Object,
 });
+
+const search = ref(props.filters?.search ?? '');
+const action = ref(props.filters?.action ?? '');
+const sortDir = ref(props.filters?.sort_dir ?? 'desc');
+
+const hasActiveFilters = computed(() => search.value || action.value);
+
+let searchTimeout = null;
+
+function applyFilters() {
+    router.get('/cms/admin/audit-logs', {
+        search: search.value || undefined,
+        action: action.value || undefined,
+        sort_dir: sortDir.value === 'desc' ? undefined : sortDir.value,
+    }, { preserveState: true, preserveScroll: true, replace: true });
+}
+
+watch(search, () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(applyFilters, 350);
+});
+
+watch([action, sortDir], applyFilters);
+
+function toggleSort() {
+    sortDir.value = sortDir.value === 'desc' ? 'asc' : 'desc';
+}
+
+function resetFilters() {
+    router.get('/cms/admin/audit-logs', {}, { preserveState: false, replace: true });
+}
 
 const ACTION_LABELS = {
     create_user: 'Create User',
