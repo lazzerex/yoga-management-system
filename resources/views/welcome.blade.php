@@ -19,7 +19,7 @@
                 <nav class="flex items-center justify-end gap-4">
                     @auth
                         <a
-                            href="{{ url('/dashboard') }}"
+                            href="{{ url('/cms/dashboard') }}"
                             class="inline-block px-5 py-1.5 border border-[#d1d5db] hover:border-[#a3a3a3] text-[#18181b] bg-white hover:bg-[#f3f4f6] rounded text-sm leading-normal shadow-sm transition"
                         >
                             Dashboard
