@@ -57,10 +57,7 @@
         gap: 1.08rem;
     }
 
-    .ym-side-group-wrap {
-        display: grid;
-        gap: 0.3rem;
-    }
+    .ym-side-group-wrap { display: grid; gap: 0.3rem; }
 
     .ym-side-group {
         padding: 0.24rem 0.6rem;
@@ -118,9 +115,7 @@
         flex-shrink: 0;
     }
 
-    .ym-top-link--active .ym-nav-item-icon {
-        color: inherit;
-    }
+    .ym-top-link--active .ym-nav-item-icon { color: inherit; }
 
     .ym-nav-item-text {
         white-space: nowrap;
@@ -201,10 +196,7 @@
         min-width: 0;
     }
 
-    .ym-search-icon {
-        font-size: 0.76rem;
-        color: #9aa5b6;
-    }
+    .ym-search-icon { font-size: 0.76rem; color: #9aa5b6; }
 
     .ym-search {
         width: 280px;
@@ -216,23 +208,15 @@
         color: #334155;
     }
 
-    .ym-search::placeholder {
-        color: #9aa4b3;
-    }
-
-    .ym-search:focus {
-        outline: none;
-    }
+    .ym-search::placeholder { color: #9aa4b3; }
+    .ym-search:focus { outline: none; }
 
     .ym-search-wrap:focus-within {
         outline: 2px solid #91acd4;
         outline-offset: 1px;
     }
 
-    .ym-header-menu-wrap {
-        position: relative;
-        flex-shrink: 0;
-    }
+    .ym-header-menu-wrap { position: relative; flex-shrink: 0; }
 
     .ym-icon-btn {
         width: 2.06rem;
@@ -284,15 +268,8 @@
         padding: 0.7rem;
     }
 
-    .ym-popover-notifications {
-        width: min(328px, calc(100vw - 2rem));
-    }
-
-    .ym-popover-menu {
-        width: min(288px, calc(100vw - 2rem));
-        display: grid;
-        gap: 0.26rem;
-    }
+    .ym-popover-notifications { width: min(328px, calc(100vw - 2rem)); }
+    .ym-popover-menu { width: min(288px, calc(100vw - 2rem)); display: grid; gap: 0.26rem; }
 
     .ym-popover-head {
         display: flex;
@@ -302,12 +279,7 @@
         margin-bottom: 0.5rem;
     }
 
-    .ym-popover-title {
-        margin: 0;
-        font-size: 0.83rem;
-        font-weight: 700;
-        color: #384e68;
-    }
+    .ym-popover-title { margin: 0; font-size: 0.83rem; font-weight: 700; color: #384e68; }
 
     .ym-popover-link {
         border: none;
@@ -319,9 +291,7 @@
         padding: 0;
     }
 
-    .ym-popover-link:hover {
-        color: #2f5f9d;
-    }
+    .ym-popover-link:hover { color: #2f5f9d; }
 
     .ym-notification-list {
         margin: 0;
@@ -408,15 +378,8 @@
         text-align: left;
     }
 
-    .ym-menu-item span {
-        font-size: 0.79rem;
-        font-weight: 600;
-    }
-
-    .ym-menu-item small {
-        font-size: 0.69rem;
-        color: #8898ad;
-    }
+    .ym-menu-item span  { font-size: 0.79rem; font-weight: 600; }
+    .ym-menu-item small { font-size: 0.69rem; color: #8898ad; }
 
     .ym-menu-item-label {
         display: inline-flex;
@@ -430,10 +393,7 @@
         flex-shrink: 0;
     }
 
-    .ym-menu-item:hover {
-        border-color: #d8e2ef;
-        background: #f6f9fd;
-    }
+    .ym-menu-item:hover { border-color: #d8e2ef; background: #f6f9fd; }
 
     .ym-menu-item--danger {
         color: #a44b56;
@@ -443,9 +403,7 @@
         border-radius: 0;
     }
 
-    .ym-menu-item--danger small {
-        color: #b7838b;
-    }
+    .ym-menu-item--danger small { color: #b7838b; }
 
     .ym-top-links {
         display: flex;
@@ -460,9 +418,7 @@
         z-index: 26;
     }
 
-    .ym-top-links-more {
-        margin-left: 0.15rem;
-    }
+    .ym-top-links-more { margin-left: 0.15rem; }
 
     .ym-top-links-more-btn {
         width: 1.86rem;
@@ -493,9 +449,7 @@
         cursor: pointer;
     }
 
-    .ym-top-link:hover {
-        color: #364b67;
-    }
+    .ym-top-link:hover { color: #364b67; }
 
     .ym-top-link--active {
         color: #2c4463;
@@ -503,33 +457,17 @@
         font-weight: 700;
     }
 
-    .ym-top-link .ym-nav-item-content {
-        gap: 0;
-    }
-
-    .ym-btn-icon {
-        font-size: 0.76rem;
-        margin-right: 0.36rem;
-    }
-
-    .ym-main {
-        padding: 1rem 1.35rem 1.5rem;
-    }
-
-    .ym-main-alert {
-        margin-bottom: 0.85rem;
-    }
+    .ym-top-link .ym-nav-item-content { gap: 0; }
+    .ym-btn-icon { font-size: 0.76rem; margin-right: 0.36rem; }
+    .ym-main { padding: 1rem 1.35rem 1.5rem; }
+    .ym-main-alert { margin-bottom: 0.85rem; }
 
     @media (min-width: 768px) {
-        .ym-main {
-            padding: 1.15rem 1.5rem 1.7rem;
-        }
+        .ym-main { padding: 1.15rem 1.5rem 1.7rem; }
     }
 
     @media (max-width: 1100px) {
-        .ym-shell {
-            grid-template-columns: 1fr;
-        }
+        .ym-shell { grid-template-columns: 1fr; }
 
         .ym-sidebar {
             position: static;
@@ -551,9 +489,7 @@
             background: #fbfcfe;
         }
 
-        .ym-topbar {
-            position: static;
-        }
+        .ym-topbar { position: static; }
     }
 
     @media (max-width: 760px) {
@@ -563,19 +499,9 @@
             padding: 0.85rem 0.95rem 0.6rem;
         }
 
-        .ym-topbar-actions {
-            width: 100%;
-            flex-wrap: wrap;
-        }
-
-        .ym-search-wrap {
-            width: 100%;
-            flex: 1 1 100%;
-        }
-
-        .ym-search {
-            width: 100%;
-        }
+        .ym-topbar-actions { width: 100%; flex-wrap: wrap; }
+        .ym-search-wrap { width: 100%; flex: 1 1 100%; }
+        .ym-search { width: 100%; }
 
         .ym-top-links {
             gap: 1rem;
@@ -584,12 +510,7 @@
             flex-wrap: wrap;
         }
 
-        .ym-main {
-            padding: 0.88rem;
-        }
-
-        .ym-side-nav {
-            grid-template-columns: 1fr;
-        }
+        .ym-main { padding: 0.88rem; }
+        .ym-side-nav { grid-template-columns: 1fr; }
     }
 }
