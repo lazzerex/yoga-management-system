@@ -11,13 +11,8 @@
         overflow: hidden;
     }
 
-    .ym-record-section {
-        padding: 0;
-    }
-
-    .ym-record-section--divided {
-        border-top: 1px solid var(--ym-panel-border);
-    }
+    .ym-record-section { padding: 0; }
+    .ym-record-section--divided { border-top: 1px solid var(--ym-panel-border); }
 
     .ym-record-group-title {
         padding: 0.72rem 1.1rem 0.48rem;
@@ -35,21 +30,11 @@
         border-bottom: 1px solid #edf1f6;
     }
 
-    .ym-record-row--single {
-        grid-template-columns: minmax(0, 1fr);
-    }
+    .ym-record-row--single { grid-template-columns: minmax(0, 1fr); }
+    .ym-record-row--last { border-bottom: none; }
 
-    .ym-record-row--last {
-        border-bottom: none;
-    }
-
-    .ym-rf {
-        padding: 0.72rem 1.1rem;
-    }
-
-    .ym-rf + .ym-rf {
-        border-left: 1px solid #edf1f6;
-    }
+    .ym-rf { padding: 0.72rem 1.1rem; }
+    .ym-rf + .ym-rf { border-left: 1px solid #edf1f6; }
 
     .ym-rf-label {
         margin: 0;
@@ -75,9 +60,7 @@
         line-height: 1.4;
     }
 
-    .ym-record-log-list {
-        margin: 0;
-    }
+    .ym-record-log-list { margin: 0; }
 
     .ym-record-log-head {
         display: grid;
@@ -102,14 +85,8 @@
         border-bottom: 1px solid #edf1f6;
     }
 
-    .ym-record-log-row:last-child {
-        border-bottom: none;
-    }
-
-    .ym-record-log-time {
-        font-size: 0.84rem;
-        color: #4a5f78;
-    }
+    .ym-record-log-row:last-child { border-bottom: none; }
+    .ym-record-log-time { font-size: 0.84rem; color: #4a5f78; }
 
     .ym-record-log-ip {
         font-size: 0.8rem;
@@ -164,18 +141,14 @@
         line-height: 1.3;
     }
 
-    .ym-record-meta-list {
-        padding: 0.2rem 0;
-    }
+    .ym-record-meta-list { padding: 0.2rem 0; }
 
     .ym-record-meta-item {
         padding: 0.6rem 1rem;
         border-bottom: 1px solid #edf1f6;
     }
 
-    .ym-record-meta-item:last-child {
-        border-bottom: none;
-    }
+    .ym-record-meta-item:last-child { border-bottom: none; }
 
     .ym-record-meta-val {
         margin: 0.2rem 0 0;
@@ -186,14 +159,8 @@
     }
 
     @media (max-width: 860px) {
-        .ym-record-layout {
-            flex-direction: column;
-        }
-
-        .ym-record-aside {
-            width: 100%;
-        }
-
+        .ym-record-layout { flex-direction: column; }
+        .ym-record-aside { width: 100%; }
         .ym-record-avatar-zone {
             flex-direction: row;
             text-align: left;
@@ -203,23 +170,11 @@
     }
 
     @media (max-width: 580px) {
-        .ym-record-row {
-            grid-template-columns: minmax(0, 1fr);
-        }
-
-        .ym-rf + .ym-rf {
-            border-left: none;
-            border-top: 1px solid #edf1f6;
-        }
-
+        .ym-record-row { grid-template-columns: minmax(0, 1fr); }
+        .ym-rf + .ym-rf { border-left: none; border-top: 1px solid #edf1f6; }
         .ym-record-log-head,
-        .ym-record-log-row {
-            grid-template-columns: 5rem 1fr;
-        }
-
+        .ym-record-log-row { grid-template-columns: 5rem 1fr; }
         .ym-record-log-head > span:last-child,
-        .ym-record-log-row > span:last-child {
-            display: none;
-        }
+        .ym-record-log-row > span:last-child { display: none; }
     }
 }
