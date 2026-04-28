@@ -33,7 +33,7 @@ class LoginLogController extends Controller
         $sortDir = $request->input('sort_dir', 'desc') === 'asc' ? 'asc' : 'desc';
         $query->orderBy('logged_in_at', $sortDir);
 
-        $logs = $query->paginate(50)->withQueryString();
+        $logs = $query->paginate(15)->withQueryString();
 
         return inertia('Admin/LoginLogs/Index', [
             'logs' => $logs,
