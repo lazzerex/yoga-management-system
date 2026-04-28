@@ -1,43 +1,18 @@
 @layer components {
     @keyframes ymRevealUp {
-        from {
-            opacity: 0;
-            transform: translateY(8px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(8px); }
+        to   { opacity: 1; transform: translateY(0); }
     }
 
     @keyframes ymStaggerIn {
-        from {
-            opacity: 0;
-            transform: translateY(7px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(7px); }
+        to   { opacity: 1; transform: translateY(0); }
     }
 
-    .ym-reveal {
-        animation: ymRevealUp 320ms ease-out both;
-    }
-
-    .ym-reveal-delay-1 {
-        animation-delay: 80ms;
-    }
-
-    .ym-reveal-delay-2 {
-        animation-delay: 140ms;
-    }
-
-    .ym-reveal-delay-3 {
-        animation-delay: 200ms;
-    }
+    .ym-reveal { animation: ymRevealUp 320ms ease-out both; }
+    .ym-reveal-delay-1 { animation-delay: 80ms; }
+    .ym-reveal-delay-2 { animation-delay: 140ms; }
+    .ym-reveal-delay-3 { animation-delay: 200ms; }
 
     .ym-stagger-item {
         opacity: 0;
