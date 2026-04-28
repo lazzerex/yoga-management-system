@@ -4,18 +4,39 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
+use Illuminate\Http\Request;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AuditLogController extends Controller
 {
-    public function index(): Response
-    {
-        $logs = AuditLog::with('causer:id,name,username')
-            ->latest('created_at')
-            ->paginate(50);
+    private const VALID_ACTIONS = ['create_user', 'update_user_info', 'change_password', 'assign_role', 'remove_role'];
 
-        return inertia('Admin/AuditLogs/Index', ['logs' => $logs]);
+    public function index(Request $request): Response
+    {
+        $query = AuditLog::with('causer:id,name,username');
+
+        if ($request->filled('action') && in_array($request->action, self::VALID_ACTIONS)) {
+            $query->where('action', $request->action);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('subject_name', 'like', "%{$search}%")
+                  ->orWhereHas('causer', fn ($q2) => $q2->where('name', 'like', "%{$search}%"));
+            });
+        }
+
+        $sortDir = $request->input('sort_dir', 'desc') === 'asc' ? 'asc' : 'desc';
+        $query->orderBy('created_at', $sortDir);
+
+        $logs = $query->paginate(50)->withQueryString();
+
+        return inertia('Admin/AuditLogs/Index', [
+            'logs' => $logs,
+            'filters' => $request->only(['action', 'search', 'sort_dir']),
+        ]);
     }
 
     public function export(): StreamedResponse
