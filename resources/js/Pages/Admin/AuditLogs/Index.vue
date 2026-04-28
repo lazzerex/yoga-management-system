@@ -19,9 +19,9 @@
                     v-model="search"
                     type="search"
                     placeholder="Search by performer or target..."
-                    class="ym-input ym-log-search"
+                    class="ym-log-search"
                 />
-                <select v-model="action" class="ym-select ym-log-filter-select">
+                <select v-model="action" class="ym-log-filter-select">
                     <option value="">All Actions</option>
                     <option value="create_user">Create User</option>
                     <option value="update_user_info">Update Info</option>
@@ -29,8 +29,8 @@
                     <option value="assign_role">Assign Role</option>
                     <option value="remove_role">Remove Role</option>
                 </select>
-                <button v-if="hasActiveFilters" @click="resetFilters" class="ym-btn-ghost ym-log-clear-btn">
-                    Clear filters
+                <button v-if="hasActiveFilters" @click="resetFilters" class="ym-log-clear-btn">
+                    Clear
                 </button>
             </div>
 
