@@ -4,17 +4,9 @@
         transition: transform 220ms ease, box-shadow 220ms ease, opacity 220ms ease;
     }
 
-    .ym-dashlet-card:hover {
-        box-shadow: 0 8px 24px rgba(26, 37, 54, 0.08);
-    }
-
-    .ym-dashlet-card--reordering {
-        will-change: transform;
-    }
-
-    .ym-dashlet-card--dragging {
-        opacity: 0.35;
-    }
+    .ym-dashlet-card:hover { box-shadow: 0 8px 24px rgba(26, 37, 54, 0.08); }
+    .ym-dashlet-card--reordering { will-change: transform; }
+    .ym-dashlet-card--dragging { opacity: 0.35; }
 
     .ym-dashlet-card--placeholder {
         border: 2px dashed #c2cedd;
@@ -50,9 +42,7 @@
         cursor: grab;
     }
 
-    .ym-dashlet-card--sorting .ym-drag-handle {
-        cursor: grabbing;
-    }
+    .ym-dashlet-card--sorting .ym-drag-handle { cursor: grabbing; }
 
     .ym-dashlet-remove {
         width: 1.72rem;
@@ -67,15 +57,8 @@
         cursor: pointer;
     }
 
-    .ym-dashlet-remove:hover {
-        background: #f6f9fd;
-        color: #3f4f65;
-    }
-
-    .ym-dashlet-remove:disabled {
-        opacity: 0.45;
-        cursor: not-allowed;
-    }
+    .ym-dashlet-remove:hover   { background: #f6f9fd; color: #3f4f65; }
+    .ym-dashlet-remove:disabled { opacity: 0.45; cursor: not-allowed; }
 
     .ym-dashlet-card--sorting {
         box-shadow: 0 22px 52px rgba(20, 33, 50, 0.26);
@@ -84,13 +67,9 @@
         cursor: grabbing;
     }
 
-    .ym-dashlet-card--locked .ym-drag-handle {
-        opacity: 0.42;
-    }
+    .ym-dashlet-card--locked .ym-drag-handle { opacity: 0.42; }
 
     @media (prefers-reduced-motion: reduce) {
-        .ym-dashlet-card {
-            transition-duration: 1ms;
-        }
+        .ym-dashlet-card { transition-duration: 1ms; }
     }
 }
