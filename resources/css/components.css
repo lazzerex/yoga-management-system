@@ -335,25 +335,68 @@
         align-items: center;
         gap: 0.5rem;
         flex-wrap: wrap;
-        margin-bottom: 1rem;
+        margin-bottom: 1.1rem;
     }
 
     .ym-log-search {
-        width: auto;
-        flex: 1 1 180px;
-        min-width: 0;
+        flex: 1 1 0;
+        min-width: 160px;
+        max-width: 260px;
+        padding: 0.38rem 0.7rem;
+        border: 1px solid #d8e1eb;
+        border-radius: 0.42rem;
+        font-size: 0.82rem;
+        color: #273447;
+        background: #ffffff;
+        outline: none;
+        transition: border-color 150ms, box-shadow 150ms;
+    }
+
+    .ym-log-search:focus {
+        border-color: #8fadd8;
+        box-shadow: 0 0 0 2px rgba(79, 122, 180, 0.15);
     }
 
     .ym-log-filter-select {
-        width: auto;
-        flex: 0 0 auto;
+        flex-shrink: 0;
+        padding: 0.38rem 2rem 0.38rem 0.65rem;
+        border: 1px solid #d8e1eb;
+        border-radius: 0.42rem;
+        font-size: 0.82rem;
+        color: #273447;
+        background-color: #ffffff;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238fa3bc' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.55rem center;
+        background-size: 0.75rem;
+        -webkit-appearance: none;
+        appearance: none;
+        cursor: pointer;
+        outline: none;
+        transition: border-color 150ms, box-shadow 150ms;
+    }
+
+    .ym-log-filter-select:focus {
+        border-color: #8fadd8;
+        box-shadow: 0 0 0 2px rgba(79, 122, 180, 0.15);
     }
 
     .ym-log-clear-btn {
         flex-shrink: 0;
+        padding: 0.36rem 0.75rem;
+        border: 1px solid #d8e1eb;
+        border-radius: 0.42rem;
         font-size: 0.78rem;
-        padding: 0.3rem 0.7rem;
-        color: #6a7f9a;
+        font-weight: 500;
+        color: #8fa3bc;
+        background: #ffffff;
+        cursor: pointer;
+        transition: color 150ms, border-color 150ms;
+    }
+
+    .ym-log-clear-btn:hover {
+        color: #3d5a7e;
+        border-color: #b0c4d8;
     }
 
     .ym-th--sortable {
