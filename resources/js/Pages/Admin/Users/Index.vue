@@ -9,7 +9,7 @@
                     </h2>
                     <p class="ym-subtitle">Manage accounts and role assignments.</p>
                 </div>
-                <Link type="button" class="ym-btn-sm" href="/cms/admin/users/create">
+                <Link type="button" class="ym-btn-sm" :href="endpoints.create">
                     Create User
                 </Link>
             </div>
@@ -39,7 +39,7 @@
                             <td class="ym-td text-neutral-500">{{ user.created_at }}</td>
                             <td class="ym-td">
                                 <div class="ym-inline-actions">
-                                    <Link type="button" class="ym-btn-outline" :href="`/cms/admin/users/${user.id}/edit`">Edit</Link>
+                                    <Link type="button" class="ym-btn-outline" :href="route('admin.users.edit', user.id)">Edit</Link>
                                     <button
                                         type="button"
                                         class="ym-btn-danger"
@@ -72,10 +72,12 @@
 
 <script setup>
 import { Link, router, usePage } from '@inertiajs/vue3';
+import { route } from 'ziggy-js';
 import AppLayout from '../../../Layouts/AppLayout.vue';
 
 const props = defineProps({
     users: Object,
+    endpoints: Object,
 });
 
 const page = usePage();
@@ -85,6 +87,6 @@ const isCurrentUser = (id) => page.props.auth?.user?.id === id;
 const deleteUser = (user) => {
     if (isCurrentUser(user.id)) return;
     if (!window.confirm(`Delete ${user.name}? This cannot be undone.`)) return;
-    router.delete(`/cms/admin/users/${user.id}`, { preserveScroll: true });
+    router.delete(route('admin.users.destroy', user.id), { preserveScroll: true });
 };
 </script>
