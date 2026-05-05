@@ -36,6 +36,11 @@ class AuditLogController extends Controller
         return inertia('Admin/AuditLogs/Index', [
             'logs' => $logs,
             'filters' => $request->only(['action', 'search', 'sort_dir']),
+            'endpoints' => [
+                'self' => route('admin.audit-logs.index'),
+                'export' => route('admin.audit-logs.export'),
+                'login_logs' => route('admin.login-logs.index'),
+            ],
         ]);
     }
 
