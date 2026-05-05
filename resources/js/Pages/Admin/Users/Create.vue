@@ -41,7 +41,7 @@
                     <button type="submit" class="ym-btn-sm" :disabled="form.processing">
                         {{ form.processing ? 'Creating...' : 'Create User' }}
                     </button>
-                    <Link href="/cms/admin/users" class="ym-btn-ghost">Cancel</Link>
+                    <Link :href="endpoints.index" class="ym-btn-ghost">Cancel</Link>
                 </div>
             </form>
         </section>
@@ -51,6 +51,10 @@
 <script setup>
 import { Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '../../../Layouts/AppLayout.vue';
+
+const props = defineProps({
+    endpoints: Object,
+});
 
 const form = useForm({
     name: '',
@@ -62,7 +66,7 @@ const form = useForm({
 });
 
 const createUser = () => {
-    form.post('/cms/admin/users', {
+    form.post(props.endpoints.store, {
         onSuccess: () => form.reset(),
     });
 };
