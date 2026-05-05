@@ -41,7 +41,7 @@
                     <button type="submit" class="ym-btn-sm" :disabled="form.processing">
                         {{ form.processing ? 'Saving...' : 'Save Changes' }}
                     </button>
-                    <Link href="/cms/admin/users" class="ym-btn-ghost">Cancel</Link>
+                    <Link :href="endpoints.index" class="ym-btn-ghost">Cancel</Link>
                 </div>
             </form>
         </section>
@@ -49,23 +49,25 @@
 </template>
 
 <script setup>
-import { Link, useForm, usePage } from '@inertiajs/vue3';
+import { Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '../../../Layouts/AppLayout.vue';
 
-const page = usePage();
-const user = page.props.user;
+const props = defineProps({
+    user: Object,
+    endpoints: Object,
+});
 
 const form = useForm({
-    name: user.name,
-    username: user.username,
-    email: user.email,
-    role: user.role,
+    name: props.user.name,
+    username: props.user.username,
+    email: props.user.email,
+    role: props.user.role,
     password: '',
     password_confirmation: '',
 });
 
 const saveEdit = () => {
-    form.patch(`/cms/admin/users/${user.id}`, {
+    form.patch(props.endpoints.update, {
         onSuccess: () => form.reset('password', 'password_confirmation'),
     });
 };
