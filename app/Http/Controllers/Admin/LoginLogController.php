@@ -38,6 +38,12 @@ class LoginLogController extends Controller
         return inertia('Admin/LoginLogs/Index', [
             'logs' => $logs,
             'filters' => $request->only(['status', 'device', 'search', 'sort_dir']),
+            'endpoints' => [
+                'self' => route('admin.login-logs.index'),
+                'export' => route('admin.login-logs.export'),
+                'users' => route('admin.users.index'),
+                'audit_logs' => route('admin.audit-logs.index'),
+            ],
         ]);
     }
 
