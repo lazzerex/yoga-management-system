@@ -7,14 +7,14 @@
                     <p class="ym-subtitle">Recent sign-in events across all accounts.</p>
                 </div>
                 <div class="ym-log-head-actions">
-                    <a href="/cms/admin/login-logs/export" class="ym-btn-outline">Export CSV</a>
-                    <Link href="/cms/admin/users" class="ym-btn-ghost">Users</Link>
+                    <a :href="endpoints.export" class="ym-btn-outline">Export CSV</a>
+                    <Link :href="endpoints.users" class="ym-btn-ghost">Users</Link>
                 </div>
             </div>
 
             <div class="ym-log-tabs">
-                <Link href="/cms/admin/login-logs" class="ym-log-tab ym-log-tab--active">Login Logs</Link>
-                <Link href="/cms/admin/audit-logs" class="ym-log-tab">Audit Logs</Link>
+                <Link :href="endpoints.self" class="ym-log-tab ym-log-tab--active">Login Logs</Link>
+                <Link :href="endpoints.audit_logs" class="ym-log-tab">Audit Logs</Link>
             </div>
 
             <div class="ym-log-filters">
@@ -100,6 +100,7 @@ import AppLayout from '../../../Layouts/AppLayout.vue';
 const props = defineProps({
     logs: Object,
     filters: Object,
+    endpoints: Object,
 });
 
 const search = ref(props.filters?.search ?? '');
@@ -112,7 +113,7 @@ const hasActiveFilters = computed(() => search.value || status.value || device.v
 let searchTimeout = null;
 
 function applyFilters() {
-    router.get('/cms/admin/login-logs', {
+    router.get(props.endpoints.self, {
         search: search.value || undefined,
         status: status.value || undefined,
         device: device.value || undefined,
@@ -132,7 +133,7 @@ function toggleSort() {
 }
 
 function resetFilters() {
-    router.get('/cms/admin/login-logs', {}, { preserveState: false, replace: true });
+    router.get(props.endpoints.self, {}, { preserveState: false, replace: true });
 }
 
 const FAILURE_REASON_LABELS = {

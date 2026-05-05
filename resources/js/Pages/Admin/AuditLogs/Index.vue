@@ -6,12 +6,12 @@
                     <h2 class="ym-title">Audit Logs</h2>
                     <p class="ym-subtitle">User management actions performed by admins.</p>
                 </div>
-                <a href="/cms/admin/audit-logs/export" class="ym-btn-outline">Export CSV</a>
+                <a :href="endpoints.export" class="ym-btn-outline">Export CSV</a>
             </div>
 
             <div class="ym-log-tabs">
-                <Link href="/cms/admin/login-logs" class="ym-log-tab">Login Logs</Link>
-                <Link href="/cms/admin/audit-logs" class="ym-log-tab ym-log-tab--active">Audit Logs</Link>
+                <Link :href="endpoints.login_logs" class="ym-log-tab">Login Logs</Link>
+                <Link :href="endpoints.self" class="ym-log-tab ym-log-tab--active">Audit Logs</Link>
             </div>
 
             <div class="ym-log-filters">
@@ -89,6 +89,7 @@ import AppLayout from '../../../Layouts/AppLayout.vue';
 const props = defineProps({
     logs: Object,
     filters: Object,
+    endpoints: Object,
 });
 
 const search = ref(props.filters?.search ?? '');
@@ -100,7 +101,7 @@ const hasActiveFilters = computed(() => search.value || action.value);
 let searchTimeout = null;
 
 function applyFilters() {
-    router.get('/cms/admin/audit-logs', {
+    router.get(props.endpoints.self, {
         search: search.value || undefined,
         action: action.value || undefined,
         sort_dir: sortDir.value === 'desc' ? undefined : sortDir.value,
@@ -119,7 +120,7 @@ function toggleSort() {
 }
 
 function resetFilters() {
-    router.get('/cms/admin/audit-logs', {}, { preserveState: false, replace: true });
+    router.get(props.endpoints.self, {}, { preserveState: false, replace: true });
 }
 
 const ACTION_LABELS = {
