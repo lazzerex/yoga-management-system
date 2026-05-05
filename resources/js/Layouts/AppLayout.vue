@@ -186,6 +186,7 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { router, usePage } from '@inertiajs/vue3';
+import { route } from 'ziggy-js';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
     faArrowRotateLeft,
@@ -241,18 +242,18 @@ const dashboardActionsRef = ref(null);
 const roleTopMenuDefaults = computed(() => {
     if (isAdmin.value) {
         return [
-            { label: 'Homepage', viewKey: 'homepage', href: '/cms/dashboard' },
-            { label: 'My Schedule', viewKey: 'my-schedule', href: '/cms/dashboard?view=my-schedule' },
-            { label: 'Members', viewKey: 'members', href: '/cms/dashboard?view=members' },
-            { label: 'Attendance', viewKey: 'attendance', href: '/cms/dashboard?view=attendance' },
-            { label: 'Studio Reports', viewKey: 'studio-reports', href: '/cms/dashboard?view=studio-reports' },
-            { label: 'Financials', viewKey: 'financials', href: '/cms/dashboard?view=financials' },
+            { label: 'Homepage', viewKey: 'homepage', href: route('cms.dashboard') },
+            { label: 'My Schedule', viewKey: 'my-schedule', href: route('cms.dashboard', { view: 'my-schedule' }) },
+            { label: 'Members', viewKey: 'members', href: route('cms.dashboard', { view: 'members' }) },
+            { label: 'Attendance', viewKey: 'attendance', href: route('cms.dashboard', { view: 'attendance' }) },
+            { label: 'Studio Reports', viewKey: 'studio-reports', href: route('cms.dashboard', { view: 'studio-reports' }) },
+            { label: 'Financials', viewKey: 'financials', href: route('cms.dashboard', { view: 'financials' }) },
         ];
     }
 
     if (isCoach.value) {
         return [
-            { label: 'Homepage', viewKey: 'homepage', href: '/cms/dashboard' },
+            { label: 'Homepage', viewKey: 'homepage', href: route('cms.dashboard') },
             { label: 'Overview', viewKey: 'overview', href: '' },
             { label: 'My Performance', viewKey: 'my-performance', href: '' },
             { label: 'Class Stats', viewKey: 'class-stats', href: '' },
@@ -262,7 +263,7 @@ const roleTopMenuDefaults = computed(() => {
     }
 
     return [
-        { label: 'Homepage', viewKey: 'homepage', href: '/cms/dashboard' },
+        { label: 'Homepage', viewKey: 'homepage', href: route('cms.dashboard') },
         { label: 'Overview', viewKey: 'overview', href: '' },
         { label: 'My Progress', viewKey: 'my-progress', href: '' },
         { label: 'Attendance', viewKey: 'attendance', href: '' },
@@ -281,7 +282,7 @@ const notifications = [
 ];
 
 const quickActions = [
-    { label: 'Profile', hint: 'View account summary', href: '/cms/profile' },
+    { label: 'Profile', hint: 'View account summary', href: route('cms.profile.show') },
     { label: 'Preferences', hint: 'Adjust workspace settings' },
     { label: 'Last Viewed', hint: 'Jump back to recent pages' },
     { label: 'About', hint: 'See release notes' },
@@ -324,8 +325,8 @@ const normalizeTopTabs = (incomingTabs) => {
             const rawViewKey = (tab?.viewKey ?? toViewKey(label)) || fallbackKey;
             const viewKey = index === 0 ? 'homepage' : rawViewKey;
             const href = index === 0
-                ? '/cms/dashboard'
-                : ('href' in (tab ?? {}) ? tab.href : `/cms/dashboard?view=${viewKey}`);
+                ? route('cms.dashboard')
+                : ('href' in (tab ?? {}) ? tab.href : route('cms.dashboard', { view: viewKey }));
 
             return { label, viewKey, href };
         });
@@ -337,7 +338,7 @@ const normalizeTopTabs = (incomingTabs) => {
     return normalized;
 };
 
-const isOnDashboard = computed(() => page.url.startsWith('/cms/dashboard'));
+const isOnDashboard = computed(() => page.url.startsWith(route('cms.dashboard', undefined, false)));
 
 const dashboardView = computed(() => {
     if (!isOnDashboard.value) {
@@ -387,15 +388,15 @@ const sidebarGroups = computed(() => {
             items: [
                 {
                     label: 'Home',
-                    href: '/cms/dashboard',
-                    activePaths: ['/cms/dashboard'],
+                    href: route('cms.dashboard'),
+                    activePaths: [route('cms.dashboard', undefined, false)],
                     icon: faHouse,
                     iconColor: '#4f8bc8',
                 },
                 {
                     label: 'My Profile',
-                    href: '/cms/profile',
-                    activePaths: ['/cms/profile'],
+                    href: route('cms.profile.show'),
+                    activePaths: [route('cms.profile.show', undefined, false)],
                     icon: faUser,
                     iconColor: '#5f77cf',
                 },
@@ -406,15 +407,15 @@ const sidebarGroups = computed(() => {
             items: [
                 {
                     label: 'Centers',
-                    href: '/cms/operations/yoga-center',
-                    activePaths: ['/cms/operations/yoga-center'],
+                    href: route('operations.yoga-center'),
+                    activePaths: [route('operations.yoga-center', undefined, false)],
                     icon: faBuilding,
                     iconColor: '#d99a34',
                 },
                 {
                     label: 'Classes',
-                    href: '/cms/operations/academy',
-                    activePaths: ['/cms/operations/academy'],
+                    href: route('operations.academy'),
+                    activePaths: [route('operations.academy', undefined, false)],
                     icon: faUsers,
                     iconColor: '#3fa07e',
                 },
@@ -426,15 +427,15 @@ const sidebarGroups = computed(() => {
         groups[1].items.push(
             {
                 label: 'Attendance',
-                href: '/cms/operations/teacher-attendance',
-                activePaths: ['/cms/operations/teacher-attendance'],
+                href: route('operations.teacher-attendance'),
+                activePaths: [route('operations.teacher-attendance', undefined, false)],
                 icon: faClipboardCheck,
                 iconColor: '#4f81cf',
             },
             {
                 label: 'Plans',
-                href: '/cms/operations/lesson-planning',
-                activePaths: ['/cms/operations/lesson-planning'],
+                href: route('operations.lesson-planning'),
+                activePaths: [route('operations.lesson-planning', undefined, false)],
                 badge: 'Approval',
                 icon: faCalendarCheck,
                 iconColor: '#6a78c8',
@@ -445,8 +446,8 @@ const sidebarGroups = computed(() => {
     if (canAccessFees.value) {
         groups[1].items.push({
             label: 'Tuition',
-            href: '/cms/operations/tuition-fees',
-            activePaths: ['/cms/operations/tuition-fees'],
+            href: route('operations.tuition-fees'),
+            activePaths: [route('operations.tuition-fees', undefined, false)],
             icon: faMoneyBillWave,
             iconColor: '#32a06f',
         });
@@ -455,8 +456,8 @@ const sidebarGroups = computed(() => {
     if (canAccessFileLibrary.value) {
         groups[1].items.push({
             label: 'Files',
-            href: '/cms/operations/file-library',
-            activePaths: ['/cms/operations/file-library'],
+            href: route('operations.file-library'),
+            activePaths: [route('operations.file-library', undefined, false)],
             icon: faFolderOpen,
             iconColor: '#c97846',
         });
@@ -468,22 +469,22 @@ const sidebarGroups = computed(() => {
             items: [
                 {
                     label: 'My Membership',
-                    href: '/cms/member/my-membership',
-                    activePaths: ['/cms/member/my-membership'],
+                    href: route('member.my-membership'),
+                    activePaths: [route('member.my-membership', undefined, false)],
                     icon: faMoneyBillWave,
                     iconColor: '#3f8f6f',
                 },
                 {
                     label: 'My Classes',
-                    href: '/cms/member/my-classes',
-                    activePaths: ['/cms/member/my-classes'],
+                    href: route('member.my-classes'),
+                    activePaths: [route('member.my-classes', undefined, false)],
                     icon: faUsers,
                     iconColor: '#3f7ec4',
                 },
                 {
                     label: 'My Schedule',
-                    href: '/cms/member/my-schedule',
-                    activePaths: ['/cms/member/my-schedule'],
+                    href: route('member.my-schedule'),
+                    activePaths: [route('member.my-schedule', undefined, false)],
                     icon: faCalendarCheck,
                     iconColor: '#6a78c8',
                 },
@@ -497,22 +498,22 @@ const sidebarGroups = computed(() => {
             items: [
                 {
                     label: 'My Classes',
-                    href: '/cms/coach/my-classes',
-                    activePaths: ['/cms/coach/my-classes'],
+                    href: route('coach.my-classes'),
+                    activePaths: [route('coach.my-classes', undefined, false)],
                     icon: faUsers,
                     iconColor: '#3f7ec4',
                 },
                 {
                     label: 'My Students',
-                    href: '/cms/coach/my-students',
-                    activePaths: ['/cms/coach/my-students'],
+                    href: route('coach.my-students'),
+                    activePaths: [route('coach.my-students', undefined, false)],
                     icon: faClipboardCheck,
                     iconColor: '#4f81cf',
                 },
                 {
                     label: 'Teaching Schedule',
-                    href: '/cms/coach/my-teaching-schedule',
-                    activePaths: ['/cms/coach/my-teaching-schedule'],
+                    href: route('coach.my-teaching-schedule'),
+                    activePaths: [route('coach.my-teaching-schedule', undefined, false)],
                     icon: faCalendarCheck,
                     iconColor: '#6a78c8',
                 },
@@ -526,15 +527,15 @@ const sidebarGroups = computed(() => {
             items: [
                 {
                     label: 'Users',
-                    href: '/cms/admin/users',
-                    activePaths: ['/cms/admin/users'],
+                    href: route('admin.users.index'),
+                    activePaths: [route('admin.users.index', undefined, false)],
                     icon: faUserShield,
                     iconColor: '#5f77cf',
                 },
                 {
                     label: 'Logs',
-                    href: '/cms/admin/login-logs',
-                    activePaths: ['/cms/admin/login-logs'],
+                    href: route('admin.login-logs.index'),
+                    activePaths: [route('admin.login-logs.index', undefined, false)],
                     icon: faClockRotateLeft,
                     iconColor: '#b26464',
                 },
@@ -577,8 +578,8 @@ const toggleDashboardActions = () => {
 const triggerDashboardAction = (action) => {
     dashboardActionsOpen.value = false;
 
-    if (!page.url.startsWith('/cms/dashboard')) {
-        router.get('/cms/dashboard', { dashboardAction: action });
+    if (!page.url.startsWith(route('cms.dashboard', undefined, false))) {
+        router.get(route('cms.dashboard'), { dashboardAction: action });
         return;
     }
 
@@ -643,6 +644,6 @@ onBeforeUnmount(() => {
 
 const logout = () => {
     closeMenus();
-    router.post('/cms/logout');
+    router.post(route('logout'));
 };
 </script>
