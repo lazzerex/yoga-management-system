@@ -36,7 +36,7 @@
 
             <p class="text-sm text-neutral-600">
                 Need an account?
-                <Link href="/cms/register" class="font-medium text-teal-700 hover:underline">Register</Link>
+                <Link :href="route('register')" class="font-medium text-teal-700 hover:underline">Register</Link>
             </p>
         </form>
     </AuthCard>
@@ -46,6 +46,7 @@
 import AuthCard from '../../Components/Auth/AuthCard.vue';
 import LabeledInput from '../../Components/Form/LabeledInput.vue';
 import { Link, useForm } from '@inertiajs/vue3';
+import { route } from 'ziggy-js';
 
 const form = useForm({
     username: '',
@@ -54,6 +55,6 @@ const form = useForm({
 });
 
 const submit = () => {
-    form.post('/cms/login');
+    form.post(route('login'));
 };
 </script>

@@ -61,7 +61,7 @@
 
             <p class="text-sm text-neutral-600">
                 Already have an account?
-                <Link href="/cms/login" class="font-medium text-teal-700 hover:underline">Sign in</Link>
+                <Link :href="route('login')" class="font-medium text-teal-700 hover:underline">Sign in</Link>
             </p>
         </form>
     </AuthCard>
@@ -69,6 +69,7 @@
 
 <script setup>
 import { Link, useForm } from '@inertiajs/vue3';
+import { route } from 'ziggy-js';
 import AuthCard from '../../Components/Auth/AuthCard.vue';
 import LabeledInput from '../../Components/Form/LabeledInput.vue';
 
@@ -81,6 +82,6 @@ const form = useForm({
 });
 
 const submit = () => {
-    form.post('/cms/register');
+    form.post(route('register'));
 };
 </script>
