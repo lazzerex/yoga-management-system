@@ -361,6 +361,7 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { usePage } from '@inertiajs/vue3';
+import { route } from 'ziggy-js';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
     faArrowTrendUp,
@@ -941,7 +942,7 @@ const buildDefaultDashboardTabs = (role) => {
         return {
             label,
             viewKey,
-            href: index === 0 ? '/cms/dashboard' : (isAdminRole ? `/cms/dashboard?view=${viewKey}` : ''),
+            href: index === 0 ? route('cms.dashboard') : (isAdminRole ? route('cms.dashboard', { view: viewKey }) : ''),
         };
     });
 };
@@ -1024,7 +1025,7 @@ const normalizeDashboardTabs = (draftTabs) => draftTabs.map((tab, index) => {
     return {
         label,
         viewKey,
-        href: index === 0 ? '/cms/dashboard' : (isAdmin.value ? `/cms/dashboard?view=${viewKey}` : ''),
+        href: index === 0 ? route('cms.dashboard') : (isAdmin.value ? route('cms.dashboard', { view: viewKey }) : ''),
     };
 });
 
@@ -1098,7 +1099,7 @@ const handleDashboardAction = (event) => {
 };
 
 const openActionFromUrl = () => {
-    if (!page.url.startsWith('/cms/dashboard')) {
+    if (!page.url.startsWith(route('cms.dashboard', undefined, false))) {
         return;
     }
 
@@ -1110,7 +1111,8 @@ const openActionFromUrl = () => {
         handleDashboardAction({ detail: { action } });
         params.delete('dashboardAction');
         const nextQuery = params.toString();
-        window.history.replaceState({}, '', nextQuery ? `/cms/dashboard?${nextQuery}` : '/cms/dashboard');
+        const dashboardPath = route('cms.dashboard', undefined, false);
+        window.history.replaceState({}, '', nextQuery ? `${dashboardPath}?${nextQuery}` : dashboardPath);
     }
 };
 
