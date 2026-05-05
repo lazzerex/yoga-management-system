@@ -16,7 +16,12 @@ class UserController extends Controller {
 
     public function create(): Response
     {
-        return inertia('Admin/Users/Create');
+        return inertia('Admin/Users/Create', [
+            'endpoints' => [
+                'store' => route('admin.users.store'),
+                'index' => route('admin.users.index'),
+            ],
+        ]);
     }
 
     public function edit(User $user): Response
@@ -28,6 +33,10 @@ class UserController extends Controller {
                 'username' => $user->username,
                 'email' => $user->email,
                 'role' => $user->role,
+            ],
+            'endpoints' => [
+                'update' => route('admin.users.update', $user),
+                'index' => route('admin.users.index'),
             ],
         ]);
     }
@@ -50,6 +59,9 @@ class UserController extends Controller {
                     ? Carbon::parse($user->last_login)->format('Y-m-d H:i')
                     : null,
             ]),
+            'endpoints' => [
+                'create' => route('admin.users.create'),
+            ],
         ]);
     }
 
