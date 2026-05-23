@@ -39,8 +39,18 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
         Fortify::redirectUserForTwoFactorAuthenticationUsing(RedirectIfTwoFactorAuthenticatable::class);
-        Fortify::loginView(fn () => inertia('Auth/Login'));
-        Fortify::registerView(fn () => inertia('Auth/Register'));
+        Fortify::loginView(fn () => inertia('Auth/Login', [
+            'endpoints' => [
+                'login' => route('login'),
+                'register' => route('register',)
+            ],
+        ]));
+        Fortify::registerView(fn () => inertia('Auth/Register', [
+            'endpoints' => [
+                'register' => route('register'),
+                'login' => route('login'),
+            ],
+        ]));
 
         Fortify::authenticateUsing(function (Request $request) {
             $identifier = trim((string) $request->input('username', ''));
