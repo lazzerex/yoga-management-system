@@ -71,18 +71,19 @@
 </template>
 
 <script setup>
-import { Link, router, usePage } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import AppLayout from '../../../Layouts/AppLayout.vue';
 
 const props = defineProps({
     users: Object,
     endpoints: Object,
+    auth: Object,
 });
 
-const page = usePage();
 
-const isCurrentUser = (id) => page.props.auth?.user?.id === id;
+
+const isCurrentUser = (id) => props.auth?.user?.id === id;
 
 const deleteUser = (user) => {
     if (isCurrentUser(user.id)) return;
