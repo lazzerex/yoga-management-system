@@ -360,7 +360,6 @@
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
-import { usePage } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
@@ -387,11 +386,16 @@ import Draggable from 'vuedraggable';
 import Modal from '../Components/UI/Modal.vue';
 import AppLayout from '../Layouts/AppLayout.vue';
 
-const page = usePage();
+const props = defineProps({
+    auth: Object,
+});
+
+const getCurrentUrl = () => 
+`${window.location.pathname}${window.location.search}`;
 
 const maxTopTabs = 6;
 
-const userRole = computed(() => page.props.auth?.user?.role ?? 'member');
+const userRole = computed(() => props.auth?.user?.role ?? 'member');
 const isAdmin = computed(() => userRole.value === 'admin');
 
 const roleDashboard = {
@@ -1099,11 +1103,12 @@ const handleDashboardAction = (event) => {
 };
 
 const openActionFromUrl = () => {
-    if (!page.url.startsWith(route('cms.dashboard', undefined, false))) {
+    const currentUrl = getCurrentUrl();
+    if (!currentUrl.startsWith(route('cms.dashboard', undefined, false))) {
         return;
     }
 
-    const query = page.url.split('?')[1] ?? '';
+    const query = currentUrl.split('?')[1] ?? '';
     const params = new URLSearchParams(query);
     const action = params.get('dashboardAction');
 
