@@ -2,17 +2,22 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Actions\Admin\User\CreateUserAction;
+use App\Actions\Admin\User\DeleteUserAction;
+use App\Actions\Admin\User\UpdateUserAction;
+use App\Actions\Admin\User\UpdateUserRoleAction;
+use App\Http\Requests\Admin\User\StoreUserRequest;
+use App\Http\Requests\Admin\User\UpdateUserRequest;
+use App\Http\Requests\Admin\User\UpdateUserRoleRequest;
 use App\Http\Controllers\Controller;
-use App\Models\AuditLog;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Password;
 use Inertia\Response;
 
-class UserController extends Controller {
+class UserController extends Controller
+{
 
     public function create(): Response
     {
@@ -48,7 +53,7 @@ class UserController extends Controller {
             ->paginate(20);
 
         return inertia('Admin/Users/Index', [
-            'users' => $users->through(fn (User $user) => [
+            'users' => $users->through(fn(User $user) => [
                 'id' => $user->id,
                 'name' => $user->name,
                 'username' => $user->username,
@@ -65,36 +70,18 @@ class UserController extends Controller {
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(StoreUserRequest $request, CreateUserAction $action): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:255', 'alpha_dash', Rule::unique(User::class, 'username')],
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class, 'email')],
-            'role' => ['required', 'in:admin,coach,member'],
-            'password' => ['required', 'confirmed', Password::default()],
-        ]);
+        $validated = $request->validated();
 
-        $user = User::create($validated);
-
-        $this->recordAudit($request, 'create_user', $user, [
-            'username' => $user->username,
-            'email' => $user->email,
-            'role' => $user->role,
-        ]);
+        $action->execute($validated, $request->user());
 
         return back()->with('success', "User {$validated['name']} created.");
     }
 
-    public function update(Request $request, User $user): RedirectResponse
+    public function update(UpdateUserRequest $request, User $user, UpdateUserAction $action): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:255', 'alpha_dash', Rule::unique(User::class, 'username')->ignore($user->id)],
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class, 'email')->ignore($user->id)],
-            'role' => ['required', 'in:admin,coach,member'],
-            'password' => ['nullable', 'confirmed', Password::default()],
-        ]);
+        $validated = $request->validated();
 
         if ($this->isSelfDemotion($request, $user, $validated['role'])) {
             return back()->with('error', 'You cannot remove your own admin role.');
@@ -104,45 +91,14 @@ class UserController extends Controller {
             return back()->with('error', 'At least one admin account is required.');
         }
 
-        $nameOrEmailChanged = $user->name !== $validated['name'] || $user->email !== $validated['email'];
-        $passwordChanged = !empty($validated['password']);
-        $roleChanged = $user->role !== $validated['role'];
-        $oldName = $user->name;
-        $oldEmail = $user->email;
-        $oldRole = $user->role;
-
-        if (empty($validated['password'])) {
-            unset($validated['password']);
-        }
-
-        $user->update($validated);
-
-        if ($nameOrEmailChanged) {
-            $this->recordAudit($request, 'update_user_info', $user, [
-                'from' => ['name' => $oldName, 'email' => $oldEmail],
-                'to' => ['name' => $user->name, 'email' => $user->email],
-            ]);
-        }
-
-        if ($passwordChanged) {
-            $this->recordAudit($request, 'change_password', $user, []);
-        }
-
-        if ($roleChanged) {
-            $this->recordAudit($request, 'assign_role', $user, [
-                'from' => $oldRole,
-                'to' => $validated['role'],
-            ]);
-        }
+        $action->execute($user, $validated, $request->user());
 
         return back()->with('success', "User {$user->name} updated.");
     }
 
-    public function updateRole(Request $request, User $user): RedirectResponse
+    public function updateRole(UpdateUserRoleRequest $request, User $user, UpdateUserRoleAction $action): RedirectResponse
     {
-        $validated = $request->validate([
-            'role' => ['required', 'in:admin,coach,member'],
-        ]);
+        $validated = $request->validated();
 
         if ($this->isSelfDemotion($request, $user, $validated['role'])) {
             return back()->with('error', 'You cannot remove your own admin role.');
@@ -152,18 +108,12 @@ class UserController extends Controller {
             return back()->with('error', 'At least one admin account is required.');
         }
 
-        $oldRole = $user->role;
-        $user->update(['role' => $validated['role']]);
-
-        $this->recordAudit($request, 'assign_role', $user, [
-            'from' => $oldRole,
-            'to' => $validated['role'],
-        ]);
+        $action->execute($user, $validated['role'], $request->user());
 
         return back()->with('success', "Role updated for {$user->name}.");
     }
 
-    public function destroy(Request $request, User $user): RedirectResponse
+    public function destroy(Request $request, User $user, DeleteUserAction $action): RedirectResponse
     {
         if ($request->user()?->is($user)) {
             return back()->with('error', 'You cannot delete your own account.');
@@ -174,11 +124,12 @@ class UserController extends Controller {
         }
 
         $name = $user->name;
-        $this->recordAudit($request, 'remove_role', $user, ['role' => $user->role]);
-        $user->delete();
+        $action->execute($user, $request->user());
 
         return back()->with('success', "User {$name} deleted.");
     }
+
+
 
     private function isSelfDemotion(Request $request, User $targetUser, string $newRole): bool
     {
@@ -194,14 +145,4 @@ class UserController extends Controller {
         return User::where('role', 'admin')->count() <= 1;
     }
 
-    private function recordAudit(Request $request, string $action, User $subject, array $meta): void
-    {
-        AuditLog::create([
-            'causer_id' => $request->user()?->id,
-            'action' => $action,
-            'subject_id' => $subject->id,
-            'subject_name' => $subject->name,
-            'meta' => $meta ?: null,
-        ]);
-    }
 }
