@@ -157,6 +157,9 @@ const formatMeta = (action, meta) => {
             if (meta.from?.email !== meta.to?.email) {
                 parts.push(`email: ${meta.from.email} → ${meta.to.email}`);
             }
+            if (meta.from?.username !== meta.to?.username) {
+                parts.push(`username: ${meta.from.username} -> ${meta.to.username}`);
+            }
             return parts.join(', ') || '—';
         }
         case 'change_password':
