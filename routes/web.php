@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\LoginLogController;
-use App\Http\Controllers\Admin\UserController;
+use App\Modules\Admin\User\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Middleware\EnsureAdmin;
 use Illuminate\Support\Facades\Route;
