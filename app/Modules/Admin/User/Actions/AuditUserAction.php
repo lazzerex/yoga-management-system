@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Actions\Admin\User;
+namespace App\Modules\Admin\User\Actions;
 
 use App\Models\AuditLog;
 use App\Models\User;
