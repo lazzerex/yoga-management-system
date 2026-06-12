@@ -1,20 +1,4 @@
-<template>
-    <Link v-if="href" :href="href" :class="linkClasses">
-        <span class="ym-nav-item-content">
-            <FontAwesomeIcon v-if="icon" :icon="icon" class="ym-nav-item-icon" :style="iconStyles" />
-            <span class="ym-nav-item-text">{{ label }}</span>
-        </span>
-        <span v-if="badge && variant === 'sidebar'" class="ym-side-link-badge">{{ badge }}</span>
-    </Link>
-    <span v-else :class="linkClasses" @click="emit('tab-click')">
-        <span class="ym-nav-item-content">
-            <FontAwesomeIcon v-if="icon" :icon="icon" class="ym-nav-item-icon" :style="iconStyles" />
-            <span class="ym-nav-item-text">{{ label }}</span>
-        </span>
-    </span>
-</template>
-
-<script setup>
+﻿<script setup>
 import { computed } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -68,3 +52,19 @@ const iconStyles = computed(() => {
     return null;
 });
 </script>
+
+<template>
+    <Link v-if="href" :href="href" :class="linkClasses">
+        <span class="ym-nav-item-content">
+            <FontAwesomeIcon v-if="icon" :icon="icon" class="ym-nav-item-icon" :style="iconStyles" />
+            <span class="ym-nav-item-text">{{ label }}</span>
+        </span>
+        <span v-if="badge && variant === 'sidebar'" class="ym-side-link-badge">{{ badge }}</span>
+    </Link>
+    <span v-else :class="linkClasses" @click="emit('tab-click')">
+        <span class="ym-nav-item-content">
+            <FontAwesomeIcon v-if="icon" :icon="icon" class="ym-nav-item-icon" :style="iconStyles" />
+            <span class="ym-nav-item-text">{{ label }}</span>
+        </span>
+    </span>
+</template>
