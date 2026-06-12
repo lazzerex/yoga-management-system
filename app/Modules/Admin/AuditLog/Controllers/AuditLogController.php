@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Modules\Admin\AuditLog\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
