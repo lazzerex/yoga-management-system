@@ -1,7 +1,7 @@
 ﻿<script setup>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faChalkboardUser, faCircleInfo, faLightbulb } from '@fortawesome/free-solid-svg-icons';
-import AppLayout from '../../Layouts/AppLayout.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 
 const classes = [
     { name: 'Power Core', branch: 'Riverside', students: 24, waitlist: 3 },

@@ -1,7 +1,7 @@
 ﻿<script setup>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faBuilding, faCircleInfo, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
-import AppLayout from '../../Layouts/AppLayout.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 
 const branches = [
     { name: 'Downtown Studio', address: '1 Main St', classes: 12 },

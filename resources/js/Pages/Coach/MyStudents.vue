@@ -1,7 +1,7 @@
 ﻿<script setup>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faChartSimple, faTriangleExclamation, faUsers } from '@fortawesome/free-solid-svg-icons';
-import AppLayout from '../../Layouts/AppLayout.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 
 const students = [
     { name: 'Nora Ellis', primaryClass: 'Power Core', attendance: '9 / 10', lastSession: 'Apr 24' },

@@ -1,7 +1,7 @@
 ﻿<script setup>
 import { Link, router } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
-import AppLayout from '../../../Layouts/AppLayout.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 
 const props = defineProps({
     users: Object,

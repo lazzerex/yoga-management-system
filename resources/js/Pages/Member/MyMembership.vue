@@ -1,7 +1,7 @@
 ﻿<script setup>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faCalendarDays, faCircleInfo, faIdCard, faListCheck } from '@fortawesome/free-solid-svg-icons';
-import AppLayout from '../../Layouts/AppLayout.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 
 const benefits = [
     { title: 'Unlimited Studio Classes', meta: 'All branches Â· Any level', limit: 'Unlimited' },

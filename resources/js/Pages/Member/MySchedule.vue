@@ -1,7 +1,7 @@
 ﻿<script setup>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faBellConcierge, faCalendarWeek, faChartSimple, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
-import AppLayout from '../../Layouts/AppLayout.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 
 const weeklySchedule = [
     {

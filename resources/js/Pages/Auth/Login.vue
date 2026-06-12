@@ -1,6 +1,6 @@
 ﻿<script setup>
-import AuthCard from '../../Components/Auth/AuthCard.vue';
-import LabeledInput from '../../Components/Form/LabeledInput.vue';
+import AuthCard from '@/Components/Auth/AuthCard.vue';
+import LabeledInput from '@/Components/Form/LabeledInput.vue';
 import { Link, useForm } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 

@@ -1,7 +1,7 @@
 ﻿<script setup>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faCircleInfo, faUserCheck, faUsers } from '@fortawesome/free-solid-svg-icons';
-import AppLayout from '../../Layouts/AppLayout.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 
 const classes = [
     { className: 'Morning Vinyasa', teacher: 'Mia Tran', branch: 'Downtown', capacity: '22 / 24' },

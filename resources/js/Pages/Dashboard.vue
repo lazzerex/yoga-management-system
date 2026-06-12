@@ -23,8 +23,8 @@ import {
     faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import Draggable from 'vuedraggable';
-import Modal from '../Components/UI/Modal.vue';
-import AppLayout from '../Layouts/AppLayout.vue';
+import Modal from '@/Components/UI/Modal.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 
 const props = defineProps({
     auth: Object,

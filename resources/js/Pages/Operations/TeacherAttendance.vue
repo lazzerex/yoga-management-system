@@ -1,7 +1,7 @@
 ﻿<script setup>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faCircleInfo, faClipboardCheck } from '@fortawesome/free-solid-svg-icons';
-import AppLayout from '../../Layouts/AppLayout.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 
 const attendance = [
     { teacher: 'Mia Tran', branch: 'Downtown', shift: '06:00 - 12:00', checkIn: '05:51', status: 'On Time' },

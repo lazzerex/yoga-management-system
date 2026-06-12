@@ -22,7 +22,7 @@ import {
     faUserShield,
     faUsers,
 } from '@fortawesome/free-solid-svg-icons';
-import NavMenuLink from '../Components/UI/NavMenuLink.vue';
+import NavMenuLink from '@/Components/UI/NavMenuLink.vue';
 
 defineProps({
     title: {

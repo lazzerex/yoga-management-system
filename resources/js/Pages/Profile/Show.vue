@@ -1,6 +1,6 @@
 ﻿<script setup>
 import { computed } from 'vue';
-import AppLayout from '../../Layouts/AppLayout.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 
 const props = defineProps({
     profile: {

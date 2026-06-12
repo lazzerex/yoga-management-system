@@ -1,7 +1,7 @@
 ﻿<script setup>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faCircleInfo, faCloudArrowUp, faFolderOpen } from '@fortawesome/free-solid-svg-icons';
-import AppLayout from '../../Layouts/AppLayout.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 
 const folders = [
     { name: 'Teacher Materials', files: 312, size: '11.3 GB', owner: 'Academic Team' },

@@ -1,7 +1,7 @@
 ﻿<script setup>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faChartSimple, faCircleInfo, faMoneyBillWave } from '@fortawesome/free-solid-svg-icons';
-import AppLayout from '../../Layouts/AppLayout.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 
 const fees = [
     { student: 'Sophia Nguyen', plan: 'Unlimited Monthly', amount: '$129', dueDate: 'Apr 21', status: 'Paid', statusClass: 'ym-status-pill--started' },

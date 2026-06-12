@@ -1,7 +1,7 @@
 ﻿<script setup>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faCircleInfo, faClockRotateLeft, faTableList } from '@fortawesome/free-solid-svg-icons';
-import AppLayout from '../../Layouts/AppLayout.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 
 const enrolledClasses = [
     { name: 'Evening Yin', coach: 'Ari Gomez', schedule: 'Mon / Wed 18:30', attendance: '10 / 12' },
