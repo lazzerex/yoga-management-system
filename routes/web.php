@@ -1,9 +1,9 @@
 <?php
 
-use App\Http\Controllers\Admin\AuditLogController;
-use App\Http\Controllers\Admin\LoginLogController;
+use App\Modules\Admin\AuditLog\Controllers\AuditLogController;
+use App\Modules\Admin\LoginLog\Controllers\LoginLogController;
 use App\Modules\Admin\User\Controllers\UserController;
-use App\Http\Controllers\ProfileController;
+use App\Modules\Profile\Controllers\ProfileController;
 use App\Http\Middleware\EnsureAdmin;
 use Illuminate\Support\Facades\Route;
 
