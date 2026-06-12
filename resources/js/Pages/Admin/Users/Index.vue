@@ -1,3 +1,25 @@
+﻿<script setup>
+import { Link, router } from '@inertiajs/vue3';
+import { route } from 'ziggy-js';
+import AppLayout from '../../../Layouts/AppLayout.vue';
+
+const props = defineProps({
+    users: Object,
+    endpoints: Object,
+    auth: Object,
+});
+
+
+
+const isCurrentUser = (id) => props.auth?.user?.id === id;
+
+const deleteUser = (user) => {
+    if (isCurrentUser(user.id)) return;
+    if (!window.confirm(`Delete ${user.name}? This cannot be undone.`)) return;
+    router.delete(route('admin.users.destroy', user.id), { preserveScroll: true });
+};
+</script>
+
 <template>
     <AppLayout title="User Management">
         <section class="ym-surface ym-section">
@@ -69,25 +91,3 @@
         <!-- Modals removed, now handled by separate pages -->
     </AppLayout>
 </template>
-
-<script setup>
-import { Link, router } from '@inertiajs/vue3';
-import { route } from 'ziggy-js';
-import AppLayout from '../../../Layouts/AppLayout.vue';
-
-const props = defineProps({
-    users: Object,
-    endpoints: Object,
-    auth: Object,
-});
-
-
-
-const isCurrentUser = (id) => props.auth?.user?.id === id;
-
-const deleteUser = (user) => {
-    if (isCurrentUser(user.id)) return;
-    if (!window.confirm(`Delete ${user.name}? This cannot be undone.`)) return;
-    router.delete(route('admin.users.destroy', user.id), { preserveScroll: true });
-};
-</script>
