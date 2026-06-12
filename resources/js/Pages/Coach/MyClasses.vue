@@ -1,3 +1,23 @@
+﻿<script setup>
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faChalkboardUser, faCircleInfo, faLightbulb } from '@fortawesome/free-solid-svg-icons';
+import AppLayout from '../../Layouts/AppLayout.vue';
+
+const classes = [
+    { name: 'Power Core', branch: 'Riverside', students: 24, waitlist: 3 },
+    { name: 'Evening Yin', branch: 'Downtown', students: 21, waitlist: 1 },
+    { name: 'Prenatal Flow', branch: 'Westside', students: 14, waitlist: 0 },
+    { name: 'Weekend Flow', branch: 'Uptown', students: 19, waitlist: 2 },
+    { name: 'Breathwork Lab', branch: 'Online', students: 32, waitlist: 5 },
+];
+
+const insights = [
+    { title: 'Power Core is near full capacity', meta: 'Riverside Â· Tue/Thu 07:00', label: 'High Demand' },
+    { title: 'Prenatal Flow attendance improving', meta: 'Westside Â· +11% this month', label: 'Trend Up' },
+    { title: 'Weekend Flow has repeat bookings', meta: 'Uptown Â· retention 82%', label: 'Strong' },
+];
+</script>
+
 <template>
     <AppLayout title="My Classes">
         <div class="ym-stat-strip">
@@ -78,23 +98,3 @@
         </div>
     </AppLayout>
 </template>
-
-<script setup>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faChalkboardUser, faCircleInfo, faLightbulb } from '@fortawesome/free-solid-svg-icons';
-import AppLayout from '../../Layouts/AppLayout.vue';
-
-const classes = [
-    { name: 'Power Core', branch: 'Riverside', students: 24, waitlist: 3 },
-    { name: 'Evening Yin', branch: 'Downtown', students: 21, waitlist: 1 },
-    { name: 'Prenatal Flow', branch: 'Westside', students: 14, waitlist: 0 },
-    { name: 'Weekend Flow', branch: 'Uptown', students: 19, waitlist: 2 },
-    { name: 'Breathwork Lab', branch: 'Online', students: 32, waitlist: 5 },
-];
-
-const insights = [
-    { title: 'Power Core is near full capacity', meta: 'Riverside · Tue/Thu 07:00', label: 'High Demand' },
-    { title: 'Prenatal Flow attendance improving', meta: 'Westside · +11% this month', label: 'Trend Up' },
-    { title: 'Weekend Flow has repeat bookings', meta: 'Uptown · retention 82%', label: 'Strong' },
-];
-</script>

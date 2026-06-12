@@ -1,3 +1,48 @@
+﻿<script setup>
+import { computed } from 'vue';
+import AppLayout from '../../Layouts/AppLayout.vue';
+
+const props = defineProps({
+    profile: {
+        type: Object,
+        required: true,
+    },
+    security: {
+        type: Object,
+        required: true,
+    },
+    loginStats: {
+        type: Object,
+        required: true,
+    },
+    recentLogins: {
+        type: Array,
+        required: true,
+    },
+});
+
+const initials = computed(() => {
+    const name = props.profile?.name?.trim();
+
+    if (!name) {
+        return 'GU';
+    }
+
+    return name
+        .split(/\s+/)
+        .slice(0, 2)
+        .map((part) => part.charAt(0).toUpperCase())
+        .join('');
+});
+
+const roleLabel = computed(() => {
+    const role = props.profile?.role ?? 'member';
+    return role.charAt(0).toUpperCase() + role.slice(1);
+});
+
+const formatDevice = (deviceType) => (deviceType === 'mobile' ? 'Mobile' : 'Desktop');
+</script>
+
 <template>
     <AppLayout title="My Profile">
         <div class="ym-record-layout">
@@ -106,48 +151,3 @@
         </div>
     </AppLayout>
 </template>
-
-<script setup>
-import { computed } from 'vue';
-import AppLayout from '../../Layouts/AppLayout.vue';
-
-const props = defineProps({
-    profile: {
-        type: Object,
-        required: true,
-    },
-    security: {
-        type: Object,
-        required: true,
-    },
-    loginStats: {
-        type: Object,
-        required: true,
-    },
-    recentLogins: {
-        type: Array,
-        required: true,
-    },
-});
-
-const initials = computed(() => {
-    const name = props.profile?.name?.trim();
-
-    if (!name) {
-        return 'GU';
-    }
-
-    return name
-        .split(/\s+/)
-        .slice(0, 2)
-        .map((part) => part.charAt(0).toUpperCase())
-        .join('');
-});
-
-const roleLabel = computed(() => {
-    const role = props.profile?.role ?? 'member';
-    return role.charAt(0).toUpperCase() + role.slice(1);
-});
-
-const formatDevice = (deviceType) => (deviceType === 'mobile' ? 'Mobile' : 'Desktop');
-</script>

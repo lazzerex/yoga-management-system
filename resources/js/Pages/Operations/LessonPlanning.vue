@@ -1,53 +1,4 @@
-<template>
-    <AppLayout title="Lesson Planning & Approval">
-        <div class="ym-stat-strip">
-            <div class="ym-stat">
-                <p class="ym-stat-label">Pending Approval</p>
-                <p class="ym-stat-value">14</p>
-                <p class="ym-stat-note">6 waiting over 48 hours</p>
-            </div>
-            <div class="ym-stat">
-                <p class="ym-stat-label">Approved This Week</p>
-                <p class="ym-stat-value">22</p>
-                <p class="ym-stat-note">Avg review time 9h</p>
-            </div>
-            <div class="ym-stat">
-                <p class="ym-stat-label">Needs Revision</p>
-                <p class="ym-stat-value">5</p>
-                <p class="ym-stat-note">Feedback sent to teachers</p>
-            </div>
-        </div>
-
-        <div class="ym-pane">
-            <div class="ym-pane-head">
-                <div class="ym-pane-title-wrap">
-                    <FontAwesomeIcon :icon="faClipboardCheck" class="ym-pane-icon" />
-                    <h2 class="ym-pane-title">Approval Queue</h2>
-                </div>
-            </div>
-            <div class="ym-pane-body">
-                <div class="ym-row-list">
-                    <div v-for="plan in plans" :key="plan.name" class="ym-row">
-                        <div class="ym-row-main">
-                            <p class="ym-row-title">{{ plan.name }}</p>
-                            <p class="ym-row-meta">{{ plan.teacher }} · {{ plan.branch }} · {{ plan.date }}</p>
-                        </div>
-                        <div class="ym-row-aside">
-                            <span :class="['ym-status-pill', plan.statusClass]">{{ plan.status }}</span>
-                            <button type="button" class="ym-btn-outline">Review</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="ym-info-row">
-                    <FontAwesomeIcon :icon="faCircleInfo" class="ym-info-icon" />
-                    <span>Workflow actions and approval permissions are placeholders for now.</span>
-                </div>
-            </div>
-        </div>
-    </AppLayout>
-</template>
-
-<script setup>
+﻿<script setup>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faCircleInfo, faClipboardCheck } from '@fortawesome/free-solid-svg-icons';
 import AppLayout from '../../Layouts/AppLayout.vue';
@@ -87,3 +38,52 @@ const plans = [
     },
 ];
 </script>
+
+<template>
+    <AppLayout title="Lesson Planning & Approval">
+        <div class="ym-stat-strip">
+            <div class="ym-stat">
+                <p class="ym-stat-label">Pending Approval</p>
+                <p class="ym-stat-value">14</p>
+                <p class="ym-stat-note">6 waiting over 48 hours</p>
+            </div>
+            <div class="ym-stat">
+                <p class="ym-stat-label">Approved This Week</p>
+                <p class="ym-stat-value">22</p>
+                <p class="ym-stat-note">Avg review time 9h</p>
+            </div>
+            <div class="ym-stat">
+                <p class="ym-stat-label">Needs Revision</p>
+                <p class="ym-stat-value">5</p>
+                <p class="ym-stat-note">Feedback sent to teachers</p>
+            </div>
+        </div>
+
+        <div class="ym-pane">
+            <div class="ym-pane-head">
+                <div class="ym-pane-title-wrap">
+                    <FontAwesomeIcon :icon="faClipboardCheck" class="ym-pane-icon" />
+                    <h2 class="ym-pane-title">Approval Queue</h2>
+                </div>
+            </div>
+            <div class="ym-pane-body">
+                <div class="ym-row-list">
+                    <div v-for="plan in plans" :key="plan.name" class="ym-row">
+                        <div class="ym-row-main">
+                            <p class="ym-row-title">{{ plan.name }}</p>
+                            <p class="ym-row-meta">{{ plan.teacher }} Â· {{ plan.branch }} Â· {{ plan.date }}</p>
+                        </div>
+                        <div class="ym-row-aside">
+                            <span :class="['ym-status-pill', plan.statusClass]">{{ plan.status }}</span>
+                            <button type="button" class="ym-btn-outline">Review</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="ym-info-row">
+                    <FontAwesomeIcon :icon="faCircleInfo" class="ym-info-icon" />
+                    <span>Workflow actions and approval permissions are placeholders for now.</span>
+                </div>
+            </div>
+        </div>
+    </AppLayout>
+</template>

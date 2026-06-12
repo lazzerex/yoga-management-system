@@ -1,87 +1,4 @@
-<template>
-    <AppLayout title="My Teaching Schedule">
-        <div class="ym-pane">
-            <div class="ym-pane-head">
-                <div class="ym-pane-title-wrap">
-                    <FontAwesomeIcon :icon="faCalendarWeek" class="ym-pane-icon" />
-                    <h2 class="ym-pane-title">Weekly Teaching Calendar</h2>
-                </div>
-            </div>
-            <div class="ym-pane-body">
-                <div class="ym-timetable-scroll">
-                    <div class="ym-timetable">
-                        <div v-for="day in teachingSchedule" :key="day.day" class="ym-timetable-col">
-                            <div class="ym-timetable-head">
-                                <p class="ym-timetable-day">{{ day.day }}</p>
-                                <p class="ym-timetable-date">{{ day.date }}</p>
-                            </div>
-                            <div class="ym-timetable-body">
-                                <div
-                                    v-for="item in day.classes"
-                                    :key="item.title"
-                                    class="ym-timetable-slot ym-timetable-slot--coach"
-                                >
-                                    <p class="ym-timetable-time">{{ item.time }}</p>
-                                    <p class="ym-timetable-name">{{ item.title }}</p>
-                                    <p class="ym-timetable-sub">{{ item.branch }} · {{ item.students }}</p>
-                                </div>
-                                <div v-if="!day.classes.length" class="ym-timetable-empty">—</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="ym-page-cols mt-4">
-            <div class="ym-pane">
-                <div class="ym-pane-head">
-                    <div class="ym-pane-title-wrap">
-                        <FontAwesomeIcon :icon="faClipboardList" class="ym-pane-icon" />
-                        <h2 class="ym-pane-title">Today At A Glance</h2>
-                    </div>
-                </div>
-                <div class="ym-pane-body">
-                    <div class="ym-row-list">
-                        <div v-for="item in todayHighlights" :key="item.title" class="ym-row">
-                            <div class="ym-row-main">
-                                <p class="ym-row-title">{{ item.title }}</p>
-                                <p class="ym-row-meta">{{ item.meta }}</p>
-                            </div>
-                            <div class="ym-row-aside">
-                                <span class="ym-tag">{{ item.badge }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="ym-pane">
-                <div class="ym-pane-head">
-                    <div class="ym-pane-title-wrap">
-                        <FontAwesomeIcon :icon="faChartSimple" class="ym-pane-icon" />
-                        <h2 class="ym-pane-title">Teaching Load</h2>
-                    </div>
-                </div>
-                <div class="ym-pane-body">
-                    <div class="ym-row-list">
-                        <div v-for="load in teachingLoad" :key="load.label" class="ym-row">
-                            <div class="ym-row-main">
-                                <p class="ym-row-title">{{ load.label }}</p>
-                                <p class="ym-row-meta">{{ load.note }}</p>
-                            </div>
-                            <div class="ym-row-aside">
-                                <span class="ym-chip">{{ load.value }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </AppLayout>
-</template>
-
-<script setup>
+﻿<script setup>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faCalendarWeek, faChartSimple, faClipboardList } from '@fortawesome/free-solid-svg-icons';
 import AppLayout from '../../Layouts/AppLayout.vue';
@@ -140,7 +57,7 @@ const teachingSchedule = [
 ];
 
 const todayHighlights = [
-    { title: 'Evening Yin', meta: '18:30 · Downtown · 21 students', badge: 'Today' },
+    { title: 'Evening Yin', meta: '18:30 Â· Downtown Â· 21 students', badge: 'Today' },
     { title: 'Post-class notes due', meta: 'Submit by 21:00 for attendance sync', badge: 'Reminder' },
     { title: 'Substitute request', meta: 'Backup coach for Saturday workshop', badge: 'Pending' },
 ];
@@ -151,3 +68,86 @@ const teachingLoad = [
     { label: 'Total Student Touchpoints', note: 'Projected attendance sum', value: '182' },
 ];
 </script>
+
+<template>
+    <AppLayout title="My Teaching Schedule">
+        <div class="ym-pane">
+            <div class="ym-pane-head">
+                <div class="ym-pane-title-wrap">
+                    <FontAwesomeIcon :icon="faCalendarWeek" class="ym-pane-icon" />
+                    <h2 class="ym-pane-title">Weekly Teaching Calendar</h2>
+                </div>
+            </div>
+            <div class="ym-pane-body">
+                <div class="ym-timetable-scroll">
+                    <div class="ym-timetable">
+                        <div v-for="day in teachingSchedule" :key="day.day" class="ym-timetable-col">
+                            <div class="ym-timetable-head">
+                                <p class="ym-timetable-day">{{ day.day }}</p>
+                                <p class="ym-timetable-date">{{ day.date }}</p>
+                            </div>
+                            <div class="ym-timetable-body">
+                                <div
+                                    v-for="item in day.classes"
+                                    :key="item.title"
+                                    class="ym-timetable-slot ym-timetable-slot--coach"
+                                >
+                                    <p class="ym-timetable-time">{{ item.time }}</p>
+                                    <p class="ym-timetable-name">{{ item.title }}</p>
+                                    <p class="ym-timetable-sub">{{ item.branch }} Â· {{ item.students }}</p>
+                                </div>
+                                <div v-if="!day.classes.length" class="ym-timetable-empty">â€”</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ym-page-cols mt-4">
+            <div class="ym-pane">
+                <div class="ym-pane-head">
+                    <div class="ym-pane-title-wrap">
+                        <FontAwesomeIcon :icon="faClipboardList" class="ym-pane-icon" />
+                        <h2 class="ym-pane-title">Today At A Glance</h2>
+                    </div>
+                </div>
+                <div class="ym-pane-body">
+                    <div class="ym-row-list">
+                        <div v-for="item in todayHighlights" :key="item.title" class="ym-row">
+                            <div class="ym-row-main">
+                                <p class="ym-row-title">{{ item.title }}</p>
+                                <p class="ym-row-meta">{{ item.meta }}</p>
+                            </div>
+                            <div class="ym-row-aside">
+                                <span class="ym-tag">{{ item.badge }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ym-pane">
+                <div class="ym-pane-head">
+                    <div class="ym-pane-title-wrap">
+                        <FontAwesomeIcon :icon="faChartSimple" class="ym-pane-icon" />
+                        <h2 class="ym-pane-title">Teaching Load</h2>
+                    </div>
+                </div>
+                <div class="ym-pane-body">
+                    <div class="ym-row-list">
+                        <div v-for="load in teachingLoad" :key="load.label" class="ym-row">
+                            <div class="ym-row-main">
+                                <p class="ym-row-title">{{ load.label }}</p>
+                                <p class="ym-row-meta">{{ load.note }}</p>
+                            </div>
+                            <div class="ym-row-aside">
+                                <span class="ym-chip">{{ load.value }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </AppLayout>
+</template>

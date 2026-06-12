@@ -1,3 +1,22 @@
+﻿<script setup>
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faCircleInfo, faUserCheck, faUsers } from '@fortawesome/free-solid-svg-icons';
+import AppLayout from '../../Layouts/AppLayout.vue';
+
+const classes = [
+    { className: 'Morning Vinyasa', teacher: 'Mia Tran', branch: 'Downtown', capacity: '22 / 24' },
+    { className: 'Prenatal Flow', teacher: 'Emily Rogers', branch: 'Westside', capacity: '12 / 16' },
+    { className: 'Power Core', teacher: 'Daniel Park', branch: 'Riverside', capacity: '20 / 20' },
+    { className: 'Evening Yin', teacher: 'Ari Gomez', branch: 'Uptown', capacity: '18 / 20' },
+];
+
+const assignments = [
+    { title: 'Substitute for Evening Yin', meta: 'Uptown / Apr 22', status: 'Pending' },
+    { title: 'New Intro to Ashtanga slot', meta: 'Downtown / Apr 25', status: 'Review' },
+    { title: 'Weekend workshop staffing', meta: 'Westside / Apr 28', status: 'Planned' },
+];
+</script>
+
 <template>
     <AppLayout title="Students, Classes & Teachers">
         <div class="ym-stat-strip">
@@ -78,22 +97,3 @@
         </div>
     </AppLayout>
 </template>
-
-<script setup>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faCircleInfo, faUserCheck, faUsers } from '@fortawesome/free-solid-svg-icons';
-import AppLayout from '../../Layouts/AppLayout.vue';
-
-const classes = [
-    { className: 'Morning Vinyasa', teacher: 'Mia Tran', branch: 'Downtown', capacity: '22 / 24' },
-    { className: 'Prenatal Flow', teacher: 'Emily Rogers', branch: 'Westside', capacity: '12 / 16' },
-    { className: 'Power Core', teacher: 'Daniel Park', branch: 'Riverside', capacity: '20 / 20' },
-    { className: 'Evening Yin', teacher: 'Ari Gomez', branch: 'Uptown', capacity: '18 / 20' },
-];
-
-const assignments = [
-    { title: 'Substitute for Evening Yin', meta: 'Uptown / Apr 22', status: 'Pending' },
-    { title: 'New Intro to Ashtanga slot', meta: 'Downtown / Apr 25', status: 'Review' },
-    { title: 'Weekend workshop staffing', meta: 'Westside / Apr 28', status: 'Planned' },
-];
-</script>

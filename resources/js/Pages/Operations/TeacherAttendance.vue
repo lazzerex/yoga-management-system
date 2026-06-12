@@ -1,3 +1,17 @@
+﻿<script setup>
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faCircleInfo, faClipboardCheck } from '@fortawesome/free-solid-svg-icons';
+import AppLayout from '../../Layouts/AppLayout.vue';
+
+const attendance = [
+    { teacher: 'Mia Tran', branch: 'Downtown', shift: '06:00 - 12:00', checkIn: '05:51', status: 'On Time' },
+    { teacher: 'Daniel Park', branch: 'Riverside', shift: '07:00 - 13:00', checkIn: '07:08', status: 'Late' },
+    { teacher: 'Ari Gomez', branch: 'Uptown', shift: '10:00 - 16:00', checkIn: '09:53', status: 'On Time' },
+    { teacher: 'Emily Rogers', branch: 'Westside', shift: '14:00 - 20:00', checkIn: '13:58', status: 'On Time' },
+    { teacher: 'Noah Blake', branch: 'Downtown', shift: '16:00 - 22:00', checkIn: '--', status: 'Absent' },
+];
+</script>
+
 <template>
     <AppLayout title="Teacher Attendance Tracking">
         <div class="ym-stat-strip">
@@ -66,17 +80,3 @@
         </div>
     </AppLayout>
 </template>
-
-<script setup>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faCircleInfo, faClipboardCheck } from '@fortawesome/free-solid-svg-icons';
-import AppLayout from '../../Layouts/AppLayout.vue';
-
-const attendance = [
-    { teacher: 'Mia Tran', branch: 'Downtown', shift: '06:00 - 12:00', checkIn: '05:51', status: 'On Time' },
-    { teacher: 'Daniel Park', branch: 'Riverside', shift: '07:00 - 13:00', checkIn: '07:08', status: 'Late' },
-    { teacher: 'Ari Gomez', branch: 'Uptown', shift: '10:00 - 16:00', checkIn: '09:53', status: 'On Time' },
-    { teacher: 'Emily Rogers', branch: 'Westside', shift: '14:00 - 20:00', checkIn: '13:58', status: 'On Time' },
-    { teacher: 'Noah Blake', branch: 'Downtown', shift: '16:00 - 22:00', checkIn: '--', status: 'Absent' },
-];
-</script>

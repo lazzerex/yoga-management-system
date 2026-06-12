@@ -1,3 +1,27 @@
+﻿<script setup>
+import { Link, useForm } from '@inertiajs/vue3';
+import AppLayout from '../../../Layouts/AppLayout.vue';
+
+const props = defineProps({
+    endpoints: Object,
+});
+
+const form = useForm({
+    name: '',
+    username: '',
+    email: '',
+    role: 'member',
+    password: '',
+    password_confirmation: '',
+});
+
+const createUser = () => {
+    form.post(props.endpoints.store, {
+        onSuccess: () => form.reset(),
+    });
+};
+</script>
+
 <template>
     <AppLayout title="Create User">
         <section class="ym-surface ym-section">
@@ -47,27 +71,3 @@
         </section>
     </AppLayout>
 </template>
-
-<script setup>
-import { Link, useForm } from '@inertiajs/vue3';
-import AppLayout from '../../../Layouts/AppLayout.vue';
-
-const props = defineProps({
-    endpoints: Object,
-});
-
-const form = useForm({
-    name: '',
-    username: '',
-    email: '',
-    role: 'member',
-    password: '',
-    password_confirmation: '',
-});
-
-const createUser = () => {
-    form.post(props.endpoints.store, {
-        onSuccess: () => form.reset(),
-    });
-};
-</script>

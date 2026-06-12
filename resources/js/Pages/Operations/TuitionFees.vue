@@ -1,3 +1,22 @@
+﻿<script setup>
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faChartSimple, faCircleInfo, faMoneyBillWave } from '@fortawesome/free-solid-svg-icons';
+import AppLayout from '../../Layouts/AppLayout.vue';
+
+const fees = [
+    { student: 'Sophia Nguyen', plan: 'Unlimited Monthly', amount: '$129', dueDate: 'Apr 21', status: 'Paid', statusClass: 'ym-status-pill--started' },
+    { student: 'Ethan Cole', plan: '10-Class Pack', amount: '$160', dueDate: 'Apr 22', status: 'Pending', statusClass: 'ym-status-pill--pending' },
+    { student: 'Luna Bennett', plan: 'Private 1:1', amount: '$220', dueDate: 'Apr 18', status: 'Overdue', statusClass: 'ym-status-pill--pending' },
+    { student: 'Noah Blake', plan: 'Weekend Membership', amount: '$89', dueDate: 'Apr 25', status: 'Scheduled', statusClass: '' },
+];
+
+const channels = [
+    { name: 'Bank Transfer', meta: 'Primary method for monthly plans', share: '53%' },
+    { name: 'Card Payment', meta: 'Front desk and online checkout', share: '31%' },
+    { name: 'E-Wallet', meta: 'Preferred by younger members', share: '16%' },
+];
+</script>
+
 <template>
     <AppLayout title="Tuition Fee Collection">
         <div class="ym-stat-strip">
@@ -82,22 +101,3 @@
         </div>
     </AppLayout>
 </template>
-
-<script setup>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faChartSimple, faCircleInfo, faMoneyBillWave } from '@fortawesome/free-solid-svg-icons';
-import AppLayout from '../../Layouts/AppLayout.vue';
-
-const fees = [
-    { student: 'Sophia Nguyen', plan: 'Unlimited Monthly', amount: '$129', dueDate: 'Apr 21', status: 'Paid', statusClass: 'ym-status-pill--started' },
-    { student: 'Ethan Cole', plan: '10-Class Pack', amount: '$160', dueDate: 'Apr 22', status: 'Pending', statusClass: 'ym-status-pill--pending' },
-    { student: 'Luna Bennett', plan: 'Private 1:1', amount: '$220', dueDate: 'Apr 18', status: 'Overdue', statusClass: 'ym-status-pill--pending' },
-    { student: 'Noah Blake', plan: 'Weekend Membership', amount: '$89', dueDate: 'Apr 25', status: 'Scheduled', statusClass: '' },
-];
-
-const channels = [
-    { name: 'Bank Transfer', meta: 'Primary method for monthly plans', share: '53%' },
-    { name: 'Card Payment', meta: 'Front desk and online checkout', share: '31%' },
-    { name: 'E-Wallet', meta: 'Preferred by younger members', share: '16%' },
-];
-</script>

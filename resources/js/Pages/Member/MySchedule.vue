@@ -1,3 +1,73 @@
+﻿<script setup>
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faBellConcierge, faCalendarWeek, faChartSimple, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
+import AppLayout from '../../Layouts/AppLayout.vue';
+
+const weeklySchedule = [
+    {
+        day: 'Mon',
+        date: 'Apr 27',
+        sessions: [
+            { time: '06:45', title: 'Sunrise Mobility', meta: 'Westside Â· Coach Lina' },
+            { time: '18:30', title: 'Evening Yin', meta: 'Downtown Â· Coach Ari' },
+        ],
+    },
+    {
+        day: 'Tue',
+        date: 'Apr 28',
+        sessions: [
+            { time: '07:00', title: 'Power Core', meta: 'Riverside Â· Coach Daniel' },
+        ],
+    },
+    {
+        day: 'Wed',
+        date: 'Apr 29',
+        sessions: [
+            { time: '18:30', title: 'Evening Yin', meta: 'Downtown Â· Coach Ari' },
+        ],
+    },
+    {
+        day: 'Thu',
+        date: 'Apr 30',
+        sessions: [
+            { time: '07:00', title: 'Power Core', meta: 'Riverside Â· Coach Daniel' },
+            { time: '20:00', title: 'Breathwork Lab', meta: 'Online Â· Coach Noah' },
+        ],
+    },
+    {
+        day: 'Fri',
+        date: 'May 01',
+        sessions: [
+            { time: '17:45', title: 'Mobility Reset', meta: 'Downtown Â· Coach Lina' },
+        ],
+    },
+    {
+        day: 'Sat',
+        date: 'May 02',
+        sessions: [
+            { time: '09:00', title: 'Weekend Flow', meta: 'Uptown Â· Coach Mia' },
+        ],
+    },
+    {
+        day: 'Sun',
+        date: 'May 03',
+        sessions: [],
+    },
+];
+
+const highlights = [
+    { title: 'Form correction checkpoint', meta: 'Tue Â· Power Core', type: 'Coach Note' },
+    { title: 'Breathwork mini workshop', meta: 'Thu Â· Online room B', type: 'Workshop' },
+    { title: 'Monthly mobility assessment', meta: 'Sat Â· Uptown', type: 'Assessment' },
+];
+
+const weeklyFocus = [
+    { label: 'Total Sessions Planned', note: 'Booked and confirmed sessions', value: '7' },
+    { label: 'Intensity Balance', note: 'High vs recovery sessions', value: '3 : 4' },
+    { label: 'Current Streak', note: 'Consecutive active weeks', value: '5 weeks' },
+];
+</script>
+
 <template>
     <AppLayout title="My Schedule">
         <div class="ym-pane">
@@ -25,7 +95,7 @@
                                     <p class="ym-timetable-name">{{ session.title }}</p>
                                     <p class="ym-timetable-sub">{{ session.meta }}</p>
                                 </div>
-                                <div v-if="!day.sessions.length" class="ym-timetable-empty">—</div>
+                                <div v-if="!day.sessions.length" class="ym-timetable-empty">â€”</div>
                             </div>
                         </div>
                     </div>
@@ -84,73 +154,3 @@
         </div>
     </AppLayout>
 </template>
-
-<script setup>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faBellConcierge, faCalendarWeek, faChartSimple, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
-import AppLayout from '../../Layouts/AppLayout.vue';
-
-const weeklySchedule = [
-    {
-        day: 'Mon',
-        date: 'Apr 27',
-        sessions: [
-            { time: '06:45', title: 'Sunrise Mobility', meta: 'Westside · Coach Lina' },
-            { time: '18:30', title: 'Evening Yin', meta: 'Downtown · Coach Ari' },
-        ],
-    },
-    {
-        day: 'Tue',
-        date: 'Apr 28',
-        sessions: [
-            { time: '07:00', title: 'Power Core', meta: 'Riverside · Coach Daniel' },
-        ],
-    },
-    {
-        day: 'Wed',
-        date: 'Apr 29',
-        sessions: [
-            { time: '18:30', title: 'Evening Yin', meta: 'Downtown · Coach Ari' },
-        ],
-    },
-    {
-        day: 'Thu',
-        date: 'Apr 30',
-        sessions: [
-            { time: '07:00', title: 'Power Core', meta: 'Riverside · Coach Daniel' },
-            { time: '20:00', title: 'Breathwork Lab', meta: 'Online · Coach Noah' },
-        ],
-    },
-    {
-        day: 'Fri',
-        date: 'May 01',
-        sessions: [
-            { time: '17:45', title: 'Mobility Reset', meta: 'Downtown · Coach Lina' },
-        ],
-    },
-    {
-        day: 'Sat',
-        date: 'May 02',
-        sessions: [
-            { time: '09:00', title: 'Weekend Flow', meta: 'Uptown · Coach Mia' },
-        ],
-    },
-    {
-        day: 'Sun',
-        date: 'May 03',
-        sessions: [],
-    },
-];
-
-const highlights = [
-    { title: 'Form correction checkpoint', meta: 'Tue · Power Core', type: 'Coach Note' },
-    { title: 'Breathwork mini workshop', meta: 'Thu · Online room B', type: 'Workshop' },
-    { title: 'Monthly mobility assessment', meta: 'Sat · Uptown', type: 'Assessment' },
-];
-
-const weeklyFocus = [
-    { label: 'Total Sessions Planned', note: 'Booked and confirmed sessions', value: '7' },
-    { label: 'Intensity Balance', note: 'High vs recovery sessions', value: '3 : 4' },
-    { label: 'Current Streak', note: 'Consecutive active weeks', value: '5 weeks' },
-];
-</script>

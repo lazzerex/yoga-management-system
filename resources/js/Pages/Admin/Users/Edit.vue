@@ -1,3 +1,28 @@
+﻿<script setup>
+import { Link, useForm } from '@inertiajs/vue3';
+import AppLayout from '../../../Layouts/AppLayout.vue';
+
+const props = defineProps({
+    user: Object,
+    endpoints: Object,
+});
+
+const form = useForm({
+    name: props.user.name,
+    username: props.user.username,
+    email: props.user.email,
+    role: props.user.role,
+    password: '',
+    password_confirmation: '',
+});
+
+const saveEdit = () => {
+    form.patch(props.endpoints.update, {
+        onSuccess: () => form.reset('password', 'password_confirmation'),
+    });
+};
+</script>
+
 <template>
     <AppLayout title="Edit User">
         <section class="ym-surface ym-section">
@@ -47,28 +72,3 @@
         </section>
     </AppLayout>
 </template>
-
-<script setup>
-import { Link, useForm } from '@inertiajs/vue3';
-import AppLayout from '../../../Layouts/AppLayout.vue';
-
-const props = defineProps({
-    user: Object,
-    endpoints: Object,
-});
-
-const form = useForm({
-    name: props.user.name,
-    username: props.user.username,
-    email: props.user.email,
-    role: props.user.role,
-    password: '',
-    password_confirmation: '',
-});
-
-const saveEdit = () => {
-    form.patch(props.endpoints.update, {
-        onSuccess: () => form.reset('password', 'password_confirmation'),
-    });
-};
-</script>

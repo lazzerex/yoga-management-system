@@ -1,3 +1,20 @@
+﻿<script setup>
+import AuthCard from '../../Components/Auth/AuthCard.vue';
+import LabeledInput from '../../Components/Form/LabeledInput.vue';
+import { Link, useForm } from '@inertiajs/vue3';
+import { route } from 'ziggy-js';
+
+const form = useForm({
+    username: '',
+    password: '',
+    remember: false,
+});
+
+const submit = () => {
+    form.post(route('login'));
+};
+</script>
+
 <template>
     <AuthCard title="CMS Login">
         <form @submit.prevent="submit" class="space-y-4">
@@ -16,7 +33,7 @@
                 v-model="form.password"
                 label="Password"
                 type="password"
-                placeholder="••••••••"
+                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                 autocomplete="current-password"
                 :error="form.errors.password"
             />
@@ -41,20 +58,3 @@
         </form>
     </AuthCard>
 </template>
-
-<script setup>
-import AuthCard from '../../Components/Auth/AuthCard.vue';
-import LabeledInput from '../../Components/Form/LabeledInput.vue';
-import { Link, useForm } from '@inertiajs/vue3';
-import { route } from 'ziggy-js';
-
-const form = useForm({
-    username: '',
-    password: '',
-    remember: false,
-});
-
-const submit = () => {
-    form.post(route('login'));
-};
-</script>

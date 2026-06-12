@@ -1,3 +1,22 @@
+﻿<script setup>
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faCalendarDays, faCircleInfo, faIdCard, faListCheck } from '@fortawesome/free-solid-svg-icons';
+import AppLayout from '../../Layouts/AppLayout.vue';
+
+const benefits = [
+    { title: 'Unlimited Studio Classes', meta: 'All branches Â· Any level', limit: 'Unlimited' },
+    { title: 'Wellness Workshop Credits', meta: 'Nutrition + mobility workshops', limit: '6 / year' },
+    { title: '1:1 Coach Consultations', meta: 'Goal and posture check-in', limit: '4 / year' },
+    { title: 'Guest Access', meta: 'Invite a friend to selected sessions', limit: '4 left' },
+];
+
+const renewalTimeline = [
+    { date: 'Dec 02, 2026', note: 'Renewal reminder email', status: 'Upcoming' },
+    { date: 'Dec 20, 2026', note: 'Payment method check window', status: 'Upcoming' },
+    { date: 'Jan 05, 2027', note: 'Plan renews automatically', status: 'Scheduled' },
+];
+</script>
+
 <template>
     <AppLayout title="My Membership">
         <div class="ym-stat-strip">
@@ -30,7 +49,7 @@
                 <div class="ym-plan-header">
                     <p class="ym-plan-overline">Member ID YM-29814</p>
                     <p class="ym-plan-name">Premium Flow Annual</p>
-                    <p class="ym-plan-sub">Started Jan 5, 2026 · Renews Jan 5, 2027</p>
+                    <p class="ym-plan-sub">Started Jan 5, 2026 Â· Renews Jan 5, 2027</p>
                 </div>
             </div>
         </div>
@@ -86,22 +105,3 @@
         </div>
     </AppLayout>
 </template>
-
-<script setup>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faCalendarDays, faCircleInfo, faIdCard, faListCheck } from '@fortawesome/free-solid-svg-icons';
-import AppLayout from '../../Layouts/AppLayout.vue';
-
-const benefits = [
-    { title: 'Unlimited Studio Classes', meta: 'All branches · Any level', limit: 'Unlimited' },
-    { title: 'Wellness Workshop Credits', meta: 'Nutrition + mobility workshops', limit: '6 / year' },
-    { title: '1:1 Coach Consultations', meta: 'Goal and posture check-in', limit: '4 / year' },
-    { title: 'Guest Access', meta: 'Invite a friend to selected sessions', limit: '4 left' },
-];
-
-const renewalTimeline = [
-    { date: 'Dec 02, 2026', note: 'Renewal reminder email', status: 'Upcoming' },
-    { date: 'Dec 20, 2026', note: 'Payment method check window', status: 'Upcoming' },
-    { date: 'Jan 05, 2027', note: 'Plan renews automatically', status: 'Scheduled' },
-];
-</script>

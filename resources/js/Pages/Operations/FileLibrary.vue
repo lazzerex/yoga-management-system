@@ -1,3 +1,23 @@
+﻿<script setup>
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faCircleInfo, faCloudArrowUp, faFolderOpen } from '@fortawesome/free-solid-svg-icons';
+import AppLayout from '../../Layouts/AppLayout.vue';
+
+const folders = [
+    { name: 'Teacher Materials', files: 312, size: '11.3 GB', owner: 'Academic Team' },
+    { name: 'Class Promo Images', files: 438, size: '15.8 GB', owner: 'Marketing Team' },
+    { name: 'Student Documents', files: 289, size: '6.2 GB', owner: 'Front Desk' },
+    { name: 'Workshop Assets', files: 247, size: '5.1 GB', owner: 'Operations' },
+];
+
+const uploads = [
+    { file: 'spring-retreat-poster.jpg', by: 'Mia Tran', time: 'Today 10:22', status: 'Approved', statusClass: 'ym-status-pill--started' },
+    { file: 'yin-sequence-v2.pdf', by: 'Daniel Park', time: 'Today 09:41', status: 'Pending', statusClass: 'ym-status-pill--pending' },
+    { file: 'teacher-headshot-emily.png', by: 'Admin Team', time: 'Yesterday 17:03', status: 'Review', statusClass: '' },
+    { file: 'weekend-event-banner.psd', by: 'Marketing', time: 'Yesterday 15:18', status: 'Pending', statusClass: 'ym-status-pill--pending' },
+];
+</script>
+
 <template>
     <AppLayout title="File & Image Upload Management">
         <div class="ym-stat-strip">
@@ -31,7 +51,7 @@
                         <div v-for="folder in folders" :key="folder.name" class="ym-row">
                             <div class="ym-row-main">
                                 <p class="ym-row-title">{{ folder.name }}</p>
-                                <p class="ym-row-meta">{{ folder.files }} files · {{ folder.owner }}</p>
+                                <p class="ym-row-meta">{{ folder.files }} files Â· {{ folder.owner }}</p>
                             </div>
                             <div class="ym-row-aside">
                                 <span class="ym-chip">{{ folder.size }}</span>
@@ -53,7 +73,7 @@
                         <div v-for="item in uploads" :key="item.file" class="ym-row">
                             <div class="ym-row-main">
                                 <p class="ym-row-title">{{ item.file }}</p>
-                                <p class="ym-row-meta">{{ item.by }} · {{ item.time }}</p>
+                                <p class="ym-row-meta">{{ item.by }} Â· {{ item.time }}</p>
                             </div>
                             <div class="ym-row-aside">
                                 <span :class="['ym-status-pill', item.statusClass]">{{ item.status }}</span>
@@ -69,23 +89,3 @@
         </div>
     </AppLayout>
 </template>
-
-<script setup>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faCircleInfo, faCloudArrowUp, faFolderOpen } from '@fortawesome/free-solid-svg-icons';
-import AppLayout from '../../Layouts/AppLayout.vue';
-
-const folders = [
-    { name: 'Teacher Materials', files: 312, size: '11.3 GB', owner: 'Academic Team' },
-    { name: 'Class Promo Images', files: 438, size: '15.8 GB', owner: 'Marketing Team' },
-    { name: 'Student Documents', files: 289, size: '6.2 GB', owner: 'Front Desk' },
-    { name: 'Workshop Assets', files: 247, size: '5.1 GB', owner: 'Operations' },
-];
-
-const uploads = [
-    { file: 'spring-retreat-poster.jpg', by: 'Mia Tran', time: 'Today 10:22', status: 'Approved', statusClass: 'ym-status-pill--started' },
-    { file: 'yin-sequence-v2.pdf', by: 'Daniel Park', time: 'Today 09:41', status: 'Pending', statusClass: 'ym-status-pill--pending' },
-    { file: 'teacher-headshot-emily.png', by: 'Admin Team', time: 'Yesterday 17:03', status: 'Review', statusClass: '' },
-    { file: 'weekend-event-banner.psd', by: 'Marketing', time: 'Yesterday 15:18', status: 'Pending', statusClass: 'ym-status-pill--pending' },
-];
-</script>

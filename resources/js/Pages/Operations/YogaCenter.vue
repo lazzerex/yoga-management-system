@@ -1,3 +1,22 @@
+﻿<script setup>
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faBuilding, faCircleInfo, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
+import AppLayout from '../../Layouts/AppLayout.vue';
+
+const branches = [
+    { name: 'Downtown Studio', address: '1 Main St', classes: 12 },
+    { name: 'Westside Branch', address: '28 Lake Ave', classes: 9 },
+    { name: 'Riverside Center', address: '19 River Blvd', classes: 7 },
+    { name: 'Uptown Loft', address: '53 Summit Rd', classes: 6 },
+];
+
+const notices = [
+    { title: 'Mat storage renovation', meta: 'Downtown Studio Â· Apr 22', priority: 'High' },
+    { title: 'HVAC maintenance window', meta: 'Westside Branch Â· Apr 24', priority: 'Medium' },
+    { title: 'Equipment restock', meta: 'All branches Â· Apr 26', priority: 'Normal' },
+];
+</script>
+
 <template>
     <AppLayout title="Yoga Center Management">
         <div class="ym-stat-strip">
@@ -69,22 +88,3 @@
         </div>
     </AppLayout>
 </template>
-
-<script setup>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faBuilding, faCircleInfo, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
-import AppLayout from '../../Layouts/AppLayout.vue';
-
-const branches = [
-    { name: 'Downtown Studio', address: '1 Main St', classes: 12 },
-    { name: 'Westside Branch', address: '28 Lake Ave', classes: 9 },
-    { name: 'Riverside Center', address: '19 River Blvd', classes: 7 },
-    { name: 'Uptown Loft', address: '53 Summit Rd', classes: 6 },
-];
-
-const notices = [
-    { title: 'Mat storage renovation', meta: 'Downtown Studio · Apr 22', priority: 'High' },
-    { title: 'HVAC maintenance window', meta: 'Westside Branch · Apr 24', priority: 'Medium' },
-    { title: 'Equipment restock', meta: 'All branches · Apr 26', priority: 'Normal' },
-];
-</script>

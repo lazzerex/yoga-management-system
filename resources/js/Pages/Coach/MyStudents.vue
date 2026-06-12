@@ -1,3 +1,30 @@
+﻿<script setup>
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faChartSimple, faTriangleExclamation, faUsers } from '@fortawesome/free-solid-svg-icons';
+import AppLayout from '../../Layouts/AppLayout.vue';
+
+const students = [
+    { name: 'Nora Ellis', primaryClass: 'Power Core', attendance: '9 / 10', lastSession: 'Apr 24' },
+    { name: 'Kevin Yu', primaryClass: 'Evening Yin', attendance: '8 / 10', lastSession: 'Apr 22' },
+    { name: 'Ava Sato', primaryClass: 'Prenatal Flow', attendance: '7 / 8', lastSession: 'Apr 23' },
+    { name: 'Mason Reed', primaryClass: 'Weekend Flow', attendance: '5 / 8', lastSession: 'Apr 18' },
+    { name: 'Sienna Park', primaryClass: 'Breathwork Lab', attendance: '10 / 10', lastSession: 'Apr 25' },
+    { name: 'Noel Grant', primaryClass: 'Power Core', attendance: '4 / 8', lastSession: 'Apr 11' },
+];
+
+const followUps = [
+    { student: 'Mason Reed', note: 'Attendance down for 2 consecutive weeks' },
+    { student: 'Noel Grant', note: 'Requested support for shoulder mobility modifications' },
+    { student: 'Kevin Yu', note: 'Interested in progressing to intermediate sequence' },
+];
+
+const coachingSnapshot = [
+    { label: 'Average Attendance', note: 'All classes this month', value: '84%' },
+    { label: 'Students at Risk', note: 'Attendance < 60%', value: '6' },
+    { label: 'High Consistency Students', note: 'Attendance > 90%', value: '23' },
+];
+</script>
+
 <template>
     <AppLayout title="My Students">
         <div class="ym-stat-strip">
@@ -96,30 +123,3 @@
         </div>
     </AppLayout>
 </template>
-
-<script setup>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faChartSimple, faTriangleExclamation, faUsers } from '@fortawesome/free-solid-svg-icons';
-import AppLayout from '../../Layouts/AppLayout.vue';
-
-const students = [
-    { name: 'Nora Ellis', primaryClass: 'Power Core', attendance: '9 / 10', lastSession: 'Apr 24' },
-    { name: 'Kevin Yu', primaryClass: 'Evening Yin', attendance: '8 / 10', lastSession: 'Apr 22' },
-    { name: 'Ava Sato', primaryClass: 'Prenatal Flow', attendance: '7 / 8', lastSession: 'Apr 23' },
-    { name: 'Mason Reed', primaryClass: 'Weekend Flow', attendance: '5 / 8', lastSession: 'Apr 18' },
-    { name: 'Sienna Park', primaryClass: 'Breathwork Lab', attendance: '10 / 10', lastSession: 'Apr 25' },
-    { name: 'Noel Grant', primaryClass: 'Power Core', attendance: '4 / 8', lastSession: 'Apr 11' },
-];
-
-const followUps = [
-    { student: 'Mason Reed', note: 'Attendance down for 2 consecutive weeks' },
-    { student: 'Noel Grant', note: 'Requested support for shoulder mobility modifications' },
-    { student: 'Kevin Yu', note: 'Interested in progressing to intermediate sequence' },
-];
-
-const coachingSnapshot = [
-    { label: 'Average Attendance', note: 'All classes this month', value: '84%' },
-    { label: 'Students at Risk', note: 'Attendance < 60%', value: '6' },
-    { label: 'High Consistency Students', note: 'Attendance > 90%', value: '23' },
-];
-</script>

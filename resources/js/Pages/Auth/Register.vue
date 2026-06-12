@@ -1,3 +1,22 @@
+﻿<script setup>
+import { Link, useForm } from '@inertiajs/vue3';
+import { route } from 'ziggy-js';
+import AuthCard from '../../Components/Auth/AuthCard.vue';
+import LabeledInput from '../../Components/Form/LabeledInput.vue';
+
+const form = useForm({
+    name: '',
+    username: '',
+    email: '',
+    password: '',
+    password_confirmation: '',
+});
+
+const submit = () => {
+    form.post(route('register'));
+};
+</script>
+
 <template>
     <AuthCard title="Create account">
         <form @submit.prevent="submit" class="space-y-4">
@@ -66,22 +85,3 @@
         </form>
     </AuthCard>
 </template>
-
-<script setup>
-import { Link, useForm } from '@inertiajs/vue3';
-import { route } from 'ziggy-js';
-import AuthCard from '../../Components/Auth/AuthCard.vue';
-import LabeledInput from '../../Components/Form/LabeledInput.vue';
-
-const form = useForm({
-    name: '',
-    username: '',
-    email: '',
-    password: '',
-    password_confirmation: '',
-});
-
-const submit = () => {
-    form.post(route('register'));
-};
-</script>
