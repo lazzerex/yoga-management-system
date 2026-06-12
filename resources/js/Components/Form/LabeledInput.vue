@@ -1,20 +1,4 @@
-<template>
-    <div>
-        <label :for="id" class="block text-sm text-neutral-700 mb-1">{{ label }}</label>
-        <input
-            :id="id"
-            :type="type"
-            :placeholder="placeholder"
-            :autocomplete="autocomplete"
-            :value="modelValue"
-            @input="onInput"
-            class="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm text-neutral-900 focus:outline-none focus:ring focus:border-blue-300"
-        />
-        <p v-if="error" class="mt-1 text-sm text-rose-600">{{ error }}</p>
-    </div>
-</template>
-
-<script setup>
+﻿<script setup>
 const props = defineProps({
     id: {
         type: String,
@@ -52,3 +36,19 @@ const onInput = (event) => {
     emit('update:modelValue', event.target.value);
 };
 </script>
+
+<template>
+    <div>
+        <label :for="id" class="block text-sm text-neutral-700 mb-1">{{ label }}</label>
+        <input
+            :id="id"
+            :type="type"
+            :placeholder="placeholder"
+            :autocomplete="autocomplete"
+            :value="modelValue"
+            @input="onInput"
+            class="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm text-neutral-900 focus:outline-none focus:ring focus:border-blue-300"
+        />
+        <p v-if="error" class="mt-1 text-sm text-rose-600">{{ error }}</p>
+    </div>
+</template>

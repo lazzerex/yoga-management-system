@@ -1,23 +1,4 @@
-<template>
-    <Teleport to="body">
-        <div v-if="show" class="ym-modal-overlay" @click.self="$emit('close')">
-            <div class="ym-modal" role="dialog" :aria-label="title">
-                <div class="ym-modal-header">
-                    <div>
-                        <h2 class="ym-modal-title">{{ title }}</h2>
-                        <p v-if="description" class="ym-modal-desc">{{ description }}</p>
-                    </div>
-                    <button type="button" class="ym-modal-close" @click="$emit('close')">&times;</button>
-                </div>
-                <div class="ym-modal-body">
-                    <slot />
-                </div>
-            </div>
-        </div>
-    </Teleport>
-</template>
-
-<script setup>
+﻿<script setup>
 import { watch, onUnmounted } from 'vue';
 
 const props = defineProps({
@@ -46,3 +27,22 @@ onUnmounted(() => {
     document.removeEventListener('keydown', handleEscape);
 });
 </script>
+
+<template>
+    <Teleport to="body">
+        <div v-if="show" class="ym-modal-overlay" @click.self="$emit('close')">
+            <div class="ym-modal" role="dialog" :aria-label="title">
+                <div class="ym-modal-header">
+                    <div>
+                        <h2 class="ym-modal-title">{{ title }}</h2>
+                        <p v-if="description" class="ym-modal-desc">{{ description }}</p>
+                    </div>
+                    <button type="button" class="ym-modal-close" @click="$emit('close')">&times;</button>
+                </div>
+                <div class="ym-modal-body">
+                    <slot />
+                </div>
+            </div>
+        </div>
+    </Teleport>
+</template>
