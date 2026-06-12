@@ -1,364 +1,4 @@
-<template>
-    <AppLayout :title="pageTitle">
-        <template v-if="isAdmin">
-            <section class="ym-dashlet-grid">
-                <Draggable
-                    v-model="dashlets"
-                    item-key="id"
-                    tag="div"
-                    class="ym-dashlet-grid-inner"
-                    handle=".ym-drag-handle"
-                    ghost-class="ym-dashlet-card--placeholder"
-                    chosen-class="ym-dashlet-card--dragging"
-                    drag-class="ym-dashlet-card--sorting"
-                    :animation="240"
-                    :disabled="lockDashboard"
-                    @start="handleDashletSortStart"
-                    @end="handleDashletSortEnd"
-                >
-                    <template #item="{ element: dashlet }">
-                        <article :class="dashletClasses(dashlet)">
-                            <header class="ym-panel-head">
-                                <div class="ym-dashlet-head">
-                                    <span class="ym-drag-handle" aria-hidden="true">
-                                        <FontAwesomeIcon :icon="faGripVertical" />
-                                    </span>
-                                    <h2 class="ym-panel-title">{{ dashlet.title }}</h2>
-                                </div>
-
-                                <button
-                                    type="button"
-                                    class="ym-dashlet-remove"
-                                    :disabled="lockDashboard"
-                                    aria-label="Remove dashlet"
-                                    @click="removeDashlet(dashlet.id)"
-                                >
-                                    <FontAwesomeIcon :icon="faXmark" />
-                                </button>
-                            </header>
-
-                            <div v-if="dashlet.type === 'activities'" class="ym-activity-list">
-                                <article v-for="activity in activities" :key="activity.title" class="ym-activity-item">
-                                    <a href="#" class="ym-activity-title">{{ activity.title }}</a>
-                                    <p class="ym-activity-meta">
-                                        <span
-                                            :class="[
-                                                'ym-status-pill',
-                                                activity.stateClass === 'pending' ? 'ym-status-pill--pending' : '',
-                                                activity.stateClass === 'started' ? 'ym-status-pill--started' : '',
-                                            ]"
-                                        >
-                                            {{ activity.state }}
-                                        </span>
-                                        <span>{{ activity.when }}</span>
-                                        <span>{{ activity.context }}</span>
-                                    </p>
-                                </article>
-                                <a href="#" class="ym-show-more">Show more</a>
-                            </div>
-
-                            <div v-else-if="dashlet.type === 'calendar'">
-                                <div class="ym-calendar-grid">
-                                    <div v-for="day in weekDays" :key="day" class="ym-calendar-day-name">{{ day }}</div>
-
-                                    <div
-                                        v-for="cell in calendarCells"
-                                        :key="`${cell.date}-${cell.muted ? 'm' : 'a'}`"
-                                        :class="['ym-calendar-cell', { 'ym-calendar-cell--muted': cell.muted }]"
-                                    >
-                                        <span class="ym-calendar-date">{{ cell.date }}</span>
-                                        <span
-                                            v-for="event in cell.events"
-                                            :key="event.text"
-                                            :class="['ym-event-chip', event.colorClass]"
-                                        >
-                                            {{ event.text }}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div v-else-if="dashlet.type === 'cases'" class="ym-section">
-                                <div class="ym-case-list">
-                                    <article v-for="caseItem in cases" :key="caseItem.id" class="ym-case-row">
-                                        <span class="ym-case-id">{{ caseItem.id }}</span>
-                                        <div>
-                                            <p class="ym-case-name">{{ caseItem.title }}</p>
-                                            <p class="ym-case-meta">
-                                                <span :class="['ym-status-pill', caseItem.priority === 'High' ? 'ym-status-pill--pending' : '']">
-                                                    {{ caseItem.priority }}
-                                                </span>
-                                                <span>{{ caseItem.type }}</span>
-                                                <span>{{ caseItem.customer }}</span>
-                                            </p>
-                                        </div>
-                                    </article>
-                                </div>
-                            </div>
-
-                            <div v-else-if="dashlet.type === 'lead-source'" class="ym-section">
-                                <div class="ym-pie-wrap">
-                                    <div class="ym-pie" role="img" aria-label="Lead source distribution chart" />
-                                    <div class="ym-legend">
-                                        <div v-for="item in leadSources" :key="item.name" class="ym-legend-item">
-                                            <span class="ym-legend-dot" :style="{ background: item.color }" />
-                                            <span>{{ item.name }} ({{ item.value }}%)</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div v-else-if="dashlet.type === 'memo'" class="ym-section">
-                                <p class="ym-card-note">Keep short reminders visible to your team directly from this dashboard card.</p>
-                                <div class="ym-note-banner">
-                                    Team reminder: bring April referral stats to Monday leadership sync.
-                                </div>
-                            </div>
-
-                            <div v-else class="ym-section">
-                                <p class="ym-card-note">{{ dashlet.description }}</p>
-                                <div class="ym-list">
-                                    <div v-for="item in dashlet.previewRows" :key="item" class="ym-list-item">
-                                        <span>{{ item }}</span>
-                                        <span class="ym-list-meta">Preview</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </article>
-                    </template>
-                </Draggable>
-            </section>
-        </template>
-
-        <template v-else>
-            <div
-                v-if="dashboardNotice"
-                class="ym-info-row"
-                style="border-radius: 0.42rem; margin-bottom: 0.75rem;"
-            >
-                <FontAwesomeIcon :icon="faCircleInfo" class="ym-info-icon" />
-                <span>{{ dashboardNotice }}</span>
-            </div>
-
-            <template v-if="activeView === 'homepage'">
-                <div class="ym-stat-strip">
-                    <div v-for="metric in dashboardConfig.metrics" :key="metric.label" class="ym-stat">
-                        <p class="ym-stat-label">{{ metric.label }}</p>
-                        <p class="ym-stat-value">{{ metric.value }}</p>
-                        <p class="ym-stat-note">{{ metric.note }}</p>
-                    </div>
-                </div>
-
-                <div class="ym-page-cols">
-                    <div class="ym-pane">
-                        <div class="ym-pane-head">
-                            <div class="ym-pane-title-wrap">
-                                <FontAwesomeIcon :icon="dashboardConfig.primaryPanel.icon" class="ym-pane-icon" />
-                                <h2 class="ym-pane-title">{{ dashboardConfig.primaryPanel.title }}</h2>
-                            </div>
-                        </div>
-                        <div class="ym-pane-body">
-                            <div class="ym-row-list">
-                                <div
-                                    v-for="item in dashboardConfig.primaryPanel.rows"
-                                    :key="item.title"
-                                    class="ym-row"
-                                >
-                                    <div class="ym-row-main">
-                                        <p class="ym-row-title">{{ item.title }}</p>
-                                        <p class="ym-row-meta">{{ item.meta }}</p>
-                                    </div>
-                                    <div class="ym-row-aside">
-                                        <span :class="badgeClass(item.tone)">{{ item.badge }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="ym-pane">
-                        <div class="ym-pane-head">
-                            <div class="ym-pane-title-wrap">
-                                <FontAwesomeIcon :icon="dashboardConfig.secondaryPanel.icon" class="ym-pane-icon" />
-                                <h2 class="ym-pane-title">{{ dashboardConfig.secondaryPanel.title }}</h2>
-                            </div>
-                        </div>
-                        <div class="ym-pane-body">
-                            <div class="ym-row-list">
-                                <div
-                                    v-for="item in dashboardConfig.secondaryPanel.rows"
-                                    :key="item.title"
-                                    class="ym-row"
-                                >
-                                    <div class="ym-row-main">
-                                        <p class="ym-row-title">{{ item.title }}</p>
-                                        <p class="ym-row-meta">{{ item.meta }}</p>
-                                    </div>
-                                    <div class="ym-row-aside">
-                                        <span :class="badgeClass(item.tone)">{{ item.badge }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="ym-pane mt-4">
-                    <div class="ym-pane-head">
-                        <div class="ym-pane-title-wrap">
-                            <FontAwesomeIcon :icon="faCalendarWeek" class="ym-pane-icon" />
-                            <h2 class="ym-pane-title">{{ dashboardConfig.weeklyPanel.title }}</h2>
-                        </div>
-                    </div>
-                    <div class="ym-pane-body">
-                        <div class="ym-timetable-scroll">
-                            <div class="ym-timetable">
-                                <div
-                                    v-for="day in dashboardConfig.weeklyPanel.days"
-                                    :key="day.day"
-                                    class="ym-timetable-col"
-                                >
-                                    <div class="ym-timetable-head">
-                                        <p class="ym-timetable-day">{{ day.day.slice(0, 3) }}</p>
-                                        <p class="ym-timetable-date">{{ day.date }}</p>
-                                    </div>
-                                    <div class="ym-timetable-body">
-                                        <div
-                                            v-for="entry in day.entries"
-                                            :key="entry.title"
-                                            :class="['ym-timetable-slot', { 'ym-timetable-slot--coach': isCoach }]"
-                                        >
-                                            <p class="ym-timetable-time">{{ entry.time }}</p>
-                                            <p class="ym-timetable-name">{{ entry.title }}</p>
-                                            <p class="ym-timetable-sub">{{ entry.meta }}</p>
-                                        </div>
-                                        <div v-if="!day.entries.length" class="ym-timetable-empty">
-                                            {{ dashboardConfig.weeklyPanel.emptyMessage }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </template>
-
-            <template v-else-if="currentViewConfig">
-                <div class="ym-pane">
-                    <div class="ym-pane-head">
-                        <div class="ym-pane-title-wrap">
-                            <FontAwesomeIcon :icon="currentViewConfig.icon" class="ym-pane-icon" />
-                            <h2 class="ym-pane-title">{{ currentViewConfig.title }}</h2>
-                        </div>
-                    </div>
-                    <div class="ym-pane-body">
-                        <div class="ym-row-list">
-                            <div
-                                v-for="item in currentViewConfig.rows"
-                                :key="item.title"
-                                class="ym-row"
-                            >
-                                <div class="ym-row-main">
-                                    <p class="ym-row-title">{{ item.title }}</p>
-                                    <p class="ym-row-meta">{{ item.meta }}</p>
-                                </div>
-                                <div class="ym-row-aside">
-                                    <span :class="badgeClass(item.tone)">{{ item.badge }}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="ym-info-row">
-                            <FontAwesomeIcon :icon="faCircleInfo" class="ym-info-icon" />
-                            <span>{{ currentViewConfig.note }}</span>
-                        </div>
-                    </div>
-                </div>
-            </template>
-        </template>
-
-        <Modal :show="showEditDashboardModal" title="Edit Dashboard Tabs" @close="showEditDashboardModal = false">
-            <div class="ym-dashboard-modal-actions">
-                <button type="button" class="ym-btn-sm" @click="saveDashboardTabs">Save</button>
-                <button type="button" class="ym-btn-outline" @click="showEditDashboardModal = false">Cancel</button>
-            </div>
-
-            <p v-if="dashboardTabError" class="ym-field-error">{{ dashboardTabError }}</p>
-
-            <p class="ym-card-note">
-                Configure up to six dashboard tabs shown in the top navigation for this session.
-            </p>
-
-            <div class="ym-tab-editor-list mt-3">
-                <div v-for="(tab, index) in dashboardTabsDraft" :key="tab.id" class="ym-tab-editor-row">
-                    <span class="ym-tab-handle" aria-hidden="true">
-                        <FontAwesomeIcon :icon="faGripVertical" />
-                    </span>
-                    <input v-model="tab.label" type="text" class="ym-input" />
-                    <button
-                        type="button"
-                        class="ym-tab-remove"
-                        :disabled="dashboardTabsDraft.length === 1"
-                        @click="removeDashboardTab(index)"
-                    >
-                        <FontAwesomeIcon :icon="faXmark" />
-                    </button>
-                </div>
-
-                <div class="ym-tab-editor-row ym-tab-editor-row--add">
-                    <input
-                        v-model="newDashboardTabLabel"
-                        type="text"
-                        class="ym-input"
-                        placeholder="Type and press enter"
-                        @keydown.enter.prevent="addDashboardTab"
-                    />
-                    <button type="button" class="ym-tab-add" :disabled="dashboardTabsDraft.length >= maxTopTabs" @click="addDashboardTab">
-                        <FontAwesomeIcon :icon="faPlus" />
-                    </button>
-                </div>
-            </div>
-
-            <label v-if="isAdmin" class="ym-lock-toggle mt-3">
-                <span>Lock Dashboard</span>
-                <input v-model="lockDashboard" type="checkbox" />
-            </label>
-        </Modal>
-
-        <Modal
-            v-if="isAdmin"
-            :show="showAddDashletModal"
-            title="Add Dashlet"
-            @close="showAddDashletModal = false"
-        >
-            <label class="ym-search-wrap ym-dashboard-modal-search" aria-label="Search dashlets">
-                <FontAwesomeIcon :icon="faMagnifyingGlass" class="ym-search-icon" />
-                <input
-                    v-model="dashletSearchQuery"
-                    type="search"
-                    class="ym-search"
-                    placeholder="Search"
-                    aria-label="Search dashlets"
-                />
-            </label>
-
-            <div class="ym-dashlet-catalog">
-                <button
-                    v-for="item in filteredDashletCatalog"
-                    :key="item.id"
-                    type="button"
-                    class="ym-dashlet-catalog-item"
-                    :disabled="isDashletActive(item.id)"
-                    @click="addDashlet(item)"
-                >
-                    <span>{{ item.title }}</span>
-                    <small>{{ isDashletActive(item.id) ? 'Added' : 'Add' }}</small>
-                </button>
-            </div>
-        </Modal>
-    </AppLayout>
-</template>
-
-<script setup>
+﻿<script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { route } from 'ziggy-js';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -416,10 +56,10 @@ const roleDashboard = {
             title: "Today's Schedule",
             icon: faClipboardList,
             rows: [
-                { title: '07:00 Power Core', meta: 'Riverside · 24 students', badge: 'Completed', tone: 'started' },
-                { title: '12:30 Prenatal Flow', meta: 'Westside · 14 students', badge: 'Completed', tone: 'started' },
-                { title: '18:30 Evening Yin', meta: 'Downtown · 21 students', badge: 'Up Next', tone: 'pending' },
-                { title: '20:00 Breathwork Lab', meta: 'Online · 32 students', badge: 'Later', tone: 'default' },
+                { title: '07:00 Power Core', meta: 'Riverside Â· 24 students', badge: 'Completed', tone: 'started' },
+                { title: '12:30 Prenatal Flow', meta: 'Westside Â· 14 students', badge: 'Completed', tone: 'started' },
+                { title: '18:30 Evening Yin', meta: 'Downtown Â· 21 students', badge: 'Up Next', tone: 'pending' },
+                { title: '20:00 Breathwork Lab', meta: 'Online Â· 32 students', badge: 'Later', tone: 'default' },
             ],
         },
         secondaryPanel: {
@@ -440,45 +80,45 @@ const roleDashboard = {
                     day: 'Monday',
                     date: 'Apr 27',
                     entries: [
-                        { time: '06:45', title: 'Sunrise Mobility', meta: 'Westside · 18 students' },
-                        { time: '18:30', title: 'Evening Yin', meta: 'Downtown · 21 students' },
+                        { time: '06:45', title: 'Sunrise Mobility', meta: 'Westside Â· 18 students' },
+                        { time: '18:30', title: 'Evening Yin', meta: 'Downtown Â· 21 students' },
                     ],
                 },
                 {
                     day: 'Tuesday',
                     date: 'Apr 28',
                     entries: [
-                        { time: '07:00', title: 'Power Core', meta: 'Riverside · 24 students' },
-                        { time: '20:00', title: 'Breathwork Lab', meta: 'Online · 32 students' },
+                        { time: '07:00', title: 'Power Core', meta: 'Riverside Â· 24 students' },
+                        { time: '20:00', title: 'Breathwork Lab', meta: 'Online Â· 32 students' },
                     ],
                 },
                 {
                     day: 'Wednesday',
                     date: 'Apr 29',
                     entries: [
-                        { time: '18:30', title: 'Evening Yin', meta: 'Downtown · 20 students' },
+                        { time: '18:30', title: 'Evening Yin', meta: 'Downtown Â· 20 students' },
                     ],
                 },
                 {
                     day: 'Thursday',
                     date: 'Apr 30',
                     entries: [
-                        { time: '07:00', title: 'Power Core', meta: 'Riverside · 23 students' },
-                        { time: '12:30', title: 'Prenatal Flow', meta: 'Westside · 14 students' },
+                        { time: '07:00', title: 'Power Core', meta: 'Riverside Â· 23 students' },
+                        { time: '12:30', title: 'Prenatal Flow', meta: 'Westside Â· 14 students' },
                     ],
                 },
                 {
                     day: 'Friday',
                     date: 'May 01',
                     entries: [
-                        { time: '17:45', title: 'Mobility Reset', meta: 'Downtown · 16 students' },
+                        { time: '17:45', title: 'Mobility Reset', meta: 'Downtown Â· 16 students' },
                     ],
                 },
                 {
                     day: 'Saturday',
                     date: 'May 02',
                     entries: [
-                        { time: '09:00', title: 'Weekend Flow', meta: 'Uptown · 19 students' },
+                        { time: '09:00', title: 'Weekend Flow', meta: 'Uptown Â· 19 students' },
                     ],
                 },
                 { day: 'Sunday', date: 'May 03', entries: [] },
@@ -493,7 +133,7 @@ const roleDashboard = {
         metrics: [
             { label: 'Membership Status', value: 'Active', note: 'Premium Flow Annual' },
             { label: 'Sessions This Week', value: '3 / 5', note: '2 sessions remaining to hit your goal' },
-            { label: 'Next Session', value: 'Today 18:30', note: 'Evening Yin · Downtown' },
+            { label: 'Next Session', value: 'Today 18:30', note: 'Evening Yin Â· Downtown' },
         ],
         primaryPanel: {
             title: 'Membership Status',
@@ -509,10 +149,10 @@ const roleDashboard = {
             title: 'Upcoming Sessions',
             icon: faCalendarDays,
             rows: [
-                { title: 'Evening Yin', meta: 'Today 18:30 · Downtown', badge: 'Booked', tone: 'started' },
-                { title: 'Power Core', meta: 'Tue 07:00 · Riverside', badge: 'Booked', tone: 'started' },
-                { title: 'Breathwork Lab', meta: 'Thu 20:00 · Online', badge: 'Waitlist', tone: 'pending' },
-                { title: 'Weekend Flow', meta: 'Sat 09:00 · Uptown', badge: 'Booked', tone: 'started' },
+                { title: 'Evening Yin', meta: 'Today 18:30 Â· Downtown', badge: 'Booked', tone: 'started' },
+                { title: 'Power Core', meta: 'Tue 07:00 Â· Riverside', badge: 'Booked', tone: 'started' },
+                { title: 'Breathwork Lab', meta: 'Thu 20:00 Â· Online', badge: 'Waitlist', tone: 'pending' },
+                { title: 'Weekend Flow', meta: 'Sat 09:00 Â· Uptown', badge: 'Booked', tone: 'started' },
             ],
         },
         weeklyPanel: {
@@ -523,44 +163,44 @@ const roleDashboard = {
                     day: 'Monday',
                     date: 'Apr 27',
                     entries: [
-                        { time: '06:45', title: 'Sunrise Mobility', meta: 'Westside · Coach Lina' },
-                        { time: '18:30', title: 'Evening Yin', meta: 'Downtown · Coach Ari' },
+                        { time: '06:45', title: 'Sunrise Mobility', meta: 'Westside Â· Coach Lina' },
+                        { time: '18:30', title: 'Evening Yin', meta: 'Downtown Â· Coach Ari' },
                     ],
                 },
                 {
                     day: 'Tuesday',
                     date: 'Apr 28',
                     entries: [
-                        { time: '07:00', title: 'Power Core', meta: 'Riverside · Coach Daniel' },
+                        { time: '07:00', title: 'Power Core', meta: 'Riverside Â· Coach Daniel' },
                     ],
                 },
                 {
                     day: 'Wednesday',
                     date: 'Apr 29',
                     entries: [
-                        { time: '18:30', title: 'Evening Yin', meta: 'Downtown · Coach Ari' },
+                        { time: '18:30', title: 'Evening Yin', meta: 'Downtown Â· Coach Ari' },
                     ],
                 },
                 {
                     day: 'Thursday',
                     date: 'Apr 30',
                     entries: [
-                        { time: '07:00', title: 'Power Core', meta: 'Riverside · Coach Daniel' },
-                        { time: '20:00', title: 'Breathwork Lab', meta: 'Online · Coach Noah' },
+                        { time: '07:00', title: 'Power Core', meta: 'Riverside Â· Coach Daniel' },
+                        { time: '20:00', title: 'Breathwork Lab', meta: 'Online Â· Coach Noah' },
                     ],
                 },
                 {
                     day: 'Friday',
                     date: 'May 01',
                     entries: [
-                        { time: '17:45', title: 'Mobility Reset', meta: 'Downtown · Coach Lina' },
+                        { time: '17:45', title: 'Mobility Reset', meta: 'Downtown Â· Coach Lina' },
                     ],
                 },
                 {
                     day: 'Saturday',
                     date: 'May 02',
                     entries: [
-                        { time: '09:00', title: 'Weekend Flow', meta: 'Uptown · Coach Mia' },
+                        { time: '09:00', title: 'Weekend Flow', meta: 'Uptown Â· Coach Mia' },
                     ],
                 },
                 { day: 'Sunday', date: 'May 03', entries: [] },
@@ -642,7 +282,7 @@ const viewConfigs = {
             rows: [
                 { title: 'Sessions This Month', meta: 'Attended vs booked', badge: '11 / 14', tone: 'started' },
                 { title: 'Current Streak', meta: 'Consecutive active weeks', badge: '5 weeks', tone: 'started' },
-                { title: 'Next Class', meta: 'Today 18:30 · Evening Yin', badge: 'Today', tone: 'pending' },
+                { title: 'Next Class', meta: 'Today 18:30 Â· Evening Yin', badge: 'Today', tone: 'pending' },
                 { title: 'Sessions Left on Goal', meta: 'Weekly target: 3 sessions', badge: '2', tone: 'default' },
             ],
         },
@@ -651,7 +291,7 @@ const viewConfigs = {
             icon: faArrowTrendUp,
             note: 'Detailed progress tracking and personal goals will be tracked here.',
             rows: [
-                { title: 'Level Progress', meta: 'Beginner → Intermediate', badge: '68%', tone: 'started' },
+                { title: 'Level Progress', meta: 'Beginner â†’ Intermediate', badge: '68%', tone: 'started' },
                 { title: 'Sessions Completed', meta: 'All time', badge: '38', tone: 'started' },
                 { title: 'Monthly Attendance', meta: 'April 2026', badge: '11 / 14', tone: 'started' },
                 { title: 'Assessments Passed', meta: 'Skill checkpoints', badge: '3', tone: 'default' },
@@ -662,10 +302,10 @@ const viewConfigs = {
             icon: faClipboardCheck,
             note: 'Full attendance history and a calendar view will be shown here.',
             rows: [
-                { title: 'Power Core', meta: 'Apr 24 · Daniel Park', badge: 'Attended', tone: 'started' },
-                { title: 'Evening Yin', meta: 'Apr 22 · Ari Gomez', badge: 'Attended', tone: 'started' },
-                { title: 'Mobility Reset', meta: 'Apr 19 · Lina Tran', badge: 'Attended', tone: 'started' },
-                { title: 'Weekend Flow', meta: 'Apr 18 · Mia Chen', badge: 'Attended', tone: 'started' },
+                { title: 'Power Core', meta: 'Apr 24 Â· Daniel Park', badge: 'Attended', tone: 'started' },
+                { title: 'Evening Yin', meta: 'Apr 22 Â· Ari Gomez', badge: 'Attended', tone: 'started' },
+                { title: 'Mobility Reset', meta: 'Apr 19 Â· Lina Tran', badge: 'Attended', tone: 'started' },
+                { title: 'Weekend Flow', meta: 'Apr 18 Â· Mia Chen', badge: 'Attended', tone: 'started' },
             ],
         },
         payments: {
@@ -1130,3 +770,363 @@ onBeforeUnmount(() => {
     window.removeEventListener('ym-dashboard-action', handleDashboardAction);
 });
 </script>
+
+<template>
+    <AppLayout :title="pageTitle">
+        <template v-if="isAdmin">
+            <section class="ym-dashlet-grid">
+                <Draggable
+                    v-model="dashlets"
+                    item-key="id"
+                    tag="div"
+                    class="ym-dashlet-grid-inner"
+                    handle=".ym-drag-handle"
+                    ghost-class="ym-dashlet-card--placeholder"
+                    chosen-class="ym-dashlet-card--dragging"
+                    drag-class="ym-dashlet-card--sorting"
+                    :animation="240"
+                    :disabled="lockDashboard"
+                    @start="handleDashletSortStart"
+                    @end="handleDashletSortEnd"
+                >
+                    <template #item="{ element: dashlet }">
+                        <article :class="dashletClasses(dashlet)">
+                            <header class="ym-panel-head">
+                                <div class="ym-dashlet-head">
+                                    <span class="ym-drag-handle" aria-hidden="true">
+                                        <FontAwesomeIcon :icon="faGripVertical" />
+                                    </span>
+                                    <h2 class="ym-panel-title">{{ dashlet.title }}</h2>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    class="ym-dashlet-remove"
+                                    :disabled="lockDashboard"
+                                    aria-label="Remove dashlet"
+                                    @click="removeDashlet(dashlet.id)"
+                                >
+                                    <FontAwesomeIcon :icon="faXmark" />
+                                </button>
+                            </header>
+
+                            <div v-if="dashlet.type === 'activities'" class="ym-activity-list">
+                                <article v-for="activity in activities" :key="activity.title" class="ym-activity-item">
+                                    <a href="#" class="ym-activity-title">{{ activity.title }}</a>
+                                    <p class="ym-activity-meta">
+                                        <span
+                                            :class="[
+                                                'ym-status-pill',
+                                                activity.stateClass === 'pending' ? 'ym-status-pill--pending' : '',
+                                                activity.stateClass === 'started' ? 'ym-status-pill--started' : '',
+                                            ]"
+                                        >
+                                            {{ activity.state }}
+                                        </span>
+                                        <span>{{ activity.when }}</span>
+                                        <span>{{ activity.context }}</span>
+                                    </p>
+                                </article>
+                                <a href="#" class="ym-show-more">Show more</a>
+                            </div>
+
+                            <div v-else-if="dashlet.type === 'calendar'">
+                                <div class="ym-calendar-grid">
+                                    <div v-for="day in weekDays" :key="day" class="ym-calendar-day-name">{{ day }}</div>
+
+                                    <div
+                                        v-for="cell in calendarCells"
+                                        :key="`${cell.date}-${cell.muted ? 'm' : 'a'}`"
+                                        :class="['ym-calendar-cell', { 'ym-calendar-cell--muted': cell.muted }]"
+                                    >
+                                        <span class="ym-calendar-date">{{ cell.date }}</span>
+                                        <span
+                                            v-for="event in cell.events"
+                                            :key="event.text"
+                                            :class="['ym-event-chip', event.colorClass]"
+                                        >
+                                            {{ event.text }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div v-else-if="dashlet.type === 'cases'" class="ym-section">
+                                <div class="ym-case-list">
+                                    <article v-for="caseItem in cases" :key="caseItem.id" class="ym-case-row">
+                                        <span class="ym-case-id">{{ caseItem.id }}</span>
+                                        <div>
+                                            <p class="ym-case-name">{{ caseItem.title }}</p>
+                                            <p class="ym-case-meta">
+                                                <span :class="['ym-status-pill', caseItem.priority === 'High' ? 'ym-status-pill--pending' : '']">
+                                                    {{ caseItem.priority }}
+                                                </span>
+                                                <span>{{ caseItem.type }}</span>
+                                                <span>{{ caseItem.customer }}</span>
+                                            </p>
+                                        </div>
+                                    </article>
+                                </div>
+                            </div>
+
+                            <div v-else-if="dashlet.type === 'lead-source'" class="ym-section">
+                                <div class="ym-pie-wrap">
+                                    <div class="ym-pie" role="img" aria-label="Lead source distribution chart" />
+                                    <div class="ym-legend">
+                                        <div v-for="item in leadSources" :key="item.name" class="ym-legend-item">
+                                            <span class="ym-legend-dot" :style="{ background: item.color }" />
+                                            <span>{{ item.name }} ({{ item.value }}%)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div v-else-if="dashlet.type === 'memo'" class="ym-section">
+                                <p class="ym-card-note">Keep short reminders visible to your team directly from this dashboard card.</p>
+                                <div class="ym-note-banner">
+                                    Team reminder: bring April referral stats to Monday leadership sync.
+                                </div>
+                            </div>
+
+                            <div v-else class="ym-section">
+                                <p class="ym-card-note">{{ dashlet.description }}</p>
+                                <div class="ym-list">
+                                    <div v-for="item in dashlet.previewRows" :key="item" class="ym-list-item">
+                                        <span>{{ item }}</span>
+                                        <span class="ym-list-meta">Preview</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    </template>
+                </Draggable>
+            </section>
+        </template>
+
+        <template v-else>
+            <div
+                v-if="dashboardNotice"
+                class="ym-info-row"
+                style="border-radius: 0.42rem; margin-bottom: 0.75rem;"
+            >
+                <FontAwesomeIcon :icon="faCircleInfo" class="ym-info-icon" />
+                <span>{{ dashboardNotice }}</span>
+            </div>
+
+            <template v-if="activeView === 'homepage'">
+                <div class="ym-stat-strip">
+                    <div v-for="metric in dashboardConfig.metrics" :key="metric.label" class="ym-stat">
+                        <p class="ym-stat-label">{{ metric.label }}</p>
+                        <p class="ym-stat-value">{{ metric.value }}</p>
+                        <p class="ym-stat-note">{{ metric.note }}</p>
+                    </div>
+                </div>
+
+                <div class="ym-page-cols">
+                    <div class="ym-pane">
+                        <div class="ym-pane-head">
+                            <div class="ym-pane-title-wrap">
+                                <FontAwesomeIcon :icon="dashboardConfig.primaryPanel.icon" class="ym-pane-icon" />
+                                <h2 class="ym-pane-title">{{ dashboardConfig.primaryPanel.title }}</h2>
+                            </div>
+                        </div>
+                        <div class="ym-pane-body">
+                            <div class="ym-row-list">
+                                <div
+                                    v-for="item in dashboardConfig.primaryPanel.rows"
+                                    :key="item.title"
+                                    class="ym-row"
+                                >
+                                    <div class="ym-row-main">
+                                        <p class="ym-row-title">{{ item.title }}</p>
+                                        <p class="ym-row-meta">{{ item.meta }}</p>
+                                    </div>
+                                    <div class="ym-row-aside">
+                                        <span :class="badgeClass(item.tone)">{{ item.badge }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ym-pane">
+                        <div class="ym-pane-head">
+                            <div class="ym-pane-title-wrap">
+                                <FontAwesomeIcon :icon="dashboardConfig.secondaryPanel.icon" class="ym-pane-icon" />
+                                <h2 class="ym-pane-title">{{ dashboardConfig.secondaryPanel.title }}</h2>
+                            </div>
+                        </div>
+                        <div class="ym-pane-body">
+                            <div class="ym-row-list">
+                                <div
+                                    v-for="item in dashboardConfig.secondaryPanel.rows"
+                                    :key="item.title"
+                                    class="ym-row"
+                                >
+                                    <div class="ym-row-main">
+                                        <p class="ym-row-title">{{ item.title }}</p>
+                                        <p class="ym-row-meta">{{ item.meta }}</p>
+                                    </div>
+                                    <div class="ym-row-aside">
+                                        <span :class="badgeClass(item.tone)">{{ item.badge }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ym-pane mt-4">
+                    <div class="ym-pane-head">
+                        <div class="ym-pane-title-wrap">
+                            <FontAwesomeIcon :icon="faCalendarWeek" class="ym-pane-icon" />
+                            <h2 class="ym-pane-title">{{ dashboardConfig.weeklyPanel.title }}</h2>
+                        </div>
+                    </div>
+                    <div class="ym-pane-body">
+                        <div class="ym-timetable-scroll">
+                            <div class="ym-timetable">
+                                <div
+                                    v-for="day in dashboardConfig.weeklyPanel.days"
+                                    :key="day.day"
+                                    class="ym-timetable-col"
+                                >
+                                    <div class="ym-timetable-head">
+                                        <p class="ym-timetable-day">{{ day.day.slice(0, 3) }}</p>
+                                        <p class="ym-timetable-date">{{ day.date }}</p>
+                                    </div>
+                                    <div class="ym-timetable-body">
+                                        <div
+                                            v-for="entry in day.entries"
+                                            :key="entry.title"
+                                            :class="['ym-timetable-slot', { 'ym-timetable-slot--coach': isCoach }]"
+                                        >
+                                            <p class="ym-timetable-time">{{ entry.time }}</p>
+                                            <p class="ym-timetable-name">{{ entry.title }}</p>
+                                            <p class="ym-timetable-sub">{{ entry.meta }}</p>
+                                        </div>
+                                        <div v-if="!day.entries.length" class="ym-timetable-empty">
+                                            {{ dashboardConfig.weeklyPanel.emptyMessage }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <template v-else-if="currentViewConfig">
+                <div class="ym-pane">
+                    <div class="ym-pane-head">
+                        <div class="ym-pane-title-wrap">
+                            <FontAwesomeIcon :icon="currentViewConfig.icon" class="ym-pane-icon" />
+                            <h2 class="ym-pane-title">{{ currentViewConfig.title }}</h2>
+                        </div>
+                    </div>
+                    <div class="ym-pane-body">
+                        <div class="ym-row-list">
+                            <div
+                                v-for="item in currentViewConfig.rows"
+                                :key="item.title"
+                                class="ym-row"
+                            >
+                                <div class="ym-row-main">
+                                    <p class="ym-row-title">{{ item.title }}</p>
+                                    <p class="ym-row-meta">{{ item.meta }}</p>
+                                </div>
+                                <div class="ym-row-aside">
+                                    <span :class="badgeClass(item.tone)">{{ item.badge }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ym-info-row">
+                            <FontAwesomeIcon :icon="faCircleInfo" class="ym-info-icon" />
+                            <span>{{ currentViewConfig.note }}</span>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </template>
+
+        <Modal :show="showEditDashboardModal" title="Edit Dashboard Tabs" @close="showEditDashboardModal = false">
+            <div class="ym-dashboard-modal-actions">
+                <button type="button" class="ym-btn-sm" @click="saveDashboardTabs">Save</button>
+                <button type="button" class="ym-btn-outline" @click="showEditDashboardModal = false">Cancel</button>
+            </div>
+
+            <p v-if="dashboardTabError" class="ym-field-error">{{ dashboardTabError }}</p>
+
+            <p class="ym-card-note">
+                Configure up to six dashboard tabs shown in the top navigation for this session.
+            </p>
+
+            <div class="ym-tab-editor-list mt-3">
+                <div v-for="(tab, index) in dashboardTabsDraft" :key="tab.id" class="ym-tab-editor-row">
+                    <span class="ym-tab-handle" aria-hidden="true">
+                        <FontAwesomeIcon :icon="faGripVertical" />
+                    </span>
+                    <input v-model="tab.label" type="text" class="ym-input" />
+                    <button
+                        type="button"
+                        class="ym-tab-remove"
+                        :disabled="dashboardTabsDraft.length === 1"
+                        @click="removeDashboardTab(index)"
+                    >
+                        <FontAwesomeIcon :icon="faXmark" />
+                    </button>
+                </div>
+
+                <div class="ym-tab-editor-row ym-tab-editor-row--add">
+                    <input
+                        v-model="newDashboardTabLabel"
+                        type="text"
+                        class="ym-input"
+                        placeholder="Type and press enter"
+                        @keydown.enter.prevent="addDashboardTab"
+                    />
+                    <button type="button" class="ym-tab-add" :disabled="dashboardTabsDraft.length >= maxTopTabs" @click="addDashboardTab">
+                        <FontAwesomeIcon :icon="faPlus" />
+                    </button>
+                </div>
+            </div>
+
+            <label v-if="isAdmin" class="ym-lock-toggle mt-3">
+                <span>Lock Dashboard</span>
+                <input v-model="lockDashboard" type="checkbox" />
+            </label>
+        </Modal>
+
+        <Modal
+            v-if="isAdmin"
+            :show="showAddDashletModal"
+            title="Add Dashlet"
+            @close="showAddDashletModal = false"
+        >
+            <label class="ym-search-wrap ym-dashboard-modal-search" aria-label="Search dashlets">
+                <FontAwesomeIcon :icon="faMagnifyingGlass" class="ym-search-icon" />
+                <input
+                    v-model="dashletSearchQuery"
+                    type="search"
+                    class="ym-search"
+                    placeholder="Search"
+                    aria-label="Search dashlets"
+                />
+            </label>
+
+            <div class="ym-dashlet-catalog">
+                <button
+                    v-for="item in filteredDashletCatalog"
+                    :key="item.id"
+                    type="button"
+                    class="ym-dashlet-catalog-item"
+                    :disabled="isDashletActive(item.id)"
+                    @click="addDashlet(item)"
+                >
+                    <span>{{ item.title }}</span>
+                    <small>{{ isDashletActive(item.id) ? 'Added' : 'Add' }}</small>
+                </button>
+            </div>
+        </Modal>
+    </AppLayout>
+</template>

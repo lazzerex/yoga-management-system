@@ -1,189 +1,4 @@
-<template>
-    <div class="ym-shell">
-        <aside class="ym-sidebar">
-            <div class="ym-brand">
-                <p class="ym-brand-mark">YM</p>
-                <div>
-                    <p class="ym-brand-title">Yoga CRM</p>
-                    <p class="ym-brand-subtitle">Management workspace</p>
-                </div>
-            </div>
-
-            <nav class="ym-side-nav">
-                <section v-for="group in sidebarGroups" :key="group.label" class="ym-side-group-wrap">
-                    <p class="ym-side-group">{{ group.label }}</p>
-                    <NavMenuLink
-                        v-for="item in group.items"
-                        :key="item.href"
-                        :href="item.href"
-                        :label="item.label"
-                        :icon="item.icon"
-                        :icon-color="item.iconColor"
-                        :badge="item.badge"
-                        :active="isActive(item.activePaths)"
-                        variant="sidebar"
-                    />
-                </section>
-            </nav>
-
-            <div class="ym-sidebar-footer">
-                <span class="ym-badge">{{ roleLabel }}</span>
-            </div>
-        </aside>
-
-        <div class="ym-workspace">
-            <header class="ym-topbar">
-                <div class="ym-topbar-row">
-                    <div>
-                        <p class="ym-overline">Yoga Management System</p>
-                        <h1 class="ym-header-title">{{ title }}</h1>
-                    </div>
-
-                    <div class="ym-topbar-actions">
-                        <label class="ym-search-wrap" aria-label="Search">
-                            <FontAwesomeIcon :icon="faMagnifyingGlass" class="ym-search-icon" />
-                            <input
-                                type="search"
-                                class="ym-search"
-                                placeholder="Search"
-                                aria-label="Search"
-                            />
-                        </label>
-
-                        <div ref="notificationsRef" class="ym-header-menu-wrap">
-                            <button
-                                type="button"
-                                class="ym-icon-btn"
-                                :class="{ 'ym-icon-btn--active': notificationsOpen }"
-                                aria-label="Open notifications"
-                                aria-haspopup="menu"
-                                :aria-expanded="notificationsOpen"
-                                @click.stop="toggleNotifications"
-                            >
-                                <FontAwesomeIcon :icon="faBell" />
-                                <span class="ym-icon-dot" aria-hidden="true" />
-                            </button>
-
-                            <div v-if="notificationsOpen" class="ym-popover ym-popover-notifications" role="menu">
-                                <div class="ym-popover-head">
-                                    <p class="ym-popover-title">Notifications</p>
-                                    <button type="button" class="ym-popover-link" @click="notificationsOpen = false">
-                                        Mark all read
-                                    </button>
-                                </div>
-                                <ul class="ym-notification-list">
-                                    <li
-                                        v-for="item in notifications"
-                                        :key="item.title"
-                                        class="ym-notification-item"
-                                    >
-                                        <p class="ym-notification-title">{{ item.title }}</p>
-                                        <p class="ym-notification-time">{{ item.time }}</p>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div ref="profileMenuRef" class="ym-header-menu-wrap">
-                            <button
-                                type="button"
-                                class="ym-icon-btn"
-                                :class="{ 'ym-icon-btn--active': profileMenuOpen }"
-                                aria-label="Open quick menu"
-                                aria-haspopup="menu"
-                                :aria-expanded="profileMenuOpen"
-                                @click.stop="toggleProfileMenu"
-                            >
-                                <FontAwesomeIcon :icon="faEllipsisVertical" />
-                            </button>
-
-                            <div v-if="profileMenuOpen" class="ym-popover ym-popover-menu" role="menu">
-                                <div class="ym-profile-chip">
-                                    <span class="ym-profile-avatar">{{ userInitials }}</span>
-                                    <div>
-                                        <p class="ym-profile-name">{{ userName }}</p>
-                                        <p class="ym-profile-role">{{ roleLabel }}</p>
-                                    </div>
-                                </div>
-
-                                <button
-                                    v-for="action in quickActions"
-                                    :key="action.label"
-                                    type="button"
-                                    class="ym-menu-item"
-                                    @click="handleQuickAction(action)"
-                                >
-                                    <span>{{ action.label }}</span>
-                                    <small>{{ action.hint }}</small>
-                                </button>
-
-                                <button type="button" class="ym-menu-item ym-menu-item--danger" @click="logout">
-                                    <span>Sign Out</span>
-                                    <small>End current session</small>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <nav v-if="isOnDashboard" class="ym-top-links">
-                    <NavMenuLink
-                        v-for="item in topMenuItems"
-                        :key="item.viewKey"
-                        :href="getTopNavHref(item)"
-                        :label="item.label"
-                        :active="isTopNavActive(item)"
-                        variant="top"
-                        @tab-click="handleTopTabClick(item)"
-                    />
-
-                    <div ref="dashboardActionsRef" class="ym-header-menu-wrap ym-top-links-more">
-                        <button
-                            type="button"
-                            class="ym-icon-btn ym-top-links-more-btn"
-                            :class="{ 'ym-icon-btn--active': dashboardActionsOpen }"
-                            aria-label="Open dashboard options"
-                            aria-haspopup="menu"
-                            :aria-expanded="dashboardActionsOpen"
-                            @click.stop="toggleDashboardActions"
-                        >
-                            <FontAwesomeIcon :icon="faEllipsis" />
-                        </button>
-
-                        <div v-if="dashboardActionsOpen" class="ym-popover ym-top-links-menu" role="menu">
-                            <button type="button" class="ym-menu-item" @click="triggerDashboardAction('edit-dashboard')">
-                                <span class="ym-menu-item-label">
-                                    <FontAwesomeIcon :icon="faPenToSquare" class="ym-menu-item-icon" />
-                                    Edit Dashboard
-                                </span>
-                            </button>
-                            <button type="button" class="ym-menu-item" @click="triggerDashboardAction('add-dashlet')">
-                                <span class="ym-menu-item-label">
-                                    <FontAwesomeIcon :icon="faPlus" class="ym-menu-item-icon" />
-                                    Add Dashlet
-                                </span>
-                            </button>
-                            <button type="button" class="ym-menu-item" @click="triggerDashboardAction('reset-dashboard')">
-                                <span class="ym-menu-item-label">
-                                    <FontAwesomeIcon :icon="faArrowRotateLeft" class="ym-menu-item-icon" />
-                                    Reset Layout
-                                </span>
-                            </button>
-                        </div>
-                    </div>
-                </nav>
-            </header>
-
-            <main class="ym-main">
-                <div v-if="flash.success" class="ym-alert-success ym-main-alert">{{ flash.success }}</div>
-                <div v-if="flash.error" class="ym-alert-error ym-main-alert">{{ flash.error }}</div>
-                <slot />
-            </main>
-        </div>
-    </div>
-</template>
-
-<script setup>
+﻿<script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { router, usePage } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
@@ -647,3 +462,188 @@ const logout = () => {
     router.post(route('logout'));
 };
 </script>
+
+<template>
+    <div class="ym-shell">
+        <aside class="ym-sidebar">
+            <div class="ym-brand">
+                <p class="ym-brand-mark">YM</p>
+                <div>
+                    <p class="ym-brand-title">Yoga CRM</p>
+                    <p class="ym-brand-subtitle">Management workspace</p>
+                </div>
+            </div>
+
+            <nav class="ym-side-nav">
+                <section v-for="group in sidebarGroups" :key="group.label" class="ym-side-group-wrap">
+                    <p class="ym-side-group">{{ group.label }}</p>
+                    <NavMenuLink
+                        v-for="item in group.items"
+                        :key="item.href"
+                        :href="item.href"
+                        :label="item.label"
+                        :icon="item.icon"
+                        :icon-color="item.iconColor"
+                        :badge="item.badge"
+                        :active="isActive(item.activePaths)"
+                        variant="sidebar"
+                    />
+                </section>
+            </nav>
+
+            <div class="ym-sidebar-footer">
+                <span class="ym-badge">{{ roleLabel }}</span>
+            </div>
+        </aside>
+
+        <div class="ym-workspace">
+            <header class="ym-topbar">
+                <div class="ym-topbar-row">
+                    <div>
+                        <p class="ym-overline">Yoga Management System</p>
+                        <h1 class="ym-header-title">{{ title }}</h1>
+                    </div>
+
+                    <div class="ym-topbar-actions">
+                        <label class="ym-search-wrap" aria-label="Search">
+                            <FontAwesomeIcon :icon="faMagnifyingGlass" class="ym-search-icon" />
+                            <input
+                                type="search"
+                                class="ym-search"
+                                placeholder="Search"
+                                aria-label="Search"
+                            />
+                        </label>
+
+                        <div ref="notificationsRef" class="ym-header-menu-wrap">
+                            <button
+                                type="button"
+                                class="ym-icon-btn"
+                                :class="{ 'ym-icon-btn--active': notificationsOpen }"
+                                aria-label="Open notifications"
+                                aria-haspopup="menu"
+                                :aria-expanded="notificationsOpen"
+                                @click.stop="toggleNotifications"
+                            >
+                                <FontAwesomeIcon :icon="faBell" />
+                                <span class="ym-icon-dot" aria-hidden="true" />
+                            </button>
+
+                            <div v-if="notificationsOpen" class="ym-popover ym-popover-notifications" role="menu">
+                                <div class="ym-popover-head">
+                                    <p class="ym-popover-title">Notifications</p>
+                                    <button type="button" class="ym-popover-link" @click="notificationsOpen = false">
+                                        Mark all read
+                                    </button>
+                                </div>
+                                <ul class="ym-notification-list">
+                                    <li
+                                        v-for="item in notifications"
+                                        :key="item.title"
+                                        class="ym-notification-item"
+                                    >
+                                        <p class="ym-notification-title">{{ item.title }}</p>
+                                        <p class="ym-notification-time">{{ item.time }}</p>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div ref="profileMenuRef" class="ym-header-menu-wrap">
+                            <button
+                                type="button"
+                                class="ym-icon-btn"
+                                :class="{ 'ym-icon-btn--active': profileMenuOpen }"
+                                aria-label="Open quick menu"
+                                aria-haspopup="menu"
+                                :aria-expanded="profileMenuOpen"
+                                @click.stop="toggleProfileMenu"
+                            >
+                                <FontAwesomeIcon :icon="faEllipsisVertical" />
+                            </button>
+
+                            <div v-if="profileMenuOpen" class="ym-popover ym-popover-menu" role="menu">
+                                <div class="ym-profile-chip">
+                                    <span class="ym-profile-avatar">{{ userInitials }}</span>
+                                    <div>
+                                        <p class="ym-profile-name">{{ userName }}</p>
+                                        <p class="ym-profile-role">{{ roleLabel }}</p>
+                                    </div>
+                                </div>
+
+                                <button
+                                    v-for="action in quickActions"
+                                    :key="action.label"
+                                    type="button"
+                                    class="ym-menu-item"
+                                    @click="handleQuickAction(action)"
+                                >
+                                    <span>{{ action.label }}</span>
+                                    <small>{{ action.hint }}</small>
+                                </button>
+
+                                <button type="button" class="ym-menu-item ym-menu-item--danger" @click="logout">
+                                    <span>Sign Out</span>
+                                    <small>End current session</small>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <nav v-if="isOnDashboard" class="ym-top-links">
+                    <NavMenuLink
+                        v-for="item in topMenuItems"
+                        :key="item.viewKey"
+                        :href="getTopNavHref(item)"
+                        :label="item.label"
+                        :active="isTopNavActive(item)"
+                        variant="top"
+                        @tab-click="handleTopTabClick(item)"
+                    />
+
+                    <div ref="dashboardActionsRef" class="ym-header-menu-wrap ym-top-links-more">
+                        <button
+                            type="button"
+                            class="ym-icon-btn ym-top-links-more-btn"
+                            :class="{ 'ym-icon-btn--active': dashboardActionsOpen }"
+                            aria-label="Open dashboard options"
+                            aria-haspopup="menu"
+                            :aria-expanded="dashboardActionsOpen"
+                            @click.stop="toggleDashboardActions"
+                        >
+                            <FontAwesomeIcon :icon="faEllipsis" />
+                        </button>
+
+                        <div v-if="dashboardActionsOpen" class="ym-popover ym-top-links-menu" role="menu">
+                            <button type="button" class="ym-menu-item" @click="triggerDashboardAction('edit-dashboard')">
+                                <span class="ym-menu-item-label">
+                                    <FontAwesomeIcon :icon="faPenToSquare" class="ym-menu-item-icon" />
+                                    Edit Dashboard
+                                </span>
+                            </button>
+                            <button type="button" class="ym-menu-item" @click="triggerDashboardAction('add-dashlet')">
+                                <span class="ym-menu-item-label">
+                                    <FontAwesomeIcon :icon="faPlus" class="ym-menu-item-icon" />
+                                    Add Dashlet
+                                </span>
+                            </button>
+                            <button type="button" class="ym-menu-item" @click="triggerDashboardAction('reset-dashboard')">
+                                <span class="ym-menu-item-label">
+                                    <FontAwesomeIcon :icon="faArrowRotateLeft" class="ym-menu-item-icon" />
+                                    Reset Layout
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </nav>
+            </header>
+
+            <main class="ym-main">
+                <div v-if="flash.success" class="ym-alert-success ym-main-alert">{{ flash.success }}</div>
+                <div v-if="flash.error" class="ym-alert-error ym-main-alert">{{ flash.error }}</div>
+                <slot />
+            </main>
+        </div>
+    </div>
+</template>
