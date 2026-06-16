@@ -1,6 +1,4 @@
-﻿<script setup>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faCircleInfo, faClockRotateLeft, faTableList } from '@fortawesome/free-solid-svg-icons';
+<script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 const enrolledClasses = [
@@ -35,7 +33,7 @@ const sessionHistory = [
             <div class="ym-stat">
                 <p class="ym-stat-label">Next Session</p>
                 <p class="ym-stat-value">Today 18:30</p>
-                <p class="ym-stat-note">Evening Yin Â· Downtown</p>
+                <p class="ym-stat-note">Evening Yin · Downtown</p>
             </div>
         </div>
 
@@ -43,7 +41,7 @@ const sessionHistory = [
             <div class="ym-pane">
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
-                        <FontAwesomeIcon :icon="faTableList" class="ym-pane-icon" />
+                        <i class="bi bi-table ym-pane-icon" />
                         <h2 class="ym-pane-title">Current Enrollments</h2>
                     </div>
                 </div>
@@ -74,7 +72,7 @@ const sessionHistory = [
             <div class="ym-pane">
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
-                        <FontAwesomeIcon :icon="faClockRotateLeft" class="ym-pane-icon" />
+                        <i class="bi bi-clock-history ym-pane-icon" />
                         <h2 class="ym-pane-title">Recent Session History</h2>
                     </div>
                 </div>
@@ -83,7 +81,7 @@ const sessionHistory = [
                         <div v-for="session in sessionHistory" :key="session.id" class="ym-row">
                             <div class="ym-row-main">
                                 <p class="ym-row-title">{{ session.className }}</p>
-                                <p class="ym-row-meta">{{ session.date }} Â· {{ session.coach }}</p>
+                                <p class="ym-row-meta">{{ session.date }} · {{ session.coach }}</p>
                             </div>
                             <div class="ym-row-aside">
                                 <span class="ym-status-pill ym-status-pill--started">{{ session.result }}</span>
@@ -91,7 +89,7 @@ const sessionHistory = [
                         </div>
                     </div>
                     <div class="ym-info-row">
-                        <FontAwesomeIcon :icon="faCircleInfo" class="ym-info-icon" />
+                        <i class="bi bi-info-circle ym-info-icon" />
                         <span>Weekly goal: complete 3 sessions. You are currently at 2 this week.</span>
                     </div>
                 </div>

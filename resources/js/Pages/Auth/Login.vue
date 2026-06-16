@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import AuthCard from '@/Components/Auth/AuthCard.vue';
 import LabeledInput from '@/Components/Form/LabeledInput.vue';
 import { Link, useForm } from '@inertiajs/vue3';
@@ -33,7 +33,6 @@ const submit = () => {
                 v-model="form.password"
                 label="Password"
                 type="password"
-                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                 autocomplete="current-password"
                 :error="form.errors.password"
             />

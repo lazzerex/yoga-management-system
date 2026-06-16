@@ -2,26 +2,6 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { router, usePage } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import {
-    faArrowRotateLeft,
-    faBell,
-    faBuilding,
-    faCalendarCheck,
-    faEllipsis,
-    faEllipsisVertical,
-    faClockRotateLeft,
-    faClipboardCheck,
-    faFolderOpen,
-    faHouse,
-    faMagnifyingGlass,
-    faMoneyBillWave,
-    faPenToSquare,
-    faPlus,
-    faUser,
-    faUserShield,
-    faUsers,
-} from '@fortawesome/free-solid-svg-icons';
 import NavMenuLink from '@/Components/UI/NavMenuLink.vue';
 
 defineProps({
@@ -205,14 +185,14 @@ const sidebarGroups = computed(() => {
                     label: 'Home',
                     href: route('cms.dashboard'),
                     activePaths: [route('cms.dashboard', undefined, false)],
-                    icon: faHouse,
+                    icon: 'bi-house',
                     iconColor: '#4f8bc8',
                 },
                 {
                     label: 'My Profile',
                     href: route('cms.profile.show'),
                     activePaths: [route('cms.profile.show', undefined, false)],
-                    icon: faUser,
+                    icon: 'bi-person',
                     iconColor: '#5f77cf',
                 },
             ],
@@ -224,14 +204,14 @@ const sidebarGroups = computed(() => {
                     label: 'Centers',
                     href: route('operations.yoga-center'),
                     activePaths: [route('operations.yoga-center', undefined, false)],
-                    icon: faBuilding,
+                    icon: 'bi-building',
                     iconColor: '#d99a34',
                 },
                 {
                     label: 'Classes',
                     href: route('operations.academy'),
                     activePaths: [route('operations.academy', undefined, false)],
-                    icon: faUsers,
+                    icon: 'bi-people',
                     iconColor: '#3fa07e',
                 },
             ],
@@ -244,7 +224,7 @@ const sidebarGroups = computed(() => {
                 label: 'Attendance',
                 href: route('operations.teacher-attendance'),
                 activePaths: [route('operations.teacher-attendance', undefined, false)],
-                icon: faClipboardCheck,
+                icon: 'bi-clipboard-check',
                 iconColor: '#4f81cf',
             },
             {
@@ -252,7 +232,7 @@ const sidebarGroups = computed(() => {
                 href: route('operations.lesson-planning'),
                 activePaths: [route('operations.lesson-planning', undefined, false)],
                 badge: 'Approval',
-                icon: faCalendarCheck,
+                icon: 'bi-calendar-check',
                 iconColor: '#6a78c8',
             },
         );
@@ -263,7 +243,7 @@ const sidebarGroups = computed(() => {
             label: 'Tuition',
             href: route('operations.tuition-fees'),
             activePaths: [route('operations.tuition-fees', undefined, false)],
-            icon: faMoneyBillWave,
+            icon: 'bi-cash-stack',
             iconColor: '#32a06f',
         });
     }
@@ -273,7 +253,7 @@ const sidebarGroups = computed(() => {
             label: 'Files',
             href: route('operations.file-library'),
             activePaths: [route('operations.file-library', undefined, false)],
-            icon: faFolderOpen,
+            icon: 'bi-folder2-open',
             iconColor: '#c97846',
         });
     }
@@ -286,21 +266,21 @@ const sidebarGroups = computed(() => {
                     label: 'My Membership',
                     href: route('member.my-membership'),
                     activePaths: [route('member.my-membership', undefined, false)],
-                    icon: faMoneyBillWave,
+                    icon: 'bi-cash-stack',
                     iconColor: '#3f8f6f',
                 },
                 {
                     label: 'My Classes',
                     href: route('member.my-classes'),
                     activePaths: [route('member.my-classes', undefined, false)],
-                    icon: faUsers,
+                    icon: 'bi-people',
                     iconColor: '#3f7ec4',
                 },
                 {
                     label: 'My Schedule',
                     href: route('member.my-schedule'),
                     activePaths: [route('member.my-schedule', undefined, false)],
-                    icon: faCalendarCheck,
+                    icon: 'bi-calendar-check',
                     iconColor: '#6a78c8',
                 },
             ],
@@ -315,21 +295,21 @@ const sidebarGroups = computed(() => {
                     label: 'My Classes',
                     href: route('coach.my-classes'),
                     activePaths: [route('coach.my-classes', undefined, false)],
-                    icon: faUsers,
+                    icon: 'bi-people',
                     iconColor: '#3f7ec4',
                 },
                 {
                     label: 'My Students',
                     href: route('coach.my-students'),
                     activePaths: [route('coach.my-students', undefined, false)],
-                    icon: faClipboardCheck,
+                    icon: 'bi-clipboard-check',
                     iconColor: '#4f81cf',
                 },
                 {
                     label: 'Teaching Schedule',
                     href: route('coach.my-teaching-schedule'),
                     activePaths: [route('coach.my-teaching-schedule', undefined, false)],
-                    icon: faCalendarCheck,
+                    icon: 'bi-calendar-check',
                     iconColor: '#6a78c8',
                 },
             ],
@@ -344,14 +324,14 @@ const sidebarGroups = computed(() => {
                     label: 'Users',
                     href: route('admin.users.index'),
                     activePaths: [route('admin.users.index', undefined, false)],
-                    icon: faUserShield,
+                    icon: 'bi-shield-lock',
                     iconColor: '#5f77cf',
                 },
                 {
                     label: 'Logs',
                     href: route('admin.login-logs.index'),
                     activePaths: [route('admin.login-logs.index', undefined, false)],
-                    icon: faClockRotateLeft,
+                    icon: 'bi-clock-history',
                     iconColor: '#b26464',
                 },
             ],
@@ -506,7 +486,7 @@ const logout = () => {
 
                     <div class="ym-topbar-actions">
                         <label class="ym-search-wrap" aria-label="Search">
-                            <FontAwesomeIcon :icon="faMagnifyingGlass" class="ym-search-icon" />
+                            <i class="bi bi-search ym-search-icon" />
                             <input
                                 type="search"
                                 class="ym-search"
@@ -525,7 +505,7 @@ const logout = () => {
                                 :aria-expanded="notificationsOpen"
                                 @click.stop="toggleNotifications"
                             >
-                                <FontAwesomeIcon :icon="faBell" />
+                                <i class="bi bi-bell" />
                                 <span class="ym-icon-dot" aria-hidden="true" />
                             </button>
 
@@ -559,7 +539,7 @@ const logout = () => {
                                 :aria-expanded="profileMenuOpen"
                                 @click.stop="toggleProfileMenu"
                             >
-                                <FontAwesomeIcon :icon="faEllipsisVertical" />
+                                <i class="bi bi-three-dots-vertical" />
                             </button>
 
                             <div v-if="profileMenuOpen" class="ym-popover ym-popover-menu" role="menu">
@@ -612,25 +592,25 @@ const logout = () => {
                             :aria-expanded="dashboardActionsOpen"
                             @click.stop="toggleDashboardActions"
                         >
-                            <FontAwesomeIcon :icon="faEllipsis" />
+                            <i class="bi bi-three-dots" />
                         </button>
 
                         <div v-if="dashboardActionsOpen" class="ym-popover ym-top-links-menu" role="menu">
                             <button type="button" class="ym-menu-item" @click="triggerDashboardAction('edit-dashboard')">
                                 <span class="ym-menu-item-label">
-                                    <FontAwesomeIcon :icon="faPenToSquare" class="ym-menu-item-icon" />
+                                    <i class="bi bi-pencil-square ym-menu-item-icon" />
                                     Edit Dashboard
                                 </span>
                             </button>
                             <button type="button" class="ym-menu-item" @click="triggerDashboardAction('add-dashlet')">
                                 <span class="ym-menu-item-label">
-                                    <FontAwesomeIcon :icon="faPlus" class="ym-menu-item-icon" />
+                                    <i class="bi bi-plus-lg ym-menu-item-icon" />
                                     Add Dashlet
                                 </span>
                             </button>
                             <button type="button" class="ym-menu-item" @click="triggerDashboardAction('reset-dashboard')">
                                 <span class="ym-menu-item-label">
-                                    <FontAwesomeIcon :icon="faArrowRotateLeft" class="ym-menu-item-icon" />
+                                    <i class="bi bi-arrow-counterclockwise ym-menu-item-icon" />
                                     Reset Layout
                                 </span>
                             </button>

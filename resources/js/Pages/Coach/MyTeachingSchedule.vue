@@ -1,6 +1,4 @@
-﻿<script setup>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faCalendarWeek, faChartSimple, faClipboardList } from '@fortawesome/free-solid-svg-icons';
+<script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 const teachingSchedule = [
@@ -57,7 +55,7 @@ const teachingSchedule = [
 ];
 
 const todayHighlights = [
-    { title: 'Evening Yin', meta: '18:30 Â· Downtown Â· 21 students', badge: 'Today' },
+    { title: 'Evening Yin', meta: '18:30 · Downtown · 21 students', badge: 'Today' },
     { title: 'Post-class notes due', meta: 'Submit by 21:00 for attendance sync', badge: 'Reminder' },
     { title: 'Substitute request', meta: 'Backup coach for Saturday workshop', badge: 'Pending' },
 ];
@@ -74,7 +72,7 @@ const teachingLoad = [
         <div class="ym-pane">
             <div class="ym-pane-head">
                 <div class="ym-pane-title-wrap">
-                    <FontAwesomeIcon :icon="faCalendarWeek" class="ym-pane-icon" />
+                    <i class="bi bi-calendar-week ym-pane-icon" />
                     <h2 class="ym-pane-title">Weekly Teaching Calendar</h2>
                 </div>
             </div>
@@ -94,9 +92,9 @@ const teachingLoad = [
                                 >
                                     <p class="ym-timetable-time">{{ item.time }}</p>
                                     <p class="ym-timetable-name">{{ item.title }}</p>
-                                    <p class="ym-timetable-sub">{{ item.branch }} Â· {{ item.students }}</p>
+                                    <p class="ym-timetable-sub">{{ item.branch }} · {{ item.students }}</p>
                                 </div>
-                                <div v-if="!day.classes.length" class="ym-timetable-empty">â€”</div>
+                                <div v-if="!day.classes.length" class="ym-timetable-empty">—</div>
                             </div>
                         </div>
                     </div>
@@ -108,7 +106,7 @@ const teachingLoad = [
             <div class="ym-pane">
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
-                        <FontAwesomeIcon :icon="faClipboardList" class="ym-pane-icon" />
+                        <i class="bi bi-clipboard-data ym-pane-icon" />
                         <h2 class="ym-pane-title">Today At A Glance</h2>
                     </div>
                 </div>
@@ -130,7 +128,7 @@ const teachingLoad = [
             <div class="ym-pane">
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
-                        <FontAwesomeIcon :icon="faChartSimple" class="ym-pane-icon" />
+                        <i class="bi bi-bar-chart ym-pane-icon" />
                         <h2 class="ym-pane-title">Teaching Load</h2>
                     </div>
                 </div>

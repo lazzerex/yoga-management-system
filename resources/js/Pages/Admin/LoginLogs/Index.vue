@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { ref, computed, watch } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -52,13 +52,13 @@ const statusBadgeClass = (status) =>
 
 const statusLabel = (log) => {
     if (log.status === 'failed') {
-        return `Failed Â· ${FAILURE_REASON_LABELS[log.failure_reason] ?? log.failure_reason ?? 'Unknown'}`;
+        return `Failed · ${FAILURE_REASON_LABELS[log.failure_reason] ?? log.failure_reason ?? 'Unknown'}`;
     }
     return 'Success';
 };
 
 const formatDate = (dateStr) => {
-    if (!dateStr) return 'â€”';
+    if (!dateStr) return '—';
     return new Date(dateStr).toLocaleString('en-US', {
         year: 'numeric',
         month: 'short',
@@ -121,7 +121,7 @@ const formatDate = (dateStr) => {
                             <th class="ym-th">Device</th>
                             <th class="ym-th ym-th--sortable" @click="toggleSort">
                                 Time
-                                <span class="ym-sort-icon">{{ sortDir === 'asc' ? 'â†‘' : 'â†“' }}</span>
+                                <span class="ym-sort-icon">{{ sortDir === 'asc' ? '↑' : '↓' }}</span>
                             </th>
                         </tr>
                     </thead>
@@ -135,8 +135,8 @@ const formatDate = (dateStr) => {
                                     {{ statusLabel(log) }}
                                 </span>
                             </td>
-                            <td class="ym-td font-medium">{{ log.user?.name ?? 'â€”' }}</td>
-                            <td class="ym-td text-neutral-500">{{ log.attempted_identifier ? `@${log.attempted_identifier}` : 'â€”' }}</td>
+                            <td class="ym-td font-medium">{{ log.user?.name ?? '—' }}</td>
+                            <td class="ym-td text-neutral-500">{{ log.attempted_identifier ? `@${log.attempted_identifier}` : '—' }}</td>
                             <td class="ym-td font-mono text-sm">{{ log.ip_address }}</td>
                             <td class="ym-td">
                                 <span :class="['ym-device-badge', log.device_type === 'mobile' ? 'ym-device-mobile' : 'ym-device-desktop']">

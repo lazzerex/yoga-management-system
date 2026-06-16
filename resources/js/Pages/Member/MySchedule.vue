@@ -1,6 +1,4 @@
-﻿<script setup>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faBellConcierge, faCalendarWeek, faChartSimple, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
+<script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 const weeklySchedule = [
@@ -8,44 +6,44 @@ const weeklySchedule = [
         day: 'Mon',
         date: 'Apr 27',
         sessions: [
-            { time: '06:45', title: 'Sunrise Mobility', meta: 'Westside Â· Coach Lina' },
-            { time: '18:30', title: 'Evening Yin', meta: 'Downtown Â· Coach Ari' },
+            { time: '06:45', title: 'Sunrise Mobility', meta: 'Westside · Coach Lina' },
+            { time: '18:30', title: 'Evening Yin', meta: 'Downtown · Coach Ari' },
         ],
     },
     {
         day: 'Tue',
         date: 'Apr 28',
         sessions: [
-            { time: '07:00', title: 'Power Core', meta: 'Riverside Â· Coach Daniel' },
+            { time: '07:00', title: 'Power Core', meta: 'Riverside · Coach Daniel' },
         ],
     },
     {
         day: 'Wed',
         date: 'Apr 29',
         sessions: [
-            { time: '18:30', title: 'Evening Yin', meta: 'Downtown Â· Coach Ari' },
+            { time: '18:30', title: 'Evening Yin', meta: 'Downtown · Coach Ari' },
         ],
     },
     {
         day: 'Thu',
         date: 'Apr 30',
         sessions: [
-            { time: '07:00', title: 'Power Core', meta: 'Riverside Â· Coach Daniel' },
-            { time: '20:00', title: 'Breathwork Lab', meta: 'Online Â· Coach Noah' },
+            { time: '07:00', title: 'Power Core', meta: 'Riverside · Coach Daniel' },
+            { time: '20:00', title: 'Breathwork Lab', meta: 'Online · Coach Noah' },
         ],
     },
     {
         day: 'Fri',
         date: 'May 01',
         sessions: [
-            { time: '17:45', title: 'Mobility Reset', meta: 'Downtown Â· Coach Lina' },
+            { time: '17:45', title: 'Mobility Reset', meta: 'Downtown · Coach Lina' },
         ],
     },
     {
         day: 'Sat',
         date: 'May 02',
         sessions: [
-            { time: '09:00', title: 'Weekend Flow', meta: 'Uptown Â· Coach Mia' },
+            { time: '09:00', title: 'Weekend Flow', meta: 'Uptown · Coach Mia' },
         ],
     },
     {
@@ -56,9 +54,9 @@ const weeklySchedule = [
 ];
 
 const highlights = [
-    { title: 'Form correction checkpoint', meta: 'Tue Â· Power Core', type: 'Coach Note' },
-    { title: 'Breathwork mini workshop', meta: 'Thu Â· Online room B', type: 'Workshop' },
-    { title: 'Monthly mobility assessment', meta: 'Sat Â· Uptown', type: 'Assessment' },
+    { title: 'Form correction checkpoint', meta: 'Tue · Power Core', type: 'Coach Note' },
+    { title: 'Breathwork mini workshop', meta: 'Thu · Online room B', type: 'Workshop' },
+    { title: 'Monthly mobility assessment', meta: 'Sat · Uptown', type: 'Assessment' },
 ];
 
 const weeklyFocus = [
@@ -73,7 +71,7 @@ const weeklyFocus = [
         <div class="ym-pane">
             <div class="ym-pane-head">
                 <div class="ym-pane-title-wrap">
-                    <FontAwesomeIcon :icon="faCalendarWeek" class="ym-pane-icon" />
+                    <i class="bi bi-calendar-week ym-pane-icon" />
                     <h2 class="ym-pane-title">Personal Weekly Calendar</h2>
                 </div>
             </div>
@@ -95,7 +93,7 @@ const weeklyFocus = [
                                     <p class="ym-timetable-name">{{ session.title }}</p>
                                     <p class="ym-timetable-sub">{{ session.meta }}</p>
                                 </div>
-                                <div v-if="!day.sessions.length" class="ym-timetable-empty">â€”</div>
+                                <div v-if="!day.sessions.length" class="ym-timetable-empty">—</div>
                             </div>
                         </div>
                     </div>
@@ -107,7 +105,7 @@ const weeklyFocus = [
             <div class="ym-pane">
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
-                        <FontAwesomeIcon :icon="faBellConcierge" class="ym-pane-icon" />
+                        <i class="bi bi-bell ym-pane-icon" />
                         <h2 class="ym-pane-title">Upcoming Highlights</h2>
                     </div>
                 </div>
@@ -129,7 +127,7 @@ const weeklyFocus = [
             <div class="ym-pane">
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
-                        <FontAwesomeIcon :icon="faChartSimple" class="ym-pane-icon" />
+                        <i class="bi bi-bar-chart ym-pane-icon" />
                         <h2 class="ym-pane-title">Weekly Focus</h2>
                     </div>
                 </div>
@@ -146,7 +144,7 @@ const weeklyFocus = [
                         </div>
                     </div>
                     <div class="ym-info-row">
-                        <FontAwesomeIcon :icon="faCircleInfo" class="ym-info-icon" />
+                        <i class="bi bi-info-circle ym-info-icon" />
                         <span>Keep at least one recovery day between high-intensity sessions for better consistency.</span>
                     </div>
                 </div>

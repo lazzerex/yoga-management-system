@@ -1,10 +1,8 @@
-﻿<script setup>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faCalendarDays, faCircleInfo, faIdCard, faListCheck } from '@fortawesome/free-solid-svg-icons';
+<script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 const benefits = [
-    { title: 'Unlimited Studio Classes', meta: 'All branches Â· Any level', limit: 'Unlimited' },
+    { title: 'Unlimited Studio Classes', meta: 'All branches · Any level', limit: 'Unlimited' },
     { title: 'Wellness Workshop Credits', meta: 'Nutrition + mobility workshops', limit: '6 / year' },
     { title: '1:1 Coach Consultations', meta: 'Goal and posture check-in', limit: '4 / year' },
     { title: 'Guest Access', meta: 'Invite a friend to selected sessions', limit: '4 left' },
@@ -40,7 +38,7 @@ const renewalTimeline = [
         <div class="ym-pane">
             <div class="ym-pane-head">
                 <div class="ym-pane-title-wrap">
-                    <FontAwesomeIcon :icon="faIdCard" class="ym-pane-icon" />
+                    <i class="bi bi-person-vcard ym-pane-icon" />
                     <h2 class="ym-pane-title">Membership Record</h2>
                 </div>
                 <span class="ym-status-pill ym-status-pill--started">Active</span>
@@ -49,7 +47,7 @@ const renewalTimeline = [
                 <div class="ym-plan-header">
                     <p class="ym-plan-overline">Member ID YM-29814</p>
                     <p class="ym-plan-name">Premium Flow Annual</p>
-                    <p class="ym-plan-sub">Started Jan 5, 2026 Â· Renews Jan 5, 2027</p>
+                    <p class="ym-plan-sub">Started Jan 5, 2026 · Renews Jan 5, 2027</p>
                 </div>
             </div>
         </div>
@@ -58,7 +56,7 @@ const renewalTimeline = [
             <div class="ym-pane">
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
-                        <FontAwesomeIcon :icon="faListCheck" class="ym-pane-icon" />
+                        <i class="bi bi-list-check ym-pane-icon" />
                         <h2 class="ym-pane-title">Included Benefits</h2>
                     </div>
                 </div>
@@ -80,7 +78,7 @@ const renewalTimeline = [
             <div class="ym-pane">
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
-                        <FontAwesomeIcon :icon="faCalendarDays" class="ym-pane-icon" />
+                        <i class="bi bi-calendar3 ym-pane-icon" />
                         <h2 class="ym-pane-title">Renewal Timeline</h2>
                     </div>
                 </div>
@@ -97,7 +95,7 @@ const renewalTimeline = [
                         </div>
                     </div>
                     <div class="ym-info-row">
-                        <FontAwesomeIcon :icon="faCircleInfo" class="ym-info-icon" />
+                        <i class="bi bi-info-circle ym-info-icon" />
                         <span>You are set for auto-renewal. Update payment details any time before Dec 28, 2026.</span>
                     </div>
                 </div>

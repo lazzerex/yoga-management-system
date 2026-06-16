@@ -1,6 +1,4 @@
 ﻿<script setup>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faChartSimple, faTriangleExclamation, faUsers } from '@fortawesome/free-solid-svg-icons';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 const students = [
@@ -48,7 +46,7 @@ const coachingSnapshot = [
         <div class="ym-pane">
             <div class="ym-pane-head">
                 <div class="ym-pane-title-wrap">
-                    <FontAwesomeIcon :icon="faUsers" class="ym-pane-icon" />
+                    <i class="bi bi-people ym-pane-icon" />
                     <h2 class="ym-pane-title">Student Roster</h2>
                 </div>
             </div>
@@ -80,7 +78,7 @@ const coachingSnapshot = [
             <div class="ym-pane">
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
-                        <FontAwesomeIcon :icon="faTriangleExclamation" class="ym-pane-icon" />
+                        <i class="bi bi-exclamation-triangle ym-pane-icon" />
                         <h2 class="ym-pane-title">Students Needing Follow-up</h2>
                     </div>
                 </div>
@@ -102,7 +100,7 @@ const coachingSnapshot = [
             <div class="ym-pane">
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
-                        <FontAwesomeIcon :icon="faChartSimple" class="ym-pane-icon" />
+                        <i class="bi bi-bar-chart ym-pane-icon" />
                         <h2 class="ym-pane-title">Coaching Snapshot</h2>
                     </div>
                 </div>

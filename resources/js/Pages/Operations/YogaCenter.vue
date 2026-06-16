@@ -1,6 +1,4 @@
-﻿<script setup>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faBuilding, faCircleInfo, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
+<script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 const branches = [
@@ -11,9 +9,9 @@ const branches = [
 ];
 
 const notices = [
-    { title: 'Mat storage renovation', meta: 'Downtown Studio Â· Apr 22', priority: 'High' },
-    { title: 'HVAC maintenance window', meta: 'Westside Branch Â· Apr 24', priority: 'Medium' },
-    { title: 'Equipment restock', meta: 'All branches Â· Apr 26', priority: 'Normal' },
+    { title: 'Mat storage renovation', meta: 'Downtown Studio · Apr 22', priority: 'High' },
+    { title: 'HVAC maintenance window', meta: 'Westside Branch · Apr 24', priority: 'Medium' },
+    { title: 'Equipment restock', meta: 'All branches · Apr 26', priority: 'Normal' },
 ];
 </script>
 
@@ -41,7 +39,7 @@ const notices = [
             <div class="ym-pane">
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
-                        <FontAwesomeIcon :icon="faBuilding" class="ym-pane-icon" />
+                        <i class="bi bi-building ym-pane-icon" />
                         <h2 class="ym-pane-title">Branch Performance</h2>
                     </div>
                 </div>
@@ -63,7 +61,7 @@ const notices = [
             <div class="ym-pane">
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
-                        <FontAwesomeIcon :icon="faTriangleExclamation" class="ym-pane-icon" />
+                        <i class="bi bi-exclamation-triangle ym-pane-icon" />
                         <h2 class="ym-pane-title">Facility Notices</h2>
                     </div>
                 </div>
@@ -80,7 +78,7 @@ const notices = [
                         </div>
                     </div>
                     <div class="ym-info-row">
-                        <FontAwesomeIcon :icon="faCircleInfo" class="ym-info-icon" />
+                        <i class="bi bi-info-circle ym-info-icon" />
                         <span>This page will be wired to live center data in a later phase.</span>
                     </div>
                 </div>

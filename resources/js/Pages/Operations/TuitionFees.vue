@@ -1,6 +1,4 @@
 ﻿<script setup>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faChartSimple, faCircleInfo, faMoneyBillWave } from '@fortawesome/free-solid-svg-icons';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 const fees = [
@@ -41,7 +39,7 @@ const channels = [
             <div class="ym-pane">
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
-                        <FontAwesomeIcon :icon="faMoneyBillWave" class="ym-pane-icon" />
+                        <i class="bi bi-cash-stack ym-pane-icon" />
                         <h2 class="ym-pane-title">Recent Tuition Records</h2>
                     </div>
                 </div>
@@ -76,7 +74,7 @@ const channels = [
             <div class="ym-pane">
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
-                        <FontAwesomeIcon :icon="faChartSimple" class="ym-pane-icon" />
+                        <i class="bi bi-bar-chart ym-pane-icon" />
                         <h2 class="ym-pane-title">Collection Channels</h2>
                     </div>
                 </div>
@@ -93,7 +91,7 @@ const channels = [
                         </div>
                     </div>
                     <div class="ym-info-row">
-                        <FontAwesomeIcon :icon="faCircleInfo" class="ym-info-icon" />
+                        <i class="bi bi-info-circle ym-info-icon" />
                         <span>Payment processing and reminders are not connected yet.</span>
                     </div>
                 </div>

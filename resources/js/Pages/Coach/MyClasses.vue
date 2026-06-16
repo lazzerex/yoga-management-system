@@ -1,6 +1,4 @@
-﻿<script setup>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faChalkboardUser, faCircleInfo, faLightbulb } from '@fortawesome/free-solid-svg-icons';
+<script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 const classes = [
@@ -12,9 +10,9 @@ const classes = [
 ];
 
 const insights = [
-    { title: 'Power Core is near full capacity', meta: 'Riverside Â· Tue/Thu 07:00', label: 'High Demand' },
-    { title: 'Prenatal Flow attendance improving', meta: 'Westside Â· +11% this month', label: 'Trend Up' },
-    { title: 'Weekend Flow has repeat bookings', meta: 'Uptown Â· retention 82%', label: 'Strong' },
+    { title: 'Power Core is near full capacity', meta: 'Riverside · Tue/Thu 07:00', label: 'High Demand' },
+    { title: 'Prenatal Flow attendance improving', meta: 'Westside · +11% this month', label: 'Trend Up' },
+    { title: 'Weekend Flow has repeat bookings', meta: 'Uptown · retention 82%', label: 'Strong' },
 ];
 </script>
 
@@ -42,7 +40,7 @@ const insights = [
             <div class="ym-pane">
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
-                        <FontAwesomeIcon :icon="faChalkboardUser" class="ym-pane-icon" />
+                        <i class="bi bi-easel ym-pane-icon" />
                         <h2 class="ym-pane-title">Class Roster Summary</h2>
                     </div>
                 </div>
@@ -73,7 +71,7 @@ const insights = [
             <div class="ym-pane">
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
-                        <FontAwesomeIcon :icon="faLightbulb" class="ym-pane-icon" />
+                        <i class="bi bi-lightbulb ym-pane-icon" />
                         <h2 class="ym-pane-title">Class Insights</h2>
                     </div>
                 </div>
@@ -90,7 +88,7 @@ const insights = [
                         </div>
                     </div>
                     <div class="ym-info-row">
-                        <FontAwesomeIcon :icon="faCircleInfo" class="ym-info-icon" />
+                        <i class="bi bi-info-circle ym-info-icon" />
                         <span>Live attendance and class health scoring will be wired in a later phase.</span>
                     </div>
                 </div>

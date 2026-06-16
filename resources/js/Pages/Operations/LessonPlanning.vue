@@ -1,6 +1,4 @@
-﻿<script setup>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faCircleInfo, faClipboardCheck } from '@fortawesome/free-solid-svg-icons';
+<script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 const plans = [
@@ -62,7 +60,7 @@ const plans = [
         <div class="ym-pane">
             <div class="ym-pane-head">
                 <div class="ym-pane-title-wrap">
-                    <FontAwesomeIcon :icon="faClipboardCheck" class="ym-pane-icon" />
+                    <i class="bi bi-clipboard-check ym-pane-icon" />
                     <h2 class="ym-pane-title">Approval Queue</h2>
                 </div>
             </div>
@@ -71,7 +69,7 @@ const plans = [
                     <div v-for="plan in plans" :key="plan.name" class="ym-row">
                         <div class="ym-row-main">
                             <p class="ym-row-title">{{ plan.name }}</p>
-                            <p class="ym-row-meta">{{ plan.teacher }} Â· {{ plan.branch }} Â· {{ plan.date }}</p>
+                            <p class="ym-row-meta">{{ plan.teacher }} · {{ plan.branch }} · {{ plan.date }}</p>
                         </div>
                         <div class="ym-row-aside">
                             <span :class="['ym-status-pill', plan.statusClass]">{{ plan.status }}</span>
@@ -80,7 +78,7 @@ const plans = [
                     </div>
                 </div>
                 <div class="ym-info-row">
-                    <FontAwesomeIcon :icon="faCircleInfo" class="ym-info-icon" />
+                    <i class="bi bi-info-circle ym-info-icon" />
                     <span>Workflow actions and approval permissions are placeholders for now.</span>
                 </div>
             </div>

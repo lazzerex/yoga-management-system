@@ -1,6 +1,4 @@
-﻿<script setup>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faCircleInfo, faCloudArrowUp, faFolderOpen } from '@fortawesome/free-solid-svg-icons';
+<script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 const folders = [
@@ -42,7 +40,7 @@ const uploads = [
             <div class="ym-pane">
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
-                        <FontAwesomeIcon :icon="faFolderOpen" class="ym-pane-icon" />
+                        <i class="bi bi-folder2-open ym-pane-icon" />
                         <h2 class="ym-pane-title">Library Folders</h2>
                     </div>
                 </div>
@@ -51,7 +49,7 @@ const uploads = [
                         <div v-for="folder in folders" :key="folder.name" class="ym-row">
                             <div class="ym-row-main">
                                 <p class="ym-row-title">{{ folder.name }}</p>
-                                <p class="ym-row-meta">{{ folder.files }} files Â· {{ folder.owner }}</p>
+                                <p class="ym-row-meta">{{ folder.files }} files · {{ folder.owner }}</p>
                             </div>
                             <div class="ym-row-aside">
                                 <span class="ym-chip">{{ folder.size }}</span>
@@ -64,7 +62,7 @@ const uploads = [
             <div class="ym-pane">
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
-                        <FontAwesomeIcon :icon="faCloudArrowUp" class="ym-pane-icon" />
+                        <i class="bi bi-cloud-upload ym-pane-icon" />
                         <h2 class="ym-pane-title">Recent Upload Queue</h2>
                     </div>
                 </div>
@@ -73,7 +71,7 @@ const uploads = [
                         <div v-for="item in uploads" :key="item.file" class="ym-row">
                             <div class="ym-row-main">
                                 <p class="ym-row-title">{{ item.file }}</p>
-                                <p class="ym-row-meta">{{ item.by }} Â· {{ item.time }}</p>
+                                <p class="ym-row-meta">{{ item.by }} · {{ item.time }}</p>
                             </div>
                             <div class="ym-row-aside">
                                 <span :class="['ym-status-pill', item.statusClass]">{{ item.status }}</span>
@@ -81,7 +79,7 @@ const uploads = [
                         </div>
                     </div>
                     <div class="ym-info-row">
-                        <FontAwesomeIcon :icon="faCircleInfo" class="ym-info-icon" />
+                        <i class="bi bi-info-circle ym-info-icon" />
                         <span>Drag-and-drop uploads, permissions, and file processing are planned for a later phase.</span>
                     </div>
                 </div>

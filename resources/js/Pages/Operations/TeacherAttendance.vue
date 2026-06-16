@@ -1,6 +1,4 @@
 ﻿<script setup>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faCircleInfo, faClipboardCheck } from '@fortawesome/free-solid-svg-icons';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 const attendance = [
@@ -35,7 +33,7 @@ const attendance = [
         <div class="ym-pane">
             <div class="ym-pane-head">
                 <div class="ym-pane-title-wrap">
-                    <FontAwesomeIcon :icon="faClipboardCheck" class="ym-pane-icon" />
+                    <i class="bi bi-clipboard-check ym-pane-icon" />
                     <h2 class="ym-pane-title">Today Attendance Board</h2>
                 </div>
             </div>
@@ -73,7 +71,7 @@ const attendance = [
                     </table>
                 </div>
                 <div class="ym-info-row">
-                    <FontAwesomeIcon :icon="faCircleInfo" class="ym-info-icon" />
+                    <i class="bi bi-info-circle ym-info-icon" />
                     <span>Attendance actions and geolocation validation are planned but not enabled yet.</span>
                 </div>
             </div>

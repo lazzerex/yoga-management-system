@@ -1,7 +1,6 @@
-﻿<script setup>
+<script setup>
 import { computed } from 'vue';
 import { Link } from '@inertiajs/vue3';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 const emit = defineEmits(['tab-click']);
 
@@ -15,7 +14,7 @@ const props = defineProps({
         required: true,
     },
     icon: {
-        type: [Array, Object, String],
+        type: String,
         default: null,
     },
     iconColor: {
@@ -56,14 +55,14 @@ const iconStyles = computed(() => {
 <template>
     <Link v-if="href" :href="href" :class="linkClasses">
         <span class="ym-nav-item-content">
-            <FontAwesomeIcon v-if="icon" :icon="icon" class="ym-nav-item-icon" :style="iconStyles" />
+            <i v-if="icon" :class="['bi', icon, 'ym-nav-item-icon']" :style="iconStyles" />
             <span class="ym-nav-item-text">{{ label }}</span>
         </span>
         <span v-if="badge && variant === 'sidebar'" class="ym-side-link-badge">{{ badge }}</span>
     </Link>
     <span v-else :class="linkClasses" @click="emit('tab-click')">
         <span class="ym-nav-item-content">
-            <FontAwesomeIcon v-if="icon" :icon="icon" class="ym-nav-item-icon" :style="iconStyles" />
+            <i v-if="icon" :class="['bi', icon, 'ym-nav-item-icon']" :style="iconStyles" />
             <span class="ym-nav-item-text">{{ label }}</span>
         </span>
     </span>

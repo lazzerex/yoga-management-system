@@ -1,27 +1,6 @@
-﻿<script setup>
+<script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { route } from 'ziggy-js';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import {
-    faArrowTrendUp,
-    faCalendarDays,
-    faCalendarWeek,
-    faChalkboardUser,
-    faChartSimple,
-    faCircleInfo,
-    faClipboardCheck,
-    faClipboardList,
-    faGripVertical,
-    faIdCard,
-    faMagnifyingGlass,
-    faMoneyBillWave,
-    faPlus,
-    faTableList,
-    faTrophy,
-    faUserCheck,
-    faUsers,
-    faXmark,
-} from '@fortawesome/free-solid-svg-icons';
 import Draggable from 'vuedraggable';
 import Modal from '@/Components/UI/Modal.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -54,17 +33,17 @@ const roleDashboard = {
         ],
         primaryPanel: {
             title: "Today's Schedule",
-            icon: faClipboardList,
+            icon: 'bi-clipboard-data',
             rows: [
-                { title: '07:00 Power Core', meta: 'Riverside Â· 24 students', badge: 'Completed', tone: 'started' },
-                { title: '12:30 Prenatal Flow', meta: 'Westside Â· 14 students', badge: 'Completed', tone: 'started' },
-                { title: '18:30 Evening Yin', meta: 'Downtown Â· 21 students', badge: 'Up Next', tone: 'pending' },
-                { title: '20:00 Breathwork Lab', meta: 'Online Â· 32 students', badge: 'Later', tone: 'default' },
+                { title: '07:00 Power Core', meta: 'Riverside · 24 students', badge: 'Completed', tone: 'started' },
+                { title: '12:30 Prenatal Flow', meta: 'Westside · 14 students', badge: 'Completed', tone: 'started' },
+                { title: '18:30 Evening Yin', meta: 'Downtown · 21 students', badge: 'Up Next', tone: 'pending' },
+                { title: '20:00 Breathwork Lab', meta: 'Online · 32 students', badge: 'Later', tone: 'default' },
             ],
         },
         secondaryPanel: {
             title: 'Student Snapshot',
-            icon: faUsers,
+            icon: 'bi-people',
             rows: [
                 { title: 'High Consistency Students', meta: 'Attendance above 90%', badge: '23', tone: 'started' },
                 { title: 'Follow-up Needed', meta: 'Attendance below 60%', badge: '6', tone: 'pending' },
@@ -80,45 +59,45 @@ const roleDashboard = {
                     day: 'Monday',
                     date: 'Apr 27',
                     entries: [
-                        { time: '06:45', title: 'Sunrise Mobility', meta: 'Westside Â· 18 students' },
-                        { time: '18:30', title: 'Evening Yin', meta: 'Downtown Â· 21 students' },
+                        { time: '06:45', title: 'Sunrise Mobility', meta: 'Westside · 18 students' },
+                        { time: '18:30', title: 'Evening Yin', meta: 'Downtown · 21 students' },
                     ],
                 },
                 {
                     day: 'Tuesday',
                     date: 'Apr 28',
                     entries: [
-                        { time: '07:00', title: 'Power Core', meta: 'Riverside Â· 24 students' },
-                        { time: '20:00', title: 'Breathwork Lab', meta: 'Online Â· 32 students' },
+                        { time: '07:00', title: 'Power Core', meta: 'Riverside · 24 students' },
+                        { time: '20:00', title: 'Breathwork Lab', meta: 'Online · 32 students' },
                     ],
                 },
                 {
                     day: 'Wednesday',
                     date: 'Apr 29',
                     entries: [
-                        { time: '18:30', title: 'Evening Yin', meta: 'Downtown Â· 20 students' },
+                        { time: '18:30', title: 'Evening Yin', meta: 'Downtown · 20 students' },
                     ],
                 },
                 {
                     day: 'Thursday',
                     date: 'Apr 30',
                     entries: [
-                        { time: '07:00', title: 'Power Core', meta: 'Riverside Â· 23 students' },
-                        { time: '12:30', title: 'Prenatal Flow', meta: 'Westside Â· 14 students' },
+                        { time: '07:00', title: 'Power Core', meta: 'Riverside · 23 students' },
+                        { time: '12:30', title: 'Prenatal Flow', meta: 'Westside · 14 students' },
                     ],
                 },
                 {
                     day: 'Friday',
                     date: 'May 01',
                     entries: [
-                        { time: '17:45', title: 'Mobility Reset', meta: 'Downtown Â· 16 students' },
+                        { time: '17:45', title: 'Mobility Reset', meta: 'Downtown · 16 students' },
                     ],
                 },
                 {
                     day: 'Saturday',
                     date: 'May 02',
                     entries: [
-                        { time: '09:00', title: 'Weekend Flow', meta: 'Uptown Â· 19 students' },
+                        { time: '09:00', title: 'Weekend Flow', meta: 'Uptown · 19 students' },
                     ],
                 },
                 { day: 'Sunday', date: 'May 03', entries: [] },
@@ -133,11 +112,11 @@ const roleDashboard = {
         metrics: [
             { label: 'Membership Status', value: 'Active', note: 'Premium Flow Annual' },
             { label: 'Sessions This Week', value: '3 / 5', note: '2 sessions remaining to hit your goal' },
-            { label: 'Next Session', value: 'Today 18:30', note: 'Evening Yin Â· Downtown' },
+            { label: 'Next Session', value: 'Today 18:30', note: 'Evening Yin · Downtown' },
         ],
         primaryPanel: {
             title: 'Membership Status',
-            icon: faIdCard,
+            icon: 'bi-person-vcard',
             rows: [
                 { title: 'Plan Type', meta: 'Premium Flow Annual', badge: 'Premium', tone: 'started' },
                 { title: 'Renewal Date', meta: 'Jan 5, 2027', badge: 'Auto', tone: 'default' },
@@ -147,12 +126,12 @@ const roleDashboard = {
         },
         secondaryPanel: {
             title: 'Upcoming Sessions',
-            icon: faCalendarDays,
+            icon: 'bi-calendar3',
             rows: [
-                { title: 'Evening Yin', meta: 'Today 18:30 Â· Downtown', badge: 'Booked', tone: 'started' },
-                { title: 'Power Core', meta: 'Tue 07:00 Â· Riverside', badge: 'Booked', tone: 'started' },
-                { title: 'Breathwork Lab', meta: 'Thu 20:00 Â· Online', badge: 'Waitlist', tone: 'pending' },
-                { title: 'Weekend Flow', meta: 'Sat 09:00 Â· Uptown', badge: 'Booked', tone: 'started' },
+                { title: 'Evening Yin', meta: 'Today 18:30 · Downtown', badge: 'Booked', tone: 'started' },
+                { title: 'Power Core', meta: 'Tue 07:00 · Riverside', badge: 'Booked', tone: 'started' },
+                { title: 'Breathwork Lab', meta: 'Thu 20:00 · Online', badge: 'Waitlist', tone: 'pending' },
+                { title: 'Weekend Flow', meta: 'Sat 09:00 · Uptown', badge: 'Booked', tone: 'started' },
             ],
         },
         weeklyPanel: {
@@ -163,44 +142,44 @@ const roleDashboard = {
                     day: 'Monday',
                     date: 'Apr 27',
                     entries: [
-                        { time: '06:45', title: 'Sunrise Mobility', meta: 'Westside Â· Coach Lina' },
-                        { time: '18:30', title: 'Evening Yin', meta: 'Downtown Â· Coach Ari' },
+                        { time: '06:45', title: 'Sunrise Mobility', meta: 'Westside · Coach Lina' },
+                        { time: '18:30', title: 'Evening Yin', meta: 'Downtown · Coach Ari' },
                     ],
                 },
                 {
                     day: 'Tuesday',
                     date: 'Apr 28',
                     entries: [
-                        { time: '07:00', title: 'Power Core', meta: 'Riverside Â· Coach Daniel' },
+                        { time: '07:00', title: 'Power Core', meta: 'Riverside · Coach Daniel' },
                     ],
                 },
                 {
                     day: 'Wednesday',
                     date: 'Apr 29',
                     entries: [
-                        { time: '18:30', title: 'Evening Yin', meta: 'Downtown Â· Coach Ari' },
+                        { time: '18:30', title: 'Evening Yin', meta: 'Downtown · Coach Ari' },
                     ],
                 },
                 {
                     day: 'Thursday',
                     date: 'Apr 30',
                     entries: [
-                        { time: '07:00', title: 'Power Core', meta: 'Riverside Â· Coach Daniel' },
-                        { time: '20:00', title: 'Breathwork Lab', meta: 'Online Â· Coach Noah' },
+                        { time: '07:00', title: 'Power Core', meta: 'Riverside · Coach Daniel' },
+                        { time: '20:00', title: 'Breathwork Lab', meta: 'Online · Coach Noah' },
                     ],
                 },
                 {
                     day: 'Friday',
                     date: 'May 01',
                     entries: [
-                        { time: '17:45', title: 'Mobility Reset', meta: 'Downtown Â· Coach Lina' },
+                        { time: '17:45', title: 'Mobility Reset', meta: 'Downtown · Coach Lina' },
                     ],
                 },
                 {
                     day: 'Saturday',
                     date: 'May 02',
                     entries: [
-                        { time: '09:00', title: 'Weekend Flow', meta: 'Uptown Â· Coach Mia' },
+                        { time: '09:00', title: 'Weekend Flow', meta: 'Uptown · Coach Mia' },
                     ],
                 },
                 { day: 'Sunday', date: 'May 03', entries: [] },
@@ -220,7 +199,7 @@ const viewConfigs = {
     coach: {
         overview: {
             title: 'Teaching Overview',
-            icon: faChartSimple,
+            icon: 'bi-bar-chart',
             note: 'Full teaching stats and activity log will be wired in a later phase.',
             rows: [
                 { title: 'Total Sessions This Month', meta: 'Across all branches', badge: '52', tone: 'default' },
@@ -231,7 +210,7 @@ const viewConfigs = {
         },
         'my-performance': {
             title: 'My Performance',
-            icon: faChalkboardUser,
+            icon: 'bi-easel',
             note: 'Performance metrics and feedback scores will be tracked here in a later phase.',
             rows: [
                 { title: 'Punctuality Rate', meta: 'Classes started on time', badge: '96%', tone: 'started' },
@@ -242,7 +221,7 @@ const viewConfigs = {
         },
         'class-stats': {
             title: 'Class Statistics',
-            icon: faTableList,
+            icon: 'bi-table',
             note: 'Detailed fill rates, booking trends, and class analytics will appear here.',
             rows: [
                 { title: 'Power Core', meta: 'Fill rate this week', badge: '24 / 24', tone: 'started' },
@@ -253,7 +232,7 @@ const viewConfigs = {
         },
         'student-progress': {
             title: 'Student Progress',
-            icon: faUserCheck,
+            icon: 'bi-person-check',
             note: 'Progress tracking, assessments, and milestone records will be shown here.',
             rows: [
                 { title: 'Assessments Due', meta: 'By end of this week', badge: '8', tone: 'pending' },
@@ -264,7 +243,7 @@ const viewConfigs = {
         },
         earnings: {
             title: 'Earnings',
-            icon: faMoneyBillWave,
+            icon: 'bi-cash-stack',
             note: 'Session pay breakdown and earnings reports will be available here.',
             rows: [
                 { title: 'Earnings This Month', meta: 'Calculated sessions', badge: '$1,840', tone: 'started' },
@@ -277,21 +256,21 @@ const viewConfigs = {
     member: {
         overview: {
             title: 'Activity Overview',
-            icon: faChartSimple,
+            icon: 'bi-bar-chart',
             note: 'A full activity summary and trends will be available here in a later phase.',
             rows: [
                 { title: 'Sessions This Month', meta: 'Attended vs booked', badge: '11 / 14', tone: 'started' },
                 { title: 'Current Streak', meta: 'Consecutive active weeks', badge: '5 weeks', tone: 'started' },
-                { title: 'Next Class', meta: 'Today 18:30 Â· Evening Yin', badge: 'Today', tone: 'pending' },
+                { title: 'Next Class', meta: 'Today 18:30 · Evening Yin', badge: 'Today', tone: 'pending' },
                 { title: 'Sessions Left on Goal', meta: 'Weekly target: 3 sessions', badge: '2', tone: 'default' },
             ],
         },
         'my-progress': {
             title: 'My Progress',
-            icon: faArrowTrendUp,
+            icon: 'bi-graph-up-arrow',
             note: 'Detailed progress tracking and personal goals will be tracked here.',
             rows: [
-                { title: 'Level Progress', meta: 'Beginner â†’ Intermediate', badge: '68%', tone: 'started' },
+                { title: 'Level Progress', meta: 'Beginner → Intermediate', badge: '68%', tone: 'started' },
                 { title: 'Sessions Completed', meta: 'All time', badge: '38', tone: 'started' },
                 { title: 'Monthly Attendance', meta: 'April 2026', badge: '11 / 14', tone: 'started' },
                 { title: 'Assessments Passed', meta: 'Skill checkpoints', badge: '3', tone: 'default' },
@@ -299,18 +278,18 @@ const viewConfigs = {
         },
         attendance: {
             title: 'Attendance Record',
-            icon: faClipboardCheck,
+            icon: 'bi-clipboard-check',
             note: 'Full attendance history and a calendar view will be shown here.',
             rows: [
-                { title: 'Power Core', meta: 'Apr 24 Â· Daniel Park', badge: 'Attended', tone: 'started' },
-                { title: 'Evening Yin', meta: 'Apr 22 Â· Ari Gomez', badge: 'Attended', tone: 'started' },
-                { title: 'Mobility Reset', meta: 'Apr 19 Â· Lina Tran', badge: 'Attended', tone: 'started' },
-                { title: 'Weekend Flow', meta: 'Apr 18 Â· Mia Chen', badge: 'Attended', tone: 'started' },
+                { title: 'Power Core', meta: 'Apr 24 · Daniel Park', badge: 'Attended', tone: 'started' },
+                { title: 'Evening Yin', meta: 'Apr 22 · Ari Gomez', badge: 'Attended', tone: 'started' },
+                { title: 'Mobility Reset', meta: 'Apr 19 · Lina Tran', badge: 'Attended', tone: 'started' },
+                { title: 'Weekend Flow', meta: 'Apr 18 · Mia Chen', badge: 'Attended', tone: 'started' },
             ],
         },
         payments: {
             title: 'Payment Records',
-            icon: faMoneyBillWave,
+            icon: 'bi-cash-stack',
             note: 'Invoices, receipts, and full payment history will be accessible here.',
             rows: [
                 { title: 'Apr 2026 Membership', meta: 'Premium Flow Annual', badge: 'Paid', tone: 'started' },
@@ -321,7 +300,7 @@ const viewConfigs = {
         },
         achievements: {
             title: 'Achievements',
-            icon: faTrophy,
+            icon: 'bi-trophy',
             note: 'Badges, milestones, and rewards will be tracked here in a later phase.',
             rows: [
                 { title: '5-Week Streak', meta: 'Attended at least once per week', badge: 'Earned', tone: 'started' },
@@ -794,7 +773,7 @@ onBeforeUnmount(() => {
                             <header class="ym-panel-head">
                                 <div class="ym-dashlet-head">
                                     <span class="ym-drag-handle" aria-hidden="true">
-                                        <FontAwesomeIcon :icon="faGripVertical" />
+                                        <i class="bi bi-grip-vertical" />
                                     </span>
                                     <h2 class="ym-panel-title">{{ dashlet.title }}</h2>
                                 </div>
@@ -806,7 +785,7 @@ onBeforeUnmount(() => {
                                     aria-label="Remove dashlet"
                                     @click="removeDashlet(dashlet.id)"
                                 >
-                                    <FontAwesomeIcon :icon="faXmark" />
+                                    <i class="bi bi-x-lg" />
                                 </button>
                             </header>
 
@@ -909,7 +888,7 @@ onBeforeUnmount(() => {
                 class="ym-info-row"
                 style="border-radius: 0.42rem; margin-bottom: 0.75rem;"
             >
-                <FontAwesomeIcon :icon="faCircleInfo" class="ym-info-icon" />
+                <i class="bi bi-info-circle ym-info-icon" />
                 <span>{{ dashboardNotice }}</span>
             </div>
 
@@ -926,7 +905,7 @@ onBeforeUnmount(() => {
                     <div class="ym-pane">
                         <div class="ym-pane-head">
                             <div class="ym-pane-title-wrap">
-                                <FontAwesomeIcon :icon="dashboardConfig.primaryPanel.icon" class="ym-pane-icon" />
+                                <i :class="['bi', dashboardConfig.primaryPanel.icon, 'ym-pane-icon']" />
                                 <h2 class="ym-pane-title">{{ dashboardConfig.primaryPanel.title }}</h2>
                             </div>
                         </div>
@@ -952,7 +931,7 @@ onBeforeUnmount(() => {
                     <div class="ym-pane">
                         <div class="ym-pane-head">
                             <div class="ym-pane-title-wrap">
-                                <FontAwesomeIcon :icon="dashboardConfig.secondaryPanel.icon" class="ym-pane-icon" />
+                                <i :class="['bi', dashboardConfig.secondaryPanel.icon, 'ym-pane-icon']" />
                                 <h2 class="ym-pane-title">{{ dashboardConfig.secondaryPanel.title }}</h2>
                             </div>
                         </div>
@@ -979,7 +958,7 @@ onBeforeUnmount(() => {
                 <div class="ym-pane mt-4">
                     <div class="ym-pane-head">
                         <div class="ym-pane-title-wrap">
-                            <FontAwesomeIcon :icon="faCalendarWeek" class="ym-pane-icon" />
+                            <i class="bi bi-calendar-week ym-pane-icon" />
                             <h2 class="ym-pane-title">{{ dashboardConfig.weeklyPanel.title }}</h2>
                         </div>
                     </div>
@@ -1020,7 +999,7 @@ onBeforeUnmount(() => {
                 <div class="ym-pane">
                     <div class="ym-pane-head">
                         <div class="ym-pane-title-wrap">
-                            <FontAwesomeIcon :icon="currentViewConfig.icon" class="ym-pane-icon" />
+                            <i :class="['bi', currentViewConfig.icon, 'ym-pane-icon']" />
                             <h2 class="ym-pane-title">{{ currentViewConfig.title }}</h2>
                         </div>
                     </div>
@@ -1041,7 +1020,7 @@ onBeforeUnmount(() => {
                             </div>
                         </div>
                         <div class="ym-info-row">
-                            <FontAwesomeIcon :icon="faCircleInfo" class="ym-info-icon" />
+                            <i class="bi bi-info-circle ym-info-icon" />
                             <span>{{ currentViewConfig.note }}</span>
                         </div>
                     </div>
@@ -1064,7 +1043,7 @@ onBeforeUnmount(() => {
             <div class="ym-tab-editor-list mt-3">
                 <div v-for="(tab, index) in dashboardTabsDraft" :key="tab.id" class="ym-tab-editor-row">
                     <span class="ym-tab-handle" aria-hidden="true">
-                        <FontAwesomeIcon :icon="faGripVertical" />
+                        <i class="bi bi-grip-vertical" />
                     </span>
                     <input v-model="tab.label" type="text" class="ym-input" />
                     <button
@@ -1073,7 +1052,7 @@ onBeforeUnmount(() => {
                         :disabled="dashboardTabsDraft.length === 1"
                         @click="removeDashboardTab(index)"
                     >
-                        <FontAwesomeIcon :icon="faXmark" />
+                        <i class="bi bi-x-lg" />
                     </button>
                 </div>
 
@@ -1086,7 +1065,7 @@ onBeforeUnmount(() => {
                         @keydown.enter.prevent="addDashboardTab"
                     />
                     <button type="button" class="ym-tab-add" :disabled="dashboardTabsDraft.length >= maxTopTabs" @click="addDashboardTab">
-                        <FontAwesomeIcon :icon="faPlus" />
+                        <i class="bi bi-plus-lg" />
                     </button>
                 </div>
             </div>
@@ -1104,7 +1083,7 @@ onBeforeUnmount(() => {
             @close="showAddDashletModal = false"
         >
             <label class="ym-search-wrap ym-dashboard-modal-search" aria-label="Search dashlets">
-                <FontAwesomeIcon :icon="faMagnifyingGlass" class="ym-search-icon" />
+                <i class="bi bi-search ym-search-icon" />
                 <input
                     v-model="dashletSearchQuery"
                     type="search"

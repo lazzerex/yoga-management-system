@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { ref, computed, watch } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -61,37 +61,37 @@ const actionLabel = (action) => ACTION_LABELS[action] ?? action;
 const actionBadgeClass = (action) => ACTION_BADGE_CLASSES[action] ?? '';
 
 const formatMeta = (action, meta) => {
-    if (!meta) return 'â€”';
+    if (!meta) return '—';
 
     switch (action) {
         case 'create_user':
-            return `@${meta.username} Â· ${meta.role}`;
+            return `@${meta.username} · ${meta.role}`;
         case 'update_user_info': {
             const parts = [];
             if (meta.from?.name !== meta.to?.name) {
-                parts.push(`name: ${meta.from.name} â†’ ${meta.to.name}`);
+                parts.push(`name: ${meta.from.name} → ${meta.to.name}`);
             }
             if (meta.from?.email !== meta.to?.email) {
-                parts.push(`email: ${meta.from.email} â†’ ${meta.to.email}`);
+                parts.push(`email: ${meta.from.email} → ${meta.to.email}`);
             }
             if (meta.from?.username !== meta.to?.username) {
                 parts.push(`username: ${meta.from.username} -> ${meta.to.username}`);
             }
-            return parts.join(', ') || 'â€”';
+            return parts.join(', ') || '—';
         }
         case 'change_password':
             return 'Password changed';
         case 'assign_role':
-            return `${meta.from} â†’ ${meta.to}`;
+            return `${meta.from} → ${meta.to}`;
         case 'remove_role':
             return `Was ${meta.role}`;
         default:
-            return 'â€”';
+            return '—';
     }
 };
 
 const formatDate = (dateStr) => {
-    if (!dateStr) return 'â€”';
+    if (!dateStr) return '—';
     return new Date(dateStr).toLocaleString('en-US', {
         year: 'numeric',
         month: 'short',
@@ -148,7 +148,7 @@ const formatDate = (dateStr) => {
                             <th class="ym-th">Details</th>
                             <th class="ym-th ym-th--sortable" @click="toggleSort">
                                 Time
-                                <span class="ym-sort-icon">{{ sortDir === 'asc' ? 'â†‘' : 'â†“' }}</span>
+                                <span class="ym-sort-icon">{{ sortDir === 'asc' ? '↑' : '↓' }}</span>
                             </th>
                         </tr>
                     </thead>
@@ -163,7 +163,7 @@ const formatDate = (dateStr) => {
                                     {{ actionLabel(log.action) }}
                                 </span>
                             </td>
-                            <td class="ym-td">{{ log.subject_name ?? 'â€”' }}</td>
+                            <td class="ym-td">{{ log.subject_name ?? '—' }}</td>
                             <td class="ym-td ym-td--meta">{{ formatMeta(log.action, log.meta) }}</td>
                             <td class="ym-td">{{ formatDate(log.created_at) }}</td>
                         </tr>

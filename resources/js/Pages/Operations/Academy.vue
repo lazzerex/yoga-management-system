@@ -1,6 +1,4 @@
 ﻿<script setup>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faCircleInfo, faUserCheck, faUsers } from '@fortawesome/free-solid-svg-icons';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 const classes = [
@@ -41,7 +39,7 @@ const assignments = [
             <div class="ym-pane">
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
-                        <FontAwesomeIcon :icon="faUsers" class="ym-pane-icon" />
+                        <i class="bi bi-people ym-pane-icon" />
                         <h2 class="ym-pane-title">Class Schedule</h2>
                     </div>
                 </div>
@@ -72,7 +70,7 @@ const assignments = [
             <div class="ym-pane">
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
-                        <FontAwesomeIcon :icon="faUserCheck" class="ym-pane-icon" />
+                        <i class="bi bi-person-check ym-pane-icon" />
                         <h2 class="ym-pane-title">Assignment Queue</h2>
                     </div>
                 </div>
@@ -89,7 +87,7 @@ const assignments = [
                         </div>
                     </div>
                     <div class="ym-info-row">
-                        <FontAwesomeIcon :icon="faCircleInfo" class="ym-info-icon" />
+                        <i class="bi bi-info-circle ym-info-icon" />
                         <span>Assignment actions will be supported in a later phase.</span>
                     </div>
                 </div>
