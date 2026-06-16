@@ -27,6 +27,10 @@ const roleLabel = computed(() => {
     if (!role) return 'guest';
     return role.charAt(0).toUpperCase() + role.slice(1);
 });
+const sidebarOpen = ref(false);
+const toggleSidebar = () => { sidebarOpen.value = !sidebarOpen.value; };
+const closeSidebar = () => { sidebarOpen.value = false; };
+
 const notificationsOpen = ref(false);
 const profileMenuOpen = ref(false);
 const notificationsRef = ref(null);
@@ -432,6 +436,8 @@ watch(userRole, () => {
     coachMemberView.value = 'homepage';
 }, { immediate: true });
 
+watch(() => page.url, closeSidebar);
+
 onBeforeUnmount(() => {
     document.removeEventListener('click', handleGlobalClick);
     window.removeEventListener('ym-dashboard-tabs-updated', handleDashboardTabsUpdated);
@@ -445,7 +451,9 @@ const logout = () => {
 
 <template>
     <div class="ym-shell">
-        <aside class="ym-sidebar">
+        <div v-if="sidebarOpen" class="ym-sidebar-backdrop" @click="closeSidebar" />
+
+        <aside class="ym-sidebar" :class="{ 'ym-sidebar--open': sidebarOpen }">
             <div class="ym-brand">
                 <p class="ym-brand-mark">YM</p>
                 <div>
@@ -479,9 +487,19 @@ const logout = () => {
         <div class="ym-workspace">
             <header class="ym-topbar">
                 <div class="ym-topbar-row">
-                    <div>
-                        <p class="ym-overline">Yoga Management System</p>
-                        <h1 class="ym-header-title">{{ title }}</h1>
+                    <div class="ym-topbar-head">
+                        <button
+                            type="button"
+                            class="ym-icon-btn ym-sidebar-toggle"
+                            aria-label="Toggle sidebar"
+                            @click.stop="toggleSidebar"
+                        >
+                            <i class="bi bi-list" />
+                        </button>
+                        <div>
+                            <p class="ym-overline">Yoga Management System</p>
+                            <h1 class="ym-header-title">{{ title }}</h1>
+                        </div>
                     </div>
 
                     <div class="ym-topbar-actions">
