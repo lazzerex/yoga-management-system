@@ -1,10 +1,19 @@
-﻿<script setup>
+<script setup>
 import { Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Field from '@/Components/Form/Field.vue';
+import TextInput from '@/Components/Form/TextInput.vue';
+import Select from '@/Components/Form/Select.vue';
 
 const props = defineProps({
     endpoints: Object,
 });
+
+const roles = [
+    { label: 'admin', value: 'admin' },
+    { label: 'coach', value: 'coach' },
+    { label: 'member', value: 'member' },
+];
 
 const form = useForm({
     name: '',
@@ -28,39 +37,24 @@ const createUser = () => {
             <h2 class="ym-title">Create User</h2>
             <p class="ym-subtitle">Add a new admin, coach, or member account.</p>
             <form class="ym-form-grid" @submit.prevent="createUser">
-                <label class="ym-field">
-                    <span class="ym-label">Name</span>
-                    <input v-model="form.name" type="text" class="ym-input" autocomplete="name" />
-                    <span v-if="form.errors.name" class="ym-field-error">{{ form.errors.name }}</span>
-                </label>
-                <label class="ym-field">
-                    <span class="ym-label">Username</span>
-                    <input v-model="form.username" type="text" class="ym-input" autocomplete="username" />
-                    <span v-if="form.errors.username" class="ym-field-error">{{ form.errors.username }}</span>
-                </label>
-                <label class="ym-field">
-                    <span class="ym-label">Email</span>
-                    <input v-model="form.email" type="email" class="ym-input" autocomplete="email" />
-                    <span v-if="form.errors.email" class="ym-field-error">{{ form.errors.email }}</span>
-                </label>
-                <label class="ym-field">
-                    <span class="ym-label">Role</span>
-                    <select v-model="form.role" class="ym-select">
-                        <option value="admin">admin</option>
-                        <option value="coach">coach</option>
-                        <option value="member">member</option>
-                    </select>
-                    <span v-if="form.errors.role" class="ym-field-error">{{ form.errors.role }}</span>
-                </label>
-                <label class="ym-field">
-                    <span class="ym-label">Password</span>
-                    <input v-model="form.password" type="password" class="ym-input" autocomplete="new-password" />
-                    <span v-if="form.errors.password" class="ym-field-error">{{ form.errors.password }}</span>
-                </label>
-                <label class="ym-field">
-                    <span class="ym-label">Confirm Password</span>
-                    <input v-model="form.password_confirmation" type="password" class="ym-input" autocomplete="new-password" />
-                </label>
+                <Field label="Name" :error="form.errors.name">
+                    <TextInput v-model="form.name" autocomplete="name" />
+                </Field>
+                <Field label="Username" :error="form.errors.username">
+                    <TextInput v-model="form.username" autocomplete="username" />
+                </Field>
+                <Field label="Email" :error="form.errors.email">
+                    <TextInput v-model="form.email" type="email" autocomplete="email" />
+                </Field>
+                <Field label="Role" :error="form.errors.role">
+                    <Select v-model="form.role" :options="roles" />
+                </Field>
+                <Field label="Password" :error="form.errors.password">
+                    <TextInput v-model="form.password" type="password" autocomplete="new-password" />
+                </Field>
+                <Field label="Confirm Password">
+                    <TextInput v-model="form.password_confirmation" type="password" autocomplete="new-password" />
+                </Field>
                 <div class="ym-actions">
                     <button type="submit" class="ym-btn-sm" :disabled="form.processing">
                         {{ form.processing ? 'Creating...' : 'Create User' }}
