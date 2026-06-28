@@ -1,7 +1,10 @@
 <script setup>
+import { useI18n } from 'vue-i18n';
 import { ref, computed, watch } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+
+const { t } = useI18n();
 
 const props = defineProps({
     logs: Object,
@@ -40,14 +43,6 @@ function resetFilters() {
     router.get(props.endpoints.self, {}, { preserveState: false, replace: true });
 }
 
-const ACTION_LABELS = {
-    create_user: 'Create User',
-    update_user_info: 'Update Info',
-    change_password: 'Change Password',
-    assign_role: 'Assign Role',
-    remove_role: 'Remove Role',
-};
-
 const ACTION_BADGE_CLASSES = {
     create_user: 'ym-action-badge--create',
     update_user_info: 'ym-action-badge--update',
@@ -55,8 +50,6 @@ const ACTION_BADGE_CLASSES = {
     assign_role: 'ym-action-badge--role-assign',
     remove_role: 'ym-action-badge--role-remove',
 };
-
-const actionLabel = (action) => ACTION_LABELS[action] ?? action;
 
 const actionBadgeClass = (action) => ACTION_BADGE_CLASSES[action] ?? '';
 
@@ -80,11 +73,11 @@ const formatMeta = (action, meta) => {
             return parts.join(', ') || '—';
         }
         case 'change_password':
-            return 'Password changed';
+            return t('admin.passwordChanged');
         case 'assign_role':
             return `${meta.from} → ${meta.to}`;
         case 'remove_role':
-            return `Was ${meta.role}`;
+            return t('admin.wasRole', { role: meta.role });
         default:
             return '—';
     }
@@ -103,38 +96,38 @@ const formatDate = (dateStr) => {
 </script>
 
 <template>
-    <AppLayout title="Logs">
+    <AppLayout :title="t('admin.auditTitle')">
         <section class="ym-surface ym-section">
             <div class="ym-log-page-head">
                 <div>
-                    <h2 class="ym-title">Audit Logs</h2>
-                    <p class="ym-subtitle">User management actions performed by admins.</p>
+                    <h2 class="ym-title">{{ t('admin.auditTitle') }}</h2>
+                    <p class="ym-subtitle">{{ t('admin.auditSubtitle') }}</p>
                 </div>
-                <a :href="endpoints.export" class="ym-btn-outline">Export CSV</a>
+                <a :href="endpoints.export" class="ym-btn-outline">{{ t('admin.exportCsv') }}</a>
             </div>
 
             <div class="ym-log-tabs">
-                <Link :href="endpoints.login_logs" class="ym-log-tab">Login Logs</Link>
-                <Link :href="endpoints.self" class="ym-log-tab ym-log-tab--active">Audit Logs</Link>
+                <Link :href="endpoints.login_logs" class="ym-log-tab">{{ t('admin.loginLogs') }}</Link>
+                <Link :href="endpoints.self" class="ym-log-tab ym-log-tab--active">{{ t('admin.auditLogs') }}</Link>
             </div>
 
             <div class="ym-log-filters">
                 <input
                     v-model="search"
                     type="search"
-                    placeholder="Search by performer or target..."
+                    :placeholder="t('admin.searchPerformer')"
                     class="ym-log-search"
                 />
                 <select v-model="action" class="ym-log-filter-select">
-                    <option value="">All Actions</option>
-                    <option value="create_user">Create User</option>
-                    <option value="update_user_info">Update Info</option>
-                    <option value="change_password">Change Password</option>
-                    <option value="assign_role">Assign Role</option>
-                    <option value="remove_role">Remove Role</option>
+                    <option value="">{{ t('admin.allActions') }}</option>
+                    <option value="create_user">{{ t('admin.auditActions.create_user') }}</option>
+                    <option value="update_user_info">{{ t('admin.auditActions.update_user_info') }}</option>
+                    <option value="change_password">{{ t('admin.auditActions.change_password') }}</option>
+                    <option value="assign_role">{{ t('admin.auditActions.assign_role') }}</option>
+                    <option value="remove_role">{{ t('admin.auditActions.remove_role') }}</option>
                 </select>
                 <button v-if="hasActiveFilters" @click="resetFilters" class="ym-log-clear-btn">
-                    Clear
+                    {{ t('admin.clear') }}
                 </button>
             </div>
 
@@ -142,25 +135,25 @@ const formatDate = (dateStr) => {
                 <table class="ym-table">
                     <thead>
                         <tr>
-                            <th class="ym-th">Performed By</th>
-                            <th class="ym-th">Action</th>
-                            <th class="ym-th">Target User</th>
-                            <th class="ym-th">Details</th>
+                            <th class="ym-th">{{ t('admin.performedBy') }}</th>
+                            <th class="ym-th">{{ t('admin.action') }}</th>
+                            <th class="ym-th">{{ t('admin.targetUser') }}</th>
+                            <th class="ym-th">{{ t('admin.details') }}</th>
                             <th class="ym-th ym-th--sortable" @click="toggleSort">
-                                Time
+                                {{ t('admin.time') }}
                                 <span class="ym-sort-icon">{{ sortDir === 'asc' ? '↑' : '↓' }}</span>
                             </th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-if="logs.data.length === 0">
-                            <td colspan="5" class="ym-td ym-td--empty">No audit logs found.</td>
+                            <td colspan="5" class="ym-td ym-td--empty">{{ t('admin.noAuditLogs') }}</td>
                         </tr>
                         <tr v-for="log in logs.data" :key="log.id" class="ym-tr">
-                            <td class="ym-td">{{ log.causer?.name ?? 'System' }}</td>
+                            <td class="ym-td">{{ log.causer?.name ?? t('admin.system') }}</td>
                             <td class="ym-td">
                                 <span :class="['ym-action-badge', actionBadgeClass(log.action)]">
-                                    {{ actionLabel(log.action) }}
+                                    {{ t(`admin.auditActions.${log.action}`) }}
                                 </span>
                             </td>
                             <td class="ym-td">{{ log.subject_name ?? '—' }}</td>

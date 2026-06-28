@@ -1,4 +1,5 @@
 ﻿<script setup>
+import {useI18n} from 'vue-i18n';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { router, usePage } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
@@ -12,6 +13,26 @@ defineProps({
 });
 
 const page = usePage();
+
+const { t, locale } = useI18n();
+
+const toggleLocale = () => {
+    locale.value = locale.value === 'en' ? 'vi' : 'en';
+    localStorage.setItem('locale', locale.value);
+    document.cookie = `locale=${locale.value}; path=/; SameSite=Lax`;
+};
+
+const resolveFlashMessage = (message) => {
+    if (!message) {
+        return '';
+    }
+
+    if (typeof message === 'string') {
+        return message;
+    }
+
+    return t(message.key, message.params ?? {});
+};
 
 const flash = computed(() => page.props.flash ?? {});
 const userName = computed(() => page.props.auth?.user?.name ?? 'Guest');
@@ -80,12 +101,12 @@ const notifications = [
     { title: 'April tuition reconciliation is almost due', time: '1h ago' },
 ];
 
-const quickActions = [
-    { label: 'Profile', hint: 'View account summary', href: route('cms.profile.show') },
-    { label: 'Preferences', hint: 'Adjust workspace settings' },
-    { label: 'Last Viewed', hint: 'Jump back to recent pages' },
-    { label: 'About', hint: 'See release notes' },
-];
+const quickActions = computed(() => [
+    { label: t('common.profile'), hint: t('common.viewAccountSummary'), href: route('cms.profile.show') },
+    { label: t('common.preferences'), hint: t('common.adjustWorkspaceSettings') },
+    { label: t('common.lastViewed'), hint: t('common.jumpBackToRecentPages') },
+    { label: t('common.about'), hint: t('common.seeReleaseNotes') },
+]);
 
 const userInitials = computed(() => {
     const name = userName.value?.trim();
@@ -491,34 +512,43 @@ const logout = () => {
                         <button
                             type="button"
                             class="ym-icon-btn ym-sidebar-toggle"
-                            aria-label="Toggle sidebar"
+                            :aria-label="t('common.toggleSidebar')"
                             @click.stop="toggleSidebar"
                         >
                             <i class="bi bi-list" />
                         </button>
                         <div>
-                            <p class="ym-overline">Yoga Management System</p>
+                            <p class="ym-overline">{{ t('dashboard.systemName') }}</p>
                             <h1 class="ym-header-title">{{ title }}</h1>
                         </div>
                     </div>
 
                     <div class="ym-topbar-actions">
-                        <label class="ym-search-wrap" aria-label="Search">
+                        <label class="ym-search-wrap" :aria-label="t('common.search')">
                             <i class="bi bi-search ym-search-icon" />
                             <input
                                 type="search"
                                 class="ym-search"
-                                placeholder="Search"
-                                aria-label="Search"
+                                :placeholder="t('common.search')"
+                                :aria-label="t('common.search')"
                             />
                         </label>
+
+                        <button
+                            type="button"
+                            class="ym-icon-btn ym-lang-toggle"
+                            :title="t('common.switchLang')"
+                            @click="toggleLocale"
+                        >
+                            <span class="ym-lang-label">{{ locale.toUpperCase() }}</span>
+                        </button>
 
                         <div ref="notificationsRef" class="ym-header-menu-wrap">
                             <button
                                 type="button"
                                 class="ym-icon-btn"
                                 :class="{ 'ym-icon-btn--active': notificationsOpen }"
-                                aria-label="Open notifications"
+                                :aria-label="t('common.openNotifications')"
                                 aria-haspopup="menu"
                                 :aria-expanded="notificationsOpen"
                                 @click.stop="toggleNotifications"
@@ -529,9 +559,9 @@ const logout = () => {
 
                             <div v-if="notificationsOpen" class="ym-popover ym-popover-notifications" role="menu">
                                 <div class="ym-popover-head">
-                                    <p class="ym-popover-title">Notifications</p>
+                                    <p class="ym-popover-title">{{ t('common.notifications') }}</p>
                                     <button type="button" class="ym-popover-link" @click="notificationsOpen = false">
-                                        Mark all read
+                                        {{ t('common.markAllRead') }}
                                     </button>
                                 </div>
                                 <ul class="ym-notification-list">
@@ -552,7 +582,7 @@ const logout = () => {
                                 type="button"
                                 class="ym-icon-btn"
                                 :class="{ 'ym-icon-btn--active': profileMenuOpen }"
-                                aria-label="Open quick menu"
+                                :aria-label="t('common.openQuickMenu')"
                                 aria-haspopup="menu"
                                 :aria-expanded="profileMenuOpen"
                                 @click.stop="toggleProfileMenu"
@@ -581,8 +611,8 @@ const logout = () => {
                                 </button>
 
                                 <button type="button" class="ym-menu-item ym-menu-item--danger" @click="logout">
-                                    <span>Sign Out</span>
-                                    <small>End current session</small>
+                                    <span>{{ t('common.signOut') }}</span>
+                                    <small>{{ t('common.endSession') }}</small>
                                 </button>
                             </div>
                         </div>
@@ -605,7 +635,7 @@ const logout = () => {
                             type="button"
                             class="ym-icon-btn ym-top-links-more-btn"
                             :class="{ 'ym-icon-btn--active': dashboardActionsOpen }"
-                            aria-label="Open dashboard options"
+                            :aria-label="t('common.openDashboardOptions')"
                             aria-haspopup="menu"
                             :aria-expanded="dashboardActionsOpen"
                             @click.stop="toggleDashboardActions"
@@ -617,19 +647,19 @@ const logout = () => {
                             <button type="button" class="ym-menu-item" @click="triggerDashboardAction('edit-dashboard')">
                                 <span class="ym-menu-item-label">
                                     <i class="bi bi-pencil-square ym-menu-item-icon" />
-                                    Edit Dashboard
+                                    {{ t('dashboard.editDashboard') }}
                                 </span>
                             </button>
                             <button type="button" class="ym-menu-item" @click="triggerDashboardAction('add-dashlet')">
                                 <span class="ym-menu-item-label">
                                     <i class="bi bi-plus-lg ym-menu-item-icon" />
-                                    Add Dashlet
+                                    {{ t('dashboard.addDashlet') }}
                                 </span>
                             </button>
                             <button type="button" class="ym-menu-item" @click="triggerDashboardAction('reset-dashboard')">
                                 <span class="ym-menu-item-label">
                                     <i class="bi bi-arrow-counterclockwise ym-menu-item-icon" />
-                                    Reset Layout
+                                    {{ t('dashboard.resetLayout') }}
                                 </span>
                             </button>
                         </div>
@@ -638,8 +668,8 @@ const logout = () => {
             </header>
 
             <main class="ym-main">
-                <div v-if="flash.success" class="ym-alert-success ym-main-alert">{{ flash.success }}</div>
-                <div v-if="flash.error" class="ym-alert-error ym-main-alert">{{ flash.error }}</div>
+                <div v-if="flash.success" class="ym-alert-success ym-main-alert">{{ resolveFlashMessage(flash.success) }}</div>
+                <div v-if="flash.error" class="ym-alert-error ym-main-alert">{{ resolveFlashMessage(flash.error) }}</div>
                 <slot />
             </main>
         </div>

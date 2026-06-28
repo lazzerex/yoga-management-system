@@ -1,7 +1,10 @@
 ﻿<script setup>
+import { useI18n } from 'vue-i18n';
 import { Link, router } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import AppLayout from '@/Layouts/AppLayout.vue';
+
+const { t } = useI18n();
 
 const props = defineProps({
     users: Object,
@@ -9,30 +12,28 @@ const props = defineProps({
     auth: Object,
 });
 
-
-
 const isCurrentUser = (id) => props.auth?.user?.id === id;
 
 const deleteUser = (user) => {
     if (isCurrentUser(user.id)) return;
-    if (!window.confirm(`Delete ${user.name}? This cannot be undone.`)) return;
+    if (!window.confirm(t('admin.confirmDelete', { name: user.name }))) return;
     router.delete(route('admin.users.destroy', user.id), { preserveScroll: true });
 };
 </script>
 
 <template>
-    <AppLayout title="User Management">
+    <AppLayout :title="t('admin.userManagement')">
         <section class="ym-surface ym-section">
             <div class="flex items-center justify-between">
                 <div>
                     <h2 class="ym-title">
-                        Users
+                        {{ t('admin.users') }}
                         <span class="ym-count-badge">{{ users.total }}</span>
                     </h2>
-                    <p class="ym-subtitle">Manage accounts and role assignments.</p>
+                    <p class="ym-subtitle">{{ t('admin.manageAccounts') }}</p>
                 </div>
                 <Link type="button" class="ym-btn-sm" :href="endpoints.create">
-                    Create User
+                    {{ t('admin.createUser') }}
                 </Link>
             </div>
 
@@ -40,13 +41,13 @@ const deleteUser = (user) => {
                 <table class="ym-table">
                     <thead>
                         <tr>
-                            <th class="ym-th">Name</th>
-                            <th class="ym-th">Username</th>
-                            <th class="ym-th">Email</th>
-                            <th class="ym-th">Role</th>
-                            <th class="ym-th">Last Login</th>
-                            <th class="ym-th">Joined</th>
-                            <th class="ym-th">Actions</th>
+                            <th class="ym-th">{{ t('admin.name') }}</th>
+                            <th class="ym-th">{{ t('admin.username') }}</th>
+                            <th class="ym-th">{{ t('admin.email') }}</th>
+                            <th class="ym-th">{{ t('admin.role') }}</th>
+                            <th class="ym-th">{{ t('admin.lastLogin') }}</th>
+                            <th class="ym-th">{{ t('admin.joined') }}</th>
+                            <th class="ym-th">{{ t('admin.actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -57,19 +58,18 @@ const deleteUser = (user) => {
                             <td class="ym-td">
                                 <span :class="['ym-role-badge', `ym-role-${user.role}`]">{{ user.role }}</span>
                             </td>
-                            <td class="ym-td text-neutral-500">{{ user.last_login ?? 'Never' }}</td>
+                            <td class="ym-td text-neutral-500">{{ user.last_login ?? t('admin.never') }}</td>
                             <td class="ym-td text-neutral-500">{{ user.created_at }}</td>
                             <td class="ym-td">
                                 <div class="ym-inline-actions">
-                                    <Link type="button" class="ym-btn-outline" :href="route('admin.users.edit', user.id)">Edit</Link>
+                                    <Link type="button" class="ym-btn-outline" :href="route('admin.users.edit', user.id)">{{ t('admin.edit') }}</Link>
                                     <button
                                         type="button"
                                         class="ym-btn-danger"
                                         :disabled="isCurrentUser(user.id)"
                                         @click="deleteUser(user)"
-                                    >Delete</button>
+                                    >{{ t('admin.delete') }}</button>
                                 </div>
-                                <!-- <p v-if="isCurrentUser(user.id)" class="ym-inline-hint">Current user</p> -->
                             </td>
                         </tr>
                     </tbody>
@@ -87,7 +87,5 @@ const deleteUser = (user) => {
                 />
             </div>
         </section>
-
-        <!-- Modals removed, now handled by separate pages -->
     </AppLayout>
 </template>

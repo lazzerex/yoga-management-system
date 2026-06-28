@@ -1,7 +1,10 @@
 <script setup>
+import { useI18n } from 'vue-i18n';
 import { ref, computed, watch } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+
+const { t } = useI18n();
 
 const props = defineProps({
     logs: Object,
@@ -43,8 +46,8 @@ function resetFilters() {
 }
 
 const FAILURE_REASON_LABELS = {
-    wrong_password: 'Wrong password',
-    user_not_found: 'User not found',
+    wrong_password: t('admin.wrongPassword'),
+    user_not_found: t('admin.userNotFound'),
 };
 
 const statusBadgeClass = (status) =>
@@ -52,9 +55,9 @@ const statusBadgeClass = (status) =>
 
 const statusLabel = (log) => {
     if (log.status === 'failed') {
-        return `Failed · ${FAILURE_REASON_LABELS[log.failure_reason] ?? log.failure_reason ?? 'Unknown'}`;
+        return `${t('admin.failed')} · ${FAILURE_REASON_LABELS[log.failure_reason] ?? log.failure_reason ?? t('admin.unknown')}`;
     }
-    return 'Success';
+    return t('admin.success');
 };
 
 const formatDate = (dateStr) => {
@@ -70,43 +73,43 @@ const formatDate = (dateStr) => {
 </script>
 
 <template>
-    <AppLayout title="Logs">
+    <AppLayout :title="t('admin.loginLogs')">
         <section class="ym-surface ym-section">
             <div class="ym-log-page-head">
                 <div>
-                    <h2 class="ym-title">Login Activity</h2>
-                    <p class="ym-subtitle">Recent sign-in events across all accounts.</p>
+                    <h2 class="ym-title">{{ t('admin.loginActivity') }}</h2>
+                    <p class="ym-subtitle">{{ t('admin.recentSignIns') }}</p>
                 </div>
                 <div class="ym-log-head-actions">
-                    <a :href="endpoints.export" class="ym-btn-outline">Export CSV</a>
-                    <Link :href="endpoints.users" class="ym-btn-ghost">Users</Link>
+                    <a :href="endpoints.export" class="ym-btn-outline">{{ t('admin.exportCsv') }}</a>
+                    <Link :href="endpoints.users" class="ym-btn-ghost">{{ t('admin.users') }}</Link>
                 </div>
             </div>
 
             <div class="ym-log-tabs">
-                <Link :href="endpoints.self" class="ym-log-tab ym-log-tab--active">Login Logs</Link>
-                <Link :href="endpoints.audit_logs" class="ym-log-tab">Audit Logs</Link>
+                <Link :href="endpoints.self" class="ym-log-tab ym-log-tab--active">{{ t('admin.loginLogs') }}</Link>
+                <Link :href="endpoints.audit_logs" class="ym-log-tab">{{ t('admin.auditLogs') }}</Link>
             </div>
 
             <div class="ym-log-filters">
                 <input
                     v-model="search"
                     type="search"
-                    placeholder="Search IP or identifier..."
+                    :placeholder="t('admin.searchIp')"
                     class="ym-log-search"
                 />
                 <select v-model="status" class="ym-log-filter-select">
-                    <option value="">All Status</option>
-                    <option value="success">Success</option>
-                    <option value="failed">Failed</option>
+                    <option value="">{{ t('admin.allStatus') }}</option>
+                    <option value="success">{{ t('admin.success') }}</option>
+                    <option value="failed">{{ t('admin.failed') }}</option>
                 </select>
                 <select v-model="device" class="ym-log-filter-select">
-                    <option value="">All Devices</option>
+                    <option value="">{{ t('admin.allDevices') }}</option>
                     <option value="desktop">Desktop</option>
                     <option value="mobile">Mobile</option>
                 </select>
                 <button v-if="hasActiveFilters" @click="resetFilters" class="ym-log-clear-btn">
-                    Clear
+                    {{ t('admin.clear') }}
                 </button>
             </div>
 
@@ -114,20 +117,20 @@ const formatDate = (dateStr) => {
                 <table class="ym-table">
                     <thead>
                         <tr>
-                            <th class="ym-th">Status</th>
-                            <th class="ym-th">User</th>
-                            <th class="ym-th">Identifier</th>
-                            <th class="ym-th">IP Address</th>
-                            <th class="ym-th">Device</th>
+                            <th class="ym-th">{{ t('admin.status') }}</th>
+                            <th class="ym-th">{{ t('admin.user') }}</th>
+                            <th class="ym-th">{{ t('admin.identifier') }}</th>
+                            <th class="ym-th">{{ t('admin.ipAddress') }}</th>
+                            <th class="ym-th">{{ t('admin.device') }}</th>
                             <th class="ym-th ym-th--sortable" @click="toggleSort">
-                                Time
+                                {{ t('admin.time') }}
                                 <span class="ym-sort-icon">{{ sortDir === 'asc' ? '↑' : '↓' }}</span>
                             </th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-if="logs.data.length === 0">
-                            <td colspan="6" class="ym-td ym-td--empty">No login logs found.</td>
+                            <td colspan="6" class="ym-td ym-td--empty">{{ t('admin.noLogs') }}</td>
                         </tr>
                         <tr v-for="log in logs.data" :key="log.id" class="ym-tr">
                             <td class="ym-td">

@@ -1,5 +1,8 @@
 <script setup>
+import { useI18n } from 'vue-i18n';
 import AppLayout from '@/Layouts/AppLayout.vue';
+
+const { t } = useI18n();
 
 const enrolledClasses = [
     { name: 'Evening Yin', coach: 'Ari Gomez', schedule: 'Mon / Wed 18:30', attendance: '10 / 12' },
@@ -18,20 +21,20 @@ const sessionHistory = [
 </script>
 
 <template>
-    <AppLayout title="My Classes">
+    <AppLayout :title="t('member.myClassesMember')">
         <div class="ym-stat-strip">
             <div class="ym-stat">
-                <p class="ym-stat-label">Active Enrollments</p>
+                <p class="ym-stat-label">{{ t('member.enrolled') }}</p>
                 <p class="ym-stat-value">5</p>
                 <p class="ym-stat-note">Across 3 branches</p>
             </div>
             <div class="ym-stat">
-                <p class="ym-stat-label">Sessions Completed</p>
+                <p class="ym-stat-label">{{ t('member.schedule') }}</p>
                 <p class="ym-stat-value">38</p>
-                <p class="ym-stat-note">This membership cycle</p>
+                <p class="ym-stat-note">{{ t('member.unlimitedOrQuantity', { value: 'This membership cycle' }) }}</p>
             </div>
             <div class="ym-stat">
-                <p class="ym-stat-label">Next Session</p>
+                <p class="ym-stat-label">{{ t('member.mySchedule') }}</p>
                 <p class="ym-stat-value">Today 18:30</p>
                 <p class="ym-stat-note">Evening Yin · Downtown</p>
             </div>
@@ -42,7 +45,7 @@ const sessionHistory = [
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
                         <i class="bi bi-table ym-pane-icon" />
-                        <h2 class="ym-pane-title">Current Enrollments</h2>
+                        <h2 class="ym-pane-title">{{ t('member.enrolled') }}</h2>
                     </div>
                 </div>
                 <div class="ym-pane-body">
@@ -50,10 +53,10 @@ const sessionHistory = [
                         <table class="ym-table">
                             <thead>
                                 <tr>
-                                    <th class="ym-th">Class</th>
-                                    <th class="ym-th">Coach</th>
-                                    <th class="ym-th">Schedule</th>
-                                    <th class="ym-th">Attendance</th>
+                                    <th class="ym-th">{{ t('operations.class') }}</th>
+                                    <th class="ym-th">{{ t('operations.teacher') }}</th>
+                                    <th class="ym-th">{{ t('member.schedule') }}</th>
+                                    <th class="ym-th">{{ t('operations.attendance') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -73,7 +76,7 @@ const sessionHistory = [
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
                         <i class="bi bi-clock-history ym-pane-icon" />
-                        <h2 class="ym-pane-title">Recent Session History</h2>
+                        <h2 class="ym-pane-title">{{ t('member.schedule') }}</h2>
                     </div>
                 </div>
                 <div class="ym-pane-body">

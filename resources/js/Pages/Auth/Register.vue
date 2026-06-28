@@ -1,8 +1,11 @@
 ﻿<script setup>
+import { useI18n } from 'vue-i18n';
 import { Link, useForm } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import AuthCard from '@/Components/Auth/AuthCard.vue';
 import LabeledInput from '@/Components/Form/LabeledInput.vue';
+
+const { t } = useI18n();
 
 const form = useForm({
     name: '',
@@ -18,14 +21,14 @@ const submit = () => {
 </script>
 
 <template>
-    <AuthCard title="Create account">
+    <AuthCard :title="t('auth.createAccount')">
         <form @submit.prevent="submit" class="space-y-4">
             <LabeledInput
                 id="name"
                 v-model="form.name"
-                label="Full name"
+                :label="t('auth.name')"
                 type="text"
-                placeholder="Your name"
+                :placeholder="t('auth.namePlaceholder')"
                 autocomplete="name"
                 :error="form.errors.name"
             />
@@ -33,9 +36,9 @@ const submit = () => {
             <LabeledInput
                 id="username"
                 v-model="form.username"
-                label="Username"
+                :label="t('auth.username')"
                 type="text"
-                placeholder="your_username"
+                :placeholder="t('auth.usernamePlaceholder')"
                 autocomplete="username"
                 :error="form.errors.username"
             />
@@ -43,9 +46,9 @@ const submit = () => {
             <LabeledInput
                 id="email"
                 v-model="form.email"
-                label="Email"
+                :label="t('auth.email')"
                 type="email"
-                placeholder="you@example.com"
+                :placeholder="t('auth.emailPlaceholder')"
                 autocomplete="email"
                 :error="form.errors.email"
             />
@@ -53,9 +56,9 @@ const submit = () => {
             <LabeledInput
                 id="password"
                 v-model="form.password"
-                label="Password"
+                :label="t('auth.password')"
                 type="password"
-                placeholder="At least 8 characters"
+                :placeholder="t('auth.passwordHint')"
                 autocomplete="new-password"
                 :error="form.errors.password"
             />
@@ -63,9 +66,9 @@ const submit = () => {
             <LabeledInput
                 id="password_confirmation"
                 v-model="form.password_confirmation"
-                label="Confirm password"
+                :label="t('auth.confirmPassword')"
                 type="password"
-                placeholder="Repeat password"
+                :placeholder="t('auth.confirmPasswordPlaceholder')"
                 autocomplete="new-password"
                 :error="form.errors.password_confirmation"
             />
@@ -75,12 +78,12 @@ const submit = () => {
                 :disabled="form.processing"
                 class="w-full rounded-md bg-neutral-900 text-white py-2 text-sm font-medium hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed"
             >
-                {{ form.processing ? 'Creating account...' : 'Create account' }}
+                {{ form.processing ? t('auth.creatingAccount') : t('auth.createAccount') }}
             </button>
 
             <p class="text-sm text-neutral-600">
-                Already have an account?
-                <Link :href="route('login')" class="font-medium text-teal-700 hover:underline">Sign in</Link>
+                {{ t('auth.alreadyHaveAccount') }}
+                <Link :href="route('login')" class="font-medium text-teal-700 hover:underline">{{ t('auth.signIn') }}</Link>
             </p>
         </form>
     </AuthCard>

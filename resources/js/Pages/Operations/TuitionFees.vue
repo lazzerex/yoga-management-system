@@ -1,37 +1,42 @@
 ﻿<script setup>
+import { useI18n } from 'vue-i18n';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
-const fees = [
-    { student: 'Sophia Nguyen', plan: 'Unlimited Monthly', amount: '$129', dueDate: 'Apr 21', status: 'Paid', statusClass: 'ym-status-pill--started' },
-    { student: 'Ethan Cole', plan: '10-Class Pack', amount: '$160', dueDate: 'Apr 22', status: 'Pending', statusClass: 'ym-status-pill--pending' },
-    { student: 'Luna Bennett', plan: 'Private 1:1', amount: '$220', dueDate: 'Apr 18', status: 'Overdue', statusClass: 'ym-status-pill--pending' },
-    { student: 'Noah Blake', plan: 'Weekend Membership', amount: '$89', dueDate: 'Apr 25', status: 'Scheduled', statusClass: '' },
+const { t } = useI18n();
+
+const records = [
+    { student: 'Alice Chen', plan: 'Unlimited Monthly', amount: '$120', due: 'May 01', status: 'Paid' },
+    { student: 'Ben Walker', plan: '10-Class Pass', amount: '$150', due: 'May 05', status: 'Pending' },
+    { student: 'Clara Park', plan: 'Unlimited Monthly', amount: '$120', due: 'Apr 28', status: 'Overdue' },
+    { student: 'David Tran', plan: 'Drop-In (x5)', amount: '$90', due: 'May 10', status: 'Pending' },
+    { student: 'Emma Lee', plan: 'Annual Premium', amount: '$960', due: 'May 03', status: 'Paid' },
 ];
 
 const channels = [
-    { name: 'Bank Transfer', meta: 'Primary method for monthly plans', share: '53%' },
-    { name: 'Card Payment', meta: 'Front desk and online checkout', share: '31%' },
-    { name: 'E-Wallet', meta: 'Preferred by younger members', share: '16%' },
+    { method: 'Bank Transfer', count: 82, pct: '45%' },
+    { method: 'Credit Card', count: 58, pct: '32%' },
+    { method: 'Cash', count: 27, pct: '15%' },
+    { method: 'E-Wallet', count: 15, pct: '8%' },
 ];
 </script>
 
 <template>
-    <AppLayout title="Tuition Fee Collection">
+    <AppLayout :title="t('operations.tuitionFees')">
         <div class="ym-stat-strip">
             <div class="ym-stat">
-                <p class="ym-stat-label">Collected This Month</p>
-                <p class="ym-stat-value">$48,920</p>
-                <p class="ym-stat-note">82% of monthly target</p>
+                <p class="ym-stat-label">{{ t('operations.collectedThisMonth') }}</p>
+                <p class="ym-stat-value">$18,240</p>
+                <p class="ym-stat-note">{{ t('operations.ofMonthlyTarget') }}</p>
             </div>
             <div class="ym-stat">
-                <p class="ym-stat-label">Pending Invoices</p>
-                <p class="ym-stat-value">37</p>
-                <p class="ym-stat-note">$12,440 outstanding</p>
+                <p class="ym-stat-label">{{ t('operations.pendingInvoices') }}</p>
+                <p class="ym-stat-value">34</p>
+                <p class="ym-stat-note">$6,200 {{ t('operations.outstanding') }}</p>
             </div>
             <div class="ym-stat">
-                <p class="ym-stat-label">Overdue</p>
-                <p class="ym-stat-value">9</p>
-                <p class="ym-stat-note">Follow-up campaign needed</p>
+                <p class="ym-stat-label">{{ t('operations.overdue') }}</p>
+                <p class="ym-stat-value">12</p>
+                <p class="ym-stat-note">{{ t('operations.followUpNeeded') }}</p>
             </div>
         </div>
 
@@ -39,8 +44,8 @@ const channels = [
             <div class="ym-pane">
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
-                        <i class="bi bi-cash-stack ym-pane-icon" />
-                        <h2 class="ym-pane-title">Recent Tuition Records</h2>
+                        <i class="bi bi-receipt ym-pane-icon" />
+                        <h2 class="ym-pane-title">{{ t('operations.tuitionRecords') }}</h2>
                     </div>
                 </div>
                 <div class="ym-pane-body">
@@ -48,21 +53,21 @@ const channels = [
                         <table class="ym-table">
                             <thead>
                                 <tr>
-                                    <th class="ym-th">Student</th>
-                                    <th class="ym-th">Plan</th>
-                                    <th class="ym-th">Amount</th>
-                                    <th class="ym-th">Due Date</th>
-                                    <th class="ym-th">Status</th>
+                                    <th class="ym-th">{{ t('operations.student') }}</th>
+                                    <th class="ym-th">{{ t('operations.plan') }}</th>
+                                    <th class="ym-th">{{ t('operations.amount') }}</th>
+                                    <th class="ym-th">{{ t('operations.dueDate') }}</th>
+                                    <th class="ym-th">{{ t('operations.status') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="fee in fees" :key="fee.student" class="ym-tr">
-                                    <td class="ym-td font-medium">{{ fee.student }}</td>
-                                    <td class="ym-td">{{ fee.plan }}</td>
-                                    <td class="ym-td">{{ fee.amount }}</td>
-                                    <td class="ym-td">{{ fee.dueDate }}</td>
+                                <tr v-for="r in records" :key="r.student" class="ym-tr">
+                                    <td class="ym-td font-medium">{{ r.student }}</td>
+                                    <td class="ym-td">{{ r.plan }}</td>
+                                    <td class="ym-td">{{ r.amount }}</td>
+                                    <td class="ym-td">{{ r.due }}</td>
                                     <td class="ym-td">
-                                        <span :class="['ym-status-pill', fee.statusClass]">{{ fee.status }}</span>
+                                        <span class="ym-tag">{{ r.status }}</span>
                                     </td>
                                 </tr>
                             </tbody>
@@ -74,25 +79,25 @@ const channels = [
             <div class="ym-pane">
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
-                        <i class="bi bi-bar-chart ym-pane-icon" />
-                        <h2 class="ym-pane-title">Collection Channels</h2>
+                        <i class="bi bi-credit-card ym-pane-icon" />
+                        <h2 class="ym-pane-title">{{ t('operations.collectionChannels') }}</h2>
                     </div>
                 </div>
                 <div class="ym-pane-body">
                     <div class="ym-row-list">
-                        <div v-for="channel in channels" :key="channel.name" class="ym-row">
+                        <div v-for="ch in channels" :key="ch.method" class="ym-row">
                             <div class="ym-row-main">
-                                <p class="ym-row-title">{{ channel.name }}</p>
-                                <p class="ym-row-meta">{{ channel.meta }}</p>
+                                <p class="ym-row-title">{{ ch.method }}</p>
+                                <p class="ym-row-meta">{{ ch.count }} {{ t('operations.thisMonth') }}</p>
                             </div>
                             <div class="ym-row-aside">
-                                <span class="ym-chip">{{ channel.share }}</span>
+                                <span class="ym-chip">{{ ch.pct }}</span>
                             </div>
                         </div>
                     </div>
                     <div class="ym-info-row">
                         <i class="bi bi-info-circle ym-info-icon" />
-                        <span>Payment processing and reminders are not connected yet.</span>
+                        <span>{{ t('operations.tuitionPlaceholder') }}</span>
                     </div>
                 </div>
             </div>

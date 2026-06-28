@@ -1,5 +1,8 @@
 <script setup>
+import { useI18n } from 'vue-i18n';
 import AppLayout from '@/Layouts/AppLayout.vue';
+
+const { t } = useI18n();
 
 const teachingSchedule = [
     {
@@ -55,25 +58,25 @@ const teachingSchedule = [
 ];
 
 const todayHighlights = [
-    { title: 'Evening Yin', meta: '18:30 · Downtown · 21 students', badge: 'Today' },
+    { title: 'Evening Yin', meta: '18:30 · Downtown · 21 students', badge: t('coach.today') },
     { title: 'Post-class notes due', meta: 'Submit by 21:00 for attendance sync', badge: 'Reminder' },
-    { title: 'Substitute request', meta: 'Backup coach for Saturday workshop', badge: 'Pending' },
+    { title: 'Substitute request', meta: 'Backup coach for Saturday workshop', badge: t('coach.followUp') },
 ];
 
 const teachingLoad = [
-    { label: 'Total Weekly Sessions', note: 'Scheduled classes this week', value: '14' },
-    { label: 'Branch Coverage', note: 'Distinct branch locations', value: '4' },
-    { label: 'Total Student Touchpoints', note: 'Projected attendance sum', value: '182' },
+    { label: t('coach.classesThisWeek'), note: t('coach.weeklySchedule'), value: '14' },
+    { label: t('coach.totalHours'), note: t('coach.acrossBranches', { count: 4 }), value: t('coach.hours', { count: 18 }) },
+    { label: t('coach.totalStudents'), note: t('coach.eventsThisWeek'), value: '182' },
 ];
 </script>
 
 <template>
-    <AppLayout title="My Teaching Schedule">
+    <AppLayout :title="t('coach.teachingSchedule')">
         <div class="ym-pane">
             <div class="ym-pane-head">
                 <div class="ym-pane-title-wrap">
                     <i class="bi bi-calendar-week ym-pane-icon" />
-                    <h2 class="ym-pane-title">Weekly Teaching Calendar</h2>
+                    <h2 class="ym-pane-title">{{ t('coach.weeklySchedule') }}</h2>
                 </div>
             </div>
             <div class="ym-pane-body">
@@ -107,7 +110,7 @@ const teachingLoad = [
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
                         <i class="bi bi-clipboard-data ym-pane-icon" />
-                        <h2 class="ym-pane-title">Today At A Glance</h2>
+                        <h2 class="ym-pane-title">{{ t('coach.today') }}</h2>
                     </div>
                 </div>
                 <div class="ym-pane-body">
@@ -129,7 +132,7 @@ const teachingLoad = [
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
                         <i class="bi bi-bar-chart ym-pane-icon" />
-                        <h2 class="ym-pane-title">Teaching Load</h2>
+                        <h2 class="ym-pane-title">{{ t('coach.thisWeek') }}</h2>
                     </div>
                 </div>
                 <div class="ym-pane-body">
