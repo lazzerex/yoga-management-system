@@ -1,8 +1,6 @@
 <script setup>
-import { useI18n } from 'vue-i18n';
+import { trans as t } from 'laravel-vue-i18n';
 import AppLayout from '@/Layouts/AppLayout.vue';
-
-const { t } = useI18n();
 
 const teachingSchedule = [
     {
@@ -71,12 +69,12 @@ const teachingLoad = [
 </script>
 
 <template>
-    <AppLayout :title="t('coach.teachingSchedule')">
+    <AppLayout :title="$t('coach.teachingSchedule')">
         <div class="ym-pane">
             <div class="ym-pane-head">
                 <div class="ym-pane-title-wrap">
                     <i class="bi bi-calendar-week ym-pane-icon" />
-                    <h2 class="ym-pane-title">{{ t('coach.weeklySchedule') }}</h2>
+                    <h2 class="ym-pane-title">{{ $t('coach.weeklySchedule') }}</h2>
                 </div>
             </div>
             <div class="ym-pane-body">
@@ -110,7 +108,7 @@ const teachingLoad = [
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
                         <i class="bi bi-clipboard-data ym-pane-icon" />
-                        <h2 class="ym-pane-title">{{ t('coach.today') }}</h2>
+                        <h2 class="ym-pane-title">{{ $t('coach.today') }}</h2>
                     </div>
                 </div>
                 <div class="ym-pane-body">
@@ -132,7 +130,7 @@ const teachingLoad = [
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
                         <i class="bi bi-bar-chart ym-pane-icon" />
-                        <h2 class="ym-pane-title">{{ t('coach.thisWeek') }}</h2>
+                        <h2 class="ym-pane-title">{{ $t('coach.thisWeek') }}</h2>
                     </div>
                 </div>
                 <div class="ym-pane-body">

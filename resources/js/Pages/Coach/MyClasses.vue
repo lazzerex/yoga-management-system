@@ -1,8 +1,6 @@
 <script setup>
-import { useI18n } from 'vue-i18n';
+import { trans as t } from 'laravel-vue-i18n';
 import AppLayout from '@/Layouts/AppLayout.vue';
-
-const { t } = useI18n();
 
 const classes = [
     { name: 'Power Core', branch: 'Riverside', students: 24, waitlist: 3 },
@@ -20,22 +18,22 @@ const insights = [
 </script>
 
 <template>
-    <AppLayout :title="t('coach.myClasses')">
+    <AppLayout :title="$t('coach.myClasses')">
         <div class="ym-stat-strip">
             <div class="ym-stat">
-                <p class="ym-stat-label">{{ t('coach.classesThisWeek') }}</p>
+                <p class="ym-stat-label">{{ $t('coach.classesThisWeek') }}</p>
                 <p class="ym-stat-value">14</p>
-                <p class="ym-stat-note">{{ t('coach.acrossBranches', { count: 3 }) }}</p>
+                <p class="ym-stat-note">{{ $t('coach.acrossBranches', { count: 3 }) }}</p>
             </div>
             <div class="ym-stat">
-                <p class="ym-stat-label">{{ t('coach.totalStudents') }}</p>
+                <p class="ym-stat-label">{{ $t('coach.totalStudents') }}</p>
                 <p class="ym-stat-value">182</p>
-                <p class="ym-stat-note">{{ t('coach.activeParticipants') }}</p>
+                <p class="ym-stat-note">{{ $t('coach.activeParticipants') }}</p>
             </div>
             <div class="ym-stat">
-                <p class="ym-stat-label">{{ t('coach.avgFillRate') }}</p>
+                <p class="ym-stat-label">{{ $t('coach.avgFillRate') }}</p>
                 <p class="ym-stat-value">87%</p>
-                <p class="ym-stat-note">{{ t('coach.vsLastWeek', { change: '+4%' }) }}</p>
+                <p class="ym-stat-note">{{ $t('coach.vsLastWeek', { change: '+4%' }) }}</p>
             </div>
         </div>
 
@@ -44,7 +42,7 @@ const insights = [
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
                         <i class="bi bi-easel ym-pane-icon" />
-                        <h2 class="ym-pane-title">{{ t('coach.classRosterSummary') }}</h2>
+                        <h2 class="ym-pane-title">{{ $t('coach.classRosterSummary') }}</h2>
                     </div>
                 </div>
                 <div class="ym-pane-body">
@@ -52,10 +50,10 @@ const insights = [
                         <table class="ym-table">
                             <thead>
                                 <tr>
-                                    <th class="ym-th">{{ t('operations.class') }}</th>
-                                    <th class="ym-th">{{ t('operations.branch') }}</th>
-                                    <th class="ym-th">{{ t('operations.students') }}</th>
-                                    <th class="ym-th">{{ t('coach.waitlist') }}</th>
+                                    <th class="ym-th">{{ $t('operations.class') }}</th>
+                                    <th class="ym-th">{{ $t('operations.branch') }}</th>
+                                    <th class="ym-th">{{ $t('operations.students') }}</th>
+                                    <th class="ym-th">{{ $t('coach.waitlist') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -75,7 +73,7 @@ const insights = [
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
                         <i class="bi bi-lightbulb ym-pane-icon" />
-                        <h2 class="ym-pane-title">{{ t('coach.classInsights') }}</h2>
+                        <h2 class="ym-pane-title">{{ $t('coach.classInsights') }}</h2>
                     </div>
                 </div>
                 <div class="ym-pane-body">
