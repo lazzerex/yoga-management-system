@@ -1,10 +1,8 @@
 <script setup>
-import { useI18n } from 'vue-i18n';
 import { ref, computed, watch } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
+import { trans as t } from 'laravel-vue-i18n';
 import AppLayout from '@/Layouts/AppLayout.vue';
-
-const { t } = useI18n();
 
 const props = defineProps({
     logs: Object,
@@ -73,43 +71,43 @@ const formatDate = (dateStr) => {
 </script>
 
 <template>
-    <AppLayout :title="t('admin.loginLogs')">
+    <AppLayout :title="$t('admin.loginLogs')">
         <section class="ym-surface ym-section">
             <div class="ym-log-page-head">
                 <div>
-                    <h2 class="ym-title">{{ t('admin.loginActivity') }}</h2>
-                    <p class="ym-subtitle">{{ t('admin.recentSignIns') }}</p>
+                    <h2 class="ym-title">{{ $t('admin.loginActivity') }}</h2>
+                    <p class="ym-subtitle">{{ $t('admin.recentSignIns') }}</p>
                 </div>
                 <div class="ym-log-head-actions">
-                    <a :href="endpoints.export" class="ym-btn-outline">{{ t('admin.exportCsv') }}</a>
-                    <Link :href="endpoints.users" class="ym-btn-ghost">{{ t('admin.users') }}</Link>
+                    <a :href="endpoints.export" class="ym-btn-outline">{{ $t('admin.exportCsv') }}</a>
+                    <Link :href="endpoints.users" class="ym-btn-ghost">{{ $t('admin.users') }}</Link>
                 </div>
             </div>
 
             <div class="ym-log-tabs">
-                <Link :href="endpoints.self" class="ym-log-tab ym-log-tab--active">{{ t('admin.loginLogs') }}</Link>
-                <Link :href="endpoints.audit_logs" class="ym-log-tab">{{ t('admin.auditLogs') }}</Link>
+                <Link :href="endpoints.self" class="ym-log-tab ym-log-tab--active">{{ $t('admin.loginLogs') }}</Link>
+                <Link :href="endpoints.audit_logs" class="ym-log-tab">{{ $t('admin.auditLogs') }}</Link>
             </div>
 
             <div class="ym-log-filters">
                 <input
                     v-model="search"
                     type="search"
-                    :placeholder="t('admin.searchIp')"
+                    :placeholder="$t('admin.searchIp')"
                     class="ym-log-search"
                 />
                 <select v-model="status" class="ym-log-filter-select">
-                    <option value="">{{ t('admin.allStatus') }}</option>
-                    <option value="success">{{ t('admin.success') }}</option>
-                    <option value="failed">{{ t('admin.failed') }}</option>
+                    <option value="">{{ $t('admin.allStatus') }}</option>
+                    <option value="success">{{ $t('admin.success') }}</option>
+                    <option value="failed">{{ $t('admin.failed') }}</option>
                 </select>
                 <select v-model="device" class="ym-log-filter-select">
-                    <option value="">{{ t('admin.allDevices') }}</option>
+                    <option value="">{{ $t('admin.allDevices') }}</option>
                     <option value="desktop">Desktop</option>
                     <option value="mobile">Mobile</option>
                 </select>
                 <button v-if="hasActiveFilters" @click="resetFilters" class="ym-log-clear-btn">
-                    {{ t('admin.clear') }}
+                    {{ $t('admin.clear') }}
                 </button>
             </div>
 
@@ -117,20 +115,20 @@ const formatDate = (dateStr) => {
                 <table class="ym-table">
                     <thead>
                         <tr>
-                            <th class="ym-th">{{ t('admin.status') }}</th>
-                            <th class="ym-th">{{ t('admin.user') }}</th>
-                            <th class="ym-th">{{ t('admin.identifier') }}</th>
-                            <th class="ym-th">{{ t('admin.ipAddress') }}</th>
-                            <th class="ym-th">{{ t('admin.device') }}</th>
+                            <th class="ym-th">{{ $t('admin.status') }}</th>
+                            <th class="ym-th">{{ $t('admin.user') }}</th>
+                            <th class="ym-th">{{ $t('admin.identifier') }}</th>
+                            <th class="ym-th">{{ $t('admin.ipAddress') }}</th>
+                            <th class="ym-th">{{ $t('admin.device') }}</th>
                             <th class="ym-th ym-th--sortable" @click="toggleSort">
-                                {{ t('admin.time') }}
+                                {{ $t('admin.time') }}
                                 <span class="ym-sort-icon">{{ sortDir === 'asc' ? '↑' : '↓' }}</span>
                             </th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-if="logs.data.length === 0">
-                            <td colspan="6" class="ym-td ym-td--empty">{{ t('admin.noLogs') }}</td>
+                            <td colspan="6" class="ym-td ym-td--empty">{{ $t('admin.noLogs') }}</td>
                         </tr>
                         <tr v-for="log in logs.data" :key="log.id" class="ym-tr">
                             <td class="ym-td">
