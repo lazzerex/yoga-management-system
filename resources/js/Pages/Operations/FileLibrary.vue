@@ -1,8 +1,5 @@
 <script setup>
-import { useI18n } from 'vue-i18n';
 import AppLayout from '@/Layouts/AppLayout.vue';
-
-const { t } = useI18n();
 
 const folders = [
     { name: 'Syllabus PDFs', count: 28, size: '180 MB' },
@@ -19,22 +16,22 @@ const recent = [
 </script>
 
 <template>
-    <AppLayout :title="t('operations.fileLibrary')">
+    <AppLayout :title="$t('operations.fileLibrary')">
         <div class="ym-stat-strip">
             <div class="ym-stat">
-                <p class="ym-stat-label">{{ t('operations.storageUsed') }}</p>
+                <p class="ym-stat-label">{{ $t('operations.storageUsed') }}</p>
                 <p class="ym-stat-value">1.8 GB</p>
-                <p class="ym-stat-note">{{ t('operations.ofAllocated', { size: '5 GB' }) }}</p>
+                <p class="ym-stat-note">{{ $t('operations.ofAllocated') }}</p>
             </div>
             <div class="ym-stat">
-                <p class="ym-stat-label">{{ t('operations.filesUploaded') }}</p>
+                <p class="ym-stat-label">{{ $t('operations.filesUploaded') }}</p>
                 <p class="ym-stat-value">216</p>
-                <p class="ym-stat-note">{{ t('operations.studentsCount', { count: 486 }) }}</p>
+                <p class="ym-stat-note">486 {{ $t('operations.studentsCount') }}</p>
             </div>
             <div class="ym-stat">
-                <p class="ym-stat-label">{{ t('operations.pendingReview') }}</p>
+                <p class="ym-stat-label">{{ $t('operations.pendingReview') }}</p>
                 <p class="ym-stat-value">14</p>
-                <p class="ym-stat-note">{{ t('operations.waitingOver48h', { count: 3 }) }}</p>
+                <p class="ym-stat-note">3 {{ $t('operations.waitingOver48h') }}</p>
             </div>
         </div>
 
@@ -43,7 +40,7 @@ const recent = [
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
                         <i class="bi bi-folder ym-pane-icon" />
-                        <h2 class="ym-pane-title">{{ t('operations.libraryFolders') }}</h2>
+                        <h2 class="ym-pane-title">{{ $t('operations.libraryFolders') }}</h2>
                     </div>
                 </div>
                 <div class="ym-pane-body">
@@ -65,7 +62,7 @@ const recent = [
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
                         <i class="bi bi-clock-history ym-pane-icon" />
-                        <h2 class="ym-pane-title">{{ t('operations.recentUploads') }}</h2>
+                        <h2 class="ym-pane-title">{{ $t('operations.recentUploads') }}</h2>
                     </div>
                 </div>
                 <div class="ym-pane-body">
@@ -82,7 +79,7 @@ const recent = [
                     </div>
                     <div class="ym-info-row">
                         <i class="bi bi-info-circle ym-info-icon" />
-                        <span>{{ t('operations.filePlaceholder') }}</span>
+                        <span>{{ $t('operations.filePlaceholder') }}</span>
                     </div>
                 </div>
             </div>

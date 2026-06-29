@@ -1,8 +1,5 @@
 ﻿<script setup>
-import { useI18n } from 'vue-i18n';
 import AppLayout from '@/Layouts/AppLayout.vue';
-
-const { t } = useI18n();
 
 const classes = [
     { className: 'Morning Vinyasa', teacher: 'Mia Tran', branch: 'Downtown', capacity: '22 / 24' },
@@ -19,22 +16,22 @@ const assignments = [
 </script>
 
 <template>
-    <AppLayout :title="t('operations.academy')">
+    <AppLayout :title="$t('operations.academy')">
         <div class="ym-stat-strip">
             <div class="ym-stat">
-                <p class="ym-stat-label">{{ t('operations.students') }}</p>
+                <p class="ym-stat-label">{{ $t('operations.students') }}</p>
                 <p class="ym-stat-value">486</p>
-                <p class="ym-stat-note">72 {{ t('operations.thisQuarter') }}</p>
+                <p class="ym-stat-note">72 {{ $t('operations.thisQuarter') }}</p>
             </div>
             <div class="ym-stat">
-                <p class="ym-stat-label">{{ t('operations.classTemplates') }}</p>
+                <p class="ym-stat-label">{{ $t('operations.classTemplates') }}</p>
                 <p class="ym-stat-value">18</p>
-                <p class="ym-stat-note">{{ t('operations.beginnerToAdvanced') }}</p>
+                <p class="ym-stat-note">{{ $t('operations.beginnerToAdvanced') }}</p>
             </div>
             <div class="ym-stat">
-                <p class="ym-stat-label">{{ t('operations.teachers') }}</p>
+                <p class="ym-stat-label">{{ $t('operations.teachers') }}</p>
                 <p class="ym-stat-value">27</p>
-                <p class="ym-stat-note">21 {{ t('operations.activeThisWeek') }}</p>
+                <p class="ym-stat-note">21 {{ $t('operations.activeThisWeek') }}</p>
             </div>
         </div>
 
@@ -43,7 +40,7 @@ const assignments = [
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
                         <i class="bi bi-people ym-pane-icon" />
-                        <h2 class="ym-pane-title">{{ t('operations.classSchedule') }}</h2>
+                        <h2 class="ym-pane-title">{{ $t('operations.classSchedule') }}</h2>
                     </div>
                 </div>
                 <div class="ym-pane-body">
@@ -51,10 +48,10 @@ const assignments = [
                         <table class="ym-table">
                             <thead>
                                 <tr>
-                                    <th class="ym-th">{{ t('operations.class') }}</th>
-                                    <th class="ym-th">{{ t('operations.teacher') }}</th>
-                                    <th class="ym-th">{{ t('operations.branch') }}</th>
-                                    <th class="ym-th">{{ t('operations.capacity') }}</th>
+                                    <th class="ym-th">{{ $t('operations.class') }}</th>
+                                    <th class="ym-th">{{ $t('operations.teacher') }}</th>
+                                    <th class="ym-th">{{ $t('operations.branch') }}</th>
+                                    <th class="ym-th">{{ $t('operations.capacity') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -74,7 +71,7 @@ const assignments = [
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
                         <i class="bi bi-person-check ym-pane-icon" />
-                        <h2 class="ym-pane-title">{{ t('operations.assignmentQueue') }}</h2>
+                        <h2 class="ym-pane-title">{{ $t('operations.assignmentQueue') }}</h2>
                     </div>
                 </div>
                 <div class="ym-pane-body">
@@ -91,7 +88,7 @@ const assignments = [
                     </div>
                     <div class="ym-info-row">
                         <i class="bi bi-info-circle ym-info-icon" />
-                        <span>{{ t('operations.academyPlaceholder') }}</span>
+                        <span>{{ $t('operations.academyPlaceholder') }}</span>
                     </div>
                 </div>
             </div>

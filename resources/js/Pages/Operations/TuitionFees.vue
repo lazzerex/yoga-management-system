@@ -1,8 +1,5 @@
 ﻿<script setup>
-import { useI18n } from 'vue-i18n';
 import AppLayout from '@/Layouts/AppLayout.vue';
-
-const { t } = useI18n();
 
 const records = [
     { student: 'Alice Chen', plan: 'Unlimited Monthly', amount: '$120', due: 'May 01', status: 'Paid' },
@@ -21,22 +18,22 @@ const channels = [
 </script>
 
 <template>
-    <AppLayout :title="t('operations.tuitionFees')">
+    <AppLayout :title="$t('operations.tuitionFees')">
         <div class="ym-stat-strip">
             <div class="ym-stat">
-                <p class="ym-stat-label">{{ t('operations.collectedThisMonth') }}</p>
+                <p class="ym-stat-label">{{ $t('operations.collectedThisMonth') }}</p>
                 <p class="ym-stat-value">$18,240</p>
-                <p class="ym-stat-note">{{ t('operations.ofMonthlyTarget') }}</p>
+                <p class="ym-stat-note">{{ $t('operations.ofMonthlyTarget') }}</p>
             </div>
             <div class="ym-stat">
-                <p class="ym-stat-label">{{ t('operations.pendingInvoices') }}</p>
+                <p class="ym-stat-label">{{ $t('operations.pendingInvoices') }}</p>
                 <p class="ym-stat-value">34</p>
-                <p class="ym-stat-note">$6,200 {{ t('operations.outstanding') }}</p>
+                <p class="ym-stat-note">$6,200 {{ $t('operations.outstanding') }}</p>
             </div>
             <div class="ym-stat">
-                <p class="ym-stat-label">{{ t('operations.overdue') }}</p>
+                <p class="ym-stat-label">{{ $t('operations.overdue') }}</p>
                 <p class="ym-stat-value">12</p>
-                <p class="ym-stat-note">{{ t('operations.followUpNeeded') }}</p>
+                <p class="ym-stat-note">{{ $t('operations.followUpNeeded') }}</p>
             </div>
         </div>
 
@@ -45,7 +42,7 @@ const channels = [
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
                         <i class="bi bi-receipt ym-pane-icon" />
-                        <h2 class="ym-pane-title">{{ t('operations.tuitionRecords') }}</h2>
+                        <h2 class="ym-pane-title">{{ $t('operations.tuitionRecords') }}</h2>
                     </div>
                 </div>
                 <div class="ym-pane-body">
@@ -53,11 +50,11 @@ const channels = [
                         <table class="ym-table">
                             <thead>
                                 <tr>
-                                    <th class="ym-th">{{ t('operations.student') }}</th>
-                                    <th class="ym-th">{{ t('operations.plan') }}</th>
-                                    <th class="ym-th">{{ t('operations.amount') }}</th>
-                                    <th class="ym-th">{{ t('operations.dueDate') }}</th>
-                                    <th class="ym-th">{{ t('operations.status') }}</th>
+                                    <th class="ym-th">{{ $t('operations.student') }}</th>
+                                    <th class="ym-th">{{ $t('operations.plan') }}</th>
+                                    <th class="ym-th">{{ $t('operations.amount') }}</th>
+                                    <th class="ym-th">{{ $t('operations.dueDate') }}</th>
+                                    <th class="ym-th">{{ $t('operations.status') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -80,7 +77,7 @@ const channels = [
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
                         <i class="bi bi-credit-card ym-pane-icon" />
-                        <h2 class="ym-pane-title">{{ t('operations.collectionChannels') }}</h2>
+                        <h2 class="ym-pane-title">{{ $t('operations.collectionChannels') }}</h2>
                     </div>
                 </div>
                 <div class="ym-pane-body">
@@ -88,7 +85,7 @@ const channels = [
                         <div v-for="ch in channels" :key="ch.method" class="ym-row">
                             <div class="ym-row-main">
                                 <p class="ym-row-title">{{ ch.method }}</p>
-                                <p class="ym-row-meta">{{ ch.count }} {{ t('operations.thisMonth') }}</p>
+                                <p class="ym-row-meta">{{ ch.count }} {{ $t('operations.thisMonth') }}</p>
                             </div>
                             <div class="ym-row-aside">
                                 <span class="ym-chip">{{ ch.pct }}</span>
@@ -97,7 +94,7 @@ const channels = [
                     </div>
                     <div class="ym-info-row">
                         <i class="bi bi-info-circle ym-info-icon" />
-                        <span>{{ t('operations.tuitionPlaceholder') }}</span>
+                        <span>{{ $t('operations.tuitionPlaceholder') }}</span>
                     </div>
                 </div>
             </div>
