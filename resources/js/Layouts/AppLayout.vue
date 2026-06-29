@@ -1,8 +1,8 @@
 ﻿<script setup>
-import {useI18n} from 'vue-i18n';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { router, usePage } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
+import { loadLanguageAsync, trans as t, currentLocale } from 'laravel-vue-i18n';
 import NavMenuLink from '@/Components/UI/NavMenuLink.vue';
 
 defineProps({
@@ -14,12 +14,11 @@ defineProps({
 
 const page = usePage();
 
-const { t, locale } = useI18n();
-
-const toggleLocale = () => {
-    locale.value = locale.value === 'en' ? 'vi' : 'en';
-    localStorage.setItem('locale', locale.value);
-    document.cookie = `locale=${locale.value}; path=/; SameSite=Lax`;
+const toggleLocale = async () => {
+    const newLocale = t('common.switchLang').includes('Vietnamese') ? 'vi' : 'en';
+    await loadLanguageAsync(newLocale);
+    localStorage.setItem('locale', newLocale);
+    document.cookie = `locale=${newLocale}; path=/; SameSite=Lax`;
 };
 
 const resolveFlashMessage = (message) => {
@@ -60,35 +59,36 @@ const dashboardActionsOpen = ref(false);
 const dashboardActionsRef = ref(null);
 
 const roleTopMenuDefaults = computed(() => {
+    currentLocale.value;
     if (isAdmin.value) {
         return [
-            { label: 'Homepage', viewKey: 'homepage', href: route('cms.dashboard') },
-            { label: 'My Schedule', viewKey: 'my-schedule', href: route('cms.dashboard', { view: 'my-schedule' }) },
-            { label: 'Members', viewKey: 'members', href: route('cms.dashboard', { view: 'members' }) },
-            { label: 'Attendance', viewKey: 'attendance', href: route('cms.dashboard', { view: 'attendance' }) },
-            { label: 'Studio Reports', viewKey: 'studio-reports', href: route('cms.dashboard', { view: 'studio-reports' }) },
-            { label: 'Financials', viewKey: 'financials', href: route('cms.dashboard', { view: 'financials' }) },
+            { label: t('dashboard.homepage'), viewKey: 'homepage', href: route('cms.dashboard') },
+            { label: t('dashboard.mySchedule'), viewKey: 'my-schedule', href: route('cms.dashboard', { view: 'my-schedule' }) },
+            { label: t('dashboard.members'), viewKey: 'members', href: route('cms.dashboard', { view: 'members' }) },
+            { label: t('dashboard.attendance'), viewKey: 'attendance', href: route('cms.dashboard', { view: 'attendance' }) },
+            { label: t('dashboard.studioReports'), viewKey: 'studio-reports', href: route('cms.dashboard', { view: 'studio-reports' }) },
+            { label: t('dashboard.financials'), viewKey: 'financials', href: route('cms.dashboard', { view: 'financials' }) },
         ];
     }
 
     if (isCoach.value) {
         return [
-            { label: 'Homepage', viewKey: 'homepage', href: route('cms.dashboard') },
-            { label: 'Overview', viewKey: 'overview', href: '' },
-            { label: 'My Performance', viewKey: 'my-performance', href: '' },
-            { label: 'Class Stats', viewKey: 'class-stats', href: '' },
-            { label: 'Student Progress', viewKey: 'student-progress', href: '' },
-            { label: 'Earnings', viewKey: 'earnings', href: '' },
+            { label: t('dashboard.homepage'), viewKey: 'homepage', href: route('cms.dashboard') },
+            { label: t('dashboard.overview'), viewKey: 'overview', href: '' },
+            { label: t('dashboard.myPerformance'), viewKey: 'my-performance', href: '' },
+            { label: t('dashboard.classStats'), viewKey: 'class-stats', href: '' },
+            { label: t('dashboard.studentProgress'), viewKey: 'student-progress', href: '' },
+            { label: t('dashboard.earnings'), viewKey: 'earnings', href: '' },
         ];
     }
 
     return [
-        { label: 'Homepage', viewKey: 'homepage', href: route('cms.dashboard') },
-        { label: 'Overview', viewKey: 'overview', href: '' },
-        { label: 'My Progress', viewKey: 'my-progress', href: '' },
-        { label: 'Attendance', viewKey: 'attendance', href: '' },
-        { label: 'Payments', viewKey: 'payments', href: '' },
-        { label: 'Achievements', viewKey: 'achievements', href: '' },
+        { label: t('dashboard.homepage'), viewKey: 'homepage', href: route('cms.dashboard') },
+        { label: t('dashboard.overview'), viewKey: 'overview', href: '' },
+        { label: t('dashboard.myProgress'), viewKey: 'my-progress', href: '' },
+        { label: t('dashboard.attendance'), viewKey: 'attendance', href: '' },
+        { label: t('dashboard.payments'), viewKey: 'payments', href: '' },
+        { label: t('dashboard.achievements'), viewKey: 'achievements', href: '' },
     ];
 });
 
@@ -457,6 +457,10 @@ watch(userRole, () => {
     coachMemberView.value = 'homepage';
 }, { immediate: true });
 
+watch(currentLocale, () => {
+    topMenuItems.value = roleTopMenuDefaults.value.map((item) => ({ ...item }));
+});
+
 watch(() => page.url, closeSidebar);
 
 onBeforeUnmount(() => {
@@ -512,35 +516,35 @@ const logout = () => {
                         <button
                             type="button"
                             class="ym-icon-btn ym-sidebar-toggle"
-                            :aria-label="t('common.toggleSidebar')"
+                            :aria-label="$t('common.toggleSidebar')"
                             @click.stop="toggleSidebar"
                         >
                             <i class="bi bi-list" />
                         </button>
                         <div>
-                            <p class="ym-overline">{{ t('dashboard.systemName') }}</p>
+                            <p class="ym-overline">{{ $t('dashboard.systemName') }}</p>
                             <h1 class="ym-header-title">{{ title }}</h1>
                         </div>
                     </div>
 
                     <div class="ym-topbar-actions">
-                        <label class="ym-search-wrap" :aria-label="t('common.search')">
+                        <label class="ym-search-wrap" :aria-label="$t('common.search')">
                             <i class="bi bi-search ym-search-icon" />
                             <input
                                 type="search"
                                 class="ym-search"
-                                :placeholder="t('common.search')"
-                                :aria-label="t('common.search')"
+                                :placeholder="$t('common.search')"
+                                :aria-label="$t('common.search')"
                             />
                         </label>
 
                         <button
                             type="button"
                             class="ym-icon-btn ym-lang-toggle"
-                            :title="t('common.switchLang')"
+                            :title="$t('common.switchLang')"
                             @click="toggleLocale"
                         >
-                            <span class="ym-lang-label">{{ locale.toUpperCase() }}</span>
+                            <span class="ym-lang-label">{{ $t('common.switchLang').includes('Vietnamese') ? 'VI' : 'EN' }}</span>
                         </button>
 
                         <div ref="notificationsRef" class="ym-header-menu-wrap">
@@ -548,7 +552,7 @@ const logout = () => {
                                 type="button"
                                 class="ym-icon-btn"
                                 :class="{ 'ym-icon-btn--active': notificationsOpen }"
-                                :aria-label="t('common.openNotifications')"
+                                :aria-label="$t('common.openNotifications')"
                                 aria-haspopup="menu"
                                 :aria-expanded="notificationsOpen"
                                 @click.stop="toggleNotifications"
@@ -559,9 +563,9 @@ const logout = () => {
 
                             <div v-if="notificationsOpen" class="ym-popover ym-popover-notifications" role="menu">
                                 <div class="ym-popover-head">
-                                    <p class="ym-popover-title">{{ t('common.notifications') }}</p>
+                                    <p class="ym-popover-title">{{ $t('common.notifications') }}</p>
                                     <button type="button" class="ym-popover-link" @click="notificationsOpen = false">
-                                        {{ t('common.markAllRead') }}
+                                        {{ $t('common.markAllRead') }}
                                     </button>
                                 </div>
                                 <ul class="ym-notification-list">
@@ -611,8 +615,8 @@ const logout = () => {
                                 </button>
 
                                 <button type="button" class="ym-menu-item ym-menu-item--danger" @click="logout">
-                                    <span>{{ t('common.signOut') }}</span>
-                                    <small>{{ t('common.endSession') }}</small>
+                                    <span>{{ $t('common.signOut') }}</span>
+                                    <small>{{ $t('common.endSession') }}</small>
                                 </button>
                             </div>
                         </div>
@@ -635,7 +639,7 @@ const logout = () => {
                             type="button"
                             class="ym-icon-btn ym-top-links-more-btn"
                             :class="{ 'ym-icon-btn--active': dashboardActionsOpen }"
-                            :aria-label="t('common.openDashboardOptions')"
+                            :aria-label="$t('common.openDashboardOptions')"
                             aria-haspopup="menu"
                             :aria-expanded="dashboardActionsOpen"
                             @click.stop="toggleDashboardActions"
@@ -647,19 +651,19 @@ const logout = () => {
                             <button type="button" class="ym-menu-item" @click="triggerDashboardAction('edit-dashboard')">
                                 <span class="ym-menu-item-label">
                                     <i class="bi bi-pencil-square ym-menu-item-icon" />
-                                    {{ t('dashboard.editDashboard') }}
+                                    {{ $t('dashboard.editDashboard') }}
                                 </span>
                             </button>
                             <button type="button" class="ym-menu-item" @click="triggerDashboardAction('add-dashlet')">
                                 <span class="ym-menu-item-label">
                                     <i class="bi bi-plus-lg ym-menu-item-icon" />
-                                    {{ t('dashboard.addDashlet') }}
+                                    {{ $t('dashboard.addDashlet') }}
                                 </span>
                             </button>
                             <button type="button" class="ym-menu-item" @click="triggerDashboardAction('reset-dashboard')">
                                 <span class="ym-menu-item-label">
                                     <i class="bi bi-arrow-counterclockwise ym-menu-item-icon" />
-                                    {{ t('dashboard.resetLayout') }}
+                                    {{ $t('dashboard.resetLayout') }}
                                 </span>
                             </button>
                         </div>

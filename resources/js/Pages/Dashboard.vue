@@ -1,12 +1,10 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
 import { route } from 'ziggy-js';
+import { trans as t, currentLocale } from 'laravel-vue-i18n';
 import Draggable from 'vuedraggable';
 import Modal from '@/Components/UI/Modal.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
-
-const { t } = useI18n();
 
 const props = defineProps({
     auth: Object,
@@ -20,7 +18,14 @@ const maxTopTabs = 6;
 const userRole = computed(() => props.auth?.user?.role ?? 'member');
 const isAdmin = computed(() => userRole.value === 'admin');
 
-const roleDashboard = {
+const renderKey = ref(0);
+watch(currentLocale, () => {
+    renderKey.value++;
+});
+
+const roleDashboard = computed(() => {
+    void currentLocale.value;
+    return {
     admin: {
         pageTitle: t('dashboard.homepage'),
         tabs: [t('dashboard.homepage'), t('dashboard.mySchedule'), t('dashboard.members'), t('dashboard.attendance'), t('dashboard.studioReports'), t('dashboard.financials')],
@@ -85,28 +90,28 @@ const roleDashboard = {
                     day: t('dashboard.thursday'),
                     date: 'Apr 30',
                     entries: [
-                        { time: '07:00', title: 'Power Core', meta: t('dashboard.riversideStudentsWithCoach', { count: 23 }) },
-                        { time: '12:30', title: 'Prenatal Flow', meta: t('dashboard.westsideStudentsWithCoach', { count: 14 }) },
+                        { time: '07:00', title: 'Power Core', meta: t('dashboard.riversideCoachDaniel') },
+                        { time: '20:00', title: 'Breathwork Lab', meta: t('dashboard.onlineCoachNoah') },
                     ],
                 },
                 {
                     day: t('dashboard.friday'),
                     date: 'May 01',
                     entries: [
-                        { time: '17:45', title: 'Mobility Reset', meta: t('dashboard.downtownStudentsWithCoach', { count: 16 }) },
+                        { time: '17:45', title: 'Mobility Reset', meta: t('dashboard.downtownCoachLina') },
                     ],
                 },
                 {
                     day: t('dashboard.saturday'),
                     date: 'May 02',
                     entries: [
-                        { time: '09:00', title: 'Weekend Flow', meta: t('dashboard.uptownStudents', { count: 19 }) },
+                        { time: '09:00', title: 'Weekend Flow', meta: t('dashboard.uptownCoachMia') },
                     ],
                 },
                 { day: t('dashboard.sunday'), date: 'May 03', entries: [] },
             ],
         },
-        tabs: [t('dashboard.homepage'), t('dashboard.overview'), t('dashboard.myPerformance'), t('dashboard.classStats'), t('dashboard.studentProgress'), t('dashboard.earnings')],
+        tabs: [t('dashboard.homepage'), t('dashboard.overview'), t('dashboard.myProgress'), t('dashboard.attendance'), t('dashboard.payments'), t('dashboard.achievements')],
     },
     member: {
         pageTitle: t('dashboard.memberDashboard'),
@@ -190,15 +195,18 @@ const roleDashboard = {
         },
         tabs: [t('dashboard.homepage'), t('dashboard.overview'), t('dashboard.myProgress'), t('dashboard.attendance'), t('dashboard.payments'), t('dashboard.achievements')],
     },
-};
+    };
+});
 
-const dashboardConfig = computed(() => roleDashboard[userRole.value] ?? roleDashboard.member);
-const pageTitle = computed(() => roleDashboard[userRole.value]?.pageTitle ?? 'Dashboard');
+const dashboardConfig = computed(() => roleDashboard.value[userRole.value] ?? roleDashboard.value.member);
+const pageTitle = computed(() => roleDashboard.value[userRole.value]?.pageTitle ?? 'Dashboard');
 const dashboardNotice = ref('');
 const activeView = ref('homepage');
 const isCoach = computed(() => userRole.value === 'coach');
 
-const viewConfigs = {
+const viewConfigs = computed(() => {
+    void currentLocale.value;
+    return {
     coach: {
         overview: {
             title: t('dashboard.teachingOverview'),
@@ -313,49 +321,56 @@ const viewConfigs = {
             ],
         },
     },
-};
+    };
+});
 
-const currentViewConfig = computed(() => viewConfigs[userRole.value]?.[activeView.value] ?? null);
+const currentViewConfig = computed(() => viewConfigs.value[userRole.value]?.[activeView.value] ?? null);
 
-const activities = [
-    {
-        title: 'Handling trial-class schedules for this week',
-        state: t('dashboard.notStarted'),
-        stateClass: 'pending',
-        when: 'Apr 20 11:00',
-        context: 'Downtown Studio',
-    },
-    {
-        title: 'Analyze attendance drop in evening classes',
-        state: t('dashboard.planned'),
-        stateClass: 'default',
-        when: 'Apr 21',
-        context: 'Weekly review',
-    },
-    {
-        title: 'Send monthly updates to management',
-        state: t('dashboard.planned'),
-        stateClass: 'default',
-        when: 'Apr 22 16:30',
-        context: 'Head office',
-    },
-    {
-        title: 'Prepare kids yoga class onboarding pack',
-        state: t('dashboard.started'),
-        stateClass: 'started',
-        when: 'Apr 23',
-        context: 'Uptown Branch',
-    },
-    {
-        title: 'Review teacher substitution requests',
-        state: t('dashboard.notStarted'),
-        stateClass: 'pending',
-        when: 'Apr 24',
-        context: 'Staffing board',
-    },
-];
+const activities = computed(() => {
+    void currentLocale.value;
+    return [
+        {
+            title: 'Handling trial-class schedules for this week',
+            state: t('dashboard.notStarted'),
+            stateClass: 'pending',
+            when: 'Apr 20 11:00',
+            context: 'Downtown Studio',
+        },
+        {
+            title: 'Analyze attendance drop in evening classes',
+            state: t('dashboard.planned'),
+            stateClass: 'default',
+            when: 'Apr 21',
+            context: 'Weekly review',
+        },
+        {
+            title: 'Send monthly updates to management',
+            state: t('dashboard.planned'),
+            stateClass: 'default',
+            when: 'Apr 22 16:30',
+            context: 'Head office',
+        },
+        {
+            title: 'Prepare kids yoga class onboarding pack',
+            state: t('dashboard.started'),
+            stateClass: 'started',
+            when: 'Apr 23',
+            context: 'Uptown Branch',
+        },
+        {
+            title: 'Review teacher substitution requests',
+            state: t('dashboard.notStarted'),
+            stateClass: 'pending',
+            when: 'Apr 24',
+            context: 'Staffing board',
+        },
+    ];
+});
 
-const weekDays = [t('dashboard.sun'), t('dashboard.mon'), t('dashboard.tue'), t('dashboard.wed'), t('dashboard.thu'), t('dashboard.fri'), t('dashboard.sat')];
+const weekDays = computed(() => {
+    void currentLocale.value;
+    return [t('dashboard.sun'), t('dashboard.mon'), t('dashboard.tue'), t('dashboard.wed'), t('dashboard.thu'), t('dashboard.fri'), t('dashboard.sat')];
+});
 
 const calendarCells = [
     { date: '29', muted: true, events: [] },
@@ -401,76 +416,85 @@ const calendarCells = [
     },
 ];
 
-const cases = [
-    { id: 11, title: 'Asking for compensation', priority: t('dashboard.high'), type: t('dashboard.problem'), customer: 'Lotus Branch' },
-    { id: 7, title: 'Discount issue', priority: t('dashboard.normal'), type: t('dashboard.incident'), customer: 'Westside Studio' },
-    { id: 6, title: 'Delivery status check', priority: t('dashboard.low'), type: t('dashboard.question'), customer: 'Riverside Branch' },
-    { id: 5, title: 'Product support question', priority: t('dashboard.normal'), type: t('dashboard.question'), customer: 'Downtown Studio' },
-];
+const cases = computed(() => {
+    void currentLocale.value;
+    return [
+        { id: 11, title: 'Asking for compensation', priority: t('dashboard.high'), type: t('dashboard.problem'), customer: 'Lotus Branch' },
+        { id: 7, title: 'Discount issue', priority: t('dashboard.normal'), type: t('dashboard.incident'), customer: 'Westside Studio' },
+        { id: 6, title: 'Delivery status check', priority: t('dashboard.low'), type: t('dashboard.question'), customer: 'Riverside Branch' },
+        { id: 5, title: 'Product support question', priority: t('dashboard.normal'), type: t('dashboard.question'), customer: 'Downtown Studio' },
+    ];
+});
 
-const leadSources = [
-    { name: t('dashboard.leadCall'), value: 20, color: '#5d8fc0' },
-    { name: t('dashboard.leadEmail'), value: 32, color: '#4968a8' },
-    { name: t('dashboard.leadExistingCustomer'), value: 16, color: '#e2bb4e' },
-    { name: t('dashboard.leadPublicRelations'), value: 6, color: '#e47d61' },
-    { name: t('dashboard.leadWebsite'), value: 22, color: '#78bb9d' },
-    { name: t('dashboard.leadCampaign'), value: 4, color: '#8d7bc9' },
-];
+const leadSources = computed(() => {
+    void currentLocale.value;
+    return [
+        { name: 'dashboard.leadCall', value: 20, color: '#5d8fc0' },
+        { name: 'dashboard.leadEmail', value: 32, color: '#4968a8' },
+        { name: 'dashboard.leadExistingCustomer', value: 16, color: '#6a3d8a' },
+        { name: 'dashboard.leadPublicRelations', value: 6, color: '#bd6b4a' },
+        { name: 'dashboard.leadWebsite', value: 22, color: '#4a8c6f' },
+        { name: 'dashboard.leadCampaign', value: 4, color: '#b04a5e' },
+    ];
+});
 
-const dashletCatalog = [
-    {
-        id: 'calendar',
-        title: t('dashboard.calendar'),
-        type: 'calendar',
-        span: 8,
-        required: true,
-        description: t('dashboard.calendarDescription'),
-        previewRows: [t('dashboard.todayTimeline'), t('dashboard.upcomingSessions')],
-    },
-    {
-        id: 'memo',
-        title: t('dashboard.memo'),
-        type: 'memo',
-        span: 6,
-        description: t('dashboard.memoDescription'),
-        previewRows: [t('dashboard.meetingHighlights'), t('dashboard.quickReminders')],
-    },
-    {
-        id: 'activities',
-        title: t('dashboard.myActivities'),
-        type: 'activities',
-        span: 4,
-        required: true,
-        description: t('dashboard.activitiesDescription'),
-        previewRows: [t('dashboard.upcomingTasks'), t('dashboard.lateFollowUps')],
-    },
-    {
-        id: 'cases',
-        title: t('dashboard.myCases'),
-        type: 'cases',
-        span: 6,
-        required: false,
-        description: t('dashboard.casesDescription'),
-        previewRows: [t('dashboard.pendingApprovals'), t('dashboard.escalatedTickets')],
-    },
-    {
-        id: 'my-leads',
-        title: t('dashboard.myLeads'),
-        type: 'generic',
-        span: 4,
-        description: t('dashboard.leadsDescription'),
-        previewRows: [t('dashboard.newIncomingLeads'), t('dashboard.qualifiedPipeline')],
-    },
-    {
-        id: 'lead-source',
-        title: t('dashboard.opportunitiesByLeadSource'),
-        type: 'lead-source',
-        span: 6,
-        required: false,
-        description: t('dashboard.leadSourceDescription'),
-        previewRows: [t('dashboard.topChannels'), t('dashboard.campaignPerformance')],
-    },
-];
+const dashletCatalog = computed(() => {
+    void currentLocale.value;
+    return [
+        {
+            id: 'calendar',
+            title: t('dashboard.calendar'),
+            type: 'calendar',
+            span: 8,
+            required: true,
+            description: t('dashboard.calendarDescription'),
+            previewRows: [t('dashboard.todayTimeline'), t('dashboard.upcomingSessions')],
+        },
+        {
+            id: 'memo',
+            title: t('dashboard.memo'),
+            type: 'memo',
+            span: 6,
+            description: t('dashboard.memoDescription'),
+            previewRows: [t('dashboard.meetingHighlights'), t('dashboard.quickReminders')],
+        },
+        {
+            id: 'activities',
+            title: t('dashboard.myActivities'),
+            type: 'activities',
+            span: 4,
+            required: true,
+            description: t('dashboard.activitiesDescription'),
+            previewRows: [t('dashboard.upcomingTasks'), t('dashboard.lateFollowUps')],
+        },
+        {
+            id: 'cases',
+            title: t('dashboard.myCases'),
+            type: 'cases',
+            span: 6,
+            required: false,
+            description: t('dashboard.casesDescription'),
+            previewRows: [t('dashboard.pendingApprovals'), t('dashboard.escalatedTickets')],
+        },
+        {
+            id: 'my-leads',
+            title: t('dashboard.myLeads'),
+            type: 'generic',
+            span: 4,
+            description: t('dashboard.leadsDescription'),
+            previewRows: [t('dashboard.newIncomingLeads'), t('dashboard.qualifiedPipeline')],
+        },
+        {
+            id: 'lead-source',
+            title: t('dashboard.opportunitiesByLeadSource'),
+            type: 'lead-source',
+            span: 6,
+            required: false,
+            description: t('dashboard.leadSourceDescription'),
+            previewRows: [t('dashboard.topChannels'), t('dashboard.campaignPerformance')],
+        },
+    ];
+});
 
 const cloneDashlet = (dashlet) => ({
     ...dashlet,
@@ -478,7 +502,7 @@ const cloneDashlet = (dashlet) => ({
 });
 
 const createDashletFromId = (id) => {
-    const definition = dashletCatalog.find((item) => item.id === id);
+    const definition = dashletCatalog.value.find((item) => item.id === id);
     return definition ? cloneDashlet(definition) : null;
 };
 
@@ -506,10 +530,10 @@ const dashletSearchQuery = ref('');
 const filteredDashletCatalog = computed(() => {
     const query = dashletSearchQuery.value.trim().toLowerCase();
     if (!query) {
-        return dashletCatalog;
+        return dashletCatalog.value;
     }
 
-    return dashletCatalog.filter((item) => item.title.toLowerCase().includes(query));
+    return dashletCatalog.value.filter((item) => item.title.toLowerCase().includes(query));
 });
 
 const dashletClasses = (dashlet) => {
@@ -560,7 +584,7 @@ const toViewKey = (value) => value
     .replace(/^-+|-+$/g, '');
 
 const buildDefaultDashboardTabs = (role) => {
-    const config = roleDashboard[role] ?? roleDashboard.member;
+    const config = roleDashboard.value[role] ?? roleDashboard.value.member;
     const isAdminRole = role === 'admin';
 
     return config.tabs.map((label, index) => {
@@ -605,6 +629,11 @@ watch(userRole, () => {
     if (!isAdmin.value) {
         showAddDashletModal.value = false;
     }
+});
+
+watch(currentLocale, () => {
+    dashlets.value = buildDefaultDashlets();
+    dashboardTabsDraft.value = hydrateDashboardTabs();
 });
 
 const removeDashboardTab = (index) => {
@@ -756,7 +785,7 @@ onBeforeUnmount(() => {
 <template>
     <AppLayout :title="pageTitle">
         <template v-if="isAdmin">
-            <section class="ym-dashlet-grid">
+            <section :key="renderKey" class="ym-dashlet-grid">
                 <Draggable
                     v-model="dashlets"
                     item-key="id"
@@ -857,7 +886,7 @@ onBeforeUnmount(() => {
                                     <div class="ym-legend">
                                         <div v-for="item in leadSources" :key="item.name" class="ym-legend-item">
                                             <span class="ym-legend-dot" :style="{ background: item.color }" />
-                                            <span>{{ item.name }} ({{ item.value }}%)</span>
+                                            <span>{{ $t(item.name) }} ({{ item.value }}%)</span>
                                         </div>
                                     </div>
                                 </div>
@@ -887,148 +916,152 @@ onBeforeUnmount(() => {
 
         <template v-else>
             <div
-                v-if="dashboardNotice"
-                class="ym-info-row"
-                style="border-radius: 0.42rem; margin-bottom: 0.75rem;"
+                :key="renderKey"
             >
-                <i class="bi bi-info-circle ym-info-icon" />
-                <span>{{ dashboardNotice }}</span>
+                <div
+                    v-if="dashboardNotice"
+                    class="ym-info-row"
+                    style="border-radius: 0.42rem; margin-bottom: 0.75rem;"
+                >
+                    <i class="bi bi-info-circle ym-info-icon" />
+                    <span>{{ dashboardNotice }}</span>
+                </div>
+
+                <template v-if="activeView === 'homepage'">
+                    <div class="ym-stat-strip">
+                        <div v-for="metric in dashboardConfig.metrics" :key="metric.label" class="ym-stat">
+                            <p class="ym-stat-label">{{ metric.label }}</p>
+                            <p class="ym-stat-value">{{ metric.value }}</p>
+                            <p class="ym-stat-note">{{ metric.note }}</p>
+                        </div>
+                    </div>
+
+                    <div class="ym-page-cols">
+                        <div class="ym-pane">
+                            <div class="ym-pane-head">
+                                <div class="ym-pane-title-wrap">
+                                    <i :class="['bi', dashboardConfig.primaryPanel.icon, 'ym-pane-icon']" />
+                                    <h2 class="ym-pane-title">{{ dashboardConfig.primaryPanel.title }}</h2>
+                                </div>
+                            </div>
+                            <div class="ym-pane-body">
+                                <div class="ym-row-list">
+                                    <div
+                                        v-for="item in dashboardConfig.primaryPanel.rows"
+                                        :key="item.title"
+                                        class="ym-row"
+                                    >
+                                        <div class="ym-row-main">
+                                            <p class="ym-row-title">{{ item.title }}</p>
+                                            <p class="ym-row-meta">{{ item.meta }}</p>
+                                        </div>
+                                        <div class="ym-row-aside">
+                                            <span :class="badgeClass(item.tone)">{{ item.badge }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ym-pane">
+                            <div class="ym-pane-head">
+                                <div class="ym-pane-title-wrap">
+                                    <i :class="['bi', dashboardConfig.secondaryPanel.icon, 'ym-pane-icon']" />
+                                    <h2 class="ym-pane-title">{{ dashboardConfig.secondaryPanel.title }}</h2>
+                                </div>
+                            </div>
+                            <div class="ym-pane-body">
+                                <div class="ym-row-list">
+                                    <div
+                                        v-for="item in dashboardConfig.secondaryPanel.rows"
+                                        :key="item.title"
+                                        class="ym-row"
+                                    >
+                                        <div class="ym-row-main">
+                                            <p class="ym-row-title">{{ item.title }}</p>
+                                            <p class="ym-row-meta">{{ item.meta }}</p>
+                                        </div>
+                                        <div class="ym-row-aside">
+                                            <span :class="badgeClass(item.tone)">{{ item.badge }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ym-pane mt-4">
+                        <div class="ym-pane-head">
+                            <div class="ym-pane-title-wrap">
+                                <i class="bi bi-calendar-week ym-pane-icon" />
+                                <h2 class="ym-pane-title">{{ dashboardConfig.weeklyPanel.title }}</h2>
+                            </div>
+                        </div>
+                        <div class="ym-pane-body">
+                            <div class="ym-timetable-scroll">
+                                <div class="ym-timetable">
+                                    <div
+                                        v-for="day in dashboardConfig.weeklyPanel.days"
+                                        :key="day.day"
+                                        class="ym-timetable-col"
+                                    >
+                                        <div class="ym-timetable-head">
+                                            <p class="ym-timetable-day">{{ day.day.slice(0, 3) }}</p>
+                                            <p class="ym-timetable-date">{{ day.date }}</p>
+                                        </div>
+                                        <div class="ym-timetable-body">
+                                            <div
+                                                v-for="entry in day.entries"
+                                                :key="entry.title"
+                                                :class="['ym-timetable-slot', { 'ym-timetable-slot--coach': isCoach }]"
+                                            >
+                                                <p class="ym-timetable-time">{{ entry.time }}</p>
+                                                <p class="ym-timetable-name">{{ entry.title }}</p>
+                                                <p class="ym-timetable-sub">{{ entry.meta }}</p>
+                                            </div>
+                                            <div v-if="!day.entries.length" class="ym-timetable-empty">
+                                                {{ dashboardConfig.weeklyPanel.emptyMessage }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <template v-else-if="currentViewConfig">
+                    <div class="ym-pane">
+                        <div class="ym-pane-head">
+                            <div class="ym-pane-title-wrap">
+                                <i :class="['bi', currentViewConfig.icon, 'ym-pane-icon']" />
+                                <h2 class="ym-pane-title">{{ currentViewConfig.title }}</h2>
+                            </div>
+                        </div>
+                        <div class="ym-pane-body">
+                            <div class="ym-row-list">
+                                <div
+                                    v-for="item in currentViewConfig.rows"
+                                    :key="item.title"
+                                    class="ym-row"
+                                >
+                                    <div class="ym-row-main">
+                                        <p class="ym-row-title">{{ item.title }}</p>
+                                        <p class="ym-row-meta">{{ item.meta }}</p>
+                                    </div>
+                                    <div class="ym-row-aside">
+                                        <span :class="badgeClass(item.tone)">{{ item.badge }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ym-info-row">
+                                <i class="bi bi-info-circle ym-info-icon" />
+                                <span>{{ currentViewConfig.note }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </template>
             </div>
-
-            <template v-if="activeView === 'homepage'">
-                <div class="ym-stat-strip">
-                    <div v-for="metric in dashboardConfig.metrics" :key="metric.label" class="ym-stat">
-                        <p class="ym-stat-label">{{ metric.label }}</p>
-                        <p class="ym-stat-value">{{ metric.value }}</p>
-                        <p class="ym-stat-note">{{ metric.note }}</p>
-                    </div>
-                </div>
-
-                <div class="ym-page-cols">
-                    <div class="ym-pane">
-                        <div class="ym-pane-head">
-                            <div class="ym-pane-title-wrap">
-                                <i :class="['bi', dashboardConfig.primaryPanel.icon, 'ym-pane-icon']" />
-                                <h2 class="ym-pane-title">{{ dashboardConfig.primaryPanel.title }}</h2>
-                            </div>
-                        </div>
-                        <div class="ym-pane-body">
-                            <div class="ym-row-list">
-                                <div
-                                    v-for="item in dashboardConfig.primaryPanel.rows"
-                                    :key="item.title"
-                                    class="ym-row"
-                                >
-                                    <div class="ym-row-main">
-                                        <p class="ym-row-title">{{ item.title }}</p>
-                                        <p class="ym-row-meta">{{ item.meta }}</p>
-                                    </div>
-                                    <div class="ym-row-aside">
-                                        <span :class="badgeClass(item.tone)">{{ item.badge }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="ym-pane">
-                        <div class="ym-pane-head">
-                            <div class="ym-pane-title-wrap">
-                                <i :class="['bi', dashboardConfig.secondaryPanel.icon, 'ym-pane-icon']" />
-                                <h2 class="ym-pane-title">{{ dashboardConfig.secondaryPanel.title }}</h2>
-                            </div>
-                        </div>
-                        <div class="ym-pane-body">
-                            <div class="ym-row-list">
-                                <div
-                                    v-for="item in dashboardConfig.secondaryPanel.rows"
-                                    :key="item.title"
-                                    class="ym-row"
-                                >
-                                    <div class="ym-row-main">
-                                        <p class="ym-row-title">{{ item.title }}</p>
-                                        <p class="ym-row-meta">{{ item.meta }}</p>
-                                    </div>
-                                    <div class="ym-row-aside">
-                                        <span :class="badgeClass(item.tone)">{{ item.badge }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="ym-pane mt-4">
-                    <div class="ym-pane-head">
-                        <div class="ym-pane-title-wrap">
-                            <i class="bi bi-calendar-week ym-pane-icon" />
-                            <h2 class="ym-pane-title">{{ dashboardConfig.weeklyPanel.title }}</h2>
-                        </div>
-                    </div>
-                    <div class="ym-pane-body">
-                        <div class="ym-timetable-scroll">
-                            <div class="ym-timetable">
-                                <div
-                                    v-for="day in dashboardConfig.weeklyPanel.days"
-                                    :key="day.day"
-                                    class="ym-timetable-col"
-                                >
-                                    <div class="ym-timetable-head">
-                                        <p class="ym-timetable-day">{{ day.day.slice(0, 3) }}</p>
-                                        <p class="ym-timetable-date">{{ day.date }}</p>
-                                    </div>
-                                    <div class="ym-timetable-body">
-                                        <div
-                                            v-for="entry in day.entries"
-                                            :key="entry.title"
-                                            :class="['ym-timetable-slot', { 'ym-timetable-slot--coach': isCoach }]"
-                                        >
-                                            <p class="ym-timetable-time">{{ entry.time }}</p>
-                                            <p class="ym-timetable-name">{{ entry.title }}</p>
-                                            <p class="ym-timetable-sub">{{ entry.meta }}</p>
-                                        </div>
-                                        <div v-if="!day.entries.length" class="ym-timetable-empty">
-                                            {{ dashboardConfig.weeklyPanel.emptyMessage }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </template>
-
-            <template v-else-if="currentViewConfig">
-                <div class="ym-pane">
-                    <div class="ym-pane-head">
-                        <div class="ym-pane-title-wrap">
-                            <i :class="['bi', currentViewConfig.icon, 'ym-pane-icon']" />
-                            <h2 class="ym-pane-title">{{ currentViewConfig.title }}</h2>
-                        </div>
-                    </div>
-                    <div class="ym-pane-body">
-                        <div class="ym-row-list">
-                            <div
-                                v-for="item in currentViewConfig.rows"
-                                :key="item.title"
-                                class="ym-row"
-                            >
-                                <div class="ym-row-main">
-                                    <p class="ym-row-title">{{ item.title }}</p>
-                                    <p class="ym-row-meta">{{ item.meta }}</p>
-                                </div>
-                                <div class="ym-row-aside">
-                                    <span :class="badgeClass(item.tone)">{{ item.badge }}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="ym-info-row">
-                            <i class="bi bi-info-circle ym-info-icon" />
-                            <span>{{ currentViewConfig.note }}</span>
-                        </div>
-                    </div>
-                </div>
-            </template>
         </template>
 
         <Modal :show="showEditDashboardModal" title="Edit Dashboard Tabs" @close="showEditDashboardModal = false">
