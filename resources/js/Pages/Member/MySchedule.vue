@@ -1,8 +1,5 @@
 <script setup>
-import { useI18n } from 'vue-i18n';
 import AppLayout from '@/Layouts/AppLayout.vue';
-
-const { t } = useI18n();
 
 const weeklySchedule = [
     {
@@ -63,19 +60,19 @@ const highlights = [
 ];
 
 const weeklyFocus = [
-    { label: t('member.totalSessionsPlanned'), note: t('member.bookedAndConfirmed'), value: '7' },
-    { label: t('member.intensityBalance'), note: t('member.highVsRecovery'), value: '3 : 4' },
-    { label: t('member.currentStreak'), note: t('member.consecutiveWeeks'), value: '5 weeks' },
+    { label: $t('member.totalSessionsPlanned'), note: $t('member.bookedAndConfirmed'), value: '7' },
+    { label: $t('member.intensityBalance'), note: $t('member.highVsRecovery'), value: '3 : 4' },
+    { label: $t('member.currentStreak'), note: $t('member.consecutiveWeeks'), value: '5 weeks' },
 ];
 </script>
 
 <template>
-    <AppLayout :title="t('member.mySchedule')">
+    <AppLayout :title="$t('member.mySchedule')">
         <div class="ym-pane">
             <div class="ym-pane-head">
                 <div class="ym-pane-title-wrap">
                     <i class="bi bi-calendar-week ym-pane-icon" />
-                    <h2 class="ym-pane-title">{{ t('member.personalWeeklyCalendar') }}</h2>
+                    <h2 class="ym-pane-title">{{ $t('member.personalWeeklyCalendar') }}</h2>
                 </div>
             </div>
             <div class="ym-pane-body">
@@ -109,7 +106,7 @@ const weeklyFocus = [
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
                         <i class="bi bi-bell ym-pane-icon" />
-                        <h2 class="ym-pane-title">{{ t('member.upcomingHighlights') }}</h2>
+                        <h2 class="ym-pane-title">{{ $t('member.upcomingHighlights') }}</h2>
                     </div>
                 </div>
                 <div class="ym-pane-body">
@@ -131,7 +128,7 @@ const weeklyFocus = [
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
                         <i class="bi bi-bar-chart ym-pane-icon" />
-                        <h2 class="ym-pane-title">{{ t('member.weeklyFocus') }}</h2>
+                        <h2 class="ym-pane-title">{{ $t('member.weeklyFocus') }}</h2>
                     </div>
                 </div>
                 <div class="ym-pane-body">
@@ -148,7 +145,7 @@ const weeklyFocus = [
                     </div>
                     <div class="ym-info-row">
                         <i class="bi bi-info-circle ym-info-icon" />
-                        <span>{{ t('member.recoveryTip') }}</span>
+                        <span>{{ $t('member.recoveryTip') }}</span>
                     </div>
                 </div>
             </div>
