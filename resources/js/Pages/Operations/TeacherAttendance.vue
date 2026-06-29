@@ -11,22 +11,22 @@ const attendance = [
 </script>
 
 <template>
-    <AppLayout title="Teacher Attendance Tracking">
+    <AppLayout :title="$t('operations.teacherAttendance')">
         <div class="ym-stat-strip">
             <div class="ym-stat">
-                <p class="ym-stat-label">On Time</p>
+                <p class="ym-stat-label">{{ $t('operations.onTime') }}</p>
                 <p class="ym-stat-value">21</p>
-                <p class="ym-stat-note">77% attendance quality</p>
+                <p class="ym-stat-note">77% {{ $t('operations.attendanceQuality') }}</p>
             </div>
             <div class="ym-stat">
-                <p class="ym-stat-label">Late</p>
+                <p class="ym-stat-label">{{ $t('operations.late') }}</p>
                 <p class="ym-stat-value">4</p>
-                <p class="ym-stat-note">Avg delay 8 minutes</p>
+                <p class="ym-stat-note">{{ $t('operations.avgDelay') }}</p>
             </div>
             <div class="ym-stat">
-                <p class="ym-stat-label">Absent</p>
+                <p class="ym-stat-label">{{ $t('operations.absent') }}</p>
                 <p class="ym-stat-value">2</p>
-                <p class="ym-stat-note">All covered by substitutes</p>
+                <p class="ym-stat-note">{{ $t('operations.coveredBySubs') }}</p>
             </div>
         </div>
 
@@ -34,7 +34,7 @@ const attendance = [
             <div class="ym-pane-head">
                 <div class="ym-pane-title-wrap">
                     <i class="bi bi-clipboard-check ym-pane-icon" />
-                    <h2 class="ym-pane-title">Today Attendance Board</h2>
+                    <h2 class="ym-pane-title">{{ $t('operations.todayAttendance') }}</h2>
                 </div>
             </div>
             <div class="ym-pane-body">
@@ -42,11 +42,11 @@ const attendance = [
                     <table class="ym-table">
                         <thead>
                             <tr>
-                                <th class="ym-th">Teacher</th>
-                                <th class="ym-th">Branch</th>
-                                <th class="ym-th">Shift</th>
-                                <th class="ym-th">Check In</th>
-                                <th class="ym-th">Status</th>
+                                <th class="ym-th">{{ $t('operations.teacher') }}</th>
+                                <th class="ym-th">{{ $t('operations.branch') }}</th>
+                                <th class="ym-th">{{ $t('operations.shift') }}</th>
+                                <th class="ym-th">{{ $t('operations.checkIn') }}</th>
+                                <th class="ym-th">{{ $t('operations.status') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -72,7 +72,7 @@ const attendance = [
                 </div>
                 <div class="ym-info-row">
                     <i class="bi bi-info-circle ym-info-icon" />
-                    <span>Attendance actions and geolocation validation are planned but not enabled yet.</span>
+                    <span>{{ $t('operations.attendancePlaceholder') }}</span>
                 </div>
             </div>
         </div>

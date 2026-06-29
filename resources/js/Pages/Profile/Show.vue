@@ -1,5 +1,6 @@
 ﻿<script setup>
 import { computed } from 'vue';
+import { trans as t } from 'laravel-vue-i18n';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 const props = defineProps({
@@ -40,27 +41,27 @@ const roleLabel = computed(() => {
     return role.charAt(0).toUpperCase() + role.slice(1);
 });
 
-const formatDevice = (deviceType) => (deviceType === 'mobile' ? 'Mobile' : 'Desktop');
+const formatDevice = (deviceType) => (deviceType === 'mobile' ? t('profile.mobile') : t('profile.desktop'));
 </script>
 
 <template>
-    <AppLayout title="My Profile">
+    <AppLayout :title="$t('profile.myProfile')">
         <div class="ym-record-layout">
             <div class="ym-record-main ym-surface">
                 <section class="ym-record-section">
                     <div class="ym-record-row ym-record-row--single">
                         <div class="ym-rf">
-                            <p class="ym-rf-label">Username</p>
+                            <p class="ym-rf-label">{{ $t('profile.username') }}</p>
                             <p class="ym-rf-value">@{{ props.profile.username }}</p>
                         </div>
                     </div>
                     <div class="ym-record-row">
                         <div class="ym-rf">
-                            <p class="ym-rf-label">Full Name</p>
+                            <p class="ym-rf-label">{{ $t('profile.fullName') }}</p>
                             <p class="ym-rf-value">{{ props.profile.name }}</p>
                         </div>
                         <div class="ym-rf">
-                            <p class="ym-rf-label">Role</p>
+                            <p class="ym-rf-label">{{ $t('profile.role') }}</p>
                             <p class="ym-rf-value">
                                 <span :class="['ym-role-badge', `ym-role-${props.profile.role}`]">{{ roleLabel }}</span>
                             </p>
@@ -68,45 +69,45 @@ const formatDevice = (deviceType) => (deviceType === 'mobile' ? 'Mobile' : 'Desk
                     </div>
                     <div class="ym-record-row ym-record-row--single ym-record-row--last">
                         <div class="ym-rf">
-                            <p class="ym-rf-label">Email</p>
-                            <p class="ym-rf-value">{{ props.profile.email || 'Not set' }}</p>
+                            <p class="ym-rf-label">{{ $t('profile.email') }}</p>
+                            <p class="ym-rf-value">{{ props.profile.email || $t('profile.notSet') }}</p>
                         </div>
                     </div>
                 </section>
 
                 <section class="ym-record-section ym-record-section--divided">
-                    <p class="ym-record-group-title">Security and Access</p>
+                    <p class="ym-record-group-title">{{ $t('profile.securityAndAccess') }}</p>
                     <div class="ym-record-row ym-record-row--last">
                         <div class="ym-rf">
-                            <p class="ym-rf-label">Two-Factor Authentication</p>
+                            <p class="ym-rf-label">{{ $t('profile.twoFactorAuth') }}</p>
                             <p class="ym-rf-value">
-                                {{ props.security.two_factor_enabled ? 'Enabled' : 'Not Enabled' }}
+                                {{ props.security.two_factor_enabled ? $t('profile.enabled') : $t('profile.notEnabled') }}
                             </p>
                             <p class="ym-rf-note">
                                 {{
                                     props.security.two_factor_enabled
-                                        ? `Confirmed ${props.security.two_factor_confirmed_at}`
-                                        : 'Enable 2FA to improve account security'
+                                        ? $t('profile.confirmedAt', { date: props.security.two_factor_confirmed_at })
+                                        : $t('profile.enable2fa')
                                 }}
                             </p>
                         </div>
                         <div class="ym-rf">
-                            <p class="ym-rf-label">Total Sign-ins</p>
+                            <p class="ym-rf-label">{{ $t('profile.totalSignIns') }}</p>
                             <p class="ym-rf-value">{{ props.loginStats.total_sign_ins }}</p>
                             <p class="ym-rf-note">
-                                Last: {{ props.loginStats.last_login_at ?? 'No sign-ins yet' }}
+                                {{ $t('profile.last') }}: {{ props.loginStats.last_login_at ?? $t('profile.noSignInsYet') }}
                             </p>
                         </div>
                     </div>
                 </section>
 
                 <section class="ym-record-section ym-record-section--divided">
-                    <p class="ym-record-group-title">Recent Sign-ins</p>
+                    <p class="ym-record-group-title">{{ $t('profile.recentSignIns') }}</p>
                     <div v-if="props.recentLogins.length" class="ym-record-log-list">
                         <div class="ym-record-log-head">
-                            <span>Device</span>
-                            <span>Date and Time</span>
-                            <span>IP Address</span>
+                            <span>{{ $t('profile.device') }}</span>
+                            <span>{{ $t('profile.dateAndTime') }}</span>
+                            <span>{{ $t('profile.ipAddress') }}</span>
                         </div>
                         <div
                             v-for="session in props.recentLogins"
@@ -118,11 +119,11 @@ const formatDevice = (deviceType) => (deviceType === 'mobile' ? 'Mobile' : 'Desk
                                     {{ formatDevice(session.device_type) }}
                                 </span>
                             </span>
-                            <span class="ym-record-log-time">{{ session.logged_in_at ?? 'Unknown' }}</span>
+                            <span class="ym-record-log-time">{{ session.logged_in_at ?? $t('profile.unknown') }}</span>
                             <span class="ym-record-log-ip">{{ session.ip_address }}</span>
                         </div>
                     </div>
-                    <p v-else class="ym-record-empty">No login activity has been recorded yet.</p>
+                    <p v-else class="ym-record-empty">{{ $t('profile.noLoginActivity') }}</p>
                 </section>
             </div>
 
@@ -135,15 +136,15 @@ const formatDevice = (deviceType) => (deviceType === 'mobile' ? 'Mobile' : 'Desk
 
                 <div class="ym-record-meta-list">
                     <div class="ym-record-meta-item">
-                        <p class="ym-rf-label">Joined</p>
-                        <p class="ym-record-meta-val">{{ props.profile.joined_at ?? 'Unknown' }}</p>
+                        <p class="ym-rf-label">{{ $t('profile.joined') }}</p>
+                        <p class="ym-record-meta-val">{{ props.profile.joined_at ?? $t('profile.unknown') }}</p>
                     </div>
                     <div class="ym-record-meta-item">
-                        <p class="ym-rf-label">Last Sign-in</p>
-                        <p class="ym-record-meta-val">{{ props.loginStats.last_login_at ?? 'Never' }}</p>
+                        <p class="ym-rf-label">{{ $t('profile.lastSignIn') }}</p>
+                        <p class="ym-record-meta-val">{{ props.loginStats.last_login_at ?? $t('profile.never') }}</p>
                     </div>
                     <div class="ym-record-meta-item">
-                        <p class="ym-rf-label">Sessions Total</p>
+                        <p class="ym-rf-label">{{ $t('profile.sessionsTotal') }}</p>
                         <p class="ym-record-meta-val">{{ props.loginStats.total_sign_ins }}</p>
                     </div>
                 </div>

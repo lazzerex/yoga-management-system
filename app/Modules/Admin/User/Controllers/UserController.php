@@ -76,7 +76,7 @@ class UserController extends Controller
 
         $action->execute($validated, $request->user());
 
-        return back()->with('success', "User {$validated['name']} created.");
+        return back()->with('success', ['key' => 'flash.userCreated', 'params' => ['name' => $validated['name']]]);
     }
 
     public function update(UpdateUserRequest $request, User $user, UpdateUserAction $action): RedirectResponse
@@ -93,7 +93,7 @@ class UserController extends Controller
 
         $action->execute($user, $validated, $request->user());
 
-        return back()->with('success', "User {$user->name} updated.");
+        return back()->with('success', ['key' => 'flash.userUpdated', 'params' => ['name' => $user->name]]);
     }
 
     public function updateRole(UpdateUserRoleRequest $request, User $user, UpdateUserRoleAction $action): RedirectResponse
@@ -110,7 +110,7 @@ class UserController extends Controller
 
         $action->execute($user, $validated['role'], $request->user());
 
-        return back()->with('success', "Role updated for {$user->name}.");
+        return back()->with('success', ['key' => 'flash.roleUpdated', 'params' => ['name' => $user->name]]);
     }
 
     public function destroy(Request $request, User $user, DeleteUserAction $action): RedirectResponse
@@ -126,7 +126,7 @@ class UserController extends Controller
         $name = $user->name;
         $action->execute($user, $request->user());
 
-        return back()->with('success', "User {$name} deleted.");
+        return back()->with('success', ['key' => 'flash.userDeleted', 'params' => ['name' => $name]]);
     }
 
 

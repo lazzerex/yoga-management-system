@@ -38,22 +38,22 @@ const plans = [
 </script>
 
 <template>
-    <AppLayout title="Lesson Planning & Approval">
+    <AppLayout :title="$t('operations.lessonPlanning')">
         <div class="ym-stat-strip">
             <div class="ym-stat">
-                <p class="ym-stat-label">Pending Approval</p>
+                <p class="ym-stat-label">{{ $t('operations.pendingApproval') }}</p>
                 <p class="ym-stat-value">14</p>
-                <p class="ym-stat-note">6 waiting over 48 hours</p>
+                <p class="ym-stat-note">6 {{ $t('operations.waitingOver48h') }}</p>
             </div>
             <div class="ym-stat">
-                <p class="ym-stat-label">Approved This Week</p>
+                <p class="ym-stat-label">{{ $t('operations.approvedThisWeek') }}</p>
                 <p class="ym-stat-value">22</p>
-                <p class="ym-stat-note">Avg review time 9h</p>
+                <p class="ym-stat-note">{{ $t('operations.avgReviewTime') }}</p>
             </div>
             <div class="ym-stat">
-                <p class="ym-stat-label">Needs Revision</p>
+                <p class="ym-stat-label">{{ $t('operations.needsRevision') }}</p>
                 <p class="ym-stat-value">5</p>
-                <p class="ym-stat-note">Feedback sent to teachers</p>
+                <p class="ym-stat-note">{{ $t('operations.feedbackSent') }}</p>
             </div>
         </div>
 
@@ -61,7 +61,7 @@ const plans = [
             <div class="ym-pane-head">
                 <div class="ym-pane-title-wrap">
                     <i class="bi bi-clipboard-check ym-pane-icon" />
-                    <h2 class="ym-pane-title">Approval Queue</h2>
+                    <h2 class="ym-pane-title">{{ $t('operations.approvalQueue') }}</h2>
                 </div>
             </div>
             <div class="ym-pane-body">
@@ -73,13 +73,13 @@ const plans = [
                         </div>
                         <div class="ym-row-aside">
                             <span :class="['ym-status-pill', plan.statusClass]">{{ plan.status }}</span>
-                            <button type="button" class="ym-btn-outline">Review</button>
+                            <button type="button" class="ym-btn-outline">{{ $t('operations.review') }}</button>
                         </div>
                     </div>
                 </div>
                 <div class="ym-info-row">
                     <i class="bi bi-info-circle ym-info-icon" />
-                    <span>Workflow actions and approval permissions are placeholders for now.</span>
+                    <span>{{ $t('operations.lessonPlaceholder') }}</span>
                 </div>
             </div>
         </div>

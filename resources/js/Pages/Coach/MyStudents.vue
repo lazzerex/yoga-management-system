@@ -15,31 +15,25 @@ const followUps = [
     { student: 'Noel Grant', note: 'Requested support for shoulder mobility modifications' },
     { student: 'Kevin Yu', note: 'Interested in progressing to intermediate sequence' },
 ];
-
-const coachingSnapshot = [
-    { label: 'Average Attendance', note: 'All classes this month', value: '84%' },
-    { label: 'Students at Risk', note: 'Attendance < 60%', value: '6' },
-    { label: 'High Consistency Students', note: 'Attendance > 90%', value: '23' },
-];
 </script>
 
 <template>
-    <AppLayout title="My Students">
+    <AppLayout :title="$t('coach.myStudents', { count: 182 })">
         <div class="ym-stat-strip">
             <div class="ym-stat">
-                <p class="ym-stat-label">Total Students</p>
+                <p class="ym-stat-label">{{ $t('coach.totalStudents') }}</p>
                 <p class="ym-stat-value">182</p>
-                <p class="ym-stat-note">Across all active classes</p>
+                <p class="ym-stat-note">{{ $t('coach.acrossAllActiveClasses') }}</p>
             </div>
             <div class="ym-stat">
-                <p class="ym-stat-label">Avg Attendance</p>
+                <p class="ym-stat-label">{{ $t('coach.avgAttendance') }}</p>
                 <p class="ym-stat-value">84%</p>
-                <p class="ym-stat-note">All classes this month</p>
+                <p class="ym-stat-note">{{ $t('coach.allClassesThisMonth') }}</p>
             </div>
             <div class="ym-stat">
-                <p class="ym-stat-label">Need Follow-up</p>
+                <p class="ym-stat-label">{{ $t('coach.needFollowUp') }}</p>
                 <p class="ym-stat-value">3</p>
-                <p class="ym-stat-note">Attendance or support flags</p>
+                <p class="ym-stat-note">{{ $t('coach.attendanceOrSupportFlags') }}</p>
             </div>
         </div>
 
@@ -47,7 +41,7 @@ const coachingSnapshot = [
             <div class="ym-pane-head">
                 <div class="ym-pane-title-wrap">
                     <i class="bi bi-people ym-pane-icon" />
-                    <h2 class="ym-pane-title">Student Roster</h2>
+                    <h2 class="ym-pane-title">{{ $t('coach.studentRoster') }}</h2>
                 </div>
             </div>
             <div class="ym-pane-body">
@@ -55,10 +49,10 @@ const coachingSnapshot = [
                     <table class="ym-table">
                         <thead>
                             <tr>
-                                <th class="ym-th">Student</th>
-                                <th class="ym-th">Primary Class</th>
-                                <th class="ym-th">Attendance</th>
-                                <th class="ym-th">Last Session</th>
+                                <th class="ym-th">{{ $t('auth.name') }}</th>
+                                <th class="ym-th">{{ $t('coach.primaryClass') }}</th>
+                                <th class="ym-th">{{ $t('coach.avgAttendance') }}</th>
+                                <th class="ym-th">{{ $t('coach.lastSession') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -79,7 +73,7 @@ const coachingSnapshot = [
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
                         <i class="bi bi-exclamation-triangle ym-pane-icon" />
-                        <h2 class="ym-pane-title">Students Needing Follow-up</h2>
+                        <h2 class="ym-pane-title">{{ $t('coach.studentsNeedingFollowup') }}</h2>
                     </div>
                 </div>
                 <div class="ym-pane-body">
@@ -90,7 +84,7 @@ const coachingSnapshot = [
                                 <p class="ym-row-meta">{{ alert.note }}</p>
                             </div>
                             <div class="ym-row-aside">
-                                <span class="ym-status-pill ym-status-pill--pending">Follow-up</span>
+                                <span class="ym-status-pill ym-status-pill--pending">{{ $t('coach.followUp') }}</span>
                             </div>
                         </div>
                     </div>
@@ -101,7 +95,7 @@ const coachingSnapshot = [
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
                         <i class="bi bi-bar-chart ym-pane-icon" />
-                        <h2 class="ym-pane-title">Coaching Snapshot</h2>
+                        <h2 class="ym-pane-title">{{ $t('coach.coachingSnapshot') }}</h2>
                     </div>
                 </div>
                 <div class="ym-pane-body">

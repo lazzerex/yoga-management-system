@@ -17,6 +17,9 @@ importers:
       bootstrap-icons:
         specifier: ^1.13.1
         version: 1.13.1
+      laravel-vue-i18n:
+        specifier: ^2.8.0
+        version: 2.8.0
       vue:
         specifier: ^3.5.32
         version: 3.5.32
@@ -531,6 +534,9 @@ packages:
     peerDependencies:
       vite: ^8.0.0
 
+  laravel-vue-i18n@2.8.0:
+    resolution: {integrity: sha512-5D4GvITMZaLVwnirMU8NeQBCSfhEqDyRHiFshfP9ycdczB6e2oYZl5ow95M2sLOViPCuroYzMXqybfG9yFhoCw==}
+
   lightningcss-android-arm64@1.32.0:
     resolution: {integrity: sha512-YK7/ClTt4kAK0vo6w3X+Pnm0D2cf2vPHbhOXdoNti1Ga0al1P4TBZhwjATvjNwLEBCnKvjJc2jQgHXH0NEwlAg==}
     engines: {node: '>= 12.0.0'}
@@ -624,6 +630,9 @@ packages:
     resolution: {integrity: sha512-N8SpfPUnUp1bK+PMYW8qSWdl9U+wwNWI4QKxOYDy9JAro3WMX7p2OeVRF9v+347pnakNevPmiHhNmZ2HbFA76w==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
+
+  php-parser@3.2.2:
+    resolution: {integrity: sha512-voj3rzCJmEbwHwH3QteON28wA6K+JbcaJEofyUZkUXmcViiXofjbSbcE5PtqtjX6nstnnAEYCFoRq0mkjP5/cg==}
 
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
@@ -1212,6 +1221,13 @@ snapshots:
       vite: 8.0.9(jiti@2.6.1)
       vite-plugin-full-reload: 1.2.0
 
+  laravel-vue-i18n@2.8.0:
+    dependencies:
+      php-parser: 3.2.2
+      vue: 3.5.32
+    transitivePeerDependencies:
+      - typescript
+
   lightningcss-android-arm64@1.32.0:
     optional: true
 
@@ -1274,6 +1290,8 @@ snapshots:
       mime-db: 1.52.0
 
   nanoid@3.3.11: {}
+
+  php-parser@3.2.2: {}
 
   picocolors@1.1.1: {}
 

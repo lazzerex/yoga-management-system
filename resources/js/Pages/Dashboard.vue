@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { route } from 'ziggy-js';
+import { trans as t, currentLocale } from 'laravel-vue-i18n';
 import Draggable from 'vuedraggable';
 import Modal from '@/Components/UI/Modal.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -17,342 +18,359 @@ const maxTopTabs = 6;
 const userRole = computed(() => props.auth?.user?.role ?? 'member');
 const isAdmin = computed(() => userRole.value === 'admin');
 
-const roleDashboard = {
+const renderKey = ref(0);
+watch(currentLocale, () => {
+    renderKey.value++;
+});
+
+const roleDashboard = computed(() => {
+    void currentLocale.value;
+    return {
     admin: {
-        pageTitle: 'Homepage',
-        tabs: ['Homepage', 'My Schedule', 'Members', 'Attendance', 'Studio Reports', 'Financials'],
+        pageTitle: t('dashboard.homepage'),
+        tabs: [t('dashboard.homepage'), t('dashboard.mySchedule'), t('dashboard.members'), t('dashboard.attendance'), t('dashboard.studioReports'), t('dashboard.financials')],
     },
     coach: {
-        pageTitle: 'Coach Dashboard',
-        headline: "Today's Teaching Snapshot",
-        subtitle: 'Focus on current classes, student progress, and your upcoming teaching responsibilities.',
+        pageTitle: t('dashboard.coachDashboard'),
+        headline: t('dashboard.todaysTeachingSnapshot'),
+        subtitle: t('dashboard.coachSubtitle'),
         metrics: [
-            { label: 'Sessions Today', value: '4', note: '2 completed, 2 remaining' },
-            { label: 'Students Today', value: '72', note: 'Across 3 branches and 1 online class' },
-            { label: 'Average Attendance', value: '89%', note: 'Last 14 days' },
+            { label: t('dashboard.sessionsToday'), value: '4', note: t('dashboard.sessionsTodayNote') },
+            { label: t('dashboard.studentsToday'), value: '72', note: t('dashboard.studentsTodayNote') },
+            { label: t('dashboard.averageAttendance'), value: '89%', note: t('dashboard.last14Days') },
         ],
         primaryPanel: {
-            title: "Today's Schedule",
+            title: t('dashboard.todaysSchedule'),
             icon: 'bi-clipboard-data',
             rows: [
-                { title: '07:00 Power Core', meta: 'Riverside · 24 students', badge: 'Completed', tone: 'started' },
-                { title: '12:30 Prenatal Flow', meta: 'Westside · 14 students', badge: 'Completed', tone: 'started' },
-                { title: '18:30 Evening Yin', meta: 'Downtown · 21 students', badge: 'Up Next', tone: 'pending' },
-                { title: '20:00 Breathwork Lab', meta: 'Online · 32 students', badge: 'Later', tone: 'default' },
+                { title: '07:00 Power Core', meta: t('dashboard.riversideStudents', { count: 24 }), badge: t('dashboard.completed'), tone: 'started' },
+                { title: '12:30 Prenatal Flow', meta: t('dashboard.westsideStudents', { count: 14 }), badge: t('dashboard.completed'), tone: 'started' },
+                { title: '18:30 Evening Yin', meta: t('dashboard.downtownStudents', { count: 21 }), badge: t('dashboard.upNext'), tone: 'pending' },
+                { title: '20:00 Breathwork Lab', meta: t('dashboard.onlineStudents', { count: 32 }), badge: t('dashboard.later'), tone: 'default' },
             ],
         },
         secondaryPanel: {
-            title: 'Student Snapshot',
+            title: t('dashboard.studentSnapshot'),
             icon: 'bi-people',
             rows: [
-                { title: 'High Consistency Students', meta: 'Attendance above 90%', badge: '23', tone: 'started' },
-                { title: 'Follow-up Needed', meta: 'Attendance below 60%', badge: '6', tone: 'pending' },
-                { title: 'New This Week', meta: 'First-time students', badge: '11', tone: 'default' },
-                { title: 'Progress Assessments Due', meta: 'By end of week', badge: '8', tone: 'default' },
+                { title: t('dashboard.highConsistencyStudents'), meta: t('dashboard.attendanceAboveThreshold', { threshold: '90%' }), badge: '23', tone: 'started' },
+                { title: t('dashboard.followUpNeeded'), meta: t('dashboard.attendanceBelowThreshold', { threshold: '60%' }), badge: '6', tone: 'pending' },
+                { title: t('dashboard.newThisWeek'), meta: t('dashboard.firstTimeStudents'), badge: '11', tone: 'default' },
+                { title: t('dashboard.progressAssessmentsDue'), meta: t('dashboard.byEndOfWeek'), badge: '8', tone: 'default' },
             ],
         },
         weeklyPanel: {
-            title: 'Weekly Teaching Timeline',
-            emptyMessage: 'No classes assigned',
+            title: t('dashboard.weeklyTeachingTimeline'),
+            emptyMessage: t('dashboard.noClassesAssigned'),
             days: [
                 {
-                    day: 'Monday',
+                    day: t('dashboard.monday'),
                     date: 'Apr 27',
                     entries: [
-                        { time: '06:45', title: 'Sunrise Mobility', meta: 'Westside · 18 students' },
-                        { time: '18:30', title: 'Evening Yin', meta: 'Downtown · 21 students' },
+                        { time: '06:45', title: 'Sunrise Mobility', meta: t('dashboard.westsideStudentsWithCoach', { count: 18 }) },
+                        { time: '18:30', title: 'Evening Yin', meta: t('dashboard.downtownStudentsWithCoach', { count: 21 }) },
                     ],
                 },
                 {
-                    day: 'Tuesday',
+                    day: t('dashboard.tuesday'),
                     date: 'Apr 28',
                     entries: [
-                        { time: '07:00', title: 'Power Core', meta: 'Riverside · 24 students' },
-                        { time: '20:00', title: 'Breathwork Lab', meta: 'Online · 32 students' },
+                        { time: '07:00', title: 'Power Core', meta: t('dashboard.riversideStudentsWithCoach', { count: 24 }) },
+                        { time: '20:00', title: 'Breathwork Lab', meta: t('dashboard.onlineStudentsWithCoach', { count: 32 }) },
                     ],
                 },
                 {
-                    day: 'Wednesday',
+                    day: t('dashboard.wednesday'),
                     date: 'Apr 29',
                     entries: [
-                        { time: '18:30', title: 'Evening Yin', meta: 'Downtown · 20 students' },
+                        { time: '18:30', title: 'Evening Yin', meta: t('dashboard.downtownStudentsWithCoach', { count: 20 }) },
                     ],
                 },
                 {
-                    day: 'Thursday',
+                    day: t('dashboard.thursday'),
                     date: 'Apr 30',
                     entries: [
-                        { time: '07:00', title: 'Power Core', meta: 'Riverside · 23 students' },
-                        { time: '12:30', title: 'Prenatal Flow', meta: 'Westside · 14 students' },
+                        { time: '07:00', title: 'Power Core', meta: t('dashboard.riversideCoachDaniel') },
+                        { time: '20:00', title: 'Breathwork Lab', meta: t('dashboard.onlineCoachNoah') },
                     ],
                 },
                 {
-                    day: 'Friday',
+                    day: t('dashboard.friday'),
                     date: 'May 01',
                     entries: [
-                        { time: '17:45', title: 'Mobility Reset', meta: 'Downtown · 16 students' },
+                        { time: '17:45', title: 'Mobility Reset', meta: t('dashboard.downtownCoachLina') },
                     ],
                 },
                 {
-                    day: 'Saturday',
+                    day: t('dashboard.saturday'),
                     date: 'May 02',
                     entries: [
-                        { time: '09:00', title: 'Weekend Flow', meta: 'Uptown · 19 students' },
+                        { time: '09:00', title: 'Weekend Flow', meta: t('dashboard.uptownCoachMia') },
                     ],
                 },
-                { day: 'Sunday', date: 'May 03', entries: [] },
+                { day: t('dashboard.sunday'), date: 'May 03', entries: [] },
             ],
         },
-        tabs: ['Homepage', 'Overview', 'My Performance', 'Class Stats', 'Student Progress', 'Earnings'],
+        tabs: [t('dashboard.homepage'), t('dashboard.overview'), t('dashboard.myProgress'), t('dashboard.attendance'), t('dashboard.payments'), t('dashboard.achievements')],
     },
     member: {
-        pageTitle: 'Member Dashboard',
-        headline: 'Membership and Session Overview',
-        subtitle: 'Stay on top of your membership status and upcoming classes for the week.',
+        pageTitle: t('dashboard.memberDashboard'),
+        headline: t('dashboard.membershipAndSessionOverview'),
+        subtitle: t('dashboard.memberSubtitle'),
         metrics: [
-            { label: 'Membership Status', value: 'Active', note: 'Premium Flow Annual' },
-            { label: 'Sessions This Week', value: '3 / 5', note: '2 sessions remaining to hit your goal' },
-            { label: 'Next Session', value: 'Today 18:30', note: 'Evening Yin · Downtown' },
+            { label: t('dashboard.membershipStatus'), value: t('dashboard.active'), note: 'Premium Flow Annual' },
+            { label: t('dashboard.sessionsThisWeek'), value: '3 / 5', note: t('dashboard.sessionsRemainingNote') },
+            { label: t('dashboard.nextSession'), value: t('dashboard.today1830'), note: t('dashboard.eveningYinDowntown') },
         ],
         primaryPanel: {
-            title: 'Membership Status',
+            title: t('dashboard.membershipStatus'),
             icon: 'bi-person-vcard',
             rows: [
-                { title: 'Plan Type', meta: 'Premium Flow Annual', badge: 'Premium', tone: 'started' },
-                { title: 'Renewal Date', meta: 'Jan 5, 2027', badge: 'Auto', tone: 'default' },
-                { title: 'Guest Passes', meta: 'Available this cycle', badge: '4 left', tone: 'default' },
-                { title: 'Support Tickets', meta: 'Membership requests', badge: '0 open', tone: 'started' },
+                { title: t('dashboard.planType'), meta: 'Premium Flow Annual', badge: t('dashboard.premium'), tone: 'started' },
+                { title: t('dashboard.renewalDate'), meta: 'Jan 5, 2027', badge: t('dashboard.auto'), tone: 'default' },
+                { title: t('dashboard.guestPasses'), meta: t('dashboard.availableThisCycle'), badge: t('dashboard.fourLeft'), tone: 'default' },
+                { title: t('dashboard.supportTickets'), meta: t('dashboard.membershipRequests'), badge: t('dashboard.zeroOpen'), tone: 'started' },
             ],
         },
         secondaryPanel: {
-            title: 'Upcoming Sessions',
+            title: t('dashboard.upcomingSessions'),
             icon: 'bi-calendar3',
             rows: [
-                { title: 'Evening Yin', meta: 'Today 18:30 · Downtown', badge: 'Booked', tone: 'started' },
-                { title: 'Power Core', meta: 'Tue 07:00 · Riverside', badge: 'Booked', tone: 'started' },
-                { title: 'Breathwork Lab', meta: 'Thu 20:00 · Online', badge: 'Waitlist', tone: 'pending' },
-                { title: 'Weekend Flow', meta: 'Sat 09:00 · Uptown', badge: 'Booked', tone: 'started' },
+                { title: 'Evening Yin', meta: t('dashboard.today1830Downtown'), badge: t('dashboard.booked'), tone: 'started' },
+                { title: 'Power Core', meta: t('dashboard.tue0700Riverside'), badge: t('dashboard.booked'), tone: 'started' },
+                { title: 'Breathwork Lab', meta: t('dashboard.thu2000Online'), badge: t('dashboard.waitlist'), tone: 'pending' },
+                { title: 'Weekend Flow', meta: t('dashboard.sat0900Uptown'), badge: t('dashboard.booked'), tone: 'started' },
             ],
         },
         weeklyPanel: {
-            title: 'Personal Weekly Calendar',
-            emptyMessage: 'Rest and recovery day',
+            title: t('dashboard.personalWeeklyCalendar'),
+            emptyMessage: t('dashboard.restAndRecoveryDay'),
             days: [
                 {
-                    day: 'Monday',
+                    day: t('dashboard.monday'),
                     date: 'Apr 27',
                     entries: [
-                        { time: '06:45', title: 'Sunrise Mobility', meta: 'Westside · Coach Lina' },
-                        { time: '18:30', title: 'Evening Yin', meta: 'Downtown · Coach Ari' },
+                        { time: '06:45', title: 'Sunrise Mobility', meta: t('dashboard.westsideCoachLina') },
+                        { time: '18:30', title: 'Evening Yin', meta: t('dashboard.downtownCoachAri') },
                     ],
                 },
                 {
-                    day: 'Tuesday',
+                    day: t('dashboard.tuesday'),
                     date: 'Apr 28',
                     entries: [
-                        { time: '07:00', title: 'Power Core', meta: 'Riverside · Coach Daniel' },
+                        { time: '07:00', title: 'Power Core', meta: t('dashboard.riversideCoachDaniel') },
                     ],
                 },
                 {
-                    day: 'Wednesday',
+                    day: t('dashboard.wednesday'),
                     date: 'Apr 29',
                     entries: [
-                        { time: '18:30', title: 'Evening Yin', meta: 'Downtown · Coach Ari' },
+                        { time: '18:30', title: 'Evening Yin', meta: t('dashboard.downtownCoachAri') },
                     ],
                 },
                 {
-                    day: 'Thursday',
+                    day: t('dashboard.thursday'),
                     date: 'Apr 30',
                     entries: [
-                        { time: '07:00', title: 'Power Core', meta: 'Riverside · Coach Daniel' },
-                        { time: '20:00', title: 'Breathwork Lab', meta: 'Online · Coach Noah' },
+                        { time: '07:00', title: 'Power Core', meta: t('dashboard.riversideCoachDaniel') },
+                        { time: '20:00', title: 'Breathwork Lab', meta: t('dashboard.onlineCoachNoah') },
                     ],
                 },
                 {
-                    day: 'Friday',
+                    day: t('dashboard.friday'),
                     date: 'May 01',
                     entries: [
-                        { time: '17:45', title: 'Mobility Reset', meta: 'Downtown · Coach Lina' },
+                        { time: '17:45', title: 'Mobility Reset', meta: t('dashboard.downtownCoachLina') },
                     ],
                 },
                 {
-                    day: 'Saturday',
+                    day: t('dashboard.saturday'),
                     date: 'May 02',
                     entries: [
-                        { time: '09:00', title: 'Weekend Flow', meta: 'Uptown · Coach Mia' },
+                        { time: '09:00', title: 'Weekend Flow', meta: t('dashboard.uptownCoachMia') },
                     ],
                 },
-                { day: 'Sunday', date: 'May 03', entries: [] },
+                { day: t('dashboard.sunday'), date: 'May 03', entries: [] },
             ],
         },
-        tabs: ['Homepage', 'Overview', 'My Progress', 'Attendance', 'Payments', 'Achievements'],
+        tabs: [t('dashboard.homepage'), t('dashboard.overview'), t('dashboard.myProgress'), t('dashboard.attendance'), t('dashboard.payments'), t('dashboard.achievements')],
     },
-};
+    };
+});
 
-const dashboardConfig = computed(() => roleDashboard[userRole.value] ?? roleDashboard.member);
-const pageTitle = computed(() => roleDashboard[userRole.value]?.pageTitle ?? 'Dashboard');
+const dashboardConfig = computed(() => roleDashboard.value[userRole.value] ?? roleDashboard.value.member);
+const pageTitle = computed(() => roleDashboard.value[userRole.value]?.pageTitle ?? 'Dashboard');
 const dashboardNotice = ref('');
 const activeView = ref('homepage');
 const isCoach = computed(() => userRole.value === 'coach');
 
-const viewConfigs = {
+const viewConfigs = computed(() => {
+    void currentLocale.value;
+    return {
     coach: {
         overview: {
-            title: 'Teaching Overview',
+            title: t('dashboard.teachingOverview'),
             icon: 'bi-bar-chart',
-            note: 'Full teaching stats and activity log will be wired in a later phase.',
+            note: t('dashboard.teachingOverviewNote'),
             rows: [
-                { title: 'Total Sessions This Month', meta: 'Across all branches', badge: '52', tone: 'default' },
-                { title: 'New Students', meta: 'First class this month', badge: '11', tone: 'started' },
-                { title: 'Avg Class Rating', meta: 'Student feedback score', badge: '4.7 / 5', tone: 'started' },
-                { title: 'Pending Session Notes', meta: 'Overdue submissions', badge: '3', tone: 'pending' },
+                { title: t('dashboard.totalSessionsThisMonth'), meta: t('dashboard.acrossAllBranches'), badge: '52', tone: 'default' },
+                { title: t('dashboard.newStudents'), meta: t('dashboard.firstClassThisMonth'), badge: '11', tone: 'started' },
+                { title: t('dashboard.avgClassRating'), meta: t('dashboard.studentFeedbackScore'), badge: '4.7 / 5', tone: 'started' },
+                { title: t('dashboard.pendingSessionNotes'), meta: t('dashboard.overdueSubmissions'), badge: '3', tone: 'pending' },
             ],
         },
         'my-performance': {
-            title: 'My Performance',
+            title: t('dashboard.myPerformance'),
             icon: 'bi-easel',
-            note: 'Performance metrics and feedback scores will be tracked here in a later phase.',
+            note: t('dashboard.myPerformanceNote'),
             rows: [
-                { title: 'Punctuality Rate', meta: 'Classes started on time', badge: '96%', tone: 'started' },
-                { title: 'Student Retention', meta: 'Re-enrolled past students', badge: '78%', tone: 'started' },
-                { title: 'Avg Feedback Score', meta: 'From session reviews', badge: '4.7 / 5', tone: 'started' },
-                { title: 'Missed Sessions', meta: 'Unexcused this month', badge: '0', tone: 'default' },
+                { title: t('dashboard.punctualityRate'), meta: t('dashboard.classesStartedOnTime'), badge: '96%', tone: 'started' },
+                { title: t('dashboard.studentRetention'), meta: t('dashboard.reEnrolledPastStudents'), badge: '78%', tone: 'started' },
+                { title: t('dashboard.avgFeedbackScore'), meta: t('dashboard.fromSessionReviews'), badge: '4.7 / 5', tone: 'started' },
+                { title: t('dashboard.missedSessions'), meta: t('dashboard.unexcusedThisMonth'), badge: '0', tone: 'default' },
             ],
         },
         'class-stats': {
-            title: 'Class Statistics',
+            title: t('dashboard.classStatistics'),
             icon: 'bi-table',
-            note: 'Detailed fill rates, booking trends, and class analytics will appear here.',
+            note: t('dashboard.classStatisticsNote'),
             rows: [
-                { title: 'Power Core', meta: 'Fill rate this week', badge: '24 / 24', tone: 'started' },
-                { title: 'Evening Yin', meta: 'Avg attendance (4 weeks)', badge: '91%', tone: 'started' },
-                { title: 'Prenatal Flow', meta: 'Waitlist count', badge: '0', tone: 'default' },
-                { title: 'Breathwork Lab', meta: 'Online enrollment', badge: '32 / 40', tone: 'default' },
+                { title: 'Power Core', meta: t('dashboard.fillRateThisWeek'), badge: '24 / 24', tone: 'started' },
+                { title: 'Evening Yin', meta: t('dashboard.avgAttendanceFourWeeks'), badge: '91%', tone: 'started' },
+                { title: 'Prenatal Flow', meta: t('dashboard.waitlistCount'), badge: '0', tone: 'default' },
+                { title: 'Breathwork Lab', meta: t('dashboard.onlineEnrollment'), badge: '32 / 40', tone: 'default' },
             ],
         },
         'student-progress': {
-            title: 'Student Progress',
+            title: t('dashboard.studentProgress'),
             icon: 'bi-person-check',
-            note: 'Progress tracking, assessments, and milestone records will be shown here.',
+            note: t('dashboard.studentProgressNote'),
             rows: [
-                { title: 'Assessments Due', meta: 'By end of this week', badge: '8', tone: 'pending' },
-                { title: 'Completed This Month', meta: 'Progress notes submitted', badge: '14', tone: 'started' },
-                { title: 'Students Advancing Level', meta: 'Tracked progressions', badge: '6', tone: 'started' },
-                { title: 'On Watch List', meta: 'Attendance or form concerns', badge: '3', tone: 'pending' },
+                { title: t('dashboard.assessmentsDue'), meta: t('dashboard.byEndOfThisWeek'), badge: '8', tone: 'pending' },
+                { title: t('dashboard.completedThisMonth'), meta: t('dashboard.progressNotesSubmitted'), badge: '14', tone: 'started' },
+                { title: t('dashboard.studentsAdvancingLevel'), meta: t('dashboard.trackedProgressions'), badge: '6', tone: 'started' },
+                { title: t('dashboard.onWatchList'), meta: t('dashboard.attendanceOrFormConcerns'), badge: '3', tone: 'pending' },
             ],
         },
         earnings: {
-            title: 'Earnings',
+            title: t('dashboard.earnings'),
             icon: 'bi-cash-stack',
-            note: 'Session pay breakdown and earnings reports will be available here.',
+            note: t('dashboard.earningsNote'),
             rows: [
-                { title: 'Earnings This Month', meta: 'Calculated sessions', badge: '$1,840', tone: 'started' },
-                { title: 'Sessions Paid', meta: 'Processed payments', badge: '38', tone: 'started' },
-                { title: 'Pending Payout', meta: 'Awaiting cycle close', badge: '$420', tone: 'pending' },
-                { title: 'Year to Date', meta: 'Total 2026 earnings', badge: '$6,720', tone: 'default' },
+                { title: t('dashboard.earningsThisMonth'), meta: t('dashboard.calculatedSessions'), badge: '$1,840', tone: 'started' },
+                { title: t('dashboard.sessionsPaid'), meta: t('dashboard.processedPayments'), badge: '38', tone: 'started' },
+                { title: t('dashboard.pendingPayout'), meta: t('dashboard.awaitingCycleClose'), badge: '$420', tone: 'pending' },
+                { title: t('dashboard.yearToDate'), meta: t('dashboard.total2026Earnings'), badge: '$6,720', tone: 'default' },
             ],
         },
     },
     member: {
         overview: {
-            title: 'Activity Overview',
+            title: t('dashboard.activityOverview'),
             icon: 'bi-bar-chart',
-            note: 'A full activity summary and trends will be available here in a later phase.',
+            note: t('dashboard.activityOverviewNote'),
             rows: [
-                { title: 'Sessions This Month', meta: 'Attended vs booked', badge: '11 / 14', tone: 'started' },
-                { title: 'Current Streak', meta: 'Consecutive active weeks', badge: '5 weeks', tone: 'started' },
-                { title: 'Next Class', meta: 'Today 18:30 · Evening Yin', badge: 'Today', tone: 'pending' },
-                { title: 'Sessions Left on Goal', meta: 'Weekly target: 3 sessions', badge: '2', tone: 'default' },
+                { title: t('dashboard.sessionsThisMonth'), meta: t('dashboard.attendedVsBooked'), badge: '11 / 14', tone: 'started' },
+                { title: t('dashboard.currentStreak'), meta: t('dashboard.consecutiveActiveWeeks'), badge: t('dashboard.fiveWeeks'), tone: 'started' },
+                { title: t('dashboard.nextClass'), meta: t('dashboard.today1830EveningYin'), badge: t('dashboard.today'), tone: 'pending' },
+                { title: t('dashboard.sessionsLeftOnGoal'), meta: t('dashboard.weeklyTargetThreeSessions'), badge: '2', tone: 'default' },
             ],
         },
         'my-progress': {
-            title: 'My Progress',
+            title: t('dashboard.myProgress'),
             icon: 'bi-graph-up-arrow',
-            note: 'Detailed progress tracking and personal goals will be tracked here.',
+            note: t('dashboard.myProgressNote'),
             rows: [
-                { title: 'Level Progress', meta: 'Beginner → Intermediate', badge: '68%', tone: 'started' },
-                { title: 'Sessions Completed', meta: 'All time', badge: '38', tone: 'started' },
-                { title: 'Monthly Attendance', meta: 'April 2026', badge: '11 / 14', tone: 'started' },
-                { title: 'Assessments Passed', meta: 'Skill checkpoints', badge: '3', tone: 'default' },
+                { title: t('dashboard.levelProgress'), meta: t('dashboard.beginnerToIntermediate'), badge: '68%', tone: 'started' },
+                { title: t('dashboard.sessionsCompleted'), meta: t('dashboard.allTime'), badge: '38', tone: 'started' },
+                { title: t('dashboard.monthlyAttendance'), meta: 'April 2026', badge: '11 / 14', tone: 'started' },
+                { title: t('dashboard.assessmentsPassed'), meta: t('dashboard.skillCheckpoints'), badge: '3', tone: 'default' },
             ],
         },
         attendance: {
-            title: 'Attendance Record',
+            title: t('dashboard.attendanceRecord'),
             icon: 'bi-clipboard-check',
-            note: 'Full attendance history and a calendar view will be shown here.',
+            note: t('dashboard.attendanceRecordNote'),
             rows: [
-                { title: 'Power Core', meta: 'Apr 24 · Daniel Park', badge: 'Attended', tone: 'started' },
-                { title: 'Evening Yin', meta: 'Apr 22 · Ari Gomez', badge: 'Attended', tone: 'started' },
-                { title: 'Mobility Reset', meta: 'Apr 19 · Lina Tran', badge: 'Attended', tone: 'started' },
-                { title: 'Weekend Flow', meta: 'Apr 18 · Mia Chen', badge: 'Attended', tone: 'started' },
+                { title: 'Power Core', meta: 'Apr 24 · Daniel Park', badge: t('dashboard.attended'), tone: 'started' },
+                { title: 'Evening Yin', meta: 'Apr 22 · Ari Gomez', badge: t('dashboard.attended'), tone: 'started' },
+                { title: 'Mobility Reset', meta: 'Apr 19 · Lina Tran', badge: t('dashboard.attended'), tone: 'started' },
+                { title: 'Weekend Flow', meta: 'Apr 18 · Mia Chen', badge: t('dashboard.attended'), tone: 'started' },
             ],
         },
         payments: {
-            title: 'Payment Records',
+            title: t('dashboard.paymentRecords'),
             icon: 'bi-cash-stack',
-            note: 'Invoices, receipts, and full payment history will be accessible here.',
+            note: t('dashboard.paymentRecordsNote'),
             rows: [
-                { title: 'Apr 2026 Membership', meta: 'Premium Flow Annual', badge: 'Paid', tone: 'started' },
+                { title: 'Apr 2026 Membership', meta: 'Premium Flow Annual', badge: t('dashboard.paid'), tone: 'started' },
                 { title: 'Workshop Credit Pack', meta: 'Apr 12, 2026', badge: '$60', tone: 'default' },
-                { title: 'Mar 2026 Membership', meta: 'Auto-charged', badge: 'Paid', tone: 'started' },
-                { title: 'Guest Pass', meta: 'Mar 22, 2026', badge: 'Used', tone: 'default' },
+                { title: 'Mar 2026 Membership', meta: t('dashboard.autoCharged'), badge: t('dashboard.paid'), tone: 'started' },
+                { title: t('dashboard.guestPass'), meta: 'Mar 22, 2026', badge: t('dashboard.used'), tone: 'default' },
             ],
         },
         achievements: {
-            title: 'Achievements',
+            title: t('dashboard.achievements'),
             icon: 'bi-trophy',
-            note: 'Badges, milestones, and rewards will be tracked here in a later phase.',
+            note: t('dashboard.achievementsNote'),
             rows: [
-                { title: '5-Week Streak', meta: 'Attended at least once per week', badge: 'Earned', tone: 'started' },
-                { title: 'First Workshop', meta: 'Attended a wellness workshop', badge: 'Earned', tone: 'started' },
-                { title: '30 Sessions', meta: 'Completed 30 total sessions', badge: 'Earned', tone: 'started' },
-                { title: '10-Week Streak', meta: '10 consecutive weeks', badge: 'Locked', tone: 'default' },
+                { title: t('dashboard.fiveWeekStreak'), meta: t('dashboard.attendedOncePerWeek'), badge: t('dashboard.earned'), tone: 'started' },
+                { title: t('dashboard.firstWorkshop'), meta: t('dashboard.attendedWellnessWorkshop'), badge: t('dashboard.earned'), tone: 'started' },
+                { title: t('dashboard.thirtySessions'), meta: t('dashboard.completedThirtySessions'), badge: t('dashboard.earned'), tone: 'started' },
+                { title: t('dashboard.tenWeekStreak'), meta: t('dashboard.tenConsecutiveWeeks'), badge: t('dashboard.locked'), tone: 'default' },
             ],
         },
     },
-};
+    };
+});
 
-const currentViewConfig = computed(() => viewConfigs[userRole.value]?.[activeView.value] ?? null);
+const currentViewConfig = computed(() => viewConfigs.value[userRole.value]?.[activeView.value] ?? null);
 
-const activities = [
-    {
-        title: 'Handling trial-class schedules for this week',
-        state: 'Not Started',
-        stateClass: 'pending',
-        when: 'Apr 20 11:00',
-        context: 'Downtown Studio',
-    },
-    {
-        title: 'Analyze attendance drop in evening classes',
-        state: 'Planned',
-        stateClass: 'default',
-        when: 'Apr 21',
-        context: 'Weekly review',
-    },
-    {
-        title: 'Send monthly updates to management',
-        state: 'Planned',
-        stateClass: 'default',
-        when: 'Apr 22 16:30',
-        context: 'Head office',
-    },
-    {
-        title: 'Prepare kids yoga class onboarding pack',
-        state: 'Started',
-        stateClass: 'started',
-        when: 'Apr 23',
-        context: 'Uptown Branch',
-    },
-    {
-        title: 'Review teacher substitution requests',
-        state: 'Not Started',
-        stateClass: 'pending',
-        when: 'Apr 24',
-        context: 'Staffing board',
-    },
-];
+const activities = computed(() => {
+    void currentLocale.value;
+    return [
+        {
+            title: 'Handling trial-class schedules for this week',
+            state: t('dashboard.notStarted'),
+            stateClass: 'pending',
+            when: 'Apr 20 11:00',
+            context: 'Downtown Studio',
+        },
+        {
+            title: 'Analyze attendance drop in evening classes',
+            state: t('dashboard.planned'),
+            stateClass: 'default',
+            when: 'Apr 21',
+            context: 'Weekly review',
+        },
+        {
+            title: 'Send monthly updates to management',
+            state: t('dashboard.planned'),
+            stateClass: 'default',
+            when: 'Apr 22 16:30',
+            context: 'Head office',
+        },
+        {
+            title: 'Prepare kids yoga class onboarding pack',
+            state: t('dashboard.started'),
+            stateClass: 'started',
+            when: 'Apr 23',
+            context: 'Uptown Branch',
+        },
+        {
+            title: 'Review teacher substitution requests',
+            state: t('dashboard.notStarted'),
+            stateClass: 'pending',
+            when: 'Apr 24',
+            context: 'Staffing board',
+        },
+    ];
+});
 
-const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const weekDays = computed(() => {
+    void currentLocale.value;
+    return [t('dashboard.sun'), t('dashboard.mon'), t('dashboard.tue'), t('dashboard.wed'), t('dashboard.thu'), t('dashboard.fri'), t('dashboard.sat')];
+});
 
 const calendarCells = [
     { date: '29', muted: true, events: [] },
@@ -398,76 +416,85 @@ const calendarCells = [
     },
 ];
 
-const cases = [
-    { id: 11, title: 'Asking for compensation', priority: 'High', type: 'Problem', customer: 'Lotus Branch' },
-    { id: 7, title: 'Discount issue', priority: 'Normal', type: 'Incident', customer: 'Westside Studio' },
-    { id: 6, title: 'Delivery status check', priority: 'Low', type: 'Question', customer: 'Riverside Branch' },
-    { id: 5, title: 'Product support question', priority: 'Normal', type: 'Question', customer: 'Downtown Studio' },
-];
+const cases = computed(() => {
+    void currentLocale.value;
+    return [
+        { id: 11, title: 'Asking for compensation', priority: t('dashboard.high'), type: t('dashboard.problem'), customer: 'Lotus Branch' },
+        { id: 7, title: 'Discount issue', priority: t('dashboard.normal'), type: t('dashboard.incident'), customer: 'Westside Studio' },
+        { id: 6, title: 'Delivery status check', priority: t('dashboard.low'), type: t('dashboard.question'), customer: 'Riverside Branch' },
+        { id: 5, title: 'Product support question', priority: t('dashboard.normal'), type: t('dashboard.question'), customer: 'Downtown Studio' },
+    ];
+});
 
-const leadSources = [
-    { name: 'Call', value: 20, color: '#5d8fc0' },
-    { name: 'Email', value: 32, color: '#4968a8' },
-    { name: 'Existing Customer', value: 16, color: '#e2bb4e' },
-    { name: 'Public Relations', value: 6, color: '#e47d61' },
-    { name: 'Website', value: 22, color: '#78bb9d' },
-    { name: 'Campaign', value: 4, color: '#8d7bc9' },
-];
+const leadSources = computed(() => {
+    void currentLocale.value;
+    return [
+        { name: 'dashboard.leadCall', value: 20, color: '#5d8fc0' },
+        { name: 'dashboard.leadEmail', value: 32, color: '#4968a8' },
+        { name: 'dashboard.leadExistingCustomer', value: 16, color: '#6a3d8a' },
+        { name: 'dashboard.leadPublicRelations', value: 6, color: '#bd6b4a' },
+        { name: 'dashboard.leadWebsite', value: 22, color: '#4a8c6f' },
+        { name: 'dashboard.leadCampaign', value: 4, color: '#b04a5e' },
+    ];
+});
 
-const dashletCatalog = [
-    {
-        id: 'calendar',
-        title: 'Calendar',
-        type: 'calendar',
-        span: 8,
-        required: true,
-        description: 'Calendar and scheduling overview',
-        previewRows: ['Today timeline', 'Upcoming sessions'],
-    },
-    {
-        id: 'memo',
-        title: 'Memo',
-        type: 'memo',
-        span: 6,
-        description: 'Pin an editable note for your team.',
-        previewRows: ['Meeting highlights', 'Quick reminders'],
-    },
-    {
-        id: 'activities',
-        title: 'My Activities',
-        type: 'activities',
-        span: 4,
-        required: true,
-        description: 'Your timeline and follow-ups.',
-        previewRows: ['Upcoming tasks', 'Late follow-ups'],
-    },
-    {
-        id: 'cases',
-        title: 'My Cases',
-        type: 'cases',
-        span: 6,
-        required: false,
-        description: 'Open cases assigned to your team.',
-        previewRows: ['Pending approvals', 'Escalated tickets'],
-    },
-    {
-        id: 'my-leads',
-        title: 'My Leads',
-        type: 'generic',
-        span: 4,
-        description: 'Lead flow and assignment updates.',
-        previewRows: ['New incoming leads', 'Qualified pipeline'],
-    },
-    {
-        id: 'lead-source',
-        title: 'Opportunities by Lead Source',
-        type: 'lead-source',
-        span: 6,
-        required: false,
-        description: 'Channel share of incoming opportunities.',
-        previewRows: ['Top channels', 'Campaign performance'],
-    },
-];
+const dashletCatalog = computed(() => {
+    void currentLocale.value;
+    return [
+        {
+            id: 'calendar',
+            title: t('dashboard.calendar'),
+            type: 'calendar',
+            span: 8,
+            required: true,
+            description: t('dashboard.calendarDescription'),
+            previewRows: [t('dashboard.todayTimeline'), t('dashboard.upcomingSessions')],
+        },
+        {
+            id: 'memo',
+            title: t('dashboard.memo'),
+            type: 'memo',
+            span: 6,
+            description: t('dashboard.memoDescription'),
+            previewRows: [t('dashboard.meetingHighlights'), t('dashboard.quickReminders')],
+        },
+        {
+            id: 'activities',
+            title: t('dashboard.myActivities'),
+            type: 'activities',
+            span: 4,
+            required: true,
+            description: t('dashboard.activitiesDescription'),
+            previewRows: [t('dashboard.upcomingTasks'), t('dashboard.lateFollowUps')],
+        },
+        {
+            id: 'cases',
+            title: t('dashboard.myCases'),
+            type: 'cases',
+            span: 6,
+            required: false,
+            description: t('dashboard.casesDescription'),
+            previewRows: [t('dashboard.pendingApprovals'), t('dashboard.escalatedTickets')],
+        },
+        {
+            id: 'my-leads',
+            title: t('dashboard.myLeads'),
+            type: 'generic',
+            span: 4,
+            description: t('dashboard.leadsDescription'),
+            previewRows: [t('dashboard.newIncomingLeads'), t('dashboard.qualifiedPipeline')],
+        },
+        {
+            id: 'lead-source',
+            title: t('dashboard.opportunitiesByLeadSource'),
+            type: 'lead-source',
+            span: 6,
+            required: false,
+            description: t('dashboard.leadSourceDescription'),
+            previewRows: [t('dashboard.topChannels'), t('dashboard.campaignPerformance')],
+        },
+    ];
+});
 
 const cloneDashlet = (dashlet) => ({
     ...dashlet,
@@ -475,7 +502,7 @@ const cloneDashlet = (dashlet) => ({
 });
 
 const createDashletFromId = (id) => {
-    const definition = dashletCatalog.find((item) => item.id === id);
+    const definition = dashletCatalog.value.find((item) => item.id === id);
     return definition ? cloneDashlet(definition) : null;
 };
 
@@ -503,10 +530,10 @@ const dashletSearchQuery = ref('');
 const filteredDashletCatalog = computed(() => {
     const query = dashletSearchQuery.value.trim().toLowerCase();
     if (!query) {
-        return dashletCatalog;
+        return dashletCatalog.value;
     }
 
-    return dashletCatalog.filter((item) => item.title.toLowerCase().includes(query));
+    return dashletCatalog.value.filter((item) => item.title.toLowerCase().includes(query));
 });
 
 const dashletClasses = (dashlet) => {
@@ -557,7 +584,7 @@ const toViewKey = (value) => value
     .replace(/^-+|-+$/g, '');
 
 const buildDefaultDashboardTabs = (role) => {
-    const config = roleDashboard[role] ?? roleDashboard.member;
+    const config = roleDashboard.value[role] ?? roleDashboard.value.member;
     const isAdminRole = role === 'admin';
 
     return config.tabs.map((label, index) => {
@@ -602,6 +629,11 @@ watch(userRole, () => {
     if (!isAdmin.value) {
         showAddDashletModal.value = false;
     }
+});
+
+watch(currentLocale, () => {
+    dashlets.value = buildDefaultDashlets();
+    dashboardTabsDraft.value = hydrateDashboardTabs();
 });
 
 const removeDashboardTab = (index) => {
@@ -753,7 +785,7 @@ onBeforeUnmount(() => {
 <template>
     <AppLayout :title="pageTitle">
         <template v-if="isAdmin">
-            <section class="ym-dashlet-grid">
+            <section :key="renderKey" class="ym-dashlet-grid">
                 <Draggable
                     v-model="dashlets"
                     item-key="id"
@@ -854,7 +886,7 @@ onBeforeUnmount(() => {
                                     <div class="ym-legend">
                                         <div v-for="item in leadSources" :key="item.name" class="ym-legend-item">
                                             <span class="ym-legend-dot" :style="{ background: item.color }" />
-                                            <span>{{ item.name }} ({{ item.value }}%)</span>
+                                            <span>{{ $t(item.name) }} ({{ item.value }}%)</span>
                                         </div>
                                     </div>
                                 </div>
@@ -884,148 +916,152 @@ onBeforeUnmount(() => {
 
         <template v-else>
             <div
-                v-if="dashboardNotice"
-                class="ym-info-row"
-                style="border-radius: 0.42rem; margin-bottom: 0.75rem;"
+                :key="renderKey"
             >
-                <i class="bi bi-info-circle ym-info-icon" />
-                <span>{{ dashboardNotice }}</span>
+                <div
+                    v-if="dashboardNotice"
+                    class="ym-info-row"
+                    style="border-radius: 0.42rem; margin-bottom: 0.75rem;"
+                >
+                    <i class="bi bi-info-circle ym-info-icon" />
+                    <span>{{ dashboardNotice }}</span>
+                </div>
+
+                <template v-if="activeView === 'homepage'">
+                    <div class="ym-stat-strip">
+                        <div v-for="metric in dashboardConfig.metrics" :key="metric.label" class="ym-stat">
+                            <p class="ym-stat-label">{{ metric.label }}</p>
+                            <p class="ym-stat-value">{{ metric.value }}</p>
+                            <p class="ym-stat-note">{{ metric.note }}</p>
+                        </div>
+                    </div>
+
+                    <div class="ym-page-cols">
+                        <div class="ym-pane">
+                            <div class="ym-pane-head">
+                                <div class="ym-pane-title-wrap">
+                                    <i :class="['bi', dashboardConfig.primaryPanel.icon, 'ym-pane-icon']" />
+                                    <h2 class="ym-pane-title">{{ dashboardConfig.primaryPanel.title }}</h2>
+                                </div>
+                            </div>
+                            <div class="ym-pane-body">
+                                <div class="ym-row-list">
+                                    <div
+                                        v-for="item in dashboardConfig.primaryPanel.rows"
+                                        :key="item.title"
+                                        class="ym-row"
+                                    >
+                                        <div class="ym-row-main">
+                                            <p class="ym-row-title">{{ item.title }}</p>
+                                            <p class="ym-row-meta">{{ item.meta }}</p>
+                                        </div>
+                                        <div class="ym-row-aside">
+                                            <span :class="badgeClass(item.tone)">{{ item.badge }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ym-pane">
+                            <div class="ym-pane-head">
+                                <div class="ym-pane-title-wrap">
+                                    <i :class="['bi', dashboardConfig.secondaryPanel.icon, 'ym-pane-icon']" />
+                                    <h2 class="ym-pane-title">{{ dashboardConfig.secondaryPanel.title }}</h2>
+                                </div>
+                            </div>
+                            <div class="ym-pane-body">
+                                <div class="ym-row-list">
+                                    <div
+                                        v-for="item in dashboardConfig.secondaryPanel.rows"
+                                        :key="item.title"
+                                        class="ym-row"
+                                    >
+                                        <div class="ym-row-main">
+                                            <p class="ym-row-title">{{ item.title }}</p>
+                                            <p class="ym-row-meta">{{ item.meta }}</p>
+                                        </div>
+                                        <div class="ym-row-aside">
+                                            <span :class="badgeClass(item.tone)">{{ item.badge }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ym-pane mt-4">
+                        <div class="ym-pane-head">
+                            <div class="ym-pane-title-wrap">
+                                <i class="bi bi-calendar-week ym-pane-icon" />
+                                <h2 class="ym-pane-title">{{ dashboardConfig.weeklyPanel.title }}</h2>
+                            </div>
+                        </div>
+                        <div class="ym-pane-body">
+                            <div class="ym-timetable-scroll">
+                                <div class="ym-timetable">
+                                    <div
+                                        v-for="day in dashboardConfig.weeklyPanel.days"
+                                        :key="day.day"
+                                        class="ym-timetable-col"
+                                    >
+                                        <div class="ym-timetable-head">
+                                            <p class="ym-timetable-day">{{ day.day.slice(0, 3) }}</p>
+                                            <p class="ym-timetable-date">{{ day.date }}</p>
+                                        </div>
+                                        <div class="ym-timetable-body">
+                                            <div
+                                                v-for="entry in day.entries"
+                                                :key="entry.title"
+                                                :class="['ym-timetable-slot', { 'ym-timetable-slot--coach': isCoach }]"
+                                            >
+                                                <p class="ym-timetable-time">{{ entry.time }}</p>
+                                                <p class="ym-timetable-name">{{ entry.title }}</p>
+                                                <p class="ym-timetable-sub">{{ entry.meta }}</p>
+                                            </div>
+                                            <div v-if="!day.entries.length" class="ym-timetable-empty">
+                                                {{ dashboardConfig.weeklyPanel.emptyMessage }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <template v-else-if="currentViewConfig">
+                    <div class="ym-pane">
+                        <div class="ym-pane-head">
+                            <div class="ym-pane-title-wrap">
+                                <i :class="['bi', currentViewConfig.icon, 'ym-pane-icon']" />
+                                <h2 class="ym-pane-title">{{ currentViewConfig.title }}</h2>
+                            </div>
+                        </div>
+                        <div class="ym-pane-body">
+                            <div class="ym-row-list">
+                                <div
+                                    v-for="item in currentViewConfig.rows"
+                                    :key="item.title"
+                                    class="ym-row"
+                                >
+                                    <div class="ym-row-main">
+                                        <p class="ym-row-title">{{ item.title }}</p>
+                                        <p class="ym-row-meta">{{ item.meta }}</p>
+                                    </div>
+                                    <div class="ym-row-aside">
+                                        <span :class="badgeClass(item.tone)">{{ item.badge }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ym-info-row">
+                                <i class="bi bi-info-circle ym-info-icon" />
+                                <span>{{ currentViewConfig.note }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </template>
             </div>
-
-            <template v-if="activeView === 'homepage'">
-                <div class="ym-stat-strip">
-                    <div v-for="metric in dashboardConfig.metrics" :key="metric.label" class="ym-stat">
-                        <p class="ym-stat-label">{{ metric.label }}</p>
-                        <p class="ym-stat-value">{{ metric.value }}</p>
-                        <p class="ym-stat-note">{{ metric.note }}</p>
-                    </div>
-                </div>
-
-                <div class="ym-page-cols">
-                    <div class="ym-pane">
-                        <div class="ym-pane-head">
-                            <div class="ym-pane-title-wrap">
-                                <i :class="['bi', dashboardConfig.primaryPanel.icon, 'ym-pane-icon']" />
-                                <h2 class="ym-pane-title">{{ dashboardConfig.primaryPanel.title }}</h2>
-                            </div>
-                        </div>
-                        <div class="ym-pane-body">
-                            <div class="ym-row-list">
-                                <div
-                                    v-for="item in dashboardConfig.primaryPanel.rows"
-                                    :key="item.title"
-                                    class="ym-row"
-                                >
-                                    <div class="ym-row-main">
-                                        <p class="ym-row-title">{{ item.title }}</p>
-                                        <p class="ym-row-meta">{{ item.meta }}</p>
-                                    </div>
-                                    <div class="ym-row-aside">
-                                        <span :class="badgeClass(item.tone)">{{ item.badge }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="ym-pane">
-                        <div class="ym-pane-head">
-                            <div class="ym-pane-title-wrap">
-                                <i :class="['bi', dashboardConfig.secondaryPanel.icon, 'ym-pane-icon']" />
-                                <h2 class="ym-pane-title">{{ dashboardConfig.secondaryPanel.title }}</h2>
-                            </div>
-                        </div>
-                        <div class="ym-pane-body">
-                            <div class="ym-row-list">
-                                <div
-                                    v-for="item in dashboardConfig.secondaryPanel.rows"
-                                    :key="item.title"
-                                    class="ym-row"
-                                >
-                                    <div class="ym-row-main">
-                                        <p class="ym-row-title">{{ item.title }}</p>
-                                        <p class="ym-row-meta">{{ item.meta }}</p>
-                                    </div>
-                                    <div class="ym-row-aside">
-                                        <span :class="badgeClass(item.tone)">{{ item.badge }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="ym-pane mt-4">
-                    <div class="ym-pane-head">
-                        <div class="ym-pane-title-wrap">
-                            <i class="bi bi-calendar-week ym-pane-icon" />
-                            <h2 class="ym-pane-title">{{ dashboardConfig.weeklyPanel.title }}</h2>
-                        </div>
-                    </div>
-                    <div class="ym-pane-body">
-                        <div class="ym-timetable-scroll">
-                            <div class="ym-timetable">
-                                <div
-                                    v-for="day in dashboardConfig.weeklyPanel.days"
-                                    :key="day.day"
-                                    class="ym-timetable-col"
-                                >
-                                    <div class="ym-timetable-head">
-                                        <p class="ym-timetable-day">{{ day.day.slice(0, 3) }}</p>
-                                        <p class="ym-timetable-date">{{ day.date }}</p>
-                                    </div>
-                                    <div class="ym-timetable-body">
-                                        <div
-                                            v-for="entry in day.entries"
-                                            :key="entry.title"
-                                            :class="['ym-timetable-slot', { 'ym-timetable-slot--coach': isCoach }]"
-                                        >
-                                            <p class="ym-timetable-time">{{ entry.time }}</p>
-                                            <p class="ym-timetable-name">{{ entry.title }}</p>
-                                            <p class="ym-timetable-sub">{{ entry.meta }}</p>
-                                        </div>
-                                        <div v-if="!day.entries.length" class="ym-timetable-empty">
-                                            {{ dashboardConfig.weeklyPanel.emptyMessage }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </template>
-
-            <template v-else-if="currentViewConfig">
-                <div class="ym-pane">
-                    <div class="ym-pane-head">
-                        <div class="ym-pane-title-wrap">
-                            <i :class="['bi', currentViewConfig.icon, 'ym-pane-icon']" />
-                            <h2 class="ym-pane-title">{{ currentViewConfig.title }}</h2>
-                        </div>
-                    </div>
-                    <div class="ym-pane-body">
-                        <div class="ym-row-list">
-                            <div
-                                v-for="item in currentViewConfig.rows"
-                                :key="item.title"
-                                class="ym-row"
-                            >
-                                <div class="ym-row-main">
-                                    <p class="ym-row-title">{{ item.title }}</p>
-                                    <p class="ym-row-meta">{{ item.meta }}</p>
-                                </div>
-                                <div class="ym-row-aside">
-                                    <span :class="badgeClass(item.tone)">{{ item.badge }}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="ym-info-row">
-                            <i class="bi bi-info-circle ym-info-icon" />
-                            <span>{{ currentViewConfig.note }}</span>
-                        </div>
-                    </div>
-                </div>
-            </template>
         </template>
 
         <Modal :show="showEditDashboardModal" title="Edit Dashboard Tabs" @close="showEditDashboardModal = false">

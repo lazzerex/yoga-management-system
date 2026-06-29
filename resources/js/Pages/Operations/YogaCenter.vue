@@ -16,22 +16,22 @@ const notices = [
 </script>
 
 <template>
-    <AppLayout title="Yoga Center Management">
+    <AppLayout :title="$t('operations.yogaCenter')">
         <div class="ym-stat-strip">
             <div class="ym-stat">
-                <p class="ym-stat-label">Active Students</p>
+                <p class="ym-stat-label">{{ $t('operations.activeStudents') }}</p>
                 <p class="ym-stat-value">486</p>
-                <p class="ym-stat-note">+18 this month</p>
+                <p class="ym-stat-note">+18 {{ $t('operations.thisMonth') }}</p>
             </div>
             <div class="ym-stat">
-                <p class="ym-stat-label">Classes Today</p>
+                <p class="ym-stat-label">{{ $t('operations.classesToday') }}</p>
                 <p class="ym-stat-value">34</p>
-                <p class="ym-stat-note">5 fully booked</p>
+                <p class="ym-stat-note">5 {{ $t('common.noData') }}</p>
             </div>
             <div class="ym-stat">
-                <p class="ym-stat-label">Active Teachers</p>
+                <p class="ym-stat-label">{{ $t('operations.activeTeachers') }}</p>
                 <p class="ym-stat-value">27</p>
-                <p class="ym-stat-note">2 substitutes assigned</p>
+                <p class="ym-stat-note">2 {{ $t('common.noData') }}</p>
             </div>
         </div>
 
@@ -40,7 +40,7 @@ const notices = [
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
                         <i class="bi bi-building ym-pane-icon" />
-                        <h2 class="ym-pane-title">Branch Performance</h2>
+                        <h2 class="ym-pane-title">{{ $t('operations.branchPerformance') }}</h2>
                     </div>
                 </div>
                 <div class="ym-pane-body">
@@ -51,7 +51,7 @@ const notices = [
                                 <p class="ym-row-meta">{{ branch.address }}</p>
                             </div>
                             <div class="ym-row-aside">
-                                <span class="ym-chip">{{ branch.classes }} classes</span>
+                                <span class="ym-chip">{{ branch.classes }} {{ $t('operations.classes') }}</span>
                             </div>
                         </div>
                     </div>
@@ -62,7 +62,7 @@ const notices = [
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
                         <i class="bi bi-exclamation-triangle ym-pane-icon" />
-                        <h2 class="ym-pane-title">Facility Notices</h2>
+                        <h2 class="ym-pane-title">{{ $t('operations.facilityNotices') }}</h2>
                     </div>
                 </div>
                 <div class="ym-pane-body">
@@ -79,7 +79,7 @@ const notices = [
                     </div>
                     <div class="ym-info-row">
                         <i class="bi bi-info-circle ym-info-icon" />
-                        <span>This page will be wired to live center data in a later phase.</span>
+                        <span>{{ $t('operations.placeholder') }}</span>
                     </div>
                 </div>
             </div>

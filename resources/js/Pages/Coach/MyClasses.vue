@@ -1,4 +1,5 @@
 <script setup>
+import { trans as t } from 'laravel-vue-i18n';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 const classes = [
@@ -10,29 +11,29 @@ const classes = [
 ];
 
 const insights = [
-    { title: 'Power Core is near full capacity', meta: 'Riverside · Tue/Thu 07:00', label: 'High Demand' },
-    { title: 'Prenatal Flow attendance improving', meta: 'Westside · +11% this month', label: 'Trend Up' },
-    { title: 'Weekend Flow has repeat bookings', meta: 'Uptown · retention 82%', label: 'Strong' },
+    { title: 'Power Core is near full capacity', meta: 'Riverside · Tue/Thu 07:00', label: t('coach.highDemand') },
+    { title: 'Prenatal Flow attendance improving', meta: 'Westside · +11% this month', label: t('coach.trendUp') },
+    { title: 'Weekend Flow has repeat bookings', meta: 'Uptown · retention 82%', label: t('coach.strong') },
 ];
 </script>
 
 <template>
-    <AppLayout title="My Classes">
+    <AppLayout :title="$t('coach.myClasses')">
         <div class="ym-stat-strip">
             <div class="ym-stat">
-                <p class="ym-stat-label">Classes This Week</p>
+                <p class="ym-stat-label">{{ $t('coach.classesThisWeek') }}</p>
                 <p class="ym-stat-value">14</p>
-                <p class="ym-stat-note">Across 3 branches</p>
+                <p class="ym-stat-note">{{ $t('coach.acrossBranches', { count: 3 }) }}</p>
             </div>
             <div class="ym-stat">
-                <p class="ym-stat-label">Total Students</p>
+                <p class="ym-stat-label">{{ $t('coach.totalStudents') }}</p>
                 <p class="ym-stat-value">182</p>
-                <p class="ym-stat-note">Active class participants</p>
+                <p class="ym-stat-note">{{ $t('coach.activeParticipants') }}</p>
             </div>
             <div class="ym-stat">
-                <p class="ym-stat-label">Average Fill Rate</p>
+                <p class="ym-stat-label">{{ $t('coach.avgFillRate') }}</p>
                 <p class="ym-stat-value">87%</p>
-                <p class="ym-stat-note">+4% from last week</p>
+                <p class="ym-stat-note">{{ $t('coach.vsLastWeek', { change: '+4%' }) }}</p>
             </div>
         </div>
 
@@ -41,7 +42,7 @@ const insights = [
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
                         <i class="bi bi-easel ym-pane-icon" />
-                        <h2 class="ym-pane-title">Class Roster Summary</h2>
+                        <h2 class="ym-pane-title">{{ $t('coach.classRosterSummary') }}</h2>
                     </div>
                 </div>
                 <div class="ym-pane-body">
@@ -49,10 +50,10 @@ const insights = [
                         <table class="ym-table">
                             <thead>
                                 <tr>
-                                    <th class="ym-th">Class</th>
-                                    <th class="ym-th">Branch</th>
-                                    <th class="ym-th">Students</th>
-                                    <th class="ym-th">Waitlist</th>
+                                    <th class="ym-th">{{ $t('operations.class') }}</th>
+                                    <th class="ym-th">{{ $t('operations.branch') }}</th>
+                                    <th class="ym-th">{{ $t('operations.students') }}</th>
+                                    <th class="ym-th">{{ $t('coach.waitlist') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -72,7 +73,7 @@ const insights = [
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
                         <i class="bi bi-lightbulb ym-pane-icon" />
-                        <h2 class="ym-pane-title">Class Insights</h2>
+                        <h2 class="ym-pane-title">{{ $t('coach.classInsights') }}</h2>
                     </div>
                 </div>
                 <div class="ym-pane-body">

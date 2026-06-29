@@ -16,22 +16,22 @@ const assignments = [
 </script>
 
 <template>
-    <AppLayout title="Students, Classes & Teachers">
+    <AppLayout :title="$t('operations.academy')">
         <div class="ym-stat-strip">
             <div class="ym-stat">
-                <p class="ym-stat-label">Students</p>
+                <p class="ym-stat-label">{{ $t('operations.students') }}</p>
                 <p class="ym-stat-value">486</p>
-                <p class="ym-stat-note">72 new this quarter</p>
+                <p class="ym-stat-note">72 {{ $t('operations.thisQuarter') }}</p>
             </div>
             <div class="ym-stat">
-                <p class="ym-stat-label">Class Templates</p>
+                <p class="ym-stat-label">{{ $t('operations.classTemplates') }}</p>
                 <p class="ym-stat-value">18</p>
-                <p class="ym-stat-note">Beginner to advanced</p>
+                <p class="ym-stat-note">{{ $t('operations.beginnerToAdvanced') }}</p>
             </div>
             <div class="ym-stat">
-                <p class="ym-stat-label">Teachers</p>
+                <p class="ym-stat-label">{{ $t('operations.teachers') }}</p>
                 <p class="ym-stat-value">27</p>
-                <p class="ym-stat-note">21 active this week</p>
+                <p class="ym-stat-note">21 {{ $t('operations.activeThisWeek') }}</p>
             </div>
         </div>
 
@@ -40,7 +40,7 @@ const assignments = [
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
                         <i class="bi bi-people ym-pane-icon" />
-                        <h2 class="ym-pane-title">Class Schedule</h2>
+                        <h2 class="ym-pane-title">{{ $t('operations.classSchedule') }}</h2>
                     </div>
                 </div>
                 <div class="ym-pane-body">
@@ -48,10 +48,10 @@ const assignments = [
                         <table class="ym-table">
                             <thead>
                                 <tr>
-                                    <th class="ym-th">Class</th>
-                                    <th class="ym-th">Teacher</th>
-                                    <th class="ym-th">Branch</th>
-                                    <th class="ym-th">Capacity</th>
+                                    <th class="ym-th">{{ $t('operations.class') }}</th>
+                                    <th class="ym-th">{{ $t('operations.teacher') }}</th>
+                                    <th class="ym-th">{{ $t('operations.branch') }}</th>
+                                    <th class="ym-th">{{ $t('operations.capacity') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -71,7 +71,7 @@ const assignments = [
                 <div class="ym-pane-head">
                     <div class="ym-pane-title-wrap">
                         <i class="bi bi-person-check ym-pane-icon" />
-                        <h2 class="ym-pane-title">Assignment Queue</h2>
+                        <h2 class="ym-pane-title">{{ $t('operations.assignmentQueue') }}</h2>
                     </div>
                 </div>
                 <div class="ym-pane-body">
@@ -88,7 +88,7 @@ const assignments = [
                     </div>
                     <div class="ym-info-row">
                         <i class="bi bi-info-circle ym-info-icon" />
-                        <span>Assignment actions will be supported in a later phase.</span>
+                        <span>{{ $t('operations.academyPlaceholder') }}</span>
                     </div>
                 </div>
             </div>
