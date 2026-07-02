@@ -15,7 +15,7 @@ defineProps({
 const page = usePage();
 
 const toggleLocale = async () => {
-    const newLocale = t('common.switchLang').includes('Vietnamese') ? 'vi' : 'en';
+    const newLocale = currentLocale.value === 'en' ? 'vi' : 'en';
     await loadLanguageAsync(newLocale);
     localStorage.setItem('locale', newLocale);
     document.cookie = `locale=${newLocale}; path=/; SameSite=Lax`;
@@ -96,9 +96,9 @@ const topMenuItems = ref([]);
 const coachMemberView = ref('homepage');
 
 const notifications = [
-    { title: '3 new trial requests from website leads', time: '2m ago' },
-    { title: 'Teacher attendance for today was submitted', time: '14m ago' },
-    { title: 'April tuition reconciliation is almost due', time: '1h ago' },
+    { titleKey: 'layout.notifications.leads', time: '2m ago' },
+    { titleKey: 'layout.notifications.attendance', time: '14m ago' },
+    { titleKey: 'layout.notifications.tuition', time: '1h ago' },
 ];
 
 const quickActions = computed(() => [
@@ -204,17 +204,17 @@ const handleTopTabClick = (item) => {
 const sidebarGroups = computed(() => {
     const groups = [
         {
-            label: 'Main',
+            label: t('layout.sidebar.main'),
             items: [
                 {
-                    label: 'Home',
+                    label: t('layout.sidebar.home'),
                     href: route('cms.dashboard'),
                     activePaths: [route('cms.dashboard', undefined, false)],
                     icon: 'bi-house',
                     iconColor: '#4f8bc8',
                 },
                 {
-                    label: 'My Profile',
+                    label: t('layout.sidebar.myProfile'),
                     href: route('cms.profile.show'),
                     activePaths: [route('cms.profile.show', undefined, false)],
                     icon: 'bi-person',
@@ -223,17 +223,17 @@ const sidebarGroups = computed(() => {
             ],
         },
         {
-            label: 'Operations',
+            label: t('layout.sidebar.operations'),
             items: [
                 {
-                    label: 'Centers',
+                    label: t('layout.sidebar.centers'),
                     href: route('operations.yoga-center'),
                     activePaths: [route('operations.yoga-center', undefined, false)],
                     icon: 'bi-building',
                     iconColor: '#d99a34',
                 },
                 {
-                    label: 'Classes',
+                    label: t('layout.sidebar.classes'),
                     href: route('operations.academy'),
                     activePaths: [route('operations.academy', undefined, false)],
                     icon: 'bi-people',
@@ -246,17 +246,17 @@ const sidebarGroups = computed(() => {
     if (canAccessTeacherOperations.value) {
         groups[1].items.push(
             {
-                label: 'Attendance',
+                label: t('layout.sidebar.attendance'),
                 href: route('operations.teacher-attendance'),
                 activePaths: [route('operations.teacher-attendance', undefined, false)],
                 icon: 'bi-clipboard-check',
                 iconColor: '#4f81cf',
             },
             {
-                label: 'Plans',
+                label: t('layout.sidebar.plans'),
                 href: route('operations.lesson-planning'),
                 activePaths: [route('operations.lesson-planning', undefined, false)],
-                badge: 'Approval',
+                badge: t('layout.sidebar.approval'),
                 icon: 'bi-calendar-check',
                 iconColor: '#6a78c8',
             },
@@ -265,7 +265,7 @@ const sidebarGroups = computed(() => {
 
     if (canAccessFees.value) {
         groups[1].items.push({
-            label: 'Tuition',
+            label: t('layout.sidebar.tuition'),
             href: route('operations.tuition-fees'),
             activePaths: [route('operations.tuition-fees', undefined, false)],
             icon: 'bi-cash-stack',
@@ -275,7 +275,7 @@ const sidebarGroups = computed(() => {
 
     if (canAccessFileLibrary.value) {
         groups[1].items.push({
-            label: 'Files',
+            label: t('layout.sidebar.files'),
             href: route('operations.file-library'),
             activePaths: [route('operations.file-library', undefined, false)],
             icon: 'bi-folder2-open',
@@ -285,24 +285,24 @@ const sidebarGroups = computed(() => {
 
     if (isMember.value) {
         groups.push({
-            label: 'Member',
+            label: t('layout.sidebar.member'),
             items: [
                 {
-                    label: 'My Membership',
+                    label: t('layout.sidebar.myMembership'),
                     href: route('member.my-membership'),
                     activePaths: [route('member.my-membership', undefined, false)],
                     icon: 'bi-cash-stack',
                     iconColor: '#3f8f6f',
                 },
                 {
-                    label: 'My Classes',
+                    label: t('layout.sidebar.myClasses'),
                     href: route('member.my-classes'),
                     activePaths: [route('member.my-classes', undefined, false)],
                     icon: 'bi-people',
                     iconColor: '#3f7ec4',
                 },
                 {
-                    label: 'My Schedule',
+                    label: t('layout.sidebar.mySchedule'),
                     href: route('member.my-schedule'),
                     activePaths: [route('member.my-schedule', undefined, false)],
                     icon: 'bi-calendar-check',
@@ -314,24 +314,24 @@ const sidebarGroups = computed(() => {
 
     if (isCoach.value) {
         groups.push({
-            label: 'Coach',
+            label: t('layout.sidebar.coach'),
             items: [
                 {
-                    label: 'My Classes',
+                    label: t('layout.sidebar.myClasses'),
                     href: route('coach.my-classes'),
                     activePaths: [route('coach.my-classes', undefined, false)],
                     icon: 'bi-people',
                     iconColor: '#3f7ec4',
                 },
                 {
-                    label: 'My Students',
+                    label: t('layout.sidebar.myStudents'),
                     href: route('coach.my-students'),
                     activePaths: [route('coach.my-students', undefined, false)],
                     icon: 'bi-clipboard-check',
                     iconColor: '#4f81cf',
                 },
                 {
-                    label: 'Teaching Schedule',
+                    label: t('layout.sidebar.teachingSchedule'),
                     href: route('coach.my-teaching-schedule'),
                     activePaths: [route('coach.my-teaching-schedule', undefined, false)],
                     icon: 'bi-calendar-check',
@@ -343,17 +343,17 @@ const sidebarGroups = computed(() => {
 
     if (isAdmin.value) {
         groups.push({
-            label: 'Admin',
+            label: t('layout.sidebar.admin'),
             items: [
                 {
-                    label: 'Users',
+                    label: t('layout.sidebar.users'),
                     href: route('admin.users.index'),
                     activePaths: [route('admin.users.index', undefined, false)],
                     icon: 'bi-shield-lock',
                     iconColor: '#5f77cf',
                 },
                 {
-                    label: 'Logs',
+                    label: t('layout.sidebar.logs'),
                     href: route('admin.login-logs.index'),
                     activePaths: [route('admin.login-logs.index', undefined, false)],
                     icon: 'bi-clock-history',
@@ -482,8 +482,8 @@ const logout = () => {
             <div class="ym-brand">
                 <p class="ym-brand-mark">YM</p>
                 <div>
-                    <p class="ym-brand-title">Yoga CRM</p>
-                    <p class="ym-brand-subtitle">Management workspace</p>
+                    <p class="ym-brand-title">{{ $t('layout.brand.title') }}</p>
+                    <p class="ym-brand-subtitle">{{ $t('layout.brand.subtitle') }}</p>
                 </div>
             </div>
 
@@ -544,7 +544,7 @@ const logout = () => {
                             :title="$t('common.switchLang')"
                             @click="toggleLocale"
                         >
-                            <span class="ym-lang-label">{{ $t('common.switchLang').includes('Vietnamese') ? 'VI' : 'EN' }}</span>
+                            <span class="ym-lang-label">{{ currentLocale === 'en' ? 'EN' : 'VI' }}</span>
                         </button>
 
                         <div ref="notificationsRef" class="ym-header-menu-wrap">
@@ -571,10 +571,10 @@ const logout = () => {
                                 <ul class="ym-notification-list">
                                     <li
                                         v-for="item in notifications"
-                                        :key="item.title"
+                                        :key="item.titleKey"
                                         class="ym-notification-item"
                                     >
-                                        <p class="ym-notification-title">{{ item.title }}</p>
+                                        <p class="ym-notification-title">{{ $t(item.titleKey) }}</p>
                                         <p class="ym-notification-time">{{ item.time }}</p>
                                     </li>
                                 </ul>
