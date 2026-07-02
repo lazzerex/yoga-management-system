@@ -1,18 +1,20 @@
 <script setup>
+import { computed } from 'vue';
+import { trans as t } from 'laravel-vue-i18n';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
-const benefits = [
-    { title: $t('member.unlimitedOrQuantity', { value: 'Unlimited Studio Classes' }), meta: 'All branches · Any level', limit: 'Unlimited' },
-    { title: $t('member.unlimitedOrQuantity', { value: 'Wellness Workshop Credits' }), meta: 'Nutrition + mobility workshops', limit: '6 / year' },
-    { title: $t('member.unlimitedOrQuantity', { value: '1:1 Coach Consultations' }), meta: 'Goal and posture check-in', limit: '4 / year' },
-    { title: $t('member.unlimitedOrQuantity', { value: 'Guest Access' }), meta: 'Invite a friend to selected sessions', limit: '4 left' },
-];
+const benefits = computed(() => [
+    { title: t('member.unlimitedOrQuantity', { value: t('member.unlimitedStudioClasses') }), meta: t('member.allBranchesAnyLevel'), limit: t('member.unlimited') },
+    { title: t('member.unlimitedOrQuantity', { value: t('member.wellnessWorkshopCredits') }), meta: t('member.nutritionMobilityWorkshops'), limit: t('member.sixPerYear') },
+    { title: t('member.unlimitedOrQuantity', { value: t('member.coachConsultations') }), meta: t('member.goalAndPostureCheckin'), limit: t('member.fourPerYear') },
+    { title: t('member.unlimitedOrQuantity', { value: t('member.guestAccess') }), meta: t('member.inviteFriendSessions'), limit: t('member.fourLeft') },
+]);
 
-const renewalTimeline = [
-    { date: 'Dec 02, 2026', note: 'Renewal reminder email', status: $t('common.noData') },
-    { date: 'Dec 20, 2026', note: 'Payment method check window', status: $t('common.loading') },
-    { date: 'Jan 05, 2027', note: 'Plan renews automatically', status: $t('common.save') },
-];
+const renewalTimeline = computed(() => [
+    { date: 'Dec 02, 2026', note: t('member.renewalReminderEmail'), status: t('member.pending') },
+    { date: 'Dec 20, 2026', note: t('member.paymentMethodCheckWindow'), status: t('member.scheduled') },
+    { date: 'Jan 05, 2027', note: t('member.planRenewsAutomatically'), status: t('member.confirmed') },
+]);
 </script>
 
 <template>

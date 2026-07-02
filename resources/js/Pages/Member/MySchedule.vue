@@ -1,4 +1,6 @@
 <script setup>
+import { computed } from 'vue';
+import { trans as t } from 'laravel-vue-i18n';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 const weeklySchedule = [
@@ -59,11 +61,11 @@ const highlights = [
     { title: 'Monthly mobility assessment', meta: 'Sat · Uptown', type: 'Assessment' },
 ];
 
-const weeklyFocus = [
-    { label: $t('member.totalSessionsPlanned'), note: $t('member.bookedAndConfirmed'), value: '7' },
-    { label: $t('member.intensityBalance'), note: $t('member.highVsRecovery'), value: '3 : 4' },
-    { label: $t('member.currentStreak'), note: $t('member.consecutiveWeeks'), value: '5 weeks' },
-];
+const weeklyFocus = computed(() => [
+    { label: t('member.totalSessionsPlanned'), note: t('member.bookedAndConfirmed'), value: '7' },
+    { label: t('member.intensityBalance'), note: t('member.highVsRecovery'), value: '3 : 4' },
+    { label: t('member.currentStreak'), note: t('member.consecutiveWeeks'), value: t('member.fiveWeeks') },
+]);
 </script>
 
 <template>
