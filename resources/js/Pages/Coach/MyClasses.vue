@@ -1,4 +1,5 @@
 <script setup>
+import { computed } from 'vue';
 import { trans as t } from 'laravel-vue-i18n';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
@@ -10,11 +11,11 @@ const classes = [
     { name: 'Breathwork Lab', branch: 'Online', students: 32, waitlist: 5 },
 ];
 
-const insights = [
+const insights = computed(() => [
     { title: 'Power Core is near full capacity', meta: 'Riverside · Tue/Thu 07:00', label: t('coach.highDemand') },
     { title: 'Prenatal Flow attendance improving', meta: 'Westside · +11% this month', label: t('coach.trendUp') },
     { title: 'Weekend Flow has repeat bookings', meta: 'Uptown · retention 82%', label: t('coach.strong') },
-];
+]);
 </script>
 
 <template>

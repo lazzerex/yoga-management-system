@@ -1,4 +1,5 @@
 <script setup>
+import { computed } from 'vue';
 import { trans as t } from 'laravel-vue-i18n';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
@@ -55,17 +56,17 @@ const teachingSchedule = [
     },
 ];
 
-const todayHighlights = [
+const todayHighlights = computed(() => [
     { title: 'Evening Yin', meta: '18:30 · Downtown · 21 students', badge: t('coach.today') },
     { title: 'Post-class notes due', meta: 'Submit by 21:00 for attendance sync', badge: 'Reminder' },
     { title: 'Substitute request', meta: 'Backup coach for Saturday workshop', badge: t('coach.followUp') },
-];
+]);
 
-const teachingLoad = [
+const teachingLoad = computed(() => [
     { label: t('coach.classesThisWeek'), note: t('coach.weeklySchedule'), value: '14' },
     { label: t('coach.totalHours'), note: t('coach.acrossBranches', { count: 4 }), value: t('coach.hours', { count: 18 }) },
     { label: t('coach.totalStudents'), note: t('coach.eventsThisWeek'), value: '182' },
-];
+]);
 </script>
 
 <template>
