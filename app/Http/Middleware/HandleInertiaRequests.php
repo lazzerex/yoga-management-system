@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\Menu\MenuRegistry;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -51,6 +52,7 @@ class HandleInertiaRequests extends Middleware
                 'success' => $request->session()->get('success'),
                 'error' => $request->session()->get('error'),
             ],
+            'menu' => fn () => app(MenuRegistry::class)->forRole($user?->role),
         ]);
     }
 }
