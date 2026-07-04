@@ -118,7 +118,7 @@ const roleDashboard = computed(() => {
         headline: t('dashboard.membershipAndSessionOverview'),
         subtitle: t('dashboard.memberSubtitle'),
         metrics: [
-            { label: t('dashboard.membershipStatus'), value: t('dashboard.active'), note: 'Premium Flow Annual' },
+            { label: t('dashboard.membershipStatus'), value: t('dashboard.active'), note: t('member.planName') },
             { label: t('dashboard.sessionsThisWeek'), value: '3 / 5', note: t('dashboard.sessionsRemainingNote') },
             { label: t('dashboard.nextSession'), value: t('dashboard.today1830'), note: t('dashboard.eveningYinDowntown') },
         ],
@@ -126,7 +126,7 @@ const roleDashboard = computed(() => {
             title: t('dashboard.membershipStatus'),
             icon: 'bi-person-vcard',
             rows: [
-                { title: t('dashboard.planType'), meta: 'Premium Flow Annual', badge: t('dashboard.premium'), tone: 'started' },
+                { title: t('dashboard.planType'), meta: t('member.planName'), badge: t('dashboard.premium'), tone: 'started' },
                 { title: t('dashboard.renewalDate'), meta: 'Jan 5, 2027', badge: t('dashboard.auto'), tone: 'default' },
                 { title: t('dashboard.guestPasses'), meta: t('dashboard.availableThisCycle'), badge: t('dashboard.fourLeft'), tone: 'default' },
                 { title: t('dashboard.supportTickets'), meta: t('dashboard.membershipRequests'), badge: t('dashboard.zeroOpen'), tone: 'started' },
@@ -643,13 +643,13 @@ const removeDashboardTab = (index) => {
 
 const addDashboardTab = () => {
     if (dashboardTabsDraft.value.length >= maxTopTabs) {
-        dashboardTabError.value = `Top navigation is limited to ${maxTopTabs} tabs.`;
+        dashboardTabError.value = t('dashboard.tabLimitError', { max: maxTopTabs });
         return;
     }
 
     const label = newDashboardTabLabel.value.trim();
     if (!label) {
-        dashboardTabError.value = 'Enter a tab name before adding.';
+        dashboardTabError.value = t('dashboard.enterTabNameError');
         return;
     }
 
@@ -688,20 +688,20 @@ const saveDashboardTabs = () => {
     dashboardTabError.value = '';
 
     if (dashboardTabsDraft.value.length !== maxTopTabs) {
-        dashboardTabError.value = `Top navigation needs exactly ${maxTopTabs} tabs.`;
+        dashboardTabError.value = t('dashboard.tabCountError', { max: maxTopTabs });
         return;
     }
 
     for (let index = 0; index < dashboardTabsDraft.value.length; index += 1) {
         const currentLabel = dashboardTabsDraft.value[index].label.trim();
         if (!currentLabel) {
-            dashboardTabError.value = 'Every tab needs a label before saving.';
+            dashboardTabError.value = t('dashboard.tabLabelRequiredError');
             return;
         }
     }
 
     emitDashboardTabsUpdated(normalizeDashboardTabs(dashboardTabsDraft.value));
-    dashboardNotice.value = 'Dashboard tabs updated for this session.';
+    dashboardNotice.value = t('dashboard.tabsUpdatedNotice');
     showEditDashboardModal.value = false;
 };
 
@@ -739,7 +739,7 @@ const handleDashboardAction = (event) => {
         if (isAdmin.value) {
             showAddDashletModal.value = true;
         } else {
-            dashboardNotice.value = 'Dashlet management is available on the admin dashboard.';
+            dashboardNotice.value = t('dashboard.dashletAdminOnly');
         }
         return;
     }
@@ -814,7 +814,7 @@ onBeforeUnmount(() => {
                                     type="button"
                                     class="ym-dashlet-remove"
                                     :disabled="lockDashboard"
-                                    aria-label="Remove dashlet"
+                                    :aria-label="$t('dashboard.removeDashlet')"
                                     @click="removeDashlet(dashlet.id)"
                                 >
                                     <i class="bi bi-x-lg" />
@@ -838,7 +838,7 @@ onBeforeUnmount(() => {
                                         <span>{{ activity.context }}</span>
                                     </p>
                                 </article>
-                                <a href="#" class="ym-show-more">Show more</a>
+                                <a href="#" class="ym-show-more">{{ $t('dashboard.showMore') }}</a>
                             </div>
 
                             <div v-else-if="dashlet.type === 'calendar'">
@@ -882,7 +882,7 @@ onBeforeUnmount(() => {
 
                             <div v-else-if="dashlet.type === 'lead-source'" class="ym-section">
                                 <div class="ym-pie-wrap">
-                                    <div class="ym-pie" role="img" aria-label="Lead source distribution chart" />
+                                    <div class="ym-pie" role="img" :aria-label="$t('dashboard.opportunitiesByLeadSource')" />
                                     <div class="ym-legend">
                                         <div v-for="item in leadSources" :key="item.name" class="ym-legend-item">
                                             <span class="ym-legend-dot" :style="{ background: item.color }" />
@@ -893,9 +893,9 @@ onBeforeUnmount(() => {
                             </div>
 
                             <div v-else-if="dashlet.type === 'memo'" class="ym-section">
-                                <p class="ym-card-note">Keep short reminders visible to your team directly from this dashboard card.</p>
+                                <p class="ym-card-note">{{ $t('dashboard.memoHint') }}</p>
                                 <div class="ym-note-banner">
-                                    Team reminder: bring April referral stats to Monday leadership sync.
+                                    {{ $t('dashboard.memoContent') }}
                                 </div>
                             </div>
 
@@ -904,7 +904,7 @@ onBeforeUnmount(() => {
                                 <div class="ym-list">
                                     <div v-for="item in dashlet.previewRows" :key="item" class="ym-list-item">
                                         <span>{{ item }}</span>
-                                        <span class="ym-list-meta">Preview</span>
+                                        <span class="ym-list-meta">{{ $t('dashboard.preview') }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -1064,16 +1064,16 @@ onBeforeUnmount(() => {
             </div>
         </template>
 
-        <Modal :show="showEditDashboardModal" title="Edit Dashboard Tabs" @close="showEditDashboardModal = false">
+        <Modal :show="showEditDashboardModal" :title="$t('dashboard.editDashboardTabs')" @close="showEditDashboardModal = false">
             <div class="ym-dashboard-modal-actions">
-                <button type="button" class="ym-btn-sm" @click="saveDashboardTabs">Save</button>
-                <button type="button" class="ym-btn-outline" @click="showEditDashboardModal = false">Cancel</button>
+                <button type="button" class="ym-btn-sm" @click="saveDashboardTabs">{{ $t('common.save') }}</button>
+                <button type="button" class="ym-btn-outline" @click="showEditDashboardModal = false">{{ $t('common.cancel') }}</button>
             </div>
 
             <p v-if="dashboardTabError" class="ym-field-error">{{ dashboardTabError }}</p>
 
             <p class="ym-card-note">
-                Configure up to six dashboard tabs shown in the top navigation for this session.
+                {{ $t('dashboard.configureTabsNote') }}
             </p>
 
             <div class="ym-tab-editor-list mt-3">
@@ -1097,7 +1097,7 @@ onBeforeUnmount(() => {
                         v-model="newDashboardTabLabel"
                         type="text"
                         class="ym-input"
-                        placeholder="Type and press enter"
+                        :placeholder="$t('dashboard.typeAndPressEnter')"
                         @keydown.enter.prevent="addDashboardTab"
                     />
                     <button type="button" class="ym-tab-add" :disabled="dashboardTabsDraft.length >= maxTopTabs" @click="addDashboardTab">
@@ -1107,7 +1107,7 @@ onBeforeUnmount(() => {
             </div>
 
             <label v-if="isAdmin" class="ym-lock-toggle mt-3">
-                <span>Lock Dashboard</span>
+                <span>{{ $t('dashboard.lockDashboard') }}</span>
                 <input v-model="lockDashboard" type="checkbox" />
             </label>
         </Modal>
@@ -1115,17 +1115,17 @@ onBeforeUnmount(() => {
         <Modal
             v-if="isAdmin"
             :show="showAddDashletModal"
-            title="Add Dashlet"
+            :title="$t('dashboard.addDashlet')"
             @close="showAddDashletModal = false"
         >
-            <label class="ym-search-wrap ym-dashboard-modal-search" aria-label="Search dashlets">
+            <label class="ym-search-wrap ym-dashboard-modal-search" :aria-label="$t('common.search')">
                 <i class="bi bi-search ym-search-icon" />
                 <input
                     v-model="dashletSearchQuery"
                     type="search"
                     class="ym-search"
-                    placeholder="Search"
-                    aria-label="Search dashlets"
+                    :placeholder="$t('common.search')"
+                    :aria-label="$t('common.search')"
                 />
             </label>
 
@@ -1139,7 +1139,7 @@ onBeforeUnmount(() => {
                     @click="addDashlet(item)"
                 >
                     <span>{{ item.title }}</span>
-                    <small>{{ isDashletActive(item.id) ? 'Added' : 'Add' }}</small>
+                    <small>{{ isDashletActive(item.id) ? $t('dashboard.added') : $t('dashboard.add') }}</small>
                 </button>
             </div>
         </Modal>
