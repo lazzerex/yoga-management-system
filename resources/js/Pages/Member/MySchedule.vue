@@ -55,11 +55,11 @@ const weeklySchedule = [
     },
 ];
 
-const highlights = [
-    { title: 'Form correction checkpoint', meta: 'Tue · Power Core', type: 'Coach Note' },
-    { title: 'Breathwork mini workshop', meta: 'Thu · Online room B', type: 'Workshop' },
-    { title: 'Monthly mobility assessment', meta: 'Sat · Uptown', type: 'Assessment' },
-];
+const highlights = computed(() => [
+    { title: t('member.scheduleHighlightForm'), meta: t('member.scheduleHighlightFormMeta'), type: t('member.coachNoteLabel') },
+    { title: t('member.scheduleHighlightBreathwork'), meta: t('member.scheduleHighlightBreathworkMeta'), type: t('member.workshopLabel') },
+    { title: t('member.scheduleHighlightAssessment'), meta: t('member.scheduleHighlightAssessmentMeta'), type: t('member.assessmentLabel') },
+]);
 
 const weeklyFocus = computed(() => [
     { label: t('member.totalSessionsPlanned'), note: t('member.bookedAndConfirmed'), value: '7' },
@@ -95,7 +95,7 @@ const weeklyFocus = computed(() => [
                                     <p class="ym-timetable-name">{{ session.title }}</p>
                                     <p class="ym-timetable-sub">{{ session.meta }}</p>
                                 </div>
-                                <div v-if="!day.sessions.length" class="ym-timetable-empty">—</div>
+                                <div v-if="!day.sessions.length" class="ym-timetable-empty">&mdash;</div>
                             </div>
                         </div>
                     </div>

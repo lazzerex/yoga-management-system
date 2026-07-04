@@ -1,4 +1,5 @@
 <script setup>
+import { trans as t } from 'laravel-vue-i18n';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 const enrolledClasses = [
@@ -10,10 +11,10 @@ const enrolledClasses = [
 ];
 
 const sessionHistory = [
-    { id: 1, className: 'Power Core', date: 'Apr 24', coach: 'Daniel Park', result: 'Attended' },
-    { id: 2, className: 'Evening Yin', date: 'Apr 22', coach: 'Ari Gomez', result: 'Attended' },
-    { id: 3, className: 'Mobility Reset', date: 'Apr 19', coach: 'Lina Tran', result: 'Attended' },
-    { id: 4, className: 'Weekend Flow', date: 'Apr 18', coach: 'Mia Chen', result: 'Completed' },
+    { id: 1, className: 'Power Core', date: 'Apr 24', coach: 'Daniel Park', result: t('member.sessionAttended') },
+    { id: 2, className: 'Evening Yin', date: 'Apr 22', coach: 'Ari Gomez', result: t('member.sessionAttended') },
+    { id: 3, className: 'Mobility Reset', date: 'Apr 19', coach: 'Lina Tran', result: t('member.sessionAttended') },
+    { id: 4, className: 'Weekend Flow', date: 'Apr 18', coach: 'Mia Chen', result: t('member.sessionCompleted') },
 ];
 </script>
 
@@ -23,7 +24,7 @@ const sessionHistory = [
             <div class="ym-stat">
                 <p class="ym-stat-label">{{ $t('member.enrolled') }}</p>
                 <p class="ym-stat-value">5</p>
-                <p class="ym-stat-note">Across 3 branches</p>
+                <p class="ym-stat-note">{{ $t('member.acrossBranchesCount', { count: 3 }) }}</p>
             </div>
             <div class="ym-stat">
                 <p class="ym-stat-label">{{ $t('member.schedule') }}</p>
@@ -32,8 +33,8 @@ const sessionHistory = [
             </div>
             <div class="ym-stat">
                 <p class="ym-stat-label">{{ $t('member.mySchedule') }}</p>
-                <p class="ym-stat-value">Today 18:30</p>
-                <p class="ym-stat-note">Evening Yin · Downtown</p>
+                <p class="ym-stat-value">{{ $t('dashboard.today1830') }}</p>
+                <p class="ym-stat-note">{{ $t('member.todayClassMeta') }}</p>
             </div>
         </div>
 
@@ -90,7 +91,7 @@ const sessionHistory = [
                     </div>
                     <div class="ym-info-row">
                         <i class="bi bi-info-circle ym-info-icon" />
-                        <span>Weekly goal: complete 3 sessions. You are currently at 2 this week.</span>
+                        <span>{{ $t('member.weeklyGoalPlaceholder', { count: 3, current: 2 }) }}</span>
                     </div>
                 </div>
             </div>
