@@ -12,9 +12,9 @@ const classes = [
 ];
 
 const insights = computed(() => [
-    { title: 'Power Core is near full capacity', meta: 'Riverside · Tue/Thu 07:00', label: t('coach.highDemand') },
-    { title: 'Prenatal Flow attendance improving', meta: 'Westside · +11% this month', label: t('coach.trendUp') },
-    { title: 'Weekend Flow has repeat bookings', meta: 'Uptown · retention 82%', label: t('coach.strong') },
+    { title: t('coach.insightNearCapacity'), meta: t('coach.insightNearCapacityMeta'), label: t('coach.highDemand') },
+    { title: t('coach.insightAttendanceImproving'), meta: t('coach.insightAttendanceImprovingMeta'), label: t('coach.trendUp') },
+    { title: t('coach.insightRepeatBookings'), meta: t('coach.insightRepeatBookingsMeta'), label: t('coach.strong') },
 ]);
 </script>
 
@@ -91,7 +91,7 @@ const insights = computed(() => [
                     </div>
                     <div class="ym-info-row">
                         <i class="bi bi-info-circle ym-info-icon" />
-                        <span>Live attendance and class health scoring will be wired in a later phase.</span>
+                        <span>{{ $t('coach.liveAttendancePlaceholder') }}</span>
                     </div>
                 </div>
             </div>

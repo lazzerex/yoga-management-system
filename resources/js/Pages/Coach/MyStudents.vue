@@ -1,4 +1,6 @@
 ﻿<script setup>
+import { computed } from 'vue';
+import { trans as t } from 'laravel-vue-i18n';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 const students = [
@@ -11,10 +13,16 @@ const students = [
 ];
 
 const followUps = [
-    { student: 'Mason Reed', note: 'Attendance down for 2 consecutive weeks' },
-    { student: 'Noel Grant', note: 'Requested support for shoulder mobility modifications' },
-    { student: 'Kevin Yu', note: 'Interested in progressing to intermediate sequence' },
+    { student: 'Mason Reed', note: t('coach.followUpNoteAttendance') },
+    { student: 'Noel Grant', note: t('coach.followUpNoteShoulderMobility') },
+    { student: 'Kevin Yu', note: t('coach.followUpNoteIntermediate') },
 ];
+
+const coachingSnapshot = computed(() => [
+    { label: t('coach.highConsistencyStudents'), note: t('coach.attendanceAboveThreshold', { threshold: '90%' }), value: '23' },
+    { label: t('coach.studentsAtRisk'), note: t('coach.attendanceBelowThreshold', { threshold: '60%' }), value: '6' },
+    { label: t('coach.avgAttendance'), note: t('coach.allClassesThisMonth'), value: '84%' },
+]);
 </script>
 
 <template>

@@ -8,45 +8,45 @@ const teachingSchedule = [
         day: 'Mon',
         date: 'Apr 27',
         classes: [
-            { time: '06:45', title: 'Sunrise Mobility', branch: 'Westside', students: '18 students' },
-            { time: '18:30', title: 'Evening Yin', branch: 'Downtown', students: '21 students' },
+            { time: '06:45', title: 'Sunrise Mobility', branch: 'Westside', students: t('coach.studentsCount', { count: 18 }) },
+            { time: '18:30', title: 'Evening Yin', branch: 'Downtown', students: t('coach.studentsCount', { count: 21 }) },
         ],
     },
     {
         day: 'Tue',
         date: 'Apr 28',
         classes: [
-            { time: '07:00', title: 'Power Core', branch: 'Riverside', students: '24 students' },
-            { time: '19:30', title: 'Breathwork Lab', branch: 'Online', students: '32 students' },
+            { time: '07:00', title: 'Power Core', branch: 'Riverside', students: t('coach.studentsCount', { count: 24 }) },
+            { time: '19:30', title: 'Breathwork Lab', branch: 'Online', students: t('coach.studentsCount', { count: 32 }) },
         ],
     },
     {
         day: 'Wed',
         date: 'Apr 29',
         classes: [
-            { time: '18:30', title: 'Evening Yin', branch: 'Downtown', students: '20 students' },
+            { time: '18:30', title: 'Evening Yin', branch: 'Downtown', students: t('coach.studentsCount', { count: 20 }) },
         ],
     },
     {
         day: 'Thu',
         date: 'Apr 30',
         classes: [
-            { time: '07:00', title: 'Power Core', branch: 'Riverside', students: '23 students' },
-            { time: '12:30', title: 'Prenatal Flow', branch: 'Westside', students: '14 students' },
+            { time: '07:00', title: 'Power Core', branch: 'Riverside', students: t('coach.studentsCount', { count: 23 }) },
+            { time: '12:30', title: 'Prenatal Flow', branch: 'Westside', students: t('coach.studentsCount', { count: 14 }) },
         ],
     },
     {
         day: 'Fri',
         date: 'May 01',
         classes: [
-            { time: '17:45', title: 'Mobility Reset', branch: 'Downtown', students: '16 students' },
+            { time: '17:45', title: 'Mobility Reset', branch: 'Downtown', students: t('coach.studentsCount', { count: 16 }) },
         ],
     },
     {
         day: 'Sat',
         date: 'May 02',
         classes: [
-            { time: '09:00', title: 'Weekend Flow', branch: 'Uptown', students: '19 students' },
+            { time: '09:00', title: 'Weekend Flow', branch: 'Uptown', students: t('coach.studentsCount', { count: 19 }) },
         ],
     },
     {
@@ -57,9 +57,9 @@ const teachingSchedule = [
 ];
 
 const todayHighlights = computed(() => [
-    { title: 'Evening Yin', meta: '18:30 · Downtown · 21 students', badge: t('coach.today') },
-    { title: 'Post-class notes due', meta: 'Submit by 21:00 for attendance sync', badge: 'Reminder' },
-    { title: 'Substitute request', meta: 'Backup coach for Saturday workshop', badge: t('coach.followUp') },
+    { title: 'Evening Yin', meta: t('coach.insightNearCapacityMeta'), badge: t('coach.today') },
+    { title: t('coach.postClassNotesDue'), meta: t('coach.postClassNotesDueMeta'), badge: t('coach.reminderBadge') },
+    { title: t('coach.substituteRequest'), meta: t('coach.substituteRequestMeta'), badge: t('coach.followUp') },
 ]);
 
 const teachingLoad = computed(() => [
@@ -96,7 +96,7 @@ const teachingLoad = computed(() => [
                                     <p class="ym-timetable-name">{{ item.title }}</p>
                                     <p class="ym-timetable-sub">{{ item.branch }} · {{ item.students }}</p>
                                 </div>
-                                <div v-if="!day.classes.length" class="ym-timetable-empty">—</div>
+                                <div v-if="!day.classes.length" class="ym-timetable-empty">&mdash;</div>
                             </div>
                         </div>
                     </div>
