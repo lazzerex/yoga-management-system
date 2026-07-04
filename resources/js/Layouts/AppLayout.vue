@@ -39,9 +39,19 @@ const userRole = computed(() => page.props.auth?.user?.role ?? 'member');
 const isAdmin = computed(() => userRole.value === 'admin');
 const isCoach = computed(() => userRole.value === 'coach');
 const isMember = computed(() => userRole.value === 'member');
-const canAccessFees = computed(() => ['admin', 'member'].includes(userRole.value));
-const canAccessTeacherOperations = computed(() => ['admin', 'coach'].includes(userRole.value));
-const canAccessFileLibrary = computed(() => ['admin', 'coach'].includes(userRole.value));
+
+const sidebarMenu = computed(() => page.props.menu ?? []);
+
+const isMenuItemActive = (href) => {
+    if (!href) return false;
+    const path = href.startsWith('http') ? new URL(href).pathname : href;
+    return page.url === path
+        || page.url.startsWith(`${path}/`)
+        || page.url.startsWith(`${path}?`);
+};
+// const canAccessFees = computed(() => ['admin', 'member'].includes(userRole.value));
+// const canAccessTeacherOperations = computed(() => ['admin', 'coach'].includes(userRole.value));
+// const canAccessFileLibrary = computed(() => ['admin', 'coach'].includes(userRole.value));
 const roleLabel = computed(() => {
     const role = userRole.value;
     if (!role) return 'guest';
@@ -201,170 +211,170 @@ const handleTopTabClick = (item) => {
     }));
 };
 
-const sidebarGroups = computed(() => {
-    const groups = [
-        {
-            label: t('layout.sidebar.main'),
-            items: [
-                {
-                    label: t('layout.sidebar.home'),
-                    href: route('cms.dashboard'),
-                    activePaths: [route('cms.dashboard', undefined, false)],
-                    icon: 'bi-house',
-                    iconColor: '#4f8bc8',
-                },
-                {
-                    label: t('layout.sidebar.myProfile'),
-                    href: route('cms.profile.show'),
-                    activePaths: [route('cms.profile.show', undefined, false)],
-                    icon: 'bi-person',
-                    iconColor: '#5f77cf',
-                },
-            ],
-        },
-        {
-            label: t('layout.sidebar.operations'),
-            items: [
-                {
-                    label: t('layout.sidebar.centers'),
-                    href: route('operations.yoga-center'),
-                    activePaths: [route('operations.yoga-center', undefined, false)],
-                    icon: 'bi-building',
-                    iconColor: '#d99a34',
-                },
-                {
-                    label: t('layout.sidebar.classes'),
-                    href: route('operations.academy'),
-                    activePaths: [route('operations.academy', undefined, false)],
-                    icon: 'bi-people',
-                    iconColor: '#3fa07e',
-                },
-            ],
-        },
-    ];
+// const sidebarGroups = computed(() => {
+//     const groups = [
+//         {
+//             label: t('layout.sidebar.main'),
+//             items: [
+//                 {
+//                     label: t('layout.sidebar.home'),
+//                     href: route('cms.dashboard'),
+//                     activePaths: [route('cms.dashboard', undefined, false)],
+//                     icon: 'bi-house',
+//                     iconColor: '#4f8bc8',
+//                 },
+//                 {
+//                     label: t('layout.sidebar.myProfile'),
+//                     href: route('cms.profile.show'),
+//                     activePaths: [route('cms.profile.show', undefined, false)],
+//                     icon: 'bi-person',
+//                     iconColor: '#5f77cf',
+//                 },
+//             ],
+//         },
+//         {
+//             label: t('layout.sidebar.operations'),
+//             items: [
+//                 {
+//                     label: t('layout.sidebar.centers'),
+//                     href: route('operations.yoga-center'),
+//                     activePaths: [route('operations.yoga-center', undefined, false)],
+//                     icon: 'bi-building',
+//                     iconColor: '#d99a34',
+//                 },
+//                 {
+//                     label: t('layout.sidebar.classes'),
+//                     href: route('operations.academy'),
+//                     activePaths: [route('operations.academy', undefined, false)],
+//                     icon: 'bi-people',
+//                     iconColor: '#3fa07e',
+//                 },
+//             ],
+//         },
+//     ];
 
-    if (canAccessTeacherOperations.value) {
-        groups[1].items.push(
-            {
-                label: t('layout.sidebar.attendance'),
-                href: route('operations.teacher-attendance'),
-                activePaths: [route('operations.teacher-attendance', undefined, false)],
-                icon: 'bi-clipboard-check',
-                iconColor: '#4f81cf',
-            },
-            {
-                label: t('layout.sidebar.plans'),
-                href: route('operations.lesson-planning'),
-                activePaths: [route('operations.lesson-planning', undefined, false)],
-                badge: t('layout.sidebar.approval'),
-                icon: 'bi-calendar-check',
-                iconColor: '#6a78c8',
-            },
-        );
-    }
+//     if (canAccessTeacherOperations.value) {
+//         groups[1].items.push(
+//             {
+//                 label: t('layout.sidebar.attendance'),
+//                 href: route('operations.teacher-attendance'),
+//                 activePaths: [route('operations.teacher-attendance', undefined, false)],
+//                 icon: 'bi-clipboard-check',
+//                 iconColor: '#4f81cf',
+//             },
+//             {
+//                 label: t('layout.sidebar.plans'),
+//                 href: route('operations.lesson-planning'),
+//                 activePaths: [route('operations.lesson-planning', undefined, false)],
+//                 badge: t('layout.sidebar.approval'),
+//                 icon: 'bi-calendar-check',
+//                 iconColor: '#6a78c8',
+//             },
+//         );
+//     }
 
-    if (canAccessFees.value) {
-        groups[1].items.push({
-            label: t('layout.sidebar.tuition'),
-            href: route('operations.tuition-fees'),
-            activePaths: [route('operations.tuition-fees', undefined, false)],
-            icon: 'bi-cash-stack',
-            iconColor: '#32a06f',
-        });
-    }
+//     if (canAccessFees.value) {
+//         groups[1].items.push({
+//             label: t('layout.sidebar.tuition'),
+//             href: route('operations.tuition-fees'),
+//             activePaths: [route('operations.tuition-fees', undefined, false)],
+//             icon: 'bi-cash-stack',
+//             iconColor: '#32a06f',
+//         });
+//     }
 
-    if (canAccessFileLibrary.value) {
-        groups[1].items.push({
-            label: t('layout.sidebar.files'),
-            href: route('operations.file-library'),
-            activePaths: [route('operations.file-library', undefined, false)],
-            icon: 'bi-folder2-open',
-            iconColor: '#c97846',
-        });
-    }
+//     if (canAccessFileLibrary.value) {
+//         groups[1].items.push({
+//             label: t('layout.sidebar.files'),
+//             href: route('operations.file-library'),
+//             activePaths: [route('operations.file-library', undefined, false)],
+//             icon: 'bi-folder2-open',
+//             iconColor: '#c97846',
+//         });
+//     }
 
-    if (isMember.value) {
-        groups.push({
-            label: t('layout.sidebar.member'),
-            items: [
-                {
-                    label: t('layout.sidebar.myMembership'),
-                    href: route('member.my-membership'),
-                    activePaths: [route('member.my-membership', undefined, false)],
-                    icon: 'bi-cash-stack',
-                    iconColor: '#3f8f6f',
-                },
-                {
-                    label: t('layout.sidebar.myClasses'),
-                    href: route('member.my-classes'),
-                    activePaths: [route('member.my-classes', undefined, false)],
-                    icon: 'bi-people',
-                    iconColor: '#3f7ec4',
-                },
-                {
-                    label: t('layout.sidebar.mySchedule'),
-                    href: route('member.my-schedule'),
-                    activePaths: [route('member.my-schedule', undefined, false)],
-                    icon: 'bi-calendar-check',
-                    iconColor: '#6a78c8',
-                },
-            ],
-        });
-    }
+//     if (isMember.value) {
+//         groups.push({
+//             label: t('layout.sidebar.member'),
+//             items: [
+//                 {
+//                     label: t('layout.sidebar.myMembership'),
+//                     href: route('member.my-membership'),
+//                     activePaths: [route('member.my-membership', undefined, false)],
+//                     icon: 'bi-cash-stack',
+//                     iconColor: '#3f8f6f',
+//                 },
+//                 {
+//                     label: t('layout.sidebar.myClasses'),
+//                     href: route('member.my-classes'),
+//                     activePaths: [route('member.my-classes', undefined, false)],
+//                     icon: 'bi-people',
+//                     iconColor: '#3f7ec4',
+//                 },
+//                 {
+//                     label: t('layout.sidebar.mySchedule'),
+//                     href: route('member.my-schedule'),
+//                     activePaths: [route('member.my-schedule', undefined, false)],
+//                     icon: 'bi-calendar-check',
+//                     iconColor: '#6a78c8',
+//                 },
+//             ],
+//         });
+//     }
 
-    if (isCoach.value) {
-        groups.push({
-            label: t('layout.sidebar.coach'),
-            items: [
-                {
-                    label: t('layout.sidebar.myClasses'),
-                    href: route('coach.my-classes'),
-                    activePaths: [route('coach.my-classes', undefined, false)],
-                    icon: 'bi-people',
-                    iconColor: '#3f7ec4',
-                },
-                {
-                    label: t('layout.sidebar.myStudents'),
-                    href: route('coach.my-students'),
-                    activePaths: [route('coach.my-students', undefined, false)],
-                    icon: 'bi-clipboard-check',
-                    iconColor: '#4f81cf',
-                },
-                {
-                    label: t('layout.sidebar.teachingSchedule'),
-                    href: route('coach.my-teaching-schedule'),
-                    activePaths: [route('coach.my-teaching-schedule', undefined, false)],
-                    icon: 'bi-calendar-check',
-                    iconColor: '#6a78c8',
-                },
-            ],
-        });
-    }
+//     if (isCoach.value) {
+//         groups.push({
+//             label: t('layout.sidebar.coach'),
+//             items: [
+//                 {
+//                     label: t('layout.sidebar.myClasses'),
+//                     href: route('coach.my-classes'),
+//                     activePaths: [route('coach.my-classes', undefined, false)],
+//                     icon: 'bi-people',
+//                     iconColor: '#3f7ec4',
+//                 },
+//                 {
+//                     label: t('layout.sidebar.myStudents'),
+//                     href: route('coach.my-students'),
+//                     activePaths: [route('coach.my-students', undefined, false)],
+//                     icon: 'bi-clipboard-check',
+//                     iconColor: '#4f81cf',
+//                 },
+//                 {
+//                     label: t('layout.sidebar.teachingSchedule'),
+//                     href: route('coach.my-teaching-schedule'),
+//                     activePaths: [route('coach.my-teaching-schedule', undefined, false)],
+//                     icon: 'bi-calendar-check',
+//                     iconColor: '#6a78c8',
+//                 },
+//             ],
+//         });
+//     }
 
-    if (isAdmin.value) {
-        groups.push({
-            label: t('layout.sidebar.admin'),
-            items: [
-                {
-                    label: t('layout.sidebar.users'),
-                    href: route('admin.users.index'),
-                    activePaths: [route('admin.users.index', undefined, false)],
-                    icon: 'bi-shield-lock',
-                    iconColor: '#5f77cf',
-                },
-                {
-                    label: t('layout.sidebar.logs'),
-                    href: route('admin.login-logs.index'),
-                    activePaths: [route('admin.login-logs.index', undefined, false)],
-                    icon: 'bi-clock-history',
-                    iconColor: '#b26464',
-                },
-            ],
-        });
-    }
+//     if (isAdmin.value) {
+//         groups.push({
+//             label: t('layout.sidebar.admin'),
+//             items: [
+//                 {
+//                     label: t('layout.sidebar.users'),
+//                     href: route('admin.users.index'),
+//                     activePaths: [route('admin.users.index', undefined, false)],
+//                     icon: 'bi-shield-lock',
+//                     iconColor: '#5f77cf',
+//                 },
+//                 {
+//                     label: t('layout.sidebar.logs'),
+//                     href: route('admin.login-logs.index'),
+//                     activePaths: [route('admin.login-logs.index', undefined, false)],
+//                     icon: 'bi-clock-history',
+//                     iconColor: '#b26464',
+//                 },
+//             ],
+//         });
+//     }
 
-    return groups;
-});
+//     return groups;
+// });
 
 const closeMenus = () => {
     notificationsOpen.value = false;
@@ -487,7 +497,7 @@ const logout = () => {
                 </div>
             </div>
 
-            <nav class="ym-side-nav">
+            <!-- <nav class="ym-side-nav">
                 <section v-for="group in sidebarGroups" :key="group.label" class="ym-side-group-wrap">
                     <p class="ym-side-group">{{ group.label }}</p>
                     <NavMenuLink
@@ -501,6 +511,23 @@ const logout = () => {
                         :active="isActive(item.activePaths)"
                         variant="sidebar"
                     />
+                </section>
+            </nav> -->
+
+            <nav class="ym-side-nav">
+                <section v-for="group in sidebarMenu" :key="group.label" class="ym-side-group-wrap">
+                    <p class="ym-side-group">{{ group.label }}</p>
+                    <NavMenuLink
+                        v-for="item in group.items"
+                        :key="item.href"
+                        :href="item.href"
+                        :label="item.label"
+                        :icon="item.icon"
+                        :icon-color="item.iconColor"
+                        :badge="item.badge"
+                        :active="isMenuItemActive(item.href)"
+                        variant="sidebar"
+                     />
                 </section>
             </nav>
 
