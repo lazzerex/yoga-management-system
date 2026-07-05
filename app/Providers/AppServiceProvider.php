@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Support\Menu\MenuFacade as Menu;
 use App\Support\Menu\MenuRegistry;
 use Illuminate\Support\ServiceProvider;
 
@@ -11,16 +12,13 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(MenuRegistry::class);
 
-        // Allow Menu:: facade usage
-        $this->app->alias(MenuRegistry::class, 'Menu');
+        class_alias(Menu::class, 'Menu');
     }
 
     public function boot(): void
     {
-        $menu = $this->app->make(MenuRegistry::class);
-
         // Main group (all roles)
-        $menu->register('/cms/dashboard', 'Home', [
+        Menu::register('/cms/dashboard', 'Home', [
             'icon'      => 'bi-house',
             'iconColor' => '#4f8bc8',
             'group'     => 'Main',
@@ -28,7 +26,7 @@ class AppServiceProvider extends ServiceProvider
             'position'  => 1,
         ]);
 
-        $menu->register('/cms/profile', 'My Profile', [
+        Menu::register('/cms/profile', 'My Profile', [
             'icon'      => 'bi-person',
             'iconColor' => '#5f77cf',
             'group'     => 'Main',
@@ -37,7 +35,7 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         // Operations group
-        $menu->register('/cms/operations/yoga-center', 'Centers', [
+        Menu::register('/cms/operations/yoga-center', 'Centers', [
             'icon'      => 'bi-building',
             'iconColor' => '#d99a34',
             'group'     => 'Operations',
@@ -45,7 +43,7 @@ class AppServiceProvider extends ServiceProvider
             'position'  => 10,
         ]);
 
-        $menu->register('/cms/operations/academy', 'Classes', [
+        Menu::register('/cms/operations/academy', 'Classes', [
             'icon'      => 'bi-people',
             'iconColor' => '#3fa07e',
             'group'     => 'Operations',
@@ -53,7 +51,7 @@ class AppServiceProvider extends ServiceProvider
             'position'  => 11,
         ]);
 
-        $menu->register('/cms/operations/teacher-attendance', 'Attendance', [
+        Menu::register('/cms/operations/teacher-attendance', 'Attendance', [
             'icon'      => 'bi-clipboard-check',
             'iconColor' => '#4f81cf',
             'group'     => 'Operations',
@@ -61,7 +59,7 @@ class AppServiceProvider extends ServiceProvider
             'position'  => 12,
         ]);
 
-        $menu->register('/cms/operations/lesson-planning', 'Plans', [
+        Menu::register('/cms/operations/lesson-planning', 'Plans', [
             'icon'      => 'bi-calendar-check',
             'iconColor' => '#6a78c8',
             'group'     => 'Operations',
@@ -70,7 +68,7 @@ class AppServiceProvider extends ServiceProvider
             'badge'     => 'Approval',
         ]);
 
-        $menu->register('/cms/operations/tuition-fees', 'Tuition', [
+        Menu::register('/cms/operations/tuition-fees', 'Tuition', [
             'icon'      => 'bi-cash-stack',
             'iconColor' => '#32a06f',
             'group'     => 'Operations',
@@ -78,7 +76,7 @@ class AppServiceProvider extends ServiceProvider
             'position'  => 14,
         ]);
 
-        $menu->register('/cms/operations/file-library', 'Files', [
+        Menu::register('/cms/operations/file-library', 'Files', [
             'icon'      => 'bi-folder2-open',
             'iconColor' => '#c97846',
             'group'     => 'Operations',
@@ -87,7 +85,7 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         // Member group
-        $menu->register('/cms/member/my-membership', 'My Membership', [
+        Menu::register('/cms/member/my-membership', 'My Membership', [
             'icon'      => 'bi-card-checklist',
             'iconColor' => '#3f8f6f',
             'group'     => 'Member',
@@ -95,7 +93,7 @@ class AppServiceProvider extends ServiceProvider
             'position'  => 20,
         ]);
 
-        $menu->register('/cms/member/my-classes', 'My Classes', [
+        Menu::register('/cms/member/my-classes', 'My Classes', [
             'icon'      => 'bi-people',
             'iconColor' => '#3f7ec4',
             'group'     => 'Member',
@@ -103,7 +101,7 @@ class AppServiceProvider extends ServiceProvider
             'position'  => 21,
         ]);
 
-        $menu->register('/cms/member/my-schedule', 'My Schedule', [
+        Menu::register('/cms/member/my-schedule', 'My Schedule', [
             'icon'      => 'bi-calendar-check',
             'iconColor' => '#6a78c8',
             'group'     => 'Member',
@@ -112,7 +110,7 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         // Coach group
-        $menu->register('/cms/coach/my-classes', 'My Classes', [
+        Menu::register('/cms/coach/my-classes', 'My Classes', [
             'icon'      => 'bi-people',
             'iconColor' => '#3f7ec4',
             'group'     => 'Coach',
@@ -120,7 +118,7 @@ class AppServiceProvider extends ServiceProvider
             'position'  => 30,
         ]);
 
-        $menu->register('/cms/coach/my-students', 'My Students', [
+        Menu::register('/cms/coach/my-students', 'My Students', [
             'icon'      => 'bi-clipboard-check',
             'iconColor' => '#4f81cf',
             'group'     => 'Coach',
@@ -128,7 +126,7 @@ class AppServiceProvider extends ServiceProvider
             'position'  => 31,
         ]);
 
-        $menu->register('/cms/coach/my-teaching-schedule', 'Teaching Schedule', [
+        Menu::register('/cms/coach/my-teaching-schedule', 'Teaching Schedule', [
             'icon'      => 'bi-calendar-check',
             'iconColor' => '#6a78c8',
             'group'     => 'Coach',
