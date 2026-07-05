@@ -104,8 +104,8 @@ const formatDate = (dateStr) => {
                 </select>
                 <select v-model="device" class="ym-log-filter-select">
                     <option value="">{{ $t('admin.allDevices') }}</option>
-                    <option value="desktop">Desktop</option>
-                    <option value="mobile">Mobile</option>
+                    <option value="desktop">{{ $t('profile.desktop') }}</option>
+                    <option value="mobile">{{ $t('profile.mobile') }}</option>
                 </select>
                 <button v-if="hasActiveFilters" @click="resetFilters" class="ym-log-clear-btn">
                     {{ $t('admin.clear') }}
