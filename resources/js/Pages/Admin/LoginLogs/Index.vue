@@ -43,17 +43,18 @@ function resetFilters() {
     router.get(props.endpoints.self, {}, { preserveState: false, replace: true });
 }
 
-const FAILURE_REASON_LABELS = {
-    wrong_password: t('admin.wrongPassword'),
-    user_not_found: t('admin.userNotFound'),
-};
-
 const statusBadgeClass = (status) =>
     status === 'failed' ? 'ym-action-badge--login-failed' : 'ym-action-badge--login-success';
 
+const failureReasonLabel = (reason) => {
+    if (!reason) return t('admin.unknown');
+    const label = t(`admin.loginFailureReasons.${reason}`);
+    return label === `admin.loginFailureReasons.${reason}` ? reason : label;
+};
+
 const statusLabel = (log) => {
     if (log.status === 'failed') {
-        return `${t('admin.failed')} · ${FAILURE_REASON_LABELS[log.failure_reason] ?? log.failure_reason ?? t('admin.unknown')}`;
+        return `${t('admin.failed')} · ${failureReasonLabel(log.failure_reason)}`;
     }
     return t('admin.success');
 };
