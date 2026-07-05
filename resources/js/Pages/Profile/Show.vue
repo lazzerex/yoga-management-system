@@ -38,7 +38,7 @@ const initials = computed(() => {
 
 const roleLabel = computed(() => {
     const role = props.profile?.role ?? 'member';
-    return role.charAt(0).toUpperCase() + role.slice(1);
+    return t(`admin.roles.${role}`);
 });
 
 const formatDevice = (deviceType) => (deviceType === 'mobile' ? t('profile.mobile') : t('profile.desktop'));
