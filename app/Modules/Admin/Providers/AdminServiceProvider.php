@@ -34,5 +34,13 @@ class AdminServiceProvider extends ServiceProvider
             'roles'     => ['admin'],
             'position'  => 52,
         ]);
+
+        $menu->register('/cms/admin/form-demo', 'Form Demo', [
+            'icon'      => 'bi-ui-checks',
+            'iconColor' => '#3f8f6f',
+            'group'     => 'Admin',
+            'roles'     => ['admin'],
+            'position'  => 53,
+        ]);
     }
 }
