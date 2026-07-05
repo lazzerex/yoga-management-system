@@ -47,6 +47,7 @@ const ACTION_BADGE_CLASSES = {
     change_password: 'ym-action-badge--password',
     assign_role: 'ym-action-badge--role-assign',
     remove_role: 'ym-action-badge--role-remove',
+    delete_user: 'ym-action-badge--delete',
 };
 
 const actionBadgeClass = (action) => ACTION_BADGE_CLASSES[action] ?? '';
@@ -56,26 +57,27 @@ const formatMeta = (action, meta) => {
 
     switch (action) {
         case 'create_user':
-            return `@${meta.username} · ${meta.role}`;
+            return `@${meta.username} · ${t(`admin.roles.${meta.role}`)}`;
         case 'update_user_info': {
             const parts = [];
             if (meta.from?.name !== meta.to?.name) {
-                parts.push(`name: ${meta.from.name} → ${meta.to.name}`);
+                parts.push(`${t('admin.metaName')}: ${meta.from.name} → ${meta.to.name}`);
             }
             if (meta.from?.email !== meta.to?.email) {
-                parts.push(`email: ${meta.from.email} → ${meta.to.email}`);
+                parts.push(`${t('admin.metaEmail')}: ${meta.from.email} → ${meta.to.email}`);
             }
             if (meta.from?.username !== meta.to?.username) {
-                parts.push(`username: ${meta.from.username} -> ${meta.to.username}`);
+                parts.push(`${t('admin.metaUsername')}: ${meta.from.username} → ${meta.to.username}`);
             }
             return parts.join(', ') || '—';
         }
         case 'change_password':
             return t('admin.passwordChanged');
         case 'assign_role':
-            return `${meta.from} → ${meta.to}`;
+            return `${t(`admin.roles.${meta.from}`)} → ${t(`admin.roles.${meta.to}`)}`;
         case 'remove_role':
-            return t('admin.wasRole', { role: meta.role });
+        case 'delete_user':
+            return t('admin.wasRole', { role: t(`admin.roles.${meta.role}`) });
         default:
             return '—';
     }
@@ -123,6 +125,7 @@ const formatDate = (dateStr) => {
                     <option value="change_password">{{ $t('admin.auditActions.change_password') }}</option>
                     <option value="assign_role">{{ $t('admin.auditActions.assign_role') }}</option>
                     <option value="remove_role">{{ $t('admin.auditActions.remove_role') }}</option>
+                    <option value="delete_user">{{ $t('admin.auditActions.delete_user') }}</option>
                 </select>
                 <button v-if="hasActiveFilters" @click="resetFilters" class="ym-log-clear-btn">
                     {{ $t('admin.clear') }}
