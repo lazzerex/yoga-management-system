@@ -22,6 +22,6 @@ class EnsureRole
 
         return redirect()
             ->route('cms.dashboard')
-            ->with('error', 'You do not have access to that section.');
+            ->with('error', ['key' => 'flash.noSectionAccess']);
     }
 }
