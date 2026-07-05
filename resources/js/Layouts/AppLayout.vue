@@ -54,7 +54,7 @@ const isMenuItemActive = (href) => {
 const roleLabel = computed(() => {
     const role = userRole.value;
     if (!role) return 'guest';
-    return role.charAt(0).toUpperCase() + role.slice(1);
+    return t(`admin.roles.${role}`);
 });
 const sidebarOpen = ref(false);
 const toggleSidebar = () => { sidebarOpen.value = !sidebarOpen.value; };
