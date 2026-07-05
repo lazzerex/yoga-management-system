@@ -1,8 +1,10 @@
 ﻿<script setup>
+import { ref } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
-import { trans as t } from 'laravel-vue-i18n';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Modal from '@/Components/UI/Modal.vue';
+import Checkbox from '@/Components/Form/Checkbox.vue';
 
 const props = defineProps({
     users: Object,
@@ -12,10 +14,25 @@ const props = defineProps({
 
 const isCurrentUser = (id) => props.auth?.user?.id === id;
 
+const pendingDeleteUser = ref(null);
+const deleteAck = ref(false);
+
 const deleteUser = (user) => {
     if (isCurrentUser(user.id)) return;
-    if (!window.confirm(t('admin.confirmDelete', { name: user.name }))) return;
-    router.delete(route('admin.users.destroy', user.id), { preserveScroll: true });
+    pendingDeleteUser.value = user;
+    deleteAck.value = false;
+};
+
+const cancelDelete = () => {
+    pendingDeleteUser.value = null;
+    deleteAck.value = false;
+};
+
+const confirmDelete = () => {
+    router.delete(route('admin.users.destroy', pendingDeleteUser.value.id), {
+        preserveScroll: true,
+        onSuccess: cancelDelete,
+    });
 };
 </script>
 
@@ -85,5 +102,20 @@ const deleteUser = (user) => {
                 />
             </div>
         </section>
+
+        <Modal
+            :show="!!pendingDeleteUser"
+            :title="$t('admin.deleteUserTitle')"
+            @close="cancelDelete"
+        >
+            <p class="ym-card-note">{{ $t('admin.confirmDelete', { name: pendingDeleteUser?.name }) }}</p>
+
+            <Checkbox v-model="deleteAck" :label="$t('admin.confirmDeleteAck')" class="mt-3" />
+
+            <div class="ym-confirm-modal-actions">
+                <button type="button" class="ym-btn-outline" @click="cancelDelete">{{ $t('common.cancel') }}</button>
+                <button type="button" class="ym-btn-danger" :disabled="!deleteAck" @click="confirmDelete">{{ $t('admin.delete') }}</button>
+            </div>
+        </Modal>
     </AppLayout>
 </template>
