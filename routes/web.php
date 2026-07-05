@@ -61,6 +61,7 @@ Route::prefix('cms')->group(function () {
             Route::get('/login-logs/export', [LoginLogController::class, 'export'])->name('login-logs.export');
             Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
             Route::get('/audit-logs/export', [AuditLogController::class, 'export'])->name('audit-logs.export');
+            Route::get('/form-demo', fn () => inertia('Admin/FormDemo'))->name('form-demo');
         });
     });
 });
