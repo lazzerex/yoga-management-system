@@ -4,7 +4,7 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 const props = defineProps({
     modelValue: { type: Array, default: () => [] },
     options: { type: Array, required: true },   // [{ value, label }]
-    placeholder: { type: String, default: 'Select...' },
+    placeholder: { type: String, default: '' },
 });
 
 const emit = defineEmits(['update:modelValue']);
@@ -44,6 +44,8 @@ onBeforeUnmount(() => document.removeEventListener('click', handleOutsideClick))
         <button
             type="button"
             class="ym-multiselect-trigger"
+            aria-haspopup="listbox"
+            :aria-expanded="open"
             @click.stop="open = !open"
         >
             <span
@@ -55,11 +57,13 @@ onBeforeUnmount(() => document.removeEventListener('click', handleOutsideClick))
             <i class="bi bi-chevron-down ym-multiselect-arrow" />
         </button>
 
-        <div v-if="open" class="ym-multiselect-dropdown" @click.stop>
+        <div v-if="open" class="ym-multiselect-dropdown" role="listbox" aria-multiselectable="true" @click.stop>
             <label
                 v-for="opt in options"
                 :key="opt.value"
                 class="ym-multiselect-option"
+                role="option"
+                :aria-selected="isSelected(opt.value)"
             >
                 <input
                     type="checkbox"
