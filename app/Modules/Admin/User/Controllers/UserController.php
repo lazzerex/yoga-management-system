@@ -84,11 +84,11 @@ class UserController extends Controller
         $validated = $request->validated();
 
         if ($this->isSelfDemotion($request, $user, $validated['role'])) {
-            return back()->with('error', 'You cannot remove your own admin role.');
+            return $this->selfDemotionError();
         }
 
         if ($this->isRemovingLastAdmin($user, $validated['role'])) {
-            return back()->with('error', 'At least one admin account is required.');
+            return $this->lastAdminRequiredError();
         }
 
         $action->execute($user, $validated, $request->user());
@@ -101,11 +101,11 @@ class UserController extends Controller
         $validated = $request->validated();
 
         if ($this->isSelfDemotion($request, $user, $validated['role'])) {
-            return back()->with('error', 'You cannot remove your own admin role.');
+            return $this->selfDemotionError();
         }
 
         if ($this->isRemovingLastAdmin($user, $validated['role'])) {
-            return back()->with('error', 'At least one admin account is required.');
+            return $this->lastAdminRequiredError();
         }
 
         $action->execute($user, $validated['role'], $request->user());
@@ -116,11 +116,11 @@ class UserController extends Controller
     public function destroy(Request $request, User $user, DeleteUserAction $action): RedirectResponse
     {
         if ($request->user()?->is($user)) {
-            return back()->with('error', 'You cannot delete your own account.');
+            return back()->with('error', ['key' => 'flash.cannotDeleteOwnAccount']);
         }
 
         if ($this->isRemovingLastAdmin($user, 'member')) {
-            return back()->with('error', 'At least one admin account is required.');
+            return $this->lastAdminRequiredError();
         }
 
         $name = $user->name;
@@ -130,6 +130,16 @@ class UserController extends Controller
     }
 
 
+
+    private function selfDemotionError(): RedirectResponse
+    {
+        return back()->with('error', ['key' => 'flash.cannotRemoveOwnRole']);
+    }
+
+    private function lastAdminRequiredError(): RedirectResponse
+    {
+        return back()->with('error', ['key' => 'flash.lastAdminRequired']);
+    }
 
     private function isSelfDemotion(Request $request, User $targetUser, string $newRole): bool
     {
