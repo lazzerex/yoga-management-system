@@ -157,6 +157,29 @@
 
     .ym-modal-body { padding: 0.95rem; }
 
+    .ym-confirm-modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.46rem;
+        margin-top: 0.95rem;
+    }
+
+    .ym-radio-group {
+        display: flex;
+        gap: 1.2rem;
+    }
+
+    .ym-demo-preview {
+        font-family: ui-monospace, monospace;
+        font-size: 0.78rem;
+        color: #3d4c60;
+        background: #eef2f7;
+        border-radius: 0.5rem;
+        padding: 0.7rem;
+        overflow-x: auto;
+        margin-top: 0.3rem;
+    }
+
     .ym-alert-success {
         background: #ecf9ee;
         border: 1px solid #cdebcf;
