@@ -13,21 +13,16 @@ createInertiaApp({
             import.meta.glob('./Pages/**/*.vue'),
         ),
     async setup({ el, App, props, plugin }) {
-        const langs = import.meta.glob('../../lang/*.json', { eager: true });
-
-        const savedLocale = localStorage.getItem('locale') || 'en';
+        const langs = import.meta.glob('../../lang/*.json');
 
         const app = createApp({ render: () => h(App, props) })
             .use(plugin)
             .use(ZiggyVue)
             .use(i18nVue, {
-                resolve: (lang) => {
-                    const mod = langs[`../../lang/${lang}.json`];
-                    return mod ? mod.default : {};
-                },
+                resolve: (lang) => langs[`../../lang/${lang}.json`]?.() ?? Promise.resolve({ default: {} }),
             });
 
-        await loadLanguageAsync(savedLocale);
+        await loadLanguageAsync(document.documentElement.lang.replace('-', '_'));
         return app.mount(el);
     },
     progress: {
