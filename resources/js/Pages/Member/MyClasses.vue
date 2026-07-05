@@ -29,7 +29,7 @@ const sessionHistory = [
             <div class="ym-stat">
                 <p class="ym-stat-label">{{ $t('member.schedule') }}</p>
                 <p class="ym-stat-value">38</p>
-                <p class="ym-stat-note">{{ $t('member.unlimitedOrQuantity', { value: 'This membership cycle' }) }}</p>
+                <p class="ym-stat-note">{{ $t('member.unlimitedOrQuantity', { value: $t('member.thisMembershipCycle') }) }}</p>
             </div>
             <div class="ym-stat">
                 <p class="ym-stat-label">{{ $t('member.mySchedule') }}</p>
