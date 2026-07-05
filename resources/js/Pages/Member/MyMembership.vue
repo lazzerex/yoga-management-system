@@ -27,7 +27,7 @@ const renewalTimeline = computed(() => [
             </div>
             <div class="ym-stat">
                 <p class="ym-stat-label">{{ $t('member.packageType') }}</p>
-                <p class="ym-stat-value">Premium</p>
+                <p class="ym-stat-value">{{ $t('member.premium') }}</p>
                 <p class="ym-stat-note">{{ $t('member.unlimitedClassesWorkshops') }}</p>
             </div>
             <div class="ym-stat">
