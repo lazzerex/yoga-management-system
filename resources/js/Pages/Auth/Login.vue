@@ -2,7 +2,8 @@
 import { ref, onMounted } from 'vue';
 import { trans as t } from 'laravel-vue-i18n';
 import AuthCard from '@/Components/Auth/AuthCard.vue';
-import LabeledInput from '@/Components/Form/LabeledInput.vue';
+import Field from '@/Components/Form/Field.vue';
+import TextInput from '@/Components/Form/TextInput.vue';
 import { Link, useForm } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 
@@ -27,25 +28,23 @@ const submit = () => {
 <template>
     <AuthCard :title="$t('auth.cmsLogin')">
         <form @submit.prevent="submit" class="space-y-4">
-            <LabeledInput
-                id="username"
-                v-model="form.username"
-                :label="$t('auth.username')"
-                type="text"
-                :placeholder="$t('auth.usernamePlaceholder')"
-                autocomplete="username"
-                :error="form.errors.username"
-            />
+            <Field :label="$t('auth.username')" :error="form.errors.username">
+                <TextInput
+                    v-model="form.username"
+                    type="text"
+                    :placeholder="$t('auth.usernamePlaceholder')"
+                    autocomplete="username"
+                />
+            </Field>
 
-            <LabeledInput
-                id="password"
-                v-model="form.password"
-                :label="$t('auth.password')"
-                type="password"
-                autocomplete="current-password"
-                :error="hasSubmitted ? form.errors.password : ''"
-                :placeholder="$t('auth.passwordPlaceholder')"
-            />
+            <Field :label="$t('auth.password')" :error="hasSubmitted ? form.errors.password : ''">
+                <TextInput
+                    v-model="form.password"
+                    type="password"
+                    autocomplete="current-password"
+                    :placeholder="$t('auth.passwordPlaceholder')"
+                />
+            </Field>
 
             <label class="flex items-center gap-2 text-sm text-neutral-700">
                 <input v-model="form.remember" type="checkbox" class="rounded border-neutral-300" />

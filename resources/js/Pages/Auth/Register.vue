@@ -2,7 +2,8 @@
 import { Link, useForm } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import AuthCard from '@/Components/Auth/AuthCard.vue';
-import LabeledInput from '@/Components/Form/LabeledInput.vue';
+import Field from '@/Components/Form/Field.vue';
+import TextInput from '@/Components/Form/TextInput.vue';
 
 const form = useForm({
     name: '',
@@ -20,55 +21,50 @@ const submit = () => {
 <template>
     <AuthCard :title="$t('auth.createAccount')">
         <form @submit.prevent="submit" class="space-y-4">
-            <LabeledInput
-                id="name"
-                v-model="form.name"
-                :label="$t('auth.name')"
-                type="text"
-                :placeholder="$t('auth.namePlaceholder')"
-                autocomplete="name"
-                :error="form.errors.name"
-            />
+            <Field :label="$t('auth.name')" :error="form.errors.name">
+                <TextInput
+                    v-model="form.name"
+                    type="text"
+                    :placeholder="$t('auth.namePlaceholder')"
+                    autocomplete="name"
+                />
+            </Field>
 
-            <LabeledInput
-                id="username"
-                v-model="form.username"
-                :label="$t('auth.username')"
-                type="text"
-                :placeholder="$t('auth.usernamePlaceholder')"
-                autocomplete="username"
-                :error="form.errors.username"
-            />
+            <Field :label="$t('auth.username')" :error="form.errors.username">
+                <TextInput
+                    v-model="form.username"
+                    type="text"
+                    :placeholder="$t('auth.usernamePlaceholder')"
+                    autocomplete="username"
+                />
+            </Field>
 
-            <LabeledInput
-                id="email"
-                v-model="form.email"
-                :label="$t('auth.email')"
-                type="email"
-                :placeholder="$t('auth.emailPlaceholder')"
-                autocomplete="email"
-                :error="form.errors.email"
-            />
+            <Field :label="$t('auth.email')" :error="form.errors.email">
+                <TextInput
+                    v-model="form.email"
+                    type="email"
+                    :placeholder="$t('auth.emailPlaceholder')"
+                    autocomplete="email"
+                />
+            </Field>
 
-            <LabeledInput
-                id="password"
-                v-model="form.password"
-                :label="$t('auth.password')"
-                type="password"
-                :placeholder="$t('auth.passwordHint')"
-                autocomplete="new-password"
-                :error="form.errors.password"
-            />
+            <Field :label="$t('auth.password')" :error="form.errors.password">
+                <TextInput
+                    v-model="form.password"
+                    type="password"
+                    :placeholder="$t('auth.passwordHint')"
+                    autocomplete="new-password"
+                />
+            </Field>
 
-            <LabeledInput
-                id="password_confirmation"
-                v-model="form.password_confirmation"
-                :label="$t('auth.confirmPassword')"
-                type="password"
-                :placeholder="$t('auth.confirmPasswordPlaceholder')"
-                autocomplete="new-password"
-                :error="form.errors.password_confirmation"
-            />
+            <Field :label="$t('auth.confirmPassword')" :error="form.errors.password_confirmation">
+                <TextInput
+                    v-model="form.password_confirmation"
+                    type="password"
+                    :placeholder="$t('auth.confirmPasswordPlaceholder')"
+                    autocomplete="new-password"
+                />
+            </Field>
 
             <button
                 type="submit"
