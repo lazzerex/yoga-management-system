@@ -2,6 +2,7 @@
 defineProps({
     modelValue: { type: Boolean, default: false },
     label: { type: String, default: ''},
+    ariaLabel: { type: String, default: '' },
 })
 
 defineEmits(['update:modelValue']);
@@ -13,6 +14,7 @@ defineEmits(['update:modelValue']);
             type="checkbox"
             class="ym-checkbox"
             :checked="modelValue"
+            :aria-label="!label ? (ariaLabel || undefined) : undefined"
             @change="$emit('update:modelValue', $event.target.checked)"
         />
         <span v-if="label" class="ym-checkbox-label">{{ label }}</span>

@@ -1,6 +1,7 @@
 <script setup>
 defineProps({
     modelValue: { type: String, default: '#000000' },
+    ariaLabel: { type: String, default: '' },
 });
 
 defineEmits(['update:modelValue']);
@@ -12,6 +13,7 @@ defineEmits(['update:modelValue']);
             type="color"
             class="ym-color-input"
             :value="modelValue"
+            :aria-label="ariaLabel || undefined"
             @input="$emit('update:modelValue', $event.target.value)"
         />
         <span class="ym-color-value">{{ modelValue }}</span>
