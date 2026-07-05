@@ -17,7 +17,6 @@ const page = usePage();
 const toggleLocale = async () => {
     const newLocale = currentLocale.value === 'en' ? 'vi' : 'en';
     await loadLanguageAsync(newLocale);
-    localStorage.setItem('locale', newLocale);
     document.cookie = `locale=${newLocale}; path=/; SameSite=Lax`;
 };
 
