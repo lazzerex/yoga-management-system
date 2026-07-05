@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 
 class LoginAttemptLogger
 {
+    public const FAILURE_REASONS = ['user_not_found', 'wrong_password'];
+
     public static function recordFailed(Request $request, string $failureReason, ?User $user = null): void
     {
         $identifier = trim((string) $request->input('username', $request->input('email', '')));
