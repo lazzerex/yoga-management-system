@@ -381,6 +381,7 @@
     .ym-action-badge--password     { background: #fff3e0; color: #8a5a00; border: 1px solid #f4d08a; }
     .ym-action-badge--role-assign  { background: #f3eeff; color: #6331bb; border: 1px solid #d4bbf7; }
     .ym-action-badge--role-remove  { background: #fdecea; color: #a32a2a; border: 1px solid #f4b8b0; }
+    .ym-action-badge--delete       { background: #2a2a2a; color: #f5f5f5; border: 1px solid #444444; }
     .ym-action-badge--login-success { background: #e6f7ef; color: #1a7d4f; border: 1px solid #b2e6cc; }
     .ym-action-badge--login-failed  { background: #fdecea; color: #a32a2a; border: 1px solid #f4b8b0; }
 
