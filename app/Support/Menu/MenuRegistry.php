@@ -15,7 +15,7 @@ class MenuRegistry
             'label'     => $label,
             'icon'      => null,
             'iconColor' => '#666666',
-            'group'     => 'Main',
+            'group'     => 'nav.main',
             'roles'     => [],
             'position'  => 100,
             'badge'     => null,
@@ -35,13 +35,13 @@ class MenuRegistry
             ->sortBy('position')
             ->groupBy('group')
             ->map(fn (Collection $items, string $group) => [
-                'label' => $group,
+                'labelKey' => $group,
                 'items' => $items->values()->map(fn (array $item) => [
                     'href'      => $item['href'],
-                    'label'     => $item['label'],
+                    'labelKey'  => $item['label'],
                     'icon'      => $item['icon'],
                     'iconColor' => $item['iconColor'],
-                    'badge'     => $item['badge'],
+                    'badgeKey'  => $item['badge'],
                 ])->all(),
             ])
             ->values()
