@@ -39,7 +39,18 @@ const isAdmin = computed(() => userRole.value === 'admin');
 const isCoach = computed(() => userRole.value === 'coach');
 const isMember = computed(() => userRole.value === 'member');
 
-const sidebarMenu = computed(() => page.props.menu ?? []);
+const sidebarMenu = computed(() => {
+    currentLocale.value;
+    return (page.props.menu ?? []).map((group) => ({
+        key: group.labelKey,
+        label: t(group.labelKey),
+        items: group.items.map((item) => ({
+            ...item,
+            label: t(item.labelKey),
+            badge: item.badgeKey ? t(item.badgeKey) : null,
+        })),
+    }));
+});
 
 const isMenuItemActive = (href) => {
     if (!href) return false;
@@ -322,7 +333,7 @@ const logout = () => {
             </div>
 
             <nav class="ym-side-nav">
-                <section v-for="group in sidebarMenu" :key="group.label" class="ym-side-group-wrap">
+                <section v-for="group in sidebarMenu" :key="group.key" class="ym-side-group-wrap">
                     <p class="ym-side-group">{{ group.label }}</p>
                     <NavMenuLink
                         v-for="item in group.items"
