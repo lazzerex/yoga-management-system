@@ -18,118 +18,118 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Main group (all roles)
-        Menu::register('/cms/dashboard', 'Home', [
+        Menu::register('/cms/dashboard', 'nav.home', [
             'icon'      => 'bi-house',
             'iconColor' => '#4f8bc8',
-            'group'     => 'Main',
+            'group'     => 'nav.main',
             'roles'     => [],
             'position'  => 1,
         ]);
 
-        Menu::register('/cms/profile', 'My Profile', [
+        Menu::register('/cms/profile', 'nav.myProfile', [
             'icon'      => 'bi-person',
             'iconColor' => '#5f77cf',
-            'group'     => 'Main',
+            'group'     => 'nav.main',
             'roles'     => [],
             'position'  => 2,
         ]);
 
         // Operations group
-        Menu::register('/cms/operations/yoga-center', 'Centers', [
+        Menu::register('/cms/operations/yoga-center', 'nav.centers', [
             'icon'      => 'bi-building',
             'iconColor' => '#d99a34',
-            'group'     => 'Operations',
+            'group'     => 'nav.operations',
             'roles'     => [],
             'position'  => 10,
         ]);
 
-        Menu::register('/cms/operations/academy', 'Classes', [
+        Menu::register('/cms/operations/academy', 'nav.classes', [
             'icon'      => 'bi-people',
             'iconColor' => '#3fa07e',
-            'group'     => 'Operations',
+            'group'     => 'nav.operations',
             'roles'     => [],
             'position'  => 11,
         ]);
 
-        Menu::register('/cms/operations/teacher-attendance', 'Attendance', [
+        Menu::register('/cms/operations/teacher-attendance', 'nav.attendance', [
             'icon'      => 'bi-clipboard-check',
             'iconColor' => '#4f81cf',
-            'group'     => 'Operations',
+            'group'     => 'nav.operations',
             'roles'     => ['admin', 'coach'],
             'position'  => 12,
         ]);
 
-        Menu::register('/cms/operations/lesson-planning', 'Plans', [
+        Menu::register('/cms/operations/lesson-planning', 'nav.plans', [
             'icon'      => 'bi-calendar-check',
             'iconColor' => '#6a78c8',
-            'group'     => 'Operations',
+            'group'     => 'nav.operations',
             'roles'     => ['admin', 'coach'],
             'position'  => 13,
-            'badge'     => 'Approval',
+            'badge'     => 'nav.approval',
         ]);
 
-        Menu::register('/cms/operations/tuition-fees', 'Tuition', [
+        Menu::register('/cms/operations/tuition-fees', 'nav.tuition', [
             'icon'      => 'bi-cash-stack',
             'iconColor' => '#32a06f',
-            'group'     => 'Operations',
+            'group'     => 'nav.operations',
             'roles'     => ['admin', 'member'],
             'position'  => 14,
         ]);
 
-        Menu::register('/cms/operations/file-library', 'Files', [
+        Menu::register('/cms/operations/file-library', 'nav.files', [
             'icon'      => 'bi-folder2-open',
             'iconColor' => '#c97846',
-            'group'     => 'Operations',
+            'group'     => 'nav.operations',
             'roles'     => ['admin', 'coach'],
             'position'  => 15,
         ]);
 
         // Member group
-        Menu::register('/cms/member/my-membership', 'My Membership', [
+        Menu::register('/cms/member/my-membership', 'nav.myMembership', [
             'icon'      => 'bi-card-checklist',
             'iconColor' => '#3f8f6f',
-            'group'     => 'Member',
+            'group'     => 'nav.member',
             'roles'     => ['member'],
             'position'  => 20,
         ]);
 
-        Menu::register('/cms/member/my-classes', 'My Classes', [
+        Menu::register('/cms/member/my-classes', 'nav.myClasses', [
             'icon'      => 'bi-people',
             'iconColor' => '#3f7ec4',
-            'group'     => 'Member',
+            'group'     => 'nav.member',
             'roles'     => ['member'],
             'position'  => 21,
         ]);
 
-        Menu::register('/cms/member/my-schedule', 'My Schedule', [
+        Menu::register('/cms/member/my-schedule', 'nav.mySchedule', [
             'icon'      => 'bi-calendar-check',
             'iconColor' => '#6a78c8',
-            'group'     => 'Member',
+            'group'     => 'nav.member',
             'roles'     => ['member'],
             'position'  => 22,
         ]);
 
         // Coach group
-        Menu::register('/cms/coach/my-classes', 'My Classes', [
+        Menu::register('/cms/coach/my-classes', 'nav.myClasses', [
             'icon'      => 'bi-people',
             'iconColor' => '#3f7ec4',
-            'group'     => 'Coach',
+            'group'     => 'nav.coach',
             'roles'     => ['coach'],
             'position'  => 30,
         ]);
 
-        Menu::register('/cms/coach/my-students', 'My Students', [
+        Menu::register('/cms/coach/my-students', 'nav.myStudents', [
             'icon'      => 'bi-clipboard-check',
             'iconColor' => '#4f81cf',
-            'group'     => 'Coach',
+            'group'     => 'nav.coach',
             'roles'     => ['coach'],
             'position'  => 31,
         ]);
 
-        Menu::register('/cms/coach/my-teaching-schedule', 'Teaching Schedule', [
+        Menu::register('/cms/coach/my-teaching-schedule', 'nav.teachingSchedule', [
             'icon'      => 'bi-calendar-check',
             'iconColor' => '#6a78c8',
-            'group'     => 'Coach',
+            'group'     => 'nav.coach',
             'roles'     => ['coach'],
             'position'  => 32,
         ]);
