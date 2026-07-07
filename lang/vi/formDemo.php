@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'title' => 'Demo Thành phần Biểu mẫu',
+    'description' => 'Trang thử nghiệm trình bày mọi thành phần Form với dữ liệu mẫu. Không kết nối với backend.',
+    'name' => 'Tên',
+    'bio' => 'Tiểu sử',
+    'role' => 'Vai trò',
+    'active' => 'Kích hoạt',
+    'activeLabel' => 'Tài khoản đang hoạt động',
+    'gender' => 'Giới tính',
+    'male' => 'Nam',
+    'female' => 'Nữ',
+    'tags' => 'Thẻ',
+    'tagsPlaceholder' => 'Chọn thẻ...',
+    'tagYoga' => 'Yoga',
+    'tagPilates' => 'Pilates',
+    'tagMeditation' => 'Thiền',
+    'color' => 'Màu Thương hiệu',
+    'startDate' => 'Ngày Bắt đầu',
+    'startDateTime' => 'Ngày & Giờ Bắt đầu',
+    'submit' => 'Gửi',
+    'reset' => 'Đặt lại',
+    'preview' => 'Giá trị đã gửi (mẫu, chưa lưu)',
+];

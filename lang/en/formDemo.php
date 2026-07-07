@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'title' => 'Form Components Demo',
+    'description' => 'Sandbox page showcasing every Form component with mock data. Not wired to any backend.',
+    'name' => 'Name',
+    'bio' => 'Bio',
+    'role' => 'Role',
+    'active' => 'Active',
+    'activeLabel' => 'Account is active',
+    'gender' => 'Gender',
+    'male' => 'Male',
+    'female' => 'Female',
+    'tags' => 'Tags',
+    'tagsPlaceholder' => 'Pick tags...',
+    'tagYoga' => 'Yoga',
+    'tagPilates' => 'Pilates',
+    'tagMeditation' => 'Meditation',
+    'color' => 'Brand Color',
+    'startDate' => 'Start Date',
+    'startDateTime' => 'Start Date & Time',
+    'submit' => 'Submit',
+    'reset' => 'Reset',
+    'preview' => 'Submitted values (mock, not saved)',
+];

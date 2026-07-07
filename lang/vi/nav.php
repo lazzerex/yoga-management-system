@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'main' => 'Chính',
+    'operations' => 'Vận hành',
+    'member' => 'Thành viên',
+    'coach' => 'Huấn luyện viên',
+    'admin' => 'Quản trị',
+    'home' => 'Trang chủ',
+    'myProfile' => 'Hồ sơ của tôi',
+    'centers' => 'Trung tâm',
+    'classes' => 'Lớp học',
+    'attendance' => 'Điểm danh',
+    'plans' => 'Kế hoạch',
+    'tuition' => 'Học phí',
+    'files' => 'Tệp',
+    'myMembership' => 'Thành viên của tôi',
+    'myClasses' => 'Lớp học của tôi',
+    'mySchedule' => 'Lịch của tôi',
+    'myStudents' => 'Học viên của tôi',
+    'teachingSchedule' => 'Lịch giảng dạy',
+    'users' => 'Người dùng',
+    'logs' => 'Nhật ký',
+    'approval' => 'Phê duyệt',
+    'loginLogs' => 'Nhật ký Đăng nhập',
+    'auditLogs' => 'Nhật ký Hoạt động',
+    'formDemo' => 'Demo Biểu mẫu',
+];

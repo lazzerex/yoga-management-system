@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'main' => 'Main',
+    'operations' => 'Operations',
+    'member' => 'Member',
+    'coach' => 'Coach',
+    'admin' => 'Admin',
+    'home' => 'Home',
+    'myProfile' => 'My Profile',
+    'centers' => 'Centers',
+    'classes' => 'Classes',
+    'attendance' => 'Attendance',
+    'plans' => 'Plans',
+    'tuition' => 'Tuition',
+    'files' => 'Files',
+    'myMembership' => 'My Membership',
+    'myClasses' => 'My Classes',
+    'mySchedule' => 'My Schedule',
+    'myStudents' => 'My Students',
+    'teachingSchedule' => 'Teaching Schedule',
+    'users' => 'Users',
+    'logs' => 'Logs',
+    'approval' => 'Approval',
+    'loginLogs' => 'Login Logs',
+    'auditLogs' => 'Audit Logs',
+    'formDemo' => 'Form Demo',
+];
