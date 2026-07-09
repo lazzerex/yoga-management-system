@@ -12,11 +12,11 @@ const students = [
     { name: 'Noel Grant', primaryClass: 'Power Core', attendance: '4 / 8', lastSession: 'Apr 11' },
 ];
 
-const followUps = [
+const followUps = computed(() => [
     { student: 'Mason Reed', note: t('coach.followUpNoteAttendance') },
     { student: 'Noel Grant', note: t('coach.followUpNoteShoulderMobility') },
     { student: 'Kevin Yu', note: t('coach.followUpNoteIntermediate') },
-];
+]);
 
 const coachingSnapshot = computed(() => [
     { label: t('coach.highConsistencyStudents'), note: t('coach.attendanceAboveThreshold', { threshold: '90%' }), value: '23' },

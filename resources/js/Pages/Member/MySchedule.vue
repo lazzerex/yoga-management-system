@@ -3,57 +3,57 @@ import { computed } from 'vue';
 import { trans as t } from 'laravel-vue-i18n';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
-const weeklySchedule = [
+const weeklySchedule = computed(() => [
     {
-        day: 'Mon',
+        day: t('dashboard.mondayShort'),
         date: 'Apr 27',
         sessions: [
-            { time: '06:45', title: 'Sunrise Mobility', meta: 'Westside · Coach Lina' },
-            { time: '18:30', title: 'Evening Yin', meta: 'Downtown · Coach Ari' },
+            { time: '06:45', title: 'Sunrise Mobility', meta: t('dashboard.westsideCoachLina') },
+            { time: '18:30', title: 'Evening Yin', meta: t('dashboard.downtownCoachAri') },
         ],
     },
     {
-        day: 'Tue',
+        day: t('dashboard.tuesdayShort'),
         date: 'Apr 28',
         sessions: [
-            { time: '07:00', title: 'Power Core', meta: 'Riverside · Coach Daniel' },
+            { time: '07:00', title: 'Power Core', meta: t('dashboard.riversideCoachDaniel') },
         ],
     },
     {
-        day: 'Wed',
+        day: t('dashboard.wednesdayShort'),
         date: 'Apr 29',
         sessions: [
-            { time: '18:30', title: 'Evening Yin', meta: 'Downtown · Coach Ari' },
+            { time: '18:30', title: 'Evening Yin', meta: t('dashboard.downtownCoachAri') },
         ],
     },
     {
-        day: 'Thu',
+        day: t('dashboard.thursdayShort'),
         date: 'Apr 30',
         sessions: [
-            { time: '07:00', title: 'Power Core', meta: 'Riverside · Coach Daniel' },
-            { time: '20:00', title: 'Breathwork Lab', meta: 'Online · Coach Noah' },
+            { time: '07:00', title: 'Power Core', meta: t('dashboard.riversideCoachDaniel') },
+            { time: '20:00', title: 'Breathwork Lab', meta: t('dashboard.onlineCoachNoah') },
         ],
     },
     {
-        day: 'Fri',
+        day: t('dashboard.fridayShort'),
         date: 'May 01',
         sessions: [
-            { time: '17:45', title: 'Mobility Reset', meta: 'Downtown · Coach Lina' },
+            { time: '17:45', title: 'Mobility Reset', meta: t('dashboard.downtownCoachLina') },
         ],
     },
     {
-        day: 'Sat',
+        day: t('dashboard.saturdayShort'),
         date: 'May 02',
         sessions: [
-            { time: '09:00', title: 'Weekend Flow', meta: 'Uptown · Coach Mia' },
+            { time: '09:00', title: 'Weekend Flow', meta: t('dashboard.uptownCoachMia') },
         ],
     },
     {
-        day: 'Sun',
+        day: t('dashboard.sundayShort'),
         date: 'May 03',
         sessions: [],
     },
-];
+]);
 
 const highlights = computed(() => [
     { title: t('member.scheduleHighlightForm'), meta: t('member.scheduleHighlightFormMeta'), type: t('member.coachNoteLabel') },

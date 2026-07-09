@@ -65,6 +65,7 @@ const roleDashboard = computed(() => {
             days: [
                 {
                     day: t('dashboard.monday'),
+                    dayShort: t('dashboard.mondayShort'),
                     date: 'Apr 27',
                     entries: [
                         { time: '06:45', title: 'Sunrise Mobility', meta: t('dashboard.westsideStudentsWithCoach', { count: 18 }) },
@@ -73,6 +74,7 @@ const roleDashboard = computed(() => {
                 },
                 {
                     day: t('dashboard.tuesday'),
+                    dayShort: t('dashboard.tuesdayShort'),
                     date: 'Apr 28',
                     entries: [
                         { time: '07:00', title: 'Power Core', meta: t('dashboard.riversideStudentsWithCoach', { count: 24 }) },
@@ -81,6 +83,7 @@ const roleDashboard = computed(() => {
                 },
                 {
                     day: t('dashboard.wednesday'),
+                    dayShort: t('dashboard.wednesdayShort'),
                     date: 'Apr 29',
                     entries: [
                         { time: '18:30', title: 'Evening Yin', meta: t('dashboard.downtownStudentsWithCoach', { count: 20 }) },
@@ -88,6 +91,7 @@ const roleDashboard = computed(() => {
                 },
                 {
                     day: t('dashboard.thursday'),
+                    dayShort: t('dashboard.thursdayShort'),
                     date: 'Apr 30',
                     entries: [
                         { time: '07:00', title: 'Power Core', meta: t('dashboard.riversideCoachDaniel') },
@@ -96,6 +100,7 @@ const roleDashboard = computed(() => {
                 },
                 {
                     day: t('dashboard.friday'),
+                    dayShort: t('dashboard.fridayShort'),
                     date: 'May 01',
                     entries: [
                         { time: '17:45', title: 'Mobility Reset', meta: t('dashboard.downtownCoachLina') },
@@ -103,12 +108,13 @@ const roleDashboard = computed(() => {
                 },
                 {
                     day: t('dashboard.saturday'),
+                    dayShort: t('dashboard.saturdayShort'),
                     date: 'May 02',
                     entries: [
                         { time: '09:00', title: 'Weekend Flow', meta: t('dashboard.uptownCoachMia') },
                     ],
                 },
-                { day: t('dashboard.sunday'), date: 'May 03', entries: [] },
+                { day: t('dashboard.sunday'), dayShort: t('dashboard.sundayShort'), date: 'May 03', entries: [] },
             ],
         },
         tabs: [t('dashboard.homepage'), t('dashboard.overview'), t('dashboard.myProgress'), t('dashboard.attendance'), t('dashboard.payments'), t('dashboard.achievements')],
@@ -148,6 +154,7 @@ const roleDashboard = computed(() => {
             days: [
                 {
                     day: t('dashboard.monday'),
+                    dayShort: t('dashboard.mondayShort'),
                     date: 'Apr 27',
                     entries: [
                         { time: '06:45', title: 'Sunrise Mobility', meta: t('dashboard.westsideCoachLina') },
@@ -156,6 +163,7 @@ const roleDashboard = computed(() => {
                 },
                 {
                     day: t('dashboard.tuesday'),
+                    dayShort: t('dashboard.tuesdayShort'),
                     date: 'Apr 28',
                     entries: [
                         { time: '07:00', title: 'Power Core', meta: t('dashboard.riversideCoachDaniel') },
@@ -163,6 +171,7 @@ const roleDashboard = computed(() => {
                 },
                 {
                     day: t('dashboard.wednesday'),
+                    dayShort: t('dashboard.wednesdayShort'),
                     date: 'Apr 29',
                     entries: [
                         { time: '18:30', title: 'Evening Yin', meta: t('dashboard.downtownCoachAri') },
@@ -170,6 +179,7 @@ const roleDashboard = computed(() => {
                 },
                 {
                     day: t('dashboard.thursday'),
+                    dayShort: t('dashboard.thursdayShort'),
                     date: 'Apr 30',
                     entries: [
                         { time: '07:00', title: 'Power Core', meta: t('dashboard.riversideCoachDaniel') },
@@ -178,6 +188,7 @@ const roleDashboard = computed(() => {
                 },
                 {
                     day: t('dashboard.friday'),
+                    dayShort: t('dashboard.fridayShort'),
                     date: 'May 01',
                     entries: [
                         { time: '17:45', title: 'Mobility Reset', meta: t('dashboard.downtownCoachLina') },
@@ -185,12 +196,13 @@ const roleDashboard = computed(() => {
                 },
                 {
                     day: t('dashboard.saturday'),
+                    dayShort: t('dashboard.saturdayShort'),
                     date: 'May 02',
                     entries: [
                         { time: '09:00', title: 'Weekend Flow', meta: t('dashboard.uptownCoachMia') },
                     ],
                 },
-                { day: t('dashboard.sunday'), date: 'May 03', entries: [] },
+                { day: t('dashboard.sunday'), dayShort: t('dashboard.sundayShort'), date: 'May 03', entries: [] },
             ],
         },
         tabs: [t('dashboard.homepage'), t('dashboard.overview'), t('dashboard.myProgress'), t('dashboard.attendance'), t('dashboard.payments'), t('dashboard.achievements')],
@@ -1006,7 +1018,7 @@ onBeforeUnmount(() => {
                                         class="ym-timetable-col"
                                     >
                                         <div class="ym-timetable-head">
-                                            <p class="ym-timetable-day">{{ day.day.slice(0, 3) }}</p>
+                                            <p class="ym-timetable-day">{{ day.dayShort }}</p>
                                             <p class="ym-timetable-date">{{ day.date }}</p>
                                         </div>
                                         <div class="ym-timetable-body">

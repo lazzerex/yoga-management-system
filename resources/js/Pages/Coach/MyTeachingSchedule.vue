@@ -3,9 +3,9 @@ import { computed } from 'vue';
 import { trans as t } from 'laravel-vue-i18n';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
-const teachingSchedule = [
+const teachingSchedule = computed(() => [
     {
-        day: 'Mon',
+        day: t('dashboard.mondayShort'),
         date: 'Apr 27',
         classes: [
             { time: '06:45', title: 'Sunrise Mobility', branch: 'Westside', students: t('coach.studentsCount', { count: 18 }) },
@@ -13,7 +13,7 @@ const teachingSchedule = [
         ],
     },
     {
-        day: 'Tue',
+        day: t('dashboard.tuesdayShort'),
         date: 'Apr 28',
         classes: [
             { time: '07:00', title: 'Power Core', branch: 'Riverside', students: t('coach.studentsCount', { count: 24 }) },
@@ -21,14 +21,14 @@ const teachingSchedule = [
         ],
     },
     {
-        day: 'Wed',
+        day: t('dashboard.wednesdayShort'),
         date: 'Apr 29',
         classes: [
             { time: '18:30', title: 'Evening Yin', branch: 'Downtown', students: t('coach.studentsCount', { count: 20 }) },
         ],
     },
     {
-        day: 'Thu',
+        day: t('dashboard.thursdayShort'),
         date: 'Apr 30',
         classes: [
             { time: '07:00', title: 'Power Core', branch: 'Riverside', students: t('coach.studentsCount', { count: 23 }) },
@@ -36,25 +36,25 @@ const teachingSchedule = [
         ],
     },
     {
-        day: 'Fri',
+        day: t('dashboard.fridayShort'),
         date: 'May 01',
         classes: [
             { time: '17:45', title: 'Mobility Reset', branch: 'Downtown', students: t('coach.studentsCount', { count: 16 }) },
         ],
     },
     {
-        day: 'Sat',
+        day: t('dashboard.saturdayShort'),
         date: 'May 02',
         classes: [
             { time: '09:00', title: 'Weekend Flow', branch: 'Uptown', students: t('coach.studentsCount', { count: 19 }) },
         ],
     },
     {
-        day: 'Sun',
+        day: t('dashboard.sundayShort'),
         date: 'May 03',
         classes: [],
     },
-];
+]);
 
 const todayHighlights = computed(() => [
     { title: 'Evening Yin', meta: t('coach.insightNearCapacityMeta'), badge: t('coach.today') },
