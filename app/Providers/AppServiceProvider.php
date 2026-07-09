@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Support\Menu\MenuFacade as Menu;
+use App\Support\Menu\Facades\Menu;
 use App\Support\Menu\MenuRegistry;
 use Illuminate\Support\ServiceProvider;
 
@@ -10,9 +10,7 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->singleton(MenuRegistry::class);
-
-        class_alias(Menu::class, 'Menu');
+       $this->app->singleton('app-menu', fn () => new MenuRegistry());
     }
 
     public function boot(): void
