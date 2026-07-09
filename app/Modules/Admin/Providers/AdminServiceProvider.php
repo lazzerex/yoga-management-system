@@ -2,7 +2,7 @@
 
 namespace App\Modules\Admin\Providers;
 
-use App\Support\Menu\MenuFacade as Menu;
+use App\Support\Menu\Facades\Menu;
 use Illuminate\Support\ServiceProvider;
 
 class AdminServiceProvider extends ServiceProvider
