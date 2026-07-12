@@ -1,0 +1,70 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+
+class PermissionSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $permissions = [
+            'operations.center.view',
+            'operations.attendance.view',
+            'operations.plans.view',
+            'operations.files.view',
+            'operations.tuition.view',
+            'member.dashboard.view',
+            'coach.dashboard.view',
+            'admin.users.view',
+            'admin.users.manage',
+            'admin.login-logs.view',
+            'admin.audit-logs.view',
+            'admin.form-demo.view',
+            'admin.settings.view',
+            'admin.settings.system.view',
+            'admin.dashboard.manage',
+        ];
+
+        foreach ($permissions as $name) {
+            Permission::firstOrCreate(['name' => $name]);
+        }
+
+        // Mirrors the current role:x,y route groups in routes/web.php exactly —
+        // see menu.md Step 10.7 for the route side of this same mapping.
+        $admin = Role::firstOrCreate(['name' => 'admin']);
+        $admin->syncPermissions([
+            'operations.center.view',
+            'operations.attendance.view',
+            'operations.plans.view',
+            'operations.files.view',
+            'operations.tuition.view',
+            'admin.users.view',
+            'admin.users.manage',
+            'admin.login-logs.view',
+            'admin.audit-logs.view',
+            'admin.form-demo.view',
+            'admin.settings.view',
+            'admin.settings.system.view',
+            'admin.dashboard.manage',
+        ]);
+
+        $coach = Role::firstOrCreate(['name' => 'coach']);
+        $coach->syncPermissions([
+            'operations.center.view',
+            'operations.attendance.view',
+            'operations.plans.view',
+            'operations.files.view',
+            'coach.dashboard.view',
+        ]);
+
+        $member = Role::firstOrCreate(['name' => 'member']);
+        $member->syncPermissions([
+            'operations.center.view',
+            'operations.tuition.view',
+            'member.dashboard.view',
+        ]);
+    }
+}
