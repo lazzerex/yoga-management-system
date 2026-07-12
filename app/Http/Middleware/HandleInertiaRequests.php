@@ -46,13 +46,14 @@ class HandleInertiaRequests extends Middleware
                     'username' => $user->username,
                     'email' => $user->email,
                     'role' => $user->role,
+                    'canAccessAdmin' => $user->canAccessAdmin(),
                 ] : null,
             ],
             'flash' => [
                 'success' => $request->session()->get('success'),
                 'error' => $request->session()->get('error'),
             ],
-            'menu' => fn () => Menu::forRole($user?->role),
+            'menu' => fn () => Menu::forUser($user),
         ]);
     }
 }
