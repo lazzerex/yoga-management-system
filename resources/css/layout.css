@@ -134,6 +134,55 @@
         border: 1px solid #ecdca3;
     }
 
+    .ym-side-parent { display: grid; gap: 0.18rem; }
+
+    .ym-side-link--parent {
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .ym-side-chevron {
+        font-size: 0.65rem;
+        color: #8a95a4;
+        flex-shrink: 0;
+    }
+
+    .ym-side-children {
+        display: grid;
+        gap: 0.1rem;
+        padding-left: 1.4rem;
+    }
+
+    .ym-side-children .ym-side-link {
+        position: relative;
+        font-size: 0.86rem;
+        font-weight: 500;
+        padding: 0.34rem 0.6rem 0.34rem 1.15rem;
+    }
+
+    .ym-side-children .ym-side-link::before {
+        content: '';
+        position: absolute;
+        left: 0.55rem;
+        top: 50%;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: transparent;
+        border: 1.5px solid #aab4c2;
+        transform: translateY(-50%);
+    }
+
+    .ym-side-children .ym-side-link--active::before {
+        border-color: #2f4f7d;
+    }
+
+    .ym-side-separator {
+        border: none;
+        border-top: 1px solid var(--ym-sidebar-border);
+        margin: 0.3rem 0.48rem;
+    }
+
     .ym-sidebar-footer {
         margin-top: auto;
         padding: 0.7rem 0.9rem 0.95rem;
