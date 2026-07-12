@@ -4,6 +4,8 @@ import { router, usePage } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import { loadLanguageAsync, trans as t, currentLocale } from 'laravel-vue-i18n';
 import NavMenuLink from '@/Components/UI/NavMenuLink.vue';
+import SidebarMenuItem from '@/Components/UI/SidebarMenuItem.vue';
+import { useSidebarMenuState } from '@/Composables/useSidebarMenuState.js';
 
 defineProps({
     title: {
@@ -41,16 +43,22 @@ const isMember = computed(() => userRole.value === 'member');
 
 const sidebarMenu = computed(() => {
     currentLocale.value;
+
+    const mapItem = (item) => ({
+        ...item,
+        label: t(item.labelKey),
+        badge: item.badgeKey ? t(item.badgeKey) : null,
+        children: (item.children ?? []).map(mapItem),
+    });
+
     return (page.props.menu ?? []).map((group) => ({
         key: group.labelKey,
         label: t(group.labelKey),
-        items: group.items.map((item) => ({
-            ...item,
-            label: t(item.labelKey),
-            badge: item.badgeKey ? t(item.badgeKey) : null,
-        })),
+        items: group.items.map(mapItem),
     }));
 });
+
+const { openMenuItems, toggleMenuItem } = useSidebarMenuState();
 
 const isMenuItemActive = (href) => {
     if (!href) return false;
@@ -335,17 +343,14 @@ const logout = () => {
             <nav class="ym-side-nav">
                 <section v-for="group in sidebarMenu" :key="group.key" class="ym-side-group-wrap">
                     <p class="ym-side-group">{{ group.label }}</p>
-                    <NavMenuLink
+                    <SidebarMenuItem
                         v-for="item in group.items"
-                        :key="item.href"
-                        :href="item.href"
-                        :label="item.label"
-                        :icon="item.icon"
-                        :icon-color="item.iconColor"
-                        :badge="item.badge"
-                        :active="isMenuItemActive(item.href)"
-                        variant="sidebar"
-                     />
+                        :key="item.href ?? item.labelKey"
+                        :item="item"
+                        :open-items="openMenuItems"
+                        :is-active="isMenuItemActive"
+                        :toggle="toggleMenuItem"
+                    />
                 </section>
             </nav>
 

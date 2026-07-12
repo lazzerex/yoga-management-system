@@ -17,6 +17,7 @@ const maxTopTabs = 6;
 
 const userRole = computed(() => props.auth?.user?.role ?? 'member');
 const isAdmin = computed(() => userRole.value === 'admin');
+const canAccessAdmin = computed(() => props.auth?.user?.canAccessAdmin ?? false);
 
 const renderKey = ref(0);
 watch(currentLocale, () => {
@@ -638,7 +639,7 @@ const dashboardTabsDraft = ref(hydrateDashboardTabs());
 
 watch(userRole, () => {
     dashboardTabsDraft.value = hydrateDashboardTabs();
-    if (!isAdmin.value) {
+    if (!canAccessAdmin.value) {
         showAddDashletModal.value = false;
     }
 });
@@ -748,7 +749,7 @@ const handleDashboardAction = (event) => {
     }
 
     if (action === 'add-dashlet') {
-        if (isAdmin.value) {
+        if (canAccessAdmin.value) {
             showAddDashletModal.value = true;
         } else {
             dashboardNotice.value = t('dashboard.dashletAdminOnly');
@@ -757,7 +758,7 @@ const handleDashboardAction = (event) => {
     }
 
     if (action === 'reset-dashboard') {
-        if (isAdmin.value) {
+        if (canAccessAdmin.value) {
             dashlets.value = buildDefaultDashlets();
         }
         activeView.value = 'homepage';
@@ -796,7 +797,7 @@ onBeforeUnmount(() => {
 
 <template>
     <AppLayout :title="pageTitle">
-        <template v-if="isAdmin">
+        <template v-if="canAccessAdmin">
             <section :key="renderKey" class="ym-dashlet-grid">
                 <Draggable
                     v-model="dashlets"
@@ -1118,14 +1119,14 @@ onBeforeUnmount(() => {
                 </div>
             </div>
 
-            <label v-if="isAdmin" class="ym-lock-toggle mt-3">
+            <label v-if="canAccessAdmin" class="ym-lock-toggle mt-3">
                 <span>{{ $t('dashboard.lockDashboard') }}</span>
                 <input v-model="lockDashboard" type="checkbox" />
             </label>
         </Modal>
 
         <Modal
-            v-if="isAdmin"
+            v-if="canAccessAdmin"
             :show="showAddDashletModal"
             :title="$t('dashboard.addDashlet')"
             @close="showAddDashletModal = false"
