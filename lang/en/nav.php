@@ -25,4 +25,9 @@ return [
     'loginLogs' => 'Login Logs',
     'auditLogs' => 'Audit Logs',
     'formDemo' => 'Form Demo',
+    'settings' => 'Settings',
+    'settingsGeneral' => 'General Settings',
+    'settingsSystem' => 'System',
+    'settingsSystemGeneral' => 'System Info',
+    'settingsSystemAdvanced' => 'Advanced Settings',
 ];

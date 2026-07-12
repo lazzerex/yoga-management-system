@@ -25,4 +25,9 @@ return [
     'loginLogs' => 'Nhật ký Đăng nhập',
     'auditLogs' => 'Nhật ký Hoạt động',
     'formDemo' => 'Demo Biểu mẫu',
+    'settings' => 'Cấu hình',
+    'settingsGeneral' => 'Cài đặt chung',
+    'settingsSystem' => 'Hệ thống',
+    'settingsSystemGeneral' => 'Thông tin hệ thống',
+    'settingsSystemAdvanced' => 'Cài đặt nâng cao',
 ];
