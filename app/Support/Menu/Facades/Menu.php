@@ -7,8 +7,8 @@ use Illuminate\Support\Facades\Facade;
 /**
  * Menu facade
  *
- * @method static void register(string $href, string $label, array $options = [])
- * @method static array forRole(?string $role)
+ * @method static void addItems(array $items)
+ * @method static array forUser(?\Illuminate\Contracts\Auth\Authenticatable $user)
  *
  * @see \App\Support\Menu\MenuRegistry
  */
