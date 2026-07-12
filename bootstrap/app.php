@@ -18,7 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
-            'role' => \App\Http\Middleware\EnsureRole::class,
+            'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
         ]);
 
         $middleware->web(append: [
