@@ -11,7 +11,9 @@
         "laravel/fortify": "^1.36",
         "laravel/framework": "^13.0",
         "laravel/tinker": "^3.0",
-        "tightenco/ziggy": "^2.6"
+        "spatie/laravel-permission": "^8.3",
+        "tightenco/ziggy": "^2.6",
+        "tormjens/eventy": "^0.9.5"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
