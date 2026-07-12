@@ -10,22 +10,32 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
 #[Fillable(['name', 'username', 'email', 'password', 'role'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasRoles;
 
-    public function isAdmin(): bool
+    protected static function booted(): void
     {
-        return $this->role === 'admin';
+        static::saved(function (User $user) {
+            if ($user->wasChanged('role') || $user->wasRecentlyCreated) {
+                $user->syncRoles([$user->role]);
+            }
+        });
     }
 
     public function loginLogs(): HasMany
     {
         return $this->hasMany(LoginLog::class);
+    }
+
+    public function canAccessAdmin(): bool
+    {
+        return $this->can('admin.dashboard.manage');
     }
 
     protected function casts(): array
