@@ -15,9 +15,14 @@ const getCurrentUrl = () =>
 
 const maxTopTabs = 6;
 
-const userRole = computed(() => props.auth?.user?.role ?? 'member');
-const isAdmin = computed(() => userRole.value === 'admin');
 const canAccessAdmin = computed(() => props.auth?.user?.canAccessAdmin ?? false);
+const canViewCoachDashboard = computed(() => props.auth?.user?.canViewCoachDashboard ?? false);
+
+const dashboardKey = computed(() => {
+    if (canAccessAdmin.value) return 'admin';
+    if (canViewCoachDashboard.value) return 'coach';
+    return 'member';
+});
 
 const renderKey = ref(0);
 watch(currentLocale, () => {
@@ -211,11 +216,10 @@ const roleDashboard = computed(() => {
     };
 });
 
-const dashboardConfig = computed(() => roleDashboard.value[userRole.value] ?? roleDashboard.value.member);
-const pageTitle = computed(() => roleDashboard.value[userRole.value]?.pageTitle ?? 'Dashboard');
+const dashboardConfig = computed(() => roleDashboard.value[dashboardKey.value] ?? roleDashboard.value.member);
+const pageTitle = computed(() => roleDashboard.value[dashboardKey.value]?.pageTitle ?? 'Dashboard');
 const dashboardNotice = ref('');
 const activeView = ref('homepage');
-const isCoach = computed(() => userRole.value === 'coach');
 
 const viewConfigs = computed(() => {
     void currentLocale.value;
@@ -337,7 +341,7 @@ const viewConfigs = computed(() => {
     };
 });
 
-const currentViewConfig = computed(() => viewConfigs.value[userRole.value]?.[activeView.value] ?? null);
+const currentViewConfig = computed(() => viewConfigs.value[dashboardKey.value]?.[activeView.value] ?? null);
 
 const activities = computed(() => {
     void currentLocale.value;
@@ -596,21 +600,20 @@ const toViewKey = (value) => value
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
 
-const buildDefaultDashboardTabs = (role) => {
-    const config = roleDashboard.value[role] ?? roleDashboard.value.member;
-    const isAdminRole = role === 'admin';
+const buildDefaultDashboardTabs = (key) => {
+    const config = roleDashboard.value[key] ?? roleDashboard.value.member;
 
     return config.tabs.map((label, index) => {
         const viewKey = index === 0 ? 'homepage' : (toViewKey(label) || `view-${index + 1}`);
         return {
             label,
             viewKey,
-            href: index === 0 ? route('cms.dashboard') : (isAdminRole ? route('cms.dashboard', { view: viewKey }) : ''),
+            href: index === 0 ? route('cms.dashboard') : (canAccessAdmin.value ? route('cms.dashboard', { view: viewKey }) : ''),
         };
     });
 };
 
-const defaultDashboardTabs = computed(() => buildDefaultDashboardTabs(userRole.value));
+const defaultDashboardTabs = computed(() => buildDefaultDashboardTabs(dashboardKey.value));
 
 const createTabsDraft = (tabs) => tabs.slice(0, maxTopTabs).map((tab, index) => ({
     id: `tab-${index}-${tab.viewKey ?? index}`,
@@ -637,7 +640,7 @@ const dashboardTabError = ref('');
 const newDashboardTabLabel = ref('');
 const dashboardTabsDraft = ref(hydrateDashboardTabs());
 
-watch(userRole, () => {
+watch(dashboardKey, () => {
     dashboardTabsDraft.value = hydrateDashboardTabs();
     if (!canAccessAdmin.value) {
         showAddDashletModal.value = false;
@@ -693,7 +696,7 @@ const normalizeDashboardTabs = (draftTabs) => draftTabs.map((tab, index) => {
     return {
         label,
         viewKey,
-        href: index === 0 ? route('cms.dashboard') : (isAdmin.value ? route('cms.dashboard', { view: viewKey }) : ''),
+        href: index === 0 ? route('cms.dashboard') : (canAccessAdmin.value ? route('cms.dashboard', { view: viewKey }) : ''),
     };
 });
 
@@ -1026,7 +1029,7 @@ onBeforeUnmount(() => {
                                             <div
                                                 v-for="entry in day.entries"
                                                 :key="entry.title"
-                                                :class="['ym-timetable-slot', { 'ym-timetable-slot--coach': isCoach }]"
+                                                :class="['ym-timetable-slot', { 'ym-timetable-slot--coach': canViewCoachDashboard }]"
                                             >
                                                 <p class="ym-timetable-time">{{ entry.time }}</p>
                                                 <p class="ym-timetable-name">{{ entry.title }}</p>
