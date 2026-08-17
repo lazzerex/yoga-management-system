@@ -37,9 +37,8 @@ const resolveFlashMessage = (message) => {
 const flash = computed(() => page.props.flash ?? {});
 const userName = computed(() => page.props.auth?.user?.name ?? 'Guest');
 const userRole = computed(() => page.props.auth?.user?.role ?? 'member');
-const isAdmin = computed(() => userRole.value === 'admin');
-const isCoach = computed(() => userRole.value === 'coach');
-const isMember = computed(() => userRole.value === 'member');
+const canAccessAdmin = computed(() => page.props.auth?.user?.canAccessAdmin ?? false);
+const canViewCoachDashboard = computed(() => page.props.auth?.user?.canViewCoachDashboard ?? false);
 
 const sidebarMenu = computed(() => {
     currentLocale.value;
@@ -85,7 +84,7 @@ const dashboardActionsRef = ref(null);
 
 const roleTopMenuDefaults = computed(() => {
     currentLocale.value;
-    if (isAdmin.value) {
+    if (canAccessAdmin.value) {
         return [
             { label: t('dashboard.homepage'), viewKey: 'homepage', href: route('cms.dashboard') },
             { label: t('dashboard.mySchedule'), viewKey: 'my-schedule', href: route('cms.dashboard', { view: 'my-schedule' }) },
@@ -96,7 +95,7 @@ const roleTopMenuDefaults = computed(() => {
         ];
     }
 
-    if (isCoach.value) {
+    if (canViewCoachDashboard.value) {
         return [
             { label: t('dashboard.homepage'), viewKey: 'homepage', href: route('cms.dashboard') },
             { label: t('dashboard.overview'), viewKey: 'overview', href: '' },
@@ -192,7 +191,7 @@ const isTopNavActive = (item) => {
         return false;
     }
 
-    if (isAdmin.value) {
+    if (canAccessAdmin.value) {
         return dashboardView.value === item.viewKey;
     }
 
@@ -200,7 +199,7 @@ const isTopNavActive = (item) => {
 };
 
 const getTopNavHref = (item) => {
-    if (isAdmin.value) {
+    if (canAccessAdmin.value) {
         return item.href;
     }
 
@@ -208,7 +207,7 @@ const getTopNavHref = (item) => {
 };
 
 const handleTopTabClick = (item) => {
-    if (isAdmin.value) {
+    if (canAccessAdmin.value) {
         return;
     }
 
@@ -305,7 +304,7 @@ onMounted(() => {
     window.addEventListener('ym-dashboard-tabs-updated', handleDashboardTabsUpdated);
 });
 
-watch(userRole, () => {
+watch([canAccessAdmin, canViewCoachDashboard], () => {
     topMenuItems.value = roleTopMenuDefaults.value.map((item) => ({ ...item }));
     coachMemberView.value = 'homepage';
 }, { immediate: true });
