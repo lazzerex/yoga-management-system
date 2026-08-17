@@ -47,6 +47,7 @@ class HandleInertiaRequests extends Middleware
                     'email' => $user->email,
                     'role' => $user->role,
                     'canAccessAdmin' => $user->canAccessAdmin(),
+                    'canViewCoachDashboard' => $user->can('coach.dashboard.view'),
                 ] : null,
             ],
             'flash' => [
