@@ -12,6 +12,7 @@ class PermissionSeeder extends Seeder
     {
         $permissions = [
             'operations.center.view',
+            'operations.center.manage',
             'operations.attendance.view',
             'operations.plans.view',
             'operations.files.view',
@@ -37,6 +38,7 @@ class PermissionSeeder extends Seeder
         $admin = Role::firstOrCreate(['name' => 'admin']);
         $admin->syncPermissions([
             'operations.center.view',
+            'operations.center.manage',
             'operations.attendance.view',
             'operations.plans.view',
             'operations.files.view',
