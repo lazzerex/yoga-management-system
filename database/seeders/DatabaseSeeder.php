@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             PermissionSeeder::class,
             DummyUsersSeeder::class,
+            BranchSeeder::class,
         ]);
 
         // WithoutModelEvents suppresses the User::booted() saved hook during
