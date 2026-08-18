@@ -9,4 +9,7 @@ return [
     'lastAdminRequired' => 'Cần ít nhất một tài khoản quản trị.',
     'cannotDeleteOwnAccount' => 'Bạn không thể xóa tài khoản của chính mình.',
     'noSectionAccess' => 'Bạn không có quyền truy cập vào mục này.',
+    'branchCreated' => 'Đã tạo chi nhánh :name thành công.',
+    'branchUpdated' => 'Đã cập nhật chi nhánh :name thành công.',
+    'branchDeleted' => 'Đã xóa chi nhánh :name.',
 ];
