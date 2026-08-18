@@ -3,6 +3,7 @@
 use App\Modules\Admin\AuditLog\Controllers\AuditLogController;
 use App\Modules\Admin\LoginLog\Controllers\LoginLogController;
 use App\Modules\Admin\User\Controllers\UserController;
+use App\Modules\Operations\Branch\Controllers\BranchController;
 use App\Modules\Profile\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -21,8 +22,16 @@ Route::prefix('cms')->group(function () {
 
         Route::prefix('operations')->name('operations.')->group(function () {
             Route::middleware('permission:operations.center.view')->group(function () {
-                Route::get('/yoga-center', fn () => inertia('Operations/YogaCenter'))->name('yoga-center');
+                Route::get('/yoga-center', [BranchController::class, 'index'])->name('yoga-center');
                 Route::get('/academy', fn () => inertia('Operations/Academy'))->name('academy');
+            });
+
+            Route::middleware('permission:operations.center.manage')->prefix('branches')->name('branches.')->group(function () {
+                Route::get('/create', [BranchController::class, 'create'])->name('create');
+                Route::post('/', [BranchController::class, 'store'])->name('store');
+                Route::get('/{branch}/edit', [BranchController::class, 'edit'])->name('edit');
+                Route::patch('/{branch}', [BranchController::class, 'update'])->name('update');
+                Route::delete('/{branch}', [BranchController::class, 'destroy'])->name('destroy');
             });
 
             Route::middleware('permission:operations.attendance.view')->group(function () {
