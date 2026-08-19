@@ -4,6 +4,8 @@ namespace App\Modules\Operations\Branch\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Branch;
+use App\Models\ClassType;
+use App\Models\Room;
 use App\Modules\Operations\Branch\Actions\CreateBranchAction;
 use App\Modules\Operations\Branch\Actions\DeleteBranchAction;
 use App\Modules\Operations\Branch\Actions\UpdateBranchAction;
@@ -17,7 +19,9 @@ class BranchController extends Controller
 {
     public function index(Request $request): Response
     {
-        $branches = Branch::orderBy('name')->paginate(20);
+        $branches = Branch::orderBy('name')->paginate(20, pageName: 'branchesPage');
+        $rooms = Room::with('branch:id,name')->orderBy('name')->paginate(20, pageName: 'roomsPage');
+        $classTypes = ClassType::orderBy('name')->paginate(20, pageName: 'classTypesPage');
         $canManage = $request->user()->can('operations.center.manage');
 
         return inertia('Operations/YogaCenter', [
@@ -29,12 +33,36 @@ class BranchController extends Controller
                 'phone' => $branch->phone,
                 'is_active' => $branch->is_active,
             ]),
-            'stats' => [
+            'branchStats' => [
                 'total' => Branch::count(),
                 'active' => Branch::active()->count(),
             ],
+            'rooms' => $rooms->through(fn (Room $room) => [
+                'id' => $room->id,
+                'branch_id' => $room->branch_id,
+                'branch_name' => $room->branch->name,
+                'name' => $room->name,
+                'capacity' => $room->capacity,
+                'is_active' => $room->is_active,
+            ]),
+            'roomStats' => [
+                'total' => Room::count(),
+                'active' => Room::active()->count(),
+            ],
+            'classTypes' => $classTypes->through(fn (ClassType $classType) => [
+                'id' => $classType->id,
+                'name' => $classType->name,
+                'description' => $classType->description,
+                'is_active' => $classType->is_active,
+            ]),
+            'classTypeStats' => [
+                'total' => ClassType::count(),
+                'active' => ClassType::active()->count(),
+            ],
             'endpoints' => [
-                'create' => $canManage ? route('operations.branches.create') : null,
+                'createBranch' => $canManage ? route('operations.branches.create') : null,
+                'createRoom' => $canManage ? route('operations.rooms.create') : null,
+                'createClassType' => $canManage ? route('operations.class-types.create') : null,
             ],
         ]);
     }
