@@ -4,6 +4,8 @@ use App\Modules\Admin\AuditLog\Controllers\AuditLogController;
 use App\Modules\Admin\LoginLog\Controllers\LoginLogController;
 use App\Modules\Admin\User\Controllers\UserController;
 use App\Modules\Operations\Branch\Controllers\BranchController;
+use App\Modules\Operations\ClassType\Controllers\ClassTypeController;
+use App\Modules\Operations\Room\Controllers\RoomController;
 use App\Modules\Profile\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -26,12 +28,30 @@ Route::prefix('cms')->group(function () {
                 Route::get('/academy', fn () => inertia('Operations/Academy'))->name('academy');
             });
 
-            Route::middleware('permission:operations.center.manage')->prefix('branches')->name('branches.')->group(function () {
-                Route::get('/create', [BranchController::class, 'create'])->name('create');
-                Route::post('/', [BranchController::class, 'store'])->name('store');
-                Route::get('/{branch}/edit', [BranchController::class, 'edit'])->name('edit');
-                Route::patch('/{branch}', [BranchController::class, 'update'])->name('update');
-                Route::delete('/{branch}', [BranchController::class, 'destroy'])->name('destroy');
+            Route::middleware('permission:operations.center.manage')->group(function () {
+                Route::prefix('branches')->name('branches.')->group(function () {
+                    Route::get('/create', [BranchController::class, 'create'])->name('create');
+                    Route::post('/', [BranchController::class, 'store'])->name('store');
+                    Route::get('/{branch}/edit', [BranchController::class, 'edit'])->name('edit');
+                    Route::patch('/{branch}', [BranchController::class, 'update'])->name('update');
+                    Route::delete('/{branch}', [BranchController::class, 'destroy'])->name('destroy');
+                });
+
+                Route::prefix('rooms')->name('rooms.')->group(function () {
+                    Route::get('/create', [RoomController::class, 'create'])->name('create');
+                    Route::post('/', [RoomController::class, 'store'])->name('store');
+                    Route::get('/{room}/edit', [RoomController::class, 'edit'])->name('edit');
+                    Route::patch('/{room}', [RoomController::class, 'update'])->name('update');
+                    Route::delete('/{room}', [RoomController::class, 'destroy'])->name('destroy');
+                });
+
+                Route::prefix('class-types')->name('class-types.')->group(function () {
+                    Route::get('/create', [ClassTypeController::class, 'create'])->name('create');
+                    Route::post('/', [ClassTypeController::class, 'store'])->name('store');
+                    Route::get('/{classType}/edit', [ClassTypeController::class, 'edit'])->name('edit');
+                    Route::patch('/{classType}', [ClassTypeController::class, 'update'])->name('update');
+                    Route::delete('/{classType}', [ClassTypeController::class, 'destroy'])->name('destroy');
+                });
             });
 
             Route::middleware('permission:operations.attendance.view')->group(function () {
