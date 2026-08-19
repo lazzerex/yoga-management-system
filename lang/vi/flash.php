@@ -12,4 +12,11 @@ return [
     'branchCreated' => 'Đã tạo chi nhánh :name thành công.',
     'branchUpdated' => 'Đã cập nhật chi nhánh :name thành công.',
     'branchDeleted' => 'Đã xóa chi nhánh :name.',
+    'branchHasRooms' => 'Không thể xóa chi nhánh còn phòng tập. Hãy xóa các phòng tập trước.',
+    'roomCreated' => 'Đã tạo phòng tập :name thành công.',
+    'roomUpdated' => 'Đã cập nhật phòng tập :name thành công.',
+    'roomDeleted' => 'Đã xóa phòng tập :name.',
+    'classTypeCreated' => 'Đã tạo loại lớp :name thành công.',
+    'classTypeUpdated' => 'Đã cập nhật loại lớp :name thành công.',
+    'classTypeDeleted' => 'Đã xóa loại lớp :name.',
 ];

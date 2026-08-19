@@ -12,4 +12,11 @@ return [
     'branchCreated' => 'Branch :name created successfully.',
     'branchUpdated' => 'Branch :name updated successfully.',
     'branchDeleted' => 'Branch :name deleted.',
+    'branchHasRooms' => 'Cannot delete a branch that still has rooms. Remove its rooms first.',
+    'roomCreated' => 'Room :name created successfully.',
+    'roomUpdated' => 'Room :name updated successfully.',
+    'roomDeleted' => 'Room :name deleted.',
+    'classTypeCreated' => 'Class type :name created successfully.',
+    'classTypeUpdated' => 'Class type :name updated successfully.',
+    'classTypeDeleted' => 'Class type :name deleted.',
 ];
