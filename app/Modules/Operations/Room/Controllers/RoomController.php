@@ -20,7 +20,7 @@ class RoomController extends Controller
     {
         return inertia('Operations/Rooms/Create', [
             'branches' => Branch::orderBy('name')->get(['id', 'name']),
-            'selectedBranchId' => $request->integer('branch_id') ?: null,
+            'selectedBranchId' => $request->attributes->get('currentBranch')?->id,
             'endpoints' => [
                 'store' => route('operations.rooms.store'),
                 'index' => route('operations.yoga-center'),
