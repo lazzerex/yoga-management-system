@@ -1,17 +1,13 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
-import { trans as t } from 'laravel-vue-i18n';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import Modal from '@/Components/UI/Modal.vue';
-import Select from '@/Components/Form/Select.vue';
 
-const props = defineProps({
+defineProps({
     branches: Object,
     branchStats: Object,
-    branchOptions: Array,
-    selectedBranchId: Number,
     rooms: Object,
     roomStats: Object,
     classTypes: Object,
@@ -19,21 +15,6 @@ const props = defineProps({
     endpoints: Object,
     canManage: Boolean,
 });
-
-const roomBranchFilterOptions = computed(() => [
-    { value: '', label: t('operations.allBranches') },
-    ...props.branchOptions.map((b) => ({ value: String(b.id), label: b.name })),
-]);
-const roomBranchFilter = ref(props.selectedBranchId ? String(props.selectedBranchId) : '');
-
-const applyRoomBranchFilter = (value) => {
-    roomBranchFilter.value = value;
-    router.get(route('operations.yoga-center'), value ? { branch_id: value } : {}, {
-        preserveState: true,
-        preserveScroll: true,
-        replace: true,
-    });
-};
 
 const tabs = [
     { key: 'branches', label: 'operations.branches' },
@@ -184,18 +165,9 @@ const confirmDeleteClassType = () => {
                         </h2>
                         <p class="ym-subtitle">{{ $t('operations.manageRooms') }}</p>
                     </div>
-                    <div class="flex items-center gap-2 shrink-0">
-                        <div class="w-44 shrink-0">
-                            <Select
-                                :model-value="roomBranchFilter"
-                                :options="roomBranchFilterOptions"
-                                @update:model-value="applyRoomBranchFilter"
-                            />
-                        </div>
-                        <Link v-if="endpoints.createRoom" :href="endpoints.createRoom" class="ym-btn-sm shrink-0 whitespace-nowrap">
-                            {{ $t('operations.createRoom') }}
-                        </Link>
-                    </div>
+                    <Link v-if="endpoints.createRoom" :href="endpoints.createRoom" class="ym-btn-sm">
+                        {{ $t('operations.createRoom') }}
+                    </Link>
                 </div>
 
                 <div class="ym-table-wrap">

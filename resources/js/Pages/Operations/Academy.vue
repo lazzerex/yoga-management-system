@@ -1,36 +1,18 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import { trans as t } from 'laravel-vue-i18n';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import Modal from '@/Components/UI/Modal.vue';
-import Select from '@/Components/Form/Select.vue';
 
 const props = defineProps({
     sessions: Object,
     schedules: Object,
     stats: Object,
-    branchOptions: Array,
-    selectedBranchId: Number,
     endpoints: Object,
     canManage: Boolean,
 });
-
-const branchFilterOptions = computed(() => [
-    { value: '', label: t('operations.allBranches') },
-    ...props.branchOptions.map((b) => ({ value: String(b.id), label: b.name })),
-]);
-const branchFilter = ref(props.selectedBranchId ? String(props.selectedBranchId) : '');
-
-const applyBranchFilter = (value) => {
-    branchFilter.value = value;
-    router.get(route('operations.academy'), value ? { branch_id: value } : {}, {
-        preserveState: true,
-        preserveScroll: true,
-        replace: true,
-    });
-};
 
 const tabs = [
     { key: 'sessions', label: 'operations.sessions' },
@@ -60,6 +42,16 @@ const confirmDeleteSchedule = () => {
         onSuccess: () => (pendingDeleteSchedule.value = null),
     });
 };
+
+const generatingSessions = ref(false);
+
+const generateSessions = () => {
+    generatingSessions.value = true;
+    router.post(props.endpoints.generateSessions, {}, {
+        preserveScroll: true,
+        onFinish: () => (generatingSessions.value = false),
+    });
+};
 </script>
 
 <template>
@@ -75,28 +67,19 @@ const confirmDeleteSchedule = () => {
             </div>
         </div>
 
-        <div class="flex items-center justify-between border-b border-neutral-200 mb-4">
-            <div class="flex gap-2">
-                <button
-                    v-for="tab in tabs"
-                    :key="tab.key"
-                    type="button"
-                    class="px-3 py-2 text-sm font-medium border-b-2 -mb-px"
-                    :class="activeTab === tab.key
-                        ? 'border-neutral-900 text-neutral-900'
-                        : 'border-transparent text-neutral-500 hover:text-neutral-700'"
-                    @click="activeTab = tab.key"
-                >
-                    {{ $t(tab.label) }}
-                </button>
-            </div>
-            <div class="w-44 shrink-0">
-                <Select
-                    :model-value="branchFilter"
-                    :options="branchFilterOptions"
-                    @update:model-value="applyBranchFilter"
-                />
-            </div>
+        <div class="flex gap-2 border-b border-neutral-200 mb-4">
+            <button
+                v-for="tab in tabs"
+                :key="tab.key"
+                type="button"
+                class="px-3 py-2 text-sm font-medium border-b-2 -mb-px"
+                :class="activeTab === tab.key
+                    ? 'border-neutral-900 text-neutral-900'
+                    : 'border-transparent text-neutral-500 hover:text-neutral-700'"
+                @click="activeTab = tab.key"
+            >
+                {{ $t(tab.label) }}
+            </button>
         </div>
 
         <template v-if="activeTab === 'sessions'">
@@ -168,9 +151,20 @@ const confirmDeleteSchedule = () => {
                         </h2>
                         <p class="ym-subtitle">{{ $t('operations.manageSchedules') }}</p>
                     </div>
-                    <Link v-if="endpoints.createSchedule" :href="endpoints.createSchedule" class="ym-btn-sm">
-                        {{ $t('operations.createSchedule') }}
-                    </Link>
+                    <div class="flex items-center gap-2">
+                        <button
+                            v-if="endpoints.generateSessions"
+                            type="button"
+                            class="ym-btn-outline"
+                            :disabled="generatingSessions"
+                            @click="generateSessions"
+                        >
+                            {{ $t('operations.generateSessions') }}
+                        </button>
+                        <Link v-if="endpoints.createSchedule" :href="endpoints.createSchedule" class="ym-btn-sm">
+                            {{ $t('operations.createSchedule') }}
+                        </Link>
+                    </div>
                 </div>
 
                 <div class="ym-table-wrap">

@@ -81,6 +81,35 @@ const notificationsRef = ref(null);
 const profileMenuRef = ref(null);
 const dashboardActionsOpen = ref(false);
 const dashboardActionsRef = ref(null);
+const branchSwitcherOpen = ref(false);
+const branchSwitcherRef = ref(null);
+
+const currentBranch = computed(() => page.props.currentBranch);
+const allBranches = computed(() => page.props.allBranches ?? []);
+const branchSwitching = ref(false);
+
+const toggleBranchSwitcher = () => {
+    branchSwitcherOpen.value = !branchSwitcherOpen.value;
+    if (branchSwitcherOpen.value) {
+        notificationsOpen.value = false;
+        profileMenuOpen.value = false;
+        dashboardActionsOpen.value = false;
+    }
+};
+
+const switchBranch = (branchId) => {
+    if (branchId === currentBranch.value?.id) {
+        branchSwitcherOpen.value = false;
+        return;
+    }
+
+    branchSwitcherOpen.value = false;
+    branchSwitching.value = true;
+    document.cookie = `branch_id=${branchId}; path=/; SameSite=Lax`;
+    router.reload({
+        onFinish: () => { branchSwitching.value = false; },
+    });
+};
 
 const roleTopMenuDefaults = computed(() => {
     currentLocale.value;
@@ -222,6 +251,7 @@ const closeMenus = () => {
     notificationsOpen.value = false;
     profileMenuOpen.value = false;
     dashboardActionsOpen.value = false;
+    branchSwitcherOpen.value = false;
 };
 
 const toggleNotifications = () => {
@@ -296,6 +326,10 @@ const handleGlobalClick = (event) => {
 
     if (dashboardActionsOpen.value && dashboardActionsRef.value && !dashboardActionsRef.value.contains(target)) {
         dashboardActionsOpen.value = false;
+    }
+
+    if (branchSwitcherOpen.value && branchSwitcherRef.value && !branchSwitcherRef.value.contains(target)) {
+        branchSwitcherOpen.value = false;
     }
 };
 
@@ -377,6 +411,36 @@ const logout = () => {
                     </div>
 
                     <div class="ym-topbar-actions">
+                        <div v-if="currentBranch" ref="branchSwitcherRef" class="ym-header-menu-wrap">
+                            <button
+                                type="button"
+                                class="ym-btn-sm ym-branch-switch-btn"
+                                :class="{ 'ym-branch-switch-btn--busy': branchSwitching }"
+                                :disabled="branchSwitching"
+                                aria-haspopup="menu"
+                                :aria-expanded="branchSwitcherOpen"
+                                @click.stop="toggleBranchSwitcher"
+                            >
+                                <i :class="branchSwitching ? 'bi bi-arrow-repeat ym-branch-switch-spinner' : 'bi bi-geo-alt'" />
+                                {{ currentBranch.name }}
+                                <i class="bi bi-chevron-down ym-branch-switch-caret" />
+                            </button>
+
+                            <div v-if="branchSwitcherOpen" class="ym-popover ym-popover-menu" role="menu">
+                                <button
+                                    v-for="branch in allBranches"
+                                    :key="branch.id"
+                                    type="button"
+                                    class="ym-menu-item"
+                                    :class="{ 'ym-menu-item--active': branch.id === currentBranch.id }"
+                                    @click="switchBranch(branch.id)"
+                                >
+                                    <span>{{ branch.name }}</span>
+                                    <i v-if="branch.id === currentBranch.id" class="bi bi-check2" />
+                                </button>
+                            </div>
+                        </div>
+
                         <label class="ym-search-wrap" :aria-label="$t('common.search')">
                             <i class="bi bi-search ym-search-icon" />
                             <input
