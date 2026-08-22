@@ -25,7 +25,7 @@ class ClassScheduleFactory extends Factory
             'day_of_week' => fake()->numberBetween(0, 6),
             'start_time' => fake()->randomElement(['06:00', '08:00', '10:00', '17:30', '19:00']),
             'duration_minutes' => fake()->randomElement([45, 60, 75, 90]),
-            'capacity' => fake()->numberBetween(8, 20),
+            'capacity' => fake()->numberBetween(1, $room->capacity),
             'is_active' => true,
         ];
     }
