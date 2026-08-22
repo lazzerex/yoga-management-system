@@ -32,4 +32,5 @@ return [
     'classScheduleDeleted' => 'Recurring template deleted.',
     'scheduleHasSessions' => 'Cannot delete a template that already has generated sessions.',
     'classSessionUpdated' => 'Session updated successfully.',
+    'sessionsGenerated' => 'Generated :count session(s).',
 ];

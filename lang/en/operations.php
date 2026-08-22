@@ -3,7 +3,6 @@
 return [
     'yogaCenter' => 'Yoga Center Management',
     'branches' => 'Branches',
-    'allBranches' => 'All Branches',
     'totalBranches' => 'Total Branches',
     'activeBranches' => 'Active Branches',
     'manageBranches' => 'Create and maintain studio locations',
@@ -81,6 +80,7 @@ return [
     'schedules' => 'Recurring Templates',
     'manageSchedules' => 'Create and maintain recurring class templates',
     'createSchedule' => 'Add Template',
+    'generateSessions' => 'Generate Sessions',
     'editSchedule' => 'Edit Template',
     'saveSchedule' => 'Save Changes',
     'editSession' => 'Edit Session',

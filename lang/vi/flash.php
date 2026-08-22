@@ -30,6 +30,7 @@ return [
     'classScheduleCreated' => 'Đã tạo mẫu lịch lặp thành công.',
     'classScheduleUpdated' => 'Đã cập nhật mẫu lịch lặp thành công.',
     'classScheduleDeleted' => 'Đã xóa mẫu lịch lặp.',
-    'scheduleHasSessions' => 'Không thể xóa mẫu đã có buổi học được sinh ra.',
+    'scheduleHasSessions' => 'Không thể xóa mẫu đã có buổi học được tạo.',
     'classSessionUpdated' => 'Đã cập nhật buổi học thành công.',
+    'sessionsGenerated' => 'Đã tạo :count buổi học.',
 ];
