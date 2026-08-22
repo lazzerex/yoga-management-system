@@ -9,13 +9,16 @@ import Checkbox from '@/Components/Form/Checkbox.vue';
 
 const props = defineProps({
     branches: Array,
+    selectedBranchId: Number,
     endpoints: Object,
 });
 
 const branchOptions = computed(() => props.branches.map((branch) => ({ value: String(branch.id), label: branch.name })));
 
+const defaultBranchId = props.selectedBranchId ?? props.branches[0]?.id;
+
 const form = useForm({
-    branch_id: props.branches[0] ? String(props.branches[0].id) : '',
+    branch_id: defaultBranchId ? String(defaultBranchId) : '',
     name: '',
     capacity: '',
     is_active: true,

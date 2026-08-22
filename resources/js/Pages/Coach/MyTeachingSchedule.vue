@@ -3,58 +3,42 @@ import { computed } from 'vue';
 import { trans as t } from 'laravel-vue-i18n';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
-const teachingSchedule = computed(() => [
-    {
-        day: t('dashboard.mondayShort'),
-        date: 'Apr 27',
-        classes: [
-            { time: '06:45', title: 'Sunrise Mobility', branch: 'Westside', students: t('coach.studentsCount', { count: 18 }) },
-            { time: '18:30', title: 'Evening Yin', branch: 'Downtown', students: t('coach.studentsCount', { count: 21 }) },
-        ],
-    },
-    {
-        day: t('dashboard.tuesdayShort'),
-        date: 'Apr 28',
-        classes: [
-            { time: '07:00', title: 'Power Core', branch: 'Riverside', students: t('coach.studentsCount', { count: 24 }) },
-            { time: '19:30', title: 'Breathwork Lab', branch: 'Online', students: t('coach.studentsCount', { count: 32 }) },
-        ],
-    },
-    {
-        day: t('dashboard.wednesdayShort'),
-        date: 'Apr 29',
-        classes: [
-            { time: '18:30', title: 'Evening Yin', branch: 'Downtown', students: t('coach.studentsCount', { count: 20 }) },
-        ],
-    },
-    {
-        day: t('dashboard.thursdayShort'),
-        date: 'Apr 30',
-        classes: [
-            { time: '07:00', title: 'Power Core', branch: 'Riverside', students: t('coach.studentsCount', { count: 23 }) },
-            { time: '12:30', title: 'Prenatal Flow', branch: 'Westside', students: t('coach.studentsCount', { count: 14 }) },
-        ],
-    },
-    {
-        day: t('dashboard.fridayShort'),
-        date: 'May 01',
-        classes: [
-            { time: '17:45', title: 'Mobility Reset', branch: 'Downtown', students: t('coach.studentsCount', { count: 16 }) },
-        ],
-    },
-    {
-        day: t('dashboard.saturdayShort'),
-        date: 'May 02',
-        classes: [
-            { time: '09:00', title: 'Weekend Flow', branch: 'Uptown', students: t('coach.studentsCount', { count: 19 }) },
-        ],
-    },
-    {
-        day: t('dashboard.sundayShort'),
-        date: 'May 03',
-        classes: [],
-    },
-]);
+const props = defineProps({
+    sessions: Array,
+});
+
+const dayShortKeys = [
+    'dashboard.sundayShort',
+    'dashboard.mondayShort',
+    'dashboard.tuesdayShort',
+    'dashboard.wednesdayShort',
+    'dashboard.thursdayShort',
+    'dashboard.fridayShort',
+    'dashboard.saturdayShort',
+];
+
+// `students` count per slot needs `enrollments` (not built yet) — omitted rather than faked.
+const teachingSchedule = computed(() => {
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+        const date = new Date();
+        date.setDate(date.getDate() + i);
+        const isoDate = date.toISOString().slice(0, 10);
+
+        days.push({
+            day: t(dayShortKeys[date.getDay()]),
+            date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+            classes: props.sessions
+                .filter((session) => session.session_date === isoDate)
+                .map((session) => ({
+                    time: session.start_time,
+                    title: session.class_type_name,
+                    branch: `${session.branch_name} · ${session.room_name}`,
+                })),
+        });
+    }
+    return days;
+});
 
 const todayHighlights = computed(() => [
     { title: 'Evening Yin', meta: t('coach.insightNearCapacityMeta'), badge: t('coach.today') },
@@ -94,7 +78,7 @@ const teachingLoad = computed(() => [
                                 >
                                     <p class="ym-timetable-time">{{ item.time }}</p>
                                     <p class="ym-timetable-name">{{ item.title }}</p>
-                                    <p class="ym-timetable-sub">{{ item.branch }} · {{ item.students }}</p>
+                                    <p class="ym-timetable-sub">{{ item.branch }}</p>
                                 </div>
                                 <div v-if="!day.classes.length" class="ym-timetable-empty">&mdash;</div>
                             </div>

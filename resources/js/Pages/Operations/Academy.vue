@@ -1,97 +1,244 @@
-﻿<script setup>
+<script setup>
+import { computed, ref } from 'vue';
+import { Link, router } from '@inertiajs/vue3';
+import { route } from 'ziggy-js';
+import { trans as t } from 'laravel-vue-i18n';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Modal from '@/Components/UI/Modal.vue';
+import Select from '@/Components/Form/Select.vue';
 
-const classes = [
-    { className: 'Morning Vinyasa', teacher: 'Mia Tran', branch: 'Downtown', capacity: '22 / 24' },
-    { className: 'Prenatal Flow', teacher: 'Emily Rogers', branch: 'Westside', capacity: '12 / 16' },
-    { className: 'Power Core', teacher: 'Daniel Park', branch: 'Riverside', capacity: '20 / 20' },
-    { className: 'Evening Yin', teacher: 'Ari Gomez', branch: 'Uptown', capacity: '18 / 20' },
+const props = defineProps({
+    sessions: Object,
+    schedules: Object,
+    stats: Object,
+    branchOptions: Array,
+    selectedBranchId: Number,
+    endpoints: Object,
+    canManage: Boolean,
+});
+
+const branchFilterOptions = computed(() => [
+    { value: '', label: t('operations.allBranches') },
+    ...props.branchOptions.map((b) => ({ value: String(b.id), label: b.name })),
+]);
+const branchFilter = ref(props.selectedBranchId ? String(props.selectedBranchId) : '');
+
+const applyBranchFilter = (value) => {
+    branchFilter.value = value;
+    router.get(route('operations.academy'), value ? { branch_id: value } : {}, {
+        preserveState: true,
+        preserveScroll: true,
+        replace: true,
+    });
+};
+
+const tabs = [
+    { key: 'sessions', label: 'operations.sessions' },
+    { key: 'schedules', label: 'operations.schedules' },
+];
+const activeTab = ref('sessions');
+
+const dayNames = [
+    'operations.daySunday',
+    'operations.dayMonday',
+    'operations.dayTuesday',
+    'operations.dayWednesday',
+    'operations.dayThursday',
+    'operations.dayFriday',
+    'operations.daySaturday',
 ];
 
-const assignments = [
-    { title: 'Substitute for Evening Yin', meta: 'Uptown / Apr 22', status: 'Pending' },
-    { title: 'New Intro to Ashtanga slot', meta: 'Downtown / Apr 25', status: 'Review' },
-    { title: 'Weekend workshop staffing', meta: 'Westside / Apr 28', status: 'Planned' },
-];
+const dayLabel = (dayOfWeek) => t(dayNames[dayOfWeek]);
+
+const statusLabel = (status) => t(`operations.status${status.charAt(0).toUpperCase()}${status.slice(1)}`);
+
+const pendingDeleteSchedule = ref(null);
+
+const confirmDeleteSchedule = () => {
+    router.delete(route('operations.class-schedules.destroy', pendingDeleteSchedule.value.id), {
+        preserveScroll: true,
+        onSuccess: () => (pendingDeleteSchedule.value = null),
+    });
+};
 </script>
 
 <template>
     <AppLayout :title="$t('operations.academy')">
         <div class="ym-stat-strip">
             <div class="ym-stat">
-                <p class="ym-stat-label">{{ $t('operations.students') }}</p>
-                <p class="ym-stat-value">486</p>
-                <p class="ym-stat-note">72 {{ $t('operations.thisQuarter') }}</p>
+                <p class="ym-stat-label">{{ $t('operations.upcomingSessionsCount') }}</p>
+                <p class="ym-stat-value">{{ stats.upcomingSessions }}</p>
             </div>
             <div class="ym-stat">
-                <p class="ym-stat-label">{{ $t('operations.classTemplates') }}</p>
-                <p class="ym-stat-value">18</p>
-                <p class="ym-stat-note">{{ $t('operations.beginnerToAdvanced') }}</p>
-            </div>
-            <div class="ym-stat">
-                <p class="ym-stat-label">{{ $t('operations.teachers') }}</p>
-                <p class="ym-stat-value">27</p>
-                <p class="ym-stat-note">21 {{ $t('operations.activeThisWeek') }}</p>
+                <p class="ym-stat-label">{{ $t('operations.activeSchedules') }}</p>
+                <p class="ym-stat-value">{{ stats.activeSchedules }}</p>
             </div>
         </div>
 
-        <div class="ym-page-cols ym-page-cols--6040">
-            <div class="ym-pane">
-                <div class="ym-pane-head">
-                    <div class="ym-pane-title-wrap">
-                        <i class="bi bi-people ym-pane-icon" />
-                        <h2 class="ym-pane-title">{{ $t('operations.classSchedule') }}</h2>
-                    </div>
-                </div>
-                <div class="ym-pane-body">
-                    <div class="ym-table-wrap">
-                        <table class="ym-table">
-                            <thead>
-                                <tr>
-                                    <th class="ym-th">{{ $t('operations.class') }}</th>
-                                    <th class="ym-th">{{ $t('operations.teacher') }}</th>
-                                    <th class="ym-th">{{ $t('operations.branch') }}</th>
-                                    <th class="ym-th">{{ $t('operations.capacity') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="item in classes" :key="item.className" class="ym-tr">
-                                    <td class="ym-td font-medium">{{ item.className }}</td>
-                                    <td class="ym-td">{{ item.teacher }}</td>
-                                    <td class="ym-td">{{ item.branch }}</td>
-                                    <td class="ym-td">{{ item.capacity }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+        <div class="flex items-center justify-between border-b border-neutral-200 mb-4">
+            <div class="flex gap-2">
+                <button
+                    v-for="tab in tabs"
+                    :key="tab.key"
+                    type="button"
+                    class="px-3 py-2 text-sm font-medium border-b-2 -mb-px"
+                    :class="activeTab === tab.key
+                        ? 'border-neutral-900 text-neutral-900'
+                        : 'border-transparent text-neutral-500 hover:text-neutral-700'"
+                    @click="activeTab = tab.key"
+                >
+                    {{ $t(tab.label) }}
+                </button>
             </div>
-
-            <div class="ym-pane">
-                <div class="ym-pane-head">
-                    <div class="ym-pane-title-wrap">
-                        <i class="bi bi-person-check ym-pane-icon" />
-                        <h2 class="ym-pane-title">{{ $t('operations.assignmentQueue') }}</h2>
-                    </div>
-                </div>
-                <div class="ym-pane-body">
-                    <div class="ym-row-list">
-                        <div v-for="assignment in assignments" :key="assignment.title" class="ym-row">
-                            <div class="ym-row-main">
-                                <p class="ym-row-title">{{ assignment.title }}</p>
-                                <p class="ym-row-meta">{{ assignment.meta }}</p>
-                            </div>
-                            <div class="ym-row-aside">
-                                <span class="ym-status-pill">{{ assignment.status }}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="ym-info-row">
-                        <i class="bi bi-info-circle ym-info-icon" />
-                        <span>{{ $t('operations.academyPlaceholder') }}</span>
-                    </div>
-                </div>
+            <div class="w-44 shrink-0">
+                <Select
+                    :model-value="branchFilter"
+                    :options="branchFilterOptions"
+                    @update:model-value="applyBranchFilter"
+                />
             </div>
         </div>
+
+        <template v-if="activeTab === 'sessions'">
+            <section class="ym-surface ym-section">
+                <h2 class="ym-title">
+                    {{ $t('operations.sessions') }}
+                    <span class="ym-count-badge">{{ sessions.total }}</span>
+                </h2>
+
+                <div class="ym-table-wrap">
+                    <table class="ym-table">
+                        <thead>
+                            <tr>
+                                <th class="ym-th">{{ $t('operations.date') }}</th>
+                                <th class="ym-th">{{ $t('operations.time') }}</th>
+                                <th class="ym-th">{{ $t('operations.class') }}</th>
+                                <th class="ym-th">{{ $t('operations.coach') }}</th>
+                                <th class="ym-th">{{ $t('operations.branch') }}</th>
+                                <th class="ym-th">{{ $t('operations.room') }}</th>
+                                <th class="ym-th">{{ $t('operations.status') }}</th>
+                                <th v-if="canManage" class="ym-th">{{ $t('operations.actions') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="session in sessions.data" :key="session.id" class="ym-tr">
+                                <td class="ym-td">{{ session.session_date }}</td>
+                                <td class="ym-td">{{ session.start_time }}–{{ session.end_time }}</td>
+                                <td class="ym-td font-medium">{{ session.class_type_name }}</td>
+                                <td class="ym-td text-neutral-500">{{ session.coach_name }}</td>
+                                <td class="ym-td text-neutral-500">{{ session.branch_name }}</td>
+                                <td class="ym-td text-neutral-500">{{ session.room_name }}</td>
+                                <td class="ym-td">
+                                    <span class="ym-status-pill">{{ statusLabel(session.status) }}</span>
+                                    <span v-if="session.is_overridden" class="ym-tag ml-1">{{ $t('operations.overridden') }}</span>
+                                </td>
+                                <td v-if="canManage" class="ym-td">
+                                    <Link class="ym-btn-outline" :href="route('operations.class-sessions.edit', session.id)">
+                                        {{ $t('operations.edit') }}
+                                    </Link>
+                                </td>
+                            </tr>
+                            <tr v-if="!sessions.data.length">
+                                <td class="ym-td text-neutral-500" :colspan="canManage ? 8 : 7">{{ $t('operations.noSessions') }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div v-if="sessions.links.length > 3" class="ym-pagination">
+                    <Link
+                        v-for="link in sessions.links"
+                        :key="link.label"
+                        :href="link.url ?? '#'"
+                        v-html="link.label"
+                        :class="['ym-page-link', { 'ym-page-link--active': link.active, 'ym-page-link--disabled': !link.url }]"
+                        preserve-scroll
+                    />
+                </div>
+            </section>
+        </template>
+
+        <template v-else>
+            <section class="ym-surface ym-section">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="ym-title">
+                            {{ $t('operations.schedules') }}
+                            <span class="ym-count-badge">{{ schedules.total }}</span>
+                        </h2>
+                        <p class="ym-subtitle">{{ $t('operations.manageSchedules') }}</p>
+                    </div>
+                    <Link v-if="endpoints.createSchedule" :href="endpoints.createSchedule" class="ym-btn-sm">
+                        {{ $t('operations.createSchedule') }}
+                    </Link>
+                </div>
+
+                <div class="ym-table-wrap">
+                    <table class="ym-table">
+                        <thead>
+                            <tr>
+                                <th class="ym-th">{{ $t('operations.dayOfWeek') }}</th>
+                                <th class="ym-th">{{ $t('operations.startTime') }}</th>
+                                <th class="ym-th">{{ $t('operations.class') }}</th>
+                                <th class="ym-th">{{ $t('operations.coach') }}</th>
+                                <th class="ym-th">{{ $t('operations.branch') }}</th>
+                                <th class="ym-th">{{ $t('operations.room') }}</th>
+                                <th class="ym-th">{{ $t('operations.capacity') }}</th>
+                                <th class="ym-th">{{ $t('operations.status') }}</th>
+                                <th v-if="canManage" class="ym-th">{{ $t('operations.actions') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="schedule in schedules.data" :key="schedule.id" class="ym-tr">
+                                <td class="ym-td font-medium">{{ dayLabel(schedule.day_of_week) }}</td>
+                                <td class="ym-td">{{ schedule.start_time }}</td>
+                                <td class="ym-td">{{ schedule.class_type_name }}</td>
+                                <td class="ym-td text-neutral-500">{{ schedule.coach_name }}</td>
+                                <td class="ym-td text-neutral-500">{{ schedule.branch_name }}</td>
+                                <td class="ym-td text-neutral-500">{{ schedule.room_name }}</td>
+                                <td class="ym-td text-neutral-500">{{ schedule.capacity }}</td>
+                                <td class="ym-td">
+                                    <span :class="['ym-role-badge', schedule.is_active ? 'ym-role-coach' : 'ym-role-member']">
+                                        {{ schedule.is_active ? $t('operations.active') : $t('operations.inactive') }}
+                                    </span>
+                                </td>
+                                <td v-if="canManage" class="ym-td">
+                                    <div class="ym-inline-actions">
+                                        <Link class="ym-btn-outline" :href="route('operations.class-schedules.edit', schedule.id)">
+                                            {{ $t('operations.edit') }}
+                                        </Link>
+                                        <button type="button" class="ym-btn-danger" @click="pendingDeleteSchedule = schedule">
+                                            {{ $t('operations.delete') }}
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr v-if="!schedules.data.length">
+                                <td class="ym-td text-neutral-500" :colspan="canManage ? 9 : 8">{{ $t('operations.noSchedules') }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div v-if="schedules.links.length > 3" class="ym-pagination">
+                    <Link
+                        v-for="link in schedules.links"
+                        :key="link.label"
+                        :href="link.url ?? '#'"
+                        v-html="link.label"
+                        :class="['ym-page-link', { 'ym-page-link--active': link.active, 'ym-page-link--disabled': !link.url }]"
+                        preserve-scroll
+                    />
+                </div>
+            </section>
+        </template>
+
+        <Modal :show="!!pendingDeleteSchedule" :title="$t('operations.deleteScheduleTitle')" @close="pendingDeleteSchedule = null">
+            <p class="ym-card-note">{{ $t('operations.confirmDeleteSchedule') }}</p>
+            <div class="ym-confirm-modal-actions">
+                <button type="button" class="ym-btn-outline" @click="pendingDeleteSchedule = null">{{ $t('common.cancel') }}</button>
+                <button type="button" class="ym-btn-danger" @click="confirmDeleteSchedule">{{ $t('operations.delete') }}</button>
+            </div>
+        </Modal>
     </AppLayout>
 </template>

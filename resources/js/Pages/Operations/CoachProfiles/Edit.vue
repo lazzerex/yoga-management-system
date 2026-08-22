@@ -1,0 +1,62 @@
+<script setup>
+import { computed } from 'vue';
+import { Link, useForm } from '@inertiajs/vue3';
+import AppLayout from '@/Layouts/AppLayout.vue';
+import Field from '@/Components/Form/Field.vue';
+import TextInput from '@/Components/Form/TextInput.vue';
+import MultiSelect from '@/Components/Form/MultiSelect.vue';
+import Textarea from '@/Components/Form/Textarea.vue';
+import Checkbox from '@/Components/Form/Checkbox.vue';
+
+const props = defineProps({
+    coachProfile: Object,
+    classTypes: Array,
+    endpoints: Object,
+});
+
+const classTypeOptions = computed(() => props.classTypes.map((classType) => ({ value: classType.id, label: classType.name })));
+
+const form = useForm({
+    bio: props.coachProfile.bio ?? '',
+    years_experience: props.coachProfile.years_experience !== null ? String(props.coachProfile.years_experience) : '',
+    certifications: props.coachProfile.certifications ?? '',
+    class_type_ids: [...props.coachProfile.class_type_ids],
+    is_active: props.coachProfile.is_active,
+});
+
+const submit = () => {
+    form.patch(props.endpoints.update);
+};
+</script>
+
+<template>
+    <AppLayout :title="$t('operations.editCoach')">
+        <section class="ym-surface ym-section">
+            <h2 class="ym-title">{{ $t('operations.editCoach') }}</h2>
+            <p class="ym-subtitle">{{ coachProfile.user_name }}</p>
+
+            <form class="ym-form-grid" @submit.prevent="submit">
+                <Field :label="$t('operations.yearsExperience')" :error="form.errors.years_experience">
+                    <TextInput v-model="form.years_experience" type="number" />
+                </Field>
+                <Field :label="$t('operations.specializations')" :error="form.errors.class_type_ids">
+                    <MultiSelect v-model="form.class_type_ids" :options="classTypeOptions" />
+                </Field>
+                <Field :label="$t('operations.bio')" :error="form.errors.bio">
+                    <Textarea v-model="form.bio" />
+                </Field>
+                <Field :label="$t('operations.certifications')" :error="form.errors.certifications">
+                    <Textarea v-model="form.certifications" />
+                </Field>
+                <Checkbox v-model="form.is_active" :label="$t('operations.active')" />
+
+                <div class="ym-actions">
+                    <button type="submit" class="ym-btn-sm" :disabled="form.processing">
+                        {{ $t('operations.saveCoach') }}
+                    </button>
+                    <Link :href="endpoints.index" class="ym-btn-ghost">{{ $t('common.cancel') }}</Link>
+                </div>
+            </form>
+        </section>
+    </AppLayout>
+</template>
