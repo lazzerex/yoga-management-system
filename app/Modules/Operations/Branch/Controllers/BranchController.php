@@ -19,11 +19,11 @@ class BranchController extends Controller
 {
     public function index(Request $request): Response
     {
-        $roomBranchId = $request->integer('branch_id') ?: null;
+        $currentBranchId = $request->attributes->get('currentBranch')?->id;
 
         $branches = Branch::orderBy('name')->paginate(20, pageName: 'branchesPage');
         $rooms = Room::with('branch:id,name')
-            ->when($roomBranchId, fn ($q) => $q->where('branch_id', $roomBranchId))
+            ->when($currentBranchId, fn ($q) => $q->where('branch_id', $currentBranchId))
             ->orderBy('name')
             ->paginate(20, pageName: 'roomsPage');
         $classTypes = ClassType::orderBy('name')->paginate(20, pageName: 'classTypesPage');
@@ -42,8 +42,6 @@ class BranchController extends Controller
                 'total' => Branch::count(),
                 'active' => Branch::active()->count(),
             ],
-            'branchOptions' => Branch::orderBy('name')->get(['id', 'name']),
-            'selectedBranchId' => $roomBranchId,
             'rooms' => $rooms->through(fn (Room $room) => [
                 'id' => $room->id,
                 'branch_id' => $room->branch_id,
@@ -53,8 +51,8 @@ class BranchController extends Controller
                 'is_active' => $room->is_active,
             ]),
             'roomStats' => [
-                'total' => Room::when($roomBranchId, fn ($q) => $q->where('branch_id', $roomBranchId))->count(),
-                'active' => Room::active()->when($roomBranchId, fn ($q) => $q->where('branch_id', $roomBranchId))->count(),
+                'total' => Room::when($currentBranchId, fn ($q) => $q->where('branch_id', $currentBranchId))->count(),
+                'active' => Room::active()->when($currentBranchId, fn ($q) => $q->where('branch_id', $currentBranchId))->count(),
             ],
             'classTypes' => $classTypes->through(fn (ClassType $classType) => [
                 'id' => $classType->id,
@@ -68,7 +66,7 @@ class BranchController extends Controller
             ],
             'endpoints' => [
                 'createBranch' => $canManage ? route('operations.branches.create') : null,
-                'createRoom' => $canManage ? route('operations.rooms.create', $roomBranchId ? ['branch_id' => $roomBranchId] : []) : null,
+                'createRoom' => $canManage ? route('operations.rooms.create') : null,
                 'createClassType' => $canManage ? route('operations.class-types.create') : null,
             ],
         ]);
