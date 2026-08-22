@@ -14,6 +14,8 @@ return [
     'plans' => 'Plans',
     'tuition' => 'Tuition',
     'files' => 'Files',
+    'coaches' => 'Coach Profiles',
+    'studentProfiles' => 'Student Profiles',
     'myMembership' => 'My Membership',
     'myClasses' => 'My Classes',
     'mySchedule' => 'My Schedule',

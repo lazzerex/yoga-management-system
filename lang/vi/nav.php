@@ -14,6 +14,8 @@ return [
     'plans' => 'Kế hoạch',
     'tuition' => 'Học phí',
     'files' => 'Tệp',
+    'coaches' => 'Hồ sơ Giáo viên',
+    'studentProfiles' => 'Hồ sơ Học viên',
     'myMembership' => 'Thành viên của tôi',
     'myClasses' => 'Lớp học của tôi',
     'mySchedule' => 'Lịch của tôi',
