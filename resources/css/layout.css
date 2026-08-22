@@ -273,6 +273,27 @@
 
     .ym-header-menu-wrap { position: relative; flex-shrink: 0; }
 
+    .ym-branch-switch-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .ym-branch-switch-caret { font-size: 0.7rem; }
+
+    .ym-branch-switch-btn--busy { opacity: 0.7; cursor: wait; }
+
+    .ym-branch-switch-spinner { animation: ym-spin 0.6s linear infinite; }
+
+    @keyframes ym-spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .ym-menu-item--active { color: #2f5f9d; font-weight: 700; }
+
     .ym-icon-btn {
         width: 2.06rem;
         height: 2.06rem;
