@@ -11,14 +11,16 @@ use App\Modules\Operations\Room\Actions\UpdateRoomAction;
 use App\Modules\Operations\Room\Requests\StoreRoomRequest;
 use App\Modules\Operations\Room\Requests\UpdateRoomRequest;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Response;
 
 class RoomController extends Controller
 {
-    public function create(): Response
+    public function create(Request $request): Response
     {
         return inertia('Operations/Rooms/Create', [
             'branches' => Branch::orderBy('name')->get(['id', 'name']),
+            'selectedBranchId' => $request->integer('branch_id') ?: null,
             'endpoints' => [
                 'store' => route('operations.rooms.store'),
                 'index' => route('operations.yoga-center'),
