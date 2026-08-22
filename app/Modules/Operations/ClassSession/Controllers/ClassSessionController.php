@@ -3,7 +3,6 @@
 namespace App\Modules\Operations\ClassSession\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Branch;
 use App\Models\ClassSchedule;
 use App\Models\ClassSession;
 use App\Models\CoachProfile;
@@ -18,7 +17,7 @@ class ClassSessionController extends Controller
 {
     public function index(Request $request): Response
     {
-        $branchId = $request->integer('branch_id') ?: null;
+        $branchId = $request->attributes->get('currentBranch')?->id;
 
         $sessions = ClassSession::with(['branch:id,name', 'room:id,name', 'classType:id,name', 'coachProfile.user:id,name'])
             ->upcoming()
@@ -68,10 +67,9 @@ class ClassSessionController extends Controller
                 'activeSchedules' => ClassSchedule::active()
                     ->when($branchId, fn ($q) => $q->where('branch_id', $branchId))->count(),
             ],
-            'branchOptions' => Branch::orderBy('name')->get(['id', 'name']),
-            'selectedBranchId' => $branchId,
             'endpoints' => [
-                'createSchedule' => $canManage ? route('operations.class-schedules.create', $branchId ? ['branch_id' => $branchId] : []) : null,
+                'createSchedule' => $canManage ? route('operations.class-schedules.create') : null,
+                'generateSessions' => $canManage ? route('operations.class-schedules.generate-sessions') : null,
             ],
         ]);
     }
