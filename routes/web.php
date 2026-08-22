@@ -4,8 +4,12 @@ use App\Modules\Admin\AuditLog\Controllers\AuditLogController;
 use App\Modules\Admin\LoginLog\Controllers\LoginLogController;
 use App\Modules\Admin\User\Controllers\UserController;
 use App\Modules\Operations\Branch\Controllers\BranchController;
+use App\Modules\Operations\ClassSchedule\Controllers\ClassScheduleController;
+use App\Modules\Operations\ClassSession\Controllers\ClassSessionController;
 use App\Modules\Operations\ClassType\Controllers\ClassTypeController;
+use App\Modules\Operations\CoachProfile\Controllers\CoachProfileController;
 use App\Modules\Operations\Room\Controllers\RoomController;
+use App\Modules\Operations\StudentProfile\Controllers\StudentProfileController;
 use App\Modules\Profile\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -25,7 +29,25 @@ Route::prefix('cms')->group(function () {
         Route::prefix('operations')->name('operations.')->group(function () {
             Route::middleware('permission:operations.center.view')->group(function () {
                 Route::get('/yoga-center', [BranchController::class, 'index'])->name('yoga-center');
-                Route::get('/academy', fn () => inertia('Operations/Academy'))->name('academy');
+            });
+
+            Route::middleware('permission:operations.sessions.view')->group(function () {
+                Route::get('/academy', [ClassSessionController::class, 'index'])->name('academy');
+            });
+
+            Route::middleware('permission:operations.sessions.manage')->group(function () {
+                Route::prefix('class-schedules')->name('class-schedules.')->group(function () {
+                    Route::get('/create', [ClassScheduleController::class, 'create'])->name('create');
+                    Route::post('/', [ClassScheduleController::class, 'store'])->name('store');
+                    Route::get('/{classSchedule}/edit', [ClassScheduleController::class, 'edit'])->name('edit');
+                    Route::patch('/{classSchedule}', [ClassScheduleController::class, 'update'])->name('update');
+                    Route::delete('/{classSchedule}', [ClassScheduleController::class, 'destroy'])->name('destroy');
+                });
+
+                Route::prefix('class-sessions')->name('class-sessions.')->group(function () {
+                    Route::get('/{classSession}/edit', [ClassSessionController::class, 'edit'])->name('edit');
+                    Route::patch('/{classSession}', [ClassSessionController::class, 'update'])->name('update');
+                });
             });
 
             Route::middleware('permission:operations.center.manage')->group(function () {
@@ -52,6 +74,30 @@ Route::prefix('cms')->group(function () {
                     Route::patch('/{classType}', [ClassTypeController::class, 'update'])->name('update');
                     Route::delete('/{classType}', [ClassTypeController::class, 'destroy'])->name('destroy');
                 });
+            });
+
+            Route::middleware('permission:operations.coaches.view')->group(function () {
+                Route::get('/coaches', [CoachProfileController::class, 'index'])->name('coaches.index');
+            });
+
+            Route::middleware('permission:operations.coaches.manage')->prefix('coaches')->name('coaches.')->group(function () {
+                Route::get('/create', [CoachProfileController::class, 'create'])->name('create');
+                Route::post('/', [CoachProfileController::class, 'store'])->name('store');
+                Route::get('/{coachProfile}/edit', [CoachProfileController::class, 'edit'])->name('edit');
+                Route::patch('/{coachProfile}', [CoachProfileController::class, 'update'])->name('update');
+                Route::delete('/{coachProfile}', [CoachProfileController::class, 'destroy'])->name('destroy');
+            });
+
+            Route::middleware('permission:operations.students.view')->group(function () {
+                Route::get('/students', [StudentProfileController::class, 'index'])->name('students.index');
+            });
+
+            Route::middleware('permission:operations.students.manage')->prefix('students')->name('students.')->group(function () {
+                Route::get('/create', [StudentProfileController::class, 'create'])->name('create');
+                Route::post('/', [StudentProfileController::class, 'store'])->name('store');
+                Route::get('/{studentProfile}/edit', [StudentProfileController::class, 'edit'])->name('edit');
+                Route::patch('/{studentProfile}', [StudentProfileController::class, 'update'])->name('update');
+                Route::delete('/{studentProfile}', [StudentProfileController::class, 'destroy'])->name('destroy');
             });
 
             Route::middleware('permission:operations.attendance.view')->group(function () {
@@ -81,7 +127,7 @@ Route::prefix('cms')->group(function () {
         Route::middleware('permission:coach.dashboard.view')->prefix('coach')->name('coach.')->group(function () {
             Route::get('/my-classes', fn () => inertia('Coach/MyClasses'))->name('my-classes');
             Route::get('/my-students', fn () => inertia('Coach/MyStudents'))->name('my-students');
-            Route::get('/my-teaching-schedule', fn () => inertia('Coach/MyTeachingSchedule'))->name('my-teaching-schedule');
+            Route::get('/my-teaching-schedule', [ClassSessionController::class, 'myTeachingSchedule'])->name('my-teaching-schedule');
         });
 
         Route::prefix('admin')->name('admin.')->group(function () {
