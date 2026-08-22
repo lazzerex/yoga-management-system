@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Branch;
 use App\Support\Menu\Facades\Menu;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -37,8 +38,11 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         $user = $request->user();
+        $currentBranch = $request->attributes->get('currentBranch');
 
         return array_merge(parent::share($request), [
+            'currentBranch' => $currentBranch ? ['id' => $currentBranch->id, 'name' => $currentBranch->name] : null,
+            'allBranches' => fn () => Branch::active()->orderBy('name')->get(['id', 'name']),
             'auth' => [
                 'user' => $user ? [
                     'id' => $user->id,
