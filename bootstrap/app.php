@@ -11,9 +11,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->encryptCookies(except: ['locale']);
+        $middleware->encryptCookies(except: ['locale', 'branch_id']);
 
         $middleware->web(append: [
+            \App\Http\Middleware\SetCurrentBranch::class,
             \App\Http\Middleware\HandleInertiaRequests::class,
         ]);
 
