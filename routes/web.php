@@ -39,6 +39,7 @@ Route::prefix('cms')->group(function () {
                 Route::prefix('class-schedules')->name('class-schedules.')->group(function () {
                     Route::get('/create', [ClassScheduleController::class, 'create'])->name('create');
                     Route::post('/', [ClassScheduleController::class, 'store'])->name('store');
+                    Route::post('/generate-sessions', [ClassScheduleController::class, 'generateSessions'])->name('generate-sessions');
                     Route::get('/{classSchedule}/edit', [ClassScheduleController::class, 'edit'])->name('edit');
                     Route::patch('/{classSchedule}', [ClassScheduleController::class, 'update'])->name('update');
                     Route::delete('/{classSchedule}', [ClassScheduleController::class, 'destroy'])->name('destroy');
