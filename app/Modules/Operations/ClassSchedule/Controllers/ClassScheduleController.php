@@ -13,6 +13,7 @@ use App\Modules\Operations\ClassSchedule\Actions\DeleteClassScheduleAction;
 use App\Modules\Operations\ClassSchedule\Actions\UpdateClassScheduleAction;
 use App\Modules\Operations\ClassSchedule\Requests\StoreClassScheduleRequest;
 use App\Modules\Operations\ClassSchedule\Requests\UpdateClassScheduleRequest;
+use App\Modules\Operations\ClassSession\Actions\GenerateClassSessionsAction;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Response;
@@ -22,7 +23,7 @@ class ClassScheduleController extends Controller
     public function create(Request $request): Response
     {
         return inertia('Operations/ClassSchedules/Create', [
-            'selectedBranchId' => $request->integer('branch_id') ?: null,
+            'selectedBranchId' => $request->attributes->get('currentBranch')?->id,
             ...$this->formProps(),
         ]);
     }
@@ -73,6 +74,15 @@ class ClassScheduleController extends Controller
         $action->execute($classSchedule);
 
         return back()->with('success', ['key' => 'flash.classScheduleDeleted']);
+    }
+
+    public function generateSessions(GenerateClassSessionsAction $action): RedirectResponse
+    {
+        $created = $action->execute();
+
+        return redirect()
+            ->route('operations.academy')
+            ->with('success', ['key' => 'flash.sessionsGenerated', 'params' => ['count' => $created]]);
     }
 
     private function formProps(): array
