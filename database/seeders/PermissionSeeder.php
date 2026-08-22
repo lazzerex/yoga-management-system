@@ -13,6 +13,13 @@ class PermissionSeeder extends Seeder
         $permissions = [
             'operations.center.view',
             'operations.center.manage',
+            'operations.coaches.view',
+            'operations.coaches.manage',
+            'operations.students.view',
+            'operations.students.manage',
+            'operations.students.medical.view',
+            'operations.sessions.view',
+            'operations.sessions.manage',
             'operations.attendance.view',
             'operations.plans.view',
             'operations.files.view',
@@ -39,6 +46,13 @@ class PermissionSeeder extends Seeder
         $admin->syncPermissions([
             'operations.center.view',
             'operations.center.manage',
+            'operations.coaches.view',
+            'operations.coaches.manage',
+            'operations.students.view',
+            'operations.students.manage',
+            'operations.students.medical.view',
+            'operations.sessions.view',
+            'operations.sessions.manage',
             'operations.attendance.view',
             'operations.plans.view',
             'operations.files.view',
@@ -56,6 +70,8 @@ class PermissionSeeder extends Seeder
         $coach = Role::firstOrCreate(['name' => 'coach']);
         $coach->syncPermissions([
             'operations.center.view',
+            'operations.students.view',
+            'operations.sessions.view',
             'operations.attendance.view',
             'operations.plans.view',
             'operations.files.view',
@@ -65,6 +81,7 @@ class PermissionSeeder extends Seeder
         $member = Role::firstOrCreate(['name' => 'member']);
         $member->syncPermissions([
             'operations.center.view',
+            'operations.sessions.view',
             'operations.tuition.view',
             'member.dashboard.view',
         ]);

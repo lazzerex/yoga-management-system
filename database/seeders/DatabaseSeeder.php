@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Modules\Operations\ClassSession\Actions\GenerateClassSessionsAction;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -21,7 +22,12 @@ class DatabaseSeeder extends Seeder
             BranchSeeder::class,
             RoomSeeder::class,
             ClassTypeSeeder::class,
+            CoachProfileSeeder::class,
+            StudentProfileSeeder::class,
+            ClassScheduleSeeder::class,
         ]);
+
+        app(GenerateClassSessionsAction::class)->execute();
 
         // WithoutModelEvents suppresses the User::booted() saved hook during
         // seeding, so backfill spatie roles explicitly here — see menu.md 10.4.
