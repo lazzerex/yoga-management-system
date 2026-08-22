@@ -30,7 +30,7 @@ class AppServiceProvider extends ServiceProvider
                 ->permissions('operations.center.view'),
             AppMenuItem::make('nav.classes', '/cms/operations/academy')
                 ->icon('bi-people')->iconColor('#3fa07e')->group('nav.operations')->order(11)
-                ->permissions('operations.center.view'),
+                ->permissions('operations.sessions.view'),
             AppMenuItem::make('nav.attendance', '/cms/operations/teacher-attendance')
                 ->icon('bi-clipboard-check')->iconColor('#4f81cf')->group('nav.operations')->order(12)
                 ->permissions('operations.attendance.view'),
@@ -43,6 +43,12 @@ class AppServiceProvider extends ServiceProvider
             AppMenuItem::make('nav.files', '/cms/operations/file-library')
                 ->icon('bi-folder2-open')->iconColor('#c97846')->group('nav.operations')->order(15)
                 ->permissions('operations.files.view'),
+            AppMenuItem::make('nav.coaches', '/cms/operations/coaches')
+                ->icon('bi-person-badge')->iconColor('#4f8bc8')->group('nav.operations')->order(16)
+                ->permissions('operations.coaches.view'),
+            AppMenuItem::make('nav.studentProfiles', '/cms/operations/students')
+                ->icon('bi-person-lines-fill')->iconColor('#5f77cf')->group('nav.operations')->order(17)
+                ->permissions('operations.students.view'),
 
             // Member group
             AppMenuItem::make('nav.myMembership', '/cms/member/my-membership')
