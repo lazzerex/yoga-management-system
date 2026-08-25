@@ -17,7 +17,6 @@ const dayShortKeys = [
     'dashboard.saturdayShort',
 ];
 
-// `students` count per slot needs `enrollments` (not built yet) — omitted rather than faked.
 const teachingSchedule = computed(() => {
     const days = [];
     for (let i = 0; i < 7; i++) {
@@ -34,6 +33,7 @@ const teachingSchedule = computed(() => {
                     time: session.start_time,
                     title: session.class_type_name,
                     branch: `${session.branch_name} · ${session.room_name}`,
+                    students: session.students,
                 })),
         });
     }
@@ -79,6 +79,7 @@ const teachingLoad = computed(() => [
                                     <p class="ym-timetable-time">{{ item.time }}</p>
                                     <p class="ym-timetable-name">{{ item.title }}</p>
                                     <p class="ym-timetable-sub">{{ item.branch }}</p>
+                                    <p class="ym-timetable-sub">{{ $t('coach.studentsCount', { count: item.students }) }}</p>
                                 </div>
                                 <div v-if="!day.classes.length" class="ym-timetable-empty">&mdash;</div>
                             </div>

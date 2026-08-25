@@ -1,21 +1,10 @@
 <script setup>
-import { computed } from 'vue';
-import { trans as t } from 'laravel-vue-i18n';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
-const classes = [
-    { name: 'Power Core', branch: 'Riverside', students: 24, waitlist: 3 },
-    { name: 'Evening Yin', branch: 'Downtown', students: 21, waitlist: 1 },
-    { name: 'Prenatal Flow', branch: 'Westside', students: 14, waitlist: 0 },
-    { name: 'Weekend Flow', branch: 'Uptown', students: 19, waitlist: 2 },
-    { name: 'Breathwork Lab', branch: 'Online', students: 32, waitlist: 5 },
-];
-
-const insights = computed(() => [
-    { title: t('coach.insightNearCapacity'), meta: t('coach.insightNearCapacityMeta'), label: t('coach.highDemand') },
-    { title: t('coach.insightAttendanceImproving'), meta: t('coach.insightAttendanceImprovingMeta'), label: t('coach.trendUp') },
-    { title: t('coach.insightRepeatBookings'), meta: t('coach.insightRepeatBookingsMeta'), label: t('coach.strong') },
-]);
+const props = defineProps({
+    classes: Array,
+    stats: Object,
+});
 </script>
 
 <template>
@@ -23,76 +12,48 @@ const insights = computed(() => [
         <div class="ym-stat-strip">
             <div class="ym-stat">
                 <p class="ym-stat-label">{{ $t('coach.classesThisWeek') }}</p>
-                <p class="ym-stat-value">14</p>
-                <p class="ym-stat-note">{{ $t('coach.acrossBranches', { count: 3 }) }}</p>
+                <p class="ym-stat-value">{{ stats.classesThisWeek }}</p>
             </div>
             <div class="ym-stat">
                 <p class="ym-stat-label">{{ $t('coach.totalStudents') }}</p>
-                <p class="ym-stat-value">182</p>
-                <p class="ym-stat-note">{{ $t('coach.activeParticipants') }}</p>
+                <p class="ym-stat-value">{{ stats.totalStudents }}</p>
             </div>
             <div class="ym-stat">
                 <p class="ym-stat-label">{{ $t('coach.avgFillRate') }}</p>
-                <p class="ym-stat-value">87%</p>
-                <p class="ym-stat-note">{{ $t('coach.vsLastWeek', { change: '+4%' }) }}</p>
+                <p class="ym-stat-value">{{ stats.avgFillRate }}%</p>
             </div>
         </div>
 
-        <div class="ym-page-cols ym-page-cols--6040">
-            <div class="ym-pane">
-                <div class="ym-pane-head">
-                    <div class="ym-pane-title-wrap">
-                        <i class="bi bi-easel ym-pane-icon" />
-                        <h2 class="ym-pane-title">{{ $t('coach.classRosterSummary') }}</h2>
-                    </div>
-                </div>
-                <div class="ym-pane-body">
-                    <div class="ym-table-wrap">
-                        <table class="ym-table">
-                            <thead>
-                                <tr>
-                                    <th class="ym-th">{{ $t('operations.class') }}</th>
-                                    <th class="ym-th">{{ $t('operations.branch') }}</th>
-                                    <th class="ym-th">{{ $t('operations.students') }}</th>
-                                    <th class="ym-th">{{ $t('coach.waitlist') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="item in classes" :key="item.name" class="ym-tr">
-                                    <td class="ym-td font-medium">{{ item.name }}</td>
-                                    <td class="ym-td">{{ item.branch }}</td>
-                                    <td class="ym-td">{{ item.students }}</td>
-                                    <td class="ym-td">{{ item.waitlist }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+        <div class="ym-pane">
+            <div class="ym-pane-head">
+                <div class="ym-pane-title-wrap">
+                    <i class="bi bi-easel ym-pane-icon" />
+                    <h2 class="ym-pane-title">{{ $t('coach.classRosterSummary') }}</h2>
                 </div>
             </div>
-
-            <div class="ym-pane">
-                <div class="ym-pane-head">
-                    <div class="ym-pane-title-wrap">
-                        <i class="bi bi-lightbulb ym-pane-icon" />
-                        <h2 class="ym-pane-title">{{ $t('coach.classInsights') }}</h2>
-                    </div>
-                </div>
-                <div class="ym-pane-body">
-                    <div class="ym-row-list">
-                        <div v-for="insight in insights" :key="insight.title" class="ym-row">
-                            <div class="ym-row-main">
-                                <p class="ym-row-title">{{ insight.title }}</p>
-                                <p class="ym-row-meta">{{ insight.meta }}</p>
-                            </div>
-                            <div class="ym-row-aside">
-                                <span class="ym-tag">{{ insight.label }}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="ym-info-row">
-                        <i class="bi bi-info-circle ym-info-icon" />
-                        <span>{{ $t('coach.liveAttendancePlaceholder') }}</span>
-                    </div>
+            <div class="ym-pane-body">
+                <div class="ym-table-wrap">
+                    <table class="ym-table">
+                        <thead>
+                            <tr>
+                                <th class="ym-th">{{ $t('operations.class') }}</th>
+                                <th class="ym-th">{{ $t('operations.branch') }}</th>
+                                <th class="ym-th">{{ $t('operations.students') }}</th>
+                                <th class="ym-th">{{ $t('coach.waitlist') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="item in classes" :key="item.id" class="ym-tr">
+                                <td class="ym-td font-medium">{{ item.name }}</td>
+                                <td class="ym-td">{{ item.branch }}</td>
+                                <td class="ym-td">{{ item.students }}</td>
+                                <td class="ym-td">{{ item.waitlist }}</td>
+                            </tr>
+                            <tr v-if="!classes.length">
+                                <td class="ym-td text-neutral-500" colspan="4">{{ $t('coach.noClasses') }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

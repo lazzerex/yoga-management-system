@@ -3,57 +3,41 @@ import { computed } from 'vue';
 import { trans as t } from 'laravel-vue-i18n';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
-const weeklySchedule = computed(() => [
-    {
-        day: t('dashboard.mondayShort'),
-        date: 'Apr 27',
-        sessions: [
-            { time: '06:45', title: 'Sunrise Mobility', meta: t('dashboard.westsideCoachLina') },
-            { time: '18:30', title: 'Evening Yin', meta: t('dashboard.downtownCoachAri') },
-        ],
-    },
-    {
-        day: t('dashboard.tuesdayShort'),
-        date: 'Apr 28',
-        sessions: [
-            { time: '07:00', title: 'Power Core', meta: t('dashboard.riversideCoachDaniel') },
-        ],
-    },
-    {
-        day: t('dashboard.wednesdayShort'),
-        date: 'Apr 29',
-        sessions: [
-            { time: '18:30', title: 'Evening Yin', meta: t('dashboard.downtownCoachAri') },
-        ],
-    },
-    {
-        day: t('dashboard.thursdayShort'),
-        date: 'Apr 30',
-        sessions: [
-            { time: '07:00', title: 'Power Core', meta: t('dashboard.riversideCoachDaniel') },
-            { time: '20:00', title: 'Breathwork Lab', meta: t('dashboard.onlineCoachNoah') },
-        ],
-    },
-    {
-        day: t('dashboard.fridayShort'),
-        date: 'May 01',
-        sessions: [
-            { time: '17:45', title: 'Mobility Reset', meta: t('dashboard.downtownCoachLina') },
-        ],
-    },
-    {
-        day: t('dashboard.saturdayShort'),
-        date: 'May 02',
-        sessions: [
-            { time: '09:00', title: 'Weekend Flow', meta: t('dashboard.uptownCoachMia') },
-        ],
-    },
-    {
-        day: t('dashboard.sundayShort'),
-        date: 'May 03',
-        sessions: [],
-    },
-]);
+const props = defineProps({
+    sessions: Array,
+});
+
+const dayShortKeys = [
+    'dashboard.sundayShort',
+    'dashboard.mondayShort',
+    'dashboard.tuesdayShort',
+    'dashboard.wednesdayShort',
+    'dashboard.thursdayShort',
+    'dashboard.fridayShort',
+    'dashboard.saturdayShort',
+];
+
+const weeklySchedule = computed(() => {
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+        const date = new Date();
+        date.setDate(date.getDate() + i);
+        const isoDate = date.toISOString().slice(0, 10);
+
+        days.push({
+            day: t(dayShortKeys[date.getDay()]),
+            date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+            sessions: props.sessions
+                .filter((session) => session.session_date === isoDate)
+                .map((session) => ({
+                    time: session.start_time,
+                    title: session.class_type_name,
+                    meta: `${session.branch_name} · ${session.room_name}`,
+                })),
+        });
+    }
+    return days;
+});
 
 const highlights = computed(() => [
     { title: t('member.scheduleHighlightForm'), meta: t('member.scheduleHighlightFormMeta'), type: t('member.coachNoteLabel') },
