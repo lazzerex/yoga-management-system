@@ -15,13 +15,12 @@ class UpdateClassScheduleAction
             ->addMinutes($classSchedule->duration_minutes)
             ->format('H:i:s');
 
-        // Only future, not-manually-overridden, still-scheduled sessions follow the template.
-        // TODO(Week 5 / enrollments): also exclude sessions that already have an enrollment,
-        // once the `enrollments` table exists — see PLAN.md Tuan 5 tracked item.
+        // Only future, not-manually-overridden, still-scheduled, not-yet-booked sessions follow the template.
         $classSchedule->classSessions()
             ->where('session_date', '>=', now()->toDateString())
             ->where('is_overridden', false)
             ->where('status', 'scheduled')
+            ->whereDoesntHave('enrollments', fn ($q) => $q->where('status', '!=', 'cancelled'))
             ->update([
                 'branch_id' => $classSchedule->branch_id,
                 'room_id' => $classSchedule->room_id,
