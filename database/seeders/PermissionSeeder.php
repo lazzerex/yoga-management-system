@@ -24,7 +24,10 @@ class PermissionSeeder extends Seeder
             'operations.plans.view',
             'operations.files.view',
             'operations.tuition.view',
+            'operations.enrollments.view',
+            'operations.enrollments.manage',
             'member.dashboard.view',
+            'member.enrollments.manage',
             'coach.dashboard.view',
             'admin.users.view',
             'admin.users.manage',
@@ -57,6 +60,8 @@ class PermissionSeeder extends Seeder
             'operations.plans.view',
             'operations.files.view',
             'operations.tuition.view',
+            'operations.enrollments.view',
+            'operations.enrollments.manage',
             'admin.users.view',
             'admin.users.manage',
             'admin.login-logs.view',
@@ -84,6 +89,7 @@ class PermissionSeeder extends Seeder
             'operations.sessions.view',
             'operations.tuition.view',
             'member.dashboard.view',
+            'member.enrollments.manage',
         ]);
     }
 }
