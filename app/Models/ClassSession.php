@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable(['class_schedule_id', 'branch_id', 'room_id', 'class_type_id', 'coach_profile_id', 'session_date', 'start_time', 'end_time', 'capacity', 'status', 'is_overridden'])]
 class ClassSession extends Model
@@ -45,6 +46,11 @@ class ClassSession extends Model
     public function coachProfile(): BelongsTo
     {
         return $this->belongsTo(CoachProfile::class);
+    }
+
+    public function enrollments(): HasMany
+    {
+        return $this->hasMany(Enrollment::class);
     }
 
     public function scopeUpcoming(Builder $query): Builder
