@@ -11,6 +11,7 @@ use App\Modules\Operations\ClassSession\Actions\UpdateClassSessionAction;
 use App\Modules\Operations\ClassSession\Requests\UpdateClassSessionRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Inertia\Response;
 
 class ClassSessionController extends Controller
@@ -117,6 +118,7 @@ class ClassSessionController extends Controller
 
         $sessions = $coachProfile
             ? ClassSession::with(['branch:id,name', 'room:id,name', 'classType:id,name'])
+                ->withCount(['enrollments as booked_count' => fn ($q) => $q->where('status', 'booked')])
                 ->where('coach_profile_id', $coachProfile->id)
                 ->where('status', '!=', 'cancelled')
                 ->whereBetween('session_date', [now()->toDateString(), now()->addDays(6)->toDateString()])
@@ -133,7 +135,54 @@ class ClassSessionController extends Controller
                 'class_type_name' => $session->classType->name,
                 'branch_name' => $session->branch->name,
                 'room_name' => $session->room->name,
+                'students' => $session->booked_count,
             ]),
+        ]);
+    }
+
+    public function myClasses(Request $request): Response
+    {
+        $coachProfile = $request->user()->coachProfile;
+
+        $schedules = $coachProfile
+            ? ClassSchedule::with(['branch:id,name', 'classType:id,name'])
+                ->where('coach_profile_id', $coachProfile->id)
+                ->active()
+                ->get()
+            : collect();
+
+        $rows = $schedules->map(function (ClassSchedule $schedule) {
+            $nextSession = ClassSession::where('class_schedule_id', $schedule->id)
+                ->where('status', 'scheduled')
+                ->where('session_date', '>=', now()->toDateString())
+                ->orderBy('session_date')
+                ->orderBy('start_time')
+                ->withCount([
+                    'enrollments as booked_count' => fn ($q) => $q->where('status', 'booked'),
+                    'enrollments as waitlisted_count' => fn ($q) => $q->where('status', 'waitlisted'),
+                ])
+                ->first();
+
+            return [
+                'id' => $schedule->id,
+                'name' => $schedule->classType->name,
+                'branch' => $schedule->branch->name,
+                'students' => $nextSession->booked_count ?? 0,
+                'waitlist' => $nextSession->waitlisted_count ?? 0,
+                'capacity' => $nextSession->capacity ?? $schedule->capacity,
+            ];
+        });
+
+        $totalStudents = $rows->sum('students');
+        $totalCapacity = $rows->sum('capacity');
+
+        return inertia('Coach/MyClasses', [
+            'classes' => $rows->map(fn ($row) => Arr::except($row, 'capacity')),
+            'stats' => [
+                'classesThisWeek' => $rows->count(),
+                'totalStudents' => $totalStudents,
+                'avgFillRate' => $totalCapacity > 0 ? (int) round($totalStudents / $totalCapacity * 100) : 0,
+            ],
         ]);
     }
 }
