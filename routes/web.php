@@ -8,6 +8,7 @@ use App\Modules\Operations\ClassSchedule\Controllers\ClassScheduleController;
 use App\Modules\Operations\ClassSession\Controllers\ClassSessionController;
 use App\Modules\Operations\ClassType\Controllers\ClassTypeController;
 use App\Modules\Operations\CoachProfile\Controllers\CoachProfileController;
+use App\Modules\Operations\Enrollment\Controllers\EnrollmentController;
 use App\Modules\Operations\Room\Controllers\RoomController;
 use App\Modules\Operations\StudentProfile\Controllers\StudentProfileController;
 use App\Modules\Profile\Controllers\ProfileController;
@@ -117,16 +118,25 @@ Route::prefix('cms')->group(function () {
             Route::middleware('permission:operations.tuition.view')->group(function () {
                 Route::get('/tuition-fees', fn () => inertia('Operations/TuitionFees'))->name('tuition-fees');
             });
+
+            Route::middleware('permission:operations.enrollments.manage')->group(function () {
+                Route::delete('/enrollments/{enrollment}', [EnrollmentController::class, 'adminCancel'])->name('enrollments.admin-cancel');
+            });
         });
 
         Route::middleware('permission:member.dashboard.view')->prefix('member')->name('member.')->group(function () {
             Route::get('/my-membership', fn () => inertia('Member/MyMembership'))->name('my-membership');
-            Route::get('/my-classes', fn () => inertia('Member/MyClasses'))->name('my-classes');
-            Route::get('/my-schedule', fn () => inertia('Member/MySchedule'))->name('my-schedule');
+            Route::get('/my-classes', [EnrollmentController::class, 'index'])->name('my-classes');
+            Route::get('/my-schedule', [EnrollmentController::class, 'mySchedule'])->name('my-schedule');
+
+            Route::middleware('permission:member.enrollments.manage')->group(function () {
+                Route::post('/class-sessions/{classSession}/enrollments', [EnrollmentController::class, 'store'])->name('enrollments.store');
+                Route::delete('/enrollments/{enrollment}', [EnrollmentController::class, 'destroy'])->name('enrollments.destroy');
+            });
         });
 
         Route::middleware('permission:coach.dashboard.view')->prefix('coach')->name('coach.')->group(function () {
-            Route::get('/my-classes', fn () => inertia('Coach/MyClasses'))->name('my-classes');
+            Route::get('/my-classes', [ClassSessionController::class, 'myClasses'])->name('my-classes');
             Route::get('/my-students', fn () => inertia('Coach/MyStudents'))->name('my-students');
             Route::get('/my-teaching-schedule', [ClassSessionController::class, 'myTeachingSchedule'])->name('my-teaching-schedule');
         });
