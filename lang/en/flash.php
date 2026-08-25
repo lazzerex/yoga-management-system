@@ -33,4 +33,9 @@ return [
     'scheduleHasSessions' => 'Cannot delete a template that already has generated sessions.',
     'classSessionUpdated' => 'Session updated successfully.',
     'sessionsGenerated' => 'Generated :count session(s).',
+    'enrollmentCreated' => 'Enrolled in the session successfully.',
+    'enrollmentCancelled' => 'Enrollment cancelled.',
+    'enrollmentAlreadyExists' => 'You are already enrolled in this session.',
+    'enrollmentCutoffPassed' => 'The cancellation window for this session has passed.',
+    'enrollmentSessionUnavailable' => 'Cannot enroll in a cancelled or past session.',
 ];

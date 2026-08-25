@@ -33,4 +33,9 @@ return [
     'scheduleHasSessions' => 'Không thể xóa mẫu đã có buổi học được tạo.',
     'classSessionUpdated' => 'Đã cập nhật buổi học thành công.',
     'sessionsGenerated' => 'Đã tạo :count buổi học.',
+    'enrollmentCreated' => 'Đã đăng ký buổi học thành công.',
+    'enrollmentCancelled' => 'Đã huỷ đăng ký buổi học.',
+    'enrollmentAlreadyExists' => 'Bạn đã đăng ký buổi học này rồi.',
+    'enrollmentCutoffPassed' => 'Đã quá hạn huỷ đăng ký cho buổi học này.',
+    'enrollmentSessionUnavailable' => 'Không thể đăng ký buổi học đã huỷ hoặc đã qua.',
 ];
