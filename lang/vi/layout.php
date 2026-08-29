@@ -3,7 +3,6 @@
 return [
     'brand' => [
         'title' => 'Yoga CRM',
-        'subtitle' => 'Không gian quản lý',
     ],
     'notifications' => [
         'leads' => 'Có 3 yêu cầu học thử mới từ khách truy cập website',

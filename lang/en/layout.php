@@ -3,7 +3,6 @@
 return [
     'brand' => [
         'title' => 'Yoga CRM',
-        'subtitle' => 'Management workspace',
     ],
     'notifications' => [
         'leads' => '3 new trial requests from website leads',
