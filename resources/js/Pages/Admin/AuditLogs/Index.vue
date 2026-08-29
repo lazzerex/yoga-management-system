@@ -2,7 +2,6 @@
 import { ref, computed, watch } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
 import { trans as t } from 'laravel-vue-i18n';
-import AppLayout from '@/Layouts/AppLayout.vue';
 
 const props = defineProps({
     logs: Object,
@@ -97,88 +96,93 @@ const formatDate = (dateStr) => {
     });
 };
 </script>
+<script>
+import AppLayout from '@/Layouts/AppLayout.vue';
+export default {
+    layout: (h, page) => h(AppLayout, { title: t('admin.auditTitle') }, () => page),
+};
+</script>
+
 
 <template>
-    <AppLayout :title="$t('admin.auditTitle')">
-        <section class="ym-surface ym-section">
-            <div class="ym-log-page-head">
-                <div>
-                    <h2 class="ym-title">{{ $t('admin.auditTitle') }}</h2>
-                    <p class="ym-subtitle">{{ $t('admin.auditSubtitle') }}</p>
-                </div>
-                <a :href="endpoints.export" class="ym-btn-outline">{{ $t('admin.exportCsv') }}</a>
+    <section class="ym-surface ym-section">
+        <div class="ym-log-page-head">
+            <div>
+                <h2 class="ym-title">{{ $t('admin.auditTitle') }}</h2>
+                <p class="ym-subtitle">{{ $t('admin.auditSubtitle') }}</p>
             </div>
+            <a :href="endpoints.export" class="ym-btn-outline">{{ $t('admin.exportCsv') }}</a>
+        </div>
 
-            <div class="ym-log-tabs">
-                <Link :href="endpoints.login_logs" class="ym-log-tab">{{ $t('admin.loginLogs') }}</Link>
-                <Link :href="endpoints.self" class="ym-log-tab ym-log-tab--active">{{ $t('admin.auditLogs') }}</Link>
-            </div>
+        <div class="ym-log-tabs">
+            <Link :href="endpoints.login_logs" class="ym-log-tab">{{ $t('admin.loginLogs') }}</Link>
+            <Link :href="endpoints.self" class="ym-log-tab ym-log-tab--active">{{ $t('admin.auditLogs') }}</Link>
+        </div>
 
-            <div class="ym-log-filters">
-                <input
-                    v-model="search"
-                    type="search"
-                    :placeholder="$t('admin.searchPerformer')"
-                    class="ym-log-search"
-                />
-                <select v-model="action" class="ym-log-filter-select">
-                    <option value="">{{ $t('admin.allActions') }}</option>
-                    <option value="create_user">{{ $t('admin.auditActions.create_user') }}</option>
-                    <option value="update_user_info">{{ $t('admin.auditActions.update_user_info') }}</option>
-                    <option value="change_password">{{ $t('admin.auditActions.change_password') }}</option>
-                    <option value="assign_role">{{ $t('admin.auditActions.assign_role') }}</option>
-                    <option value="remove_role">{{ $t('admin.auditActions.remove_role') }}</option>
-                    <option value="delete_user">{{ $t('admin.auditActions.delete_user') }}</option>
-                    <option value="view_student_medical_notes">{{ $t('admin.auditActions.view_student_medical_notes') }}</option>
-                </select>
-                <button v-if="hasActiveFilters" @click="resetFilters" class="ym-log-clear-btn">
-                    {{ $t('admin.clear') }}
-                </button>
-            </div>
+        <div class="ym-log-filters">
+            <input
+                v-model="search"
+                type="search"
+                :placeholder="$t('admin.searchPerformer')"
+                class="ym-log-search"
+            />
+            <select v-model="action" class="ym-log-filter-select">
+                <option value="">{{ $t('admin.allActions') }}</option>
+                <option value="create_user">{{ $t('admin.auditActions.create_user') }}</option>
+                <option value="update_user_info">{{ $t('admin.auditActions.update_user_info') }}</option>
+                <option value="change_password">{{ $t('admin.auditActions.change_password') }}</option>
+                <option value="assign_role">{{ $t('admin.auditActions.assign_role') }}</option>
+                <option value="remove_role">{{ $t('admin.auditActions.remove_role') }}</option>
+                <option value="delete_user">{{ $t('admin.auditActions.delete_user') }}</option>
+                <option value="view_student_medical_notes">{{ $t('admin.auditActions.view_student_medical_notes') }}</option>
+            </select>
+            <button v-if="hasActiveFilters" @click="resetFilters" class="ym-log-clear-btn">
+                {{ $t('admin.clear') }}
+            </button>
+        </div>
 
-            <div class="ym-table-wrap">
-                <table class="ym-table">
-                    <thead>
-                        <tr>
-                            <th class="ym-th">{{ $t('admin.performedBy') }}</th>
-                            <th class="ym-th">{{ $t('admin.action') }}</th>
-                            <th class="ym-th">{{ $t('admin.targetUser') }}</th>
-                            <th class="ym-th">{{ $t('admin.details') }}</th>
-                            <th class="ym-th ym-th--sortable" @click="toggleSort">
-                                {{ $t('admin.time') }}
-                                <span class="ym-sort-icon">{{ sortDir === 'asc' ? '↑' : '↓' }}</span>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-if="logs.data.length === 0">
-                            <td colspan="5" class="ym-td ym-td--empty">{{ $t('admin.noAuditLogs') }}</td>
-                        </tr>
-                        <tr v-for="log in logs.data" :key="log.id" class="ym-tr">
-                            <td class="ym-td">{{ log.causer?.name ?? $t('admin.system') }}</td>
-                            <td class="ym-td">
-                                <span :class="['ym-action-badge', actionBadgeClass(log.action)]">
-                                    {{ $t(`admin.auditActions.${log.action}`) }}
-                                </span>
-                            </td>
-                            <td class="ym-td">{{ log.subject_name ?? '—' }}</td>
-                            <td class="ym-td ym-td--meta">{{ formatMeta(log.action, log.meta) }}</td>
-                            <td class="ym-td">{{ formatDate(log.created_at) }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+        <div class="ym-table-wrap">
+            <table class="ym-table">
+                <thead>
+                    <tr>
+                        <th class="ym-th">{{ $t('admin.performedBy') }}</th>
+                        <th class="ym-th">{{ $t('admin.action') }}</th>
+                        <th class="ym-th">{{ $t('admin.targetUser') }}</th>
+                        <th class="ym-th">{{ $t('admin.details') }}</th>
+                        <th class="ym-th ym-th--sortable" @click="toggleSort">
+                            {{ $t('admin.time') }}
+                            <span class="ym-sort-icon">{{ sortDir === 'asc' ? '↑' : '↓' }}</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-if="logs.data.length === 0">
+                        <td colspan="5" class="ym-td ym-td--empty">{{ $t('admin.noAuditLogs') }}</td>
+                    </tr>
+                    <tr v-for="log in logs.data" :key="log.id" class="ym-tr">
+                        <td class="ym-td">{{ log.causer?.name ?? $t('admin.system') }}</td>
+                        <td class="ym-td">
+                            <span :class="['ym-action-badge', actionBadgeClass(log.action)]">
+                                {{ $t(`admin.auditActions.${log.action}`) }}
+                            </span>
+                        </td>
+                        <td class="ym-td">{{ log.subject_name ?? '—' }}</td>
+                        <td class="ym-td ym-td--meta">{{ formatMeta(log.action, log.meta) }}</td>
+                        <td class="ym-td">{{ formatDate(log.created_at) }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-            <div v-if="logs.links.length > 3" class="ym-pagination">
-                <Link
-                    v-for="link in logs.links"
-                    :key="link.label"
-                    :href="link.url ?? '#'"
-                    v-html="link.label"
-                    :class="['ym-page-link', { 'ym-page-link--active': link.active, 'ym-page-link--disabled': !link.url }]"
-                    preserve-scroll
-                />
-            </div>
-        </section>
-    </AppLayout>
+        <div v-if="logs.links.length > 3" class="ym-pagination">
+            <Link
+                v-for="link in logs.links"
+                :key="link.label"
+                :href="link.url ?? '#'"
+                v-html="link.label"
+                :class="['ym-page-link', { 'ym-page-link--active': link.active, 'ym-page-link--disabled': !link.url }]"
+                preserve-scroll
+            />
+        </div>
+    </section>
 </template>
