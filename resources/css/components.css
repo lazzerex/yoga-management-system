@@ -127,6 +127,16 @@
         box-shadow: 0 20px 44px rgba(15, 23, 42, 0.22);
     }
 
+    .ym-modal-fade-enter-active,
+    .ym-modal-fade-leave-active { transition: opacity 160ms ease; }
+    .ym-modal-fade-enter-from,
+    .ym-modal-fade-leave-to { opacity: 0; }
+
+    .ym-modal-pop-enter-active { transition: opacity 160ms ease, transform 160ms ease; }
+    .ym-modal-pop-leave-active { transition: opacity 120ms ease, transform 120ms ease; }
+    .ym-modal-pop-enter-from,
+    .ym-modal-pop-leave-to { opacity: 0; transform: translateY(8px) scale(0.98); }
+
     .ym-modal-header {
         padding: 0.88rem 1rem;
         border-bottom: 1px solid #dbe3ee;

@@ -2,10 +2,11 @@
     .ym-shell {
         min-height: 100vh;
         display: grid;
-        grid-template-columns: 268px minmax(0, 1fr);
+        grid-template-columns: auto minmax(0, 1fr);
     }
 
     .ym-sidebar {
+        width: 268px;
         background: var(--ym-sidebar);
         border-right: 1px solid var(--ym-sidebar-border);
         display: flex;
@@ -13,12 +14,69 @@
         min-height: 100vh;
         position: sticky;
         top: 0;
+        z-index: 49;
+        transition: width 220ms ease;
+    }
+
+    .ym-sidebar--collapsed { width: 76px; }
+
+    .ym-sidebar--collapsed .ym-brand { justify-content: center; padding-inline: 0.5rem; gap: 0; }
+
+    .ym-brand-text {
+        overflow: hidden;
+        white-space: nowrap;
+        max-width: 200px;
+        opacity: 1;
+        transition: opacity 160ms ease, max-width 220ms ease;
+    }
+
+    .ym-sidebar--collapsed .ym-brand-text { opacity: 0; max-width: 0; }
+
+    .ym-sidebar--collapsed .ym-side-group,
+    .ym-sidebar--collapsed .ym-side-link-badge,
+    .ym-sidebar--collapsed .ym-side-chevron,
+    .ym-sidebar--collapsed .ym-side-children,
+    .ym-sidebar--collapsed .ym-sidebar-footer .ym-badge {
+        display: none;
+    }
+
+    .ym-sidebar--collapsed .ym-nav-item-content { justify-content: center; width: 100%; gap: 0; }
+    .ym-sidebar--collapsed .ym-side-link { justify-content: center; }
+    .ym-sidebar--collapsed .ym-sidebar-footer { display: flex; justify-content: center; }
+
+    .ym-sidebar-collapse-toggle {
+        display: none;
+        position: absolute;
+        top: 50%;
+        right: -1.03rem;
+        transform: translateY(-50%);
+        width: 2.06rem;
+        height: 2.06rem;
+        font-size: 0.95rem;
+        border-radius: 9999px;
+        border: 1px solid #d4dce7;
+        background: #ffffff;
+        color: #5d6c81;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 30;
+        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12);
+        transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+    }
+
+    .ym-sidebar-collapse-toggle:hover { background: #f2f6fb; color: #35495f; border-color: #c9d3e0; }
+
+    @media (min-width: 1024px) {
+        .ym-sidebar-collapse-toggle { display: inline-flex; }
     }
 
     .ym-brand {
+        position: relative;
         display: flex;
         align-items: center;
         gap: 0.75rem;
+        transition: gap 220ms ease, padding-inline 220ms ease;
         padding: 1rem 0.9rem 0.85rem;
         border-bottom: 1px solid var(--ym-sidebar-border);
     }
@@ -44,17 +102,23 @@
         color: #5b7cae;
     }
 
-    .ym-brand-subtitle {
-        font-size: 0.74rem;
-        color: var(--ym-muted);
-        margin-top: 0.08rem;
-    }
-
     .ym-side-nav {
+        position: relative;
         padding: 0.65rem 0.6rem;
         overflow-y: auto;
         display: grid;
         gap: 0.72rem;
+    }
+
+    .ym-side-active-indicator {
+        position: absolute;
+        left: 0.6rem;
+        width: 4px;
+        border-radius: 0 4px 4px 0;
+        background: var(--ym-link-strong);
+        opacity: 0;
+        pointer-events: none;
+        transition: top 220ms ease, height 220ms ease, opacity 150ms ease;
     }
 
     .ym-side-group-wrap { display: grid; gap: 0.18rem; }
@@ -80,7 +144,7 @@
         border-radius: 0.55rem;
         padding: 0.42rem 0.6rem;
         border: 1px solid transparent;
-        transition: all 140ms ease;
+        transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
     }
 
     .ym-side-link:hover {
@@ -107,6 +171,7 @@
         align-items: center;
         gap: 0.52rem;
         min-width: 0;
+        transition: gap 220ms ease;
     }
 
     .ym-nav-item-icon {
@@ -121,7 +186,12 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        max-width: 220px;
+        opacity: 1;
+        transition: opacity 160ms ease, max-width 220ms ease;
     }
+
+    .ym-sidebar--collapsed .ym-nav-item-text { opacity: 0; max-width: 0; }
 
     .ym-side-link-badge {
         flex-shrink: 0;
@@ -505,6 +575,60 @@
         position: relative;
         z-index: 26;
     }
+
+    .ym-tabbar {
+        position: relative;
+        display: flex;
+        gap: 0.5rem;
+        border-bottom: 1px solid #e5e5e5;
+        margin-bottom: 1rem;
+    }
+
+    .ym-tabbar-btn {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #737373;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        transition: color 140ms ease;
+    }
+
+    .ym-tabbar-btn:hover { color: #404040; }
+    .ym-tabbar-btn--active { color: #171717; font-weight: 600; }
+
+    .ym-tabbar-indicator {
+        position: absolute;
+        bottom: -1px;
+        height: 2px;
+        background: #171717;
+        transition: left 220ms ease, width 220ms ease;
+    }
+
+    .ym-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0 1.6rem 0.62rem;
+        font-size: 0.8rem;
+        color: var(--ym-muted);
+    }
+
+    .ym-breadcrumb-link {
+        color: var(--ym-muted);
+        text-decoration: none;
+        transition: color 140ms ease;
+    }
+
+    .ym-breadcrumb-link:hover { color: var(--ym-link-strong); }
+
+    .ym-breadcrumb-current {
+        color: var(--ym-text);
+        font-weight: 600;
+    }
+
+    .ym-breadcrumb-sep { font-size: 0.62rem; color: #aab4c2; }
 
     .ym-top-links-more { margin-left: 0.15rem; }
 
