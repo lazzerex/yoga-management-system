@@ -4,7 +4,6 @@ import { route } from 'ziggy-js';
 import { trans as t, currentLocale } from 'laravel-vue-i18n';
 import Draggable from 'vuedraggable';
 import Modal from '@/Components/UI/Modal.vue';
-import AppLayout from '@/Layouts/AppLayout.vue';
 
 const props = defineProps({
     auth: Object,
@@ -797,267 +796,188 @@ onBeforeUnmount(() => {
     window.removeEventListener('ym-dashboard-action', handleDashboardAction);
 });
 </script>
+<script>
+import AppLayout from '@/Layouts/AppLayout.vue';
+
+export default {
+    layout: (h, page) => {
+        const user = page.props.auth?.user;
+        const title = user?.canAccessAdmin
+            ? t('dashboard.homepage')
+            : user?.canViewCoachDashboard
+                ? t('dashboard.coachDashboard')
+                : t('dashboard.memberDashboard');
+        return h(AppLayout, { title }, () => page);
+    },
+};
+</script>
+
 
 <template>
-    <AppLayout :title="pageTitle">
-        <template v-if="canAccessAdmin">
-            <section :key="renderKey" class="ym-dashlet-grid">
-                <Draggable
-                    v-model="dashlets"
-                    item-key="id"
-                    tag="div"
-                    class="ym-dashlet-grid-inner"
-                    handle=".ym-drag-handle"
-                    ghost-class="ym-dashlet-card--placeholder"
-                    chosen-class="ym-dashlet-card--dragging"
-                    drag-class="ym-dashlet-card--sorting"
-                    :animation="240"
-                    :disabled="lockDashboard"
-                    @start="handleDashletSortStart"
-                    @end="handleDashletSortEnd"
-                >
-                    <template #item="{ element: dashlet }">
-                        <article :class="dashletClasses(dashlet)">
-                            <header class="ym-panel-head">
-                                <div class="ym-dashlet-head">
-                                    <span class="ym-drag-handle" aria-hidden="true">
-                                        <i class="bi bi-grip-vertical" />
-                                    </span>
-                                    <h2 class="ym-panel-title">{{ dashlet.title }}</h2>
-                                </div>
-
-                                <button
-                                    type="button"
-                                    class="ym-dashlet-remove"
-                                    :disabled="lockDashboard"
-                                    :aria-label="$t('dashboard.removeDashlet')"
-                                    @click="removeDashlet(dashlet.id)"
-                                >
-                                    <i class="bi bi-x-lg" />
-                                </button>
-                            </header>
-
-                            <div v-if="dashlet.type === 'activities'" class="ym-activity-list">
-                                <article v-for="activity in activities" :key="activity.title" class="ym-activity-item">
-                                    <a href="#" class="ym-activity-title">{{ activity.title }}</a>
-                                    <p class="ym-activity-meta">
-                                        <span
-                                            :class="[
-                                                'ym-status-pill',
-                                                activity.stateClass === 'pending' ? 'ym-status-pill--pending' : '',
-                                                activity.stateClass === 'started' ? 'ym-status-pill--started' : '',
-                                            ]"
-                                        >
-                                            {{ activity.state }}
-                                        </span>
-                                        <span>{{ activity.when }}</span>
-                                        <span>{{ activity.context }}</span>
-                                    </p>
-                                </article>
-                                <a href="#" class="ym-show-more">{{ $t('dashboard.showMore') }}</a>
-                            </div>
-
-                            <div v-else-if="dashlet.type === 'calendar'">
-                                <div class="ym-calendar-grid">
-                                    <div v-for="day in weekDays" :key="day" class="ym-calendar-day-name">{{ day }}</div>
-
-                                    <div
-                                        v-for="cell in calendarCells"
-                                        :key="`${cell.date}-${cell.muted ? 'm' : 'a'}`"
-                                        :class="['ym-calendar-cell', { 'ym-calendar-cell--muted': cell.muted }]"
-                                    >
-                                        <span class="ym-calendar-date">{{ cell.date }}</span>
-                                        <span
-                                            v-for="event in cell.events"
-                                            :key="event.text"
-                                            :class="['ym-event-chip', event.colorClass]"
-                                        >
-                                            {{ event.text }}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div v-else-if="dashlet.type === 'cases'" class="ym-section">
-                                <div class="ym-case-list">
-                                    <article v-for="caseItem in cases" :key="caseItem.id" class="ym-case-row">
-                                        <span class="ym-case-id">{{ caseItem.id }}</span>
-                                        <div>
-                                            <p class="ym-case-name">{{ caseItem.title }}</p>
-                                            <p class="ym-case-meta">
-                                                <span :class="['ym-status-pill', caseItem.priority === 'High' ? 'ym-status-pill--pending' : '']">
-                                                    {{ caseItem.priority }}
-                                                </span>
-                                                <span>{{ caseItem.type }}</span>
-                                                <span>{{ caseItem.customer }}</span>
-                                            </p>
-                                        </div>
-                                    </article>
-                                </div>
-                            </div>
-
-                            <div v-else-if="dashlet.type === 'lead-source'" class="ym-section">
-                                <div class="ym-pie-wrap">
-                                    <div class="ym-pie" role="img" :aria-label="$t('dashboard.opportunitiesByLeadSource')" />
-                                    <div class="ym-legend">
-                                        <div v-for="item in leadSources" :key="item.name" class="ym-legend-item">
-                                            <span class="ym-legend-dot" :style="{ background: item.color }" />
-                                            <span>{{ $t(item.name) }} ({{ item.value }}%)</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div v-else-if="dashlet.type === 'memo'" class="ym-section">
-                                <p class="ym-card-note">{{ $t('dashboard.memoHint') }}</p>
-                                <div class="ym-note-banner">
-                                    {{ $t('dashboard.memoContent') }}
-                                </div>
-                            </div>
-
-                            <div v-else class="ym-section">
-                                <p class="ym-card-note">{{ dashlet.description }}</p>
-                                <div class="ym-list">
-                                    <div v-for="item in dashlet.previewRows" :key="item" class="ym-list-item">
-                                        <span>{{ item }}</span>
-                                        <span class="ym-list-meta">{{ $t('dashboard.preview') }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </article>
-                    </template>
-                </Draggable>
-            </section>
-        </template>
-
-        <template v-else>
-            <div
-                :key="renderKey"
+    <template v-if="canAccessAdmin">
+        <section :key="renderKey" class="ym-dashlet-grid">
+            <Draggable
+                v-model="dashlets"
+                item-key="id"
+                tag="div"
+                class="ym-dashlet-grid-inner"
+                handle=".ym-drag-handle"
+                ghost-class="ym-dashlet-card--placeholder"
+                chosen-class="ym-dashlet-card--dragging"
+                drag-class="ym-dashlet-card--sorting"
+                :animation="240"
+                :disabled="lockDashboard"
+                @start="handleDashletSortStart"
+                @end="handleDashletSortEnd"
             >
-                <div
-                    v-if="dashboardNotice"
-                    class="ym-info-row"
-                    style="border-radius: 0.42rem; margin-bottom: 0.75rem;"
-                >
-                    <i class="bi bi-info-circle ym-info-icon" />
-                    <span>{{ dashboardNotice }}</span>
+                <template #item="{ element: dashlet }">
+                    <article :class="dashletClasses(dashlet)">
+                        <header class="ym-panel-head">
+                            <div class="ym-dashlet-head">
+                                <span class="ym-drag-handle" aria-hidden="true">
+                                    <i class="bi bi-grip-vertical" />
+                                </span>
+                                <h2 class="ym-panel-title">{{ dashlet.title }}</h2>
+                            </div>
+
+                            <button
+                                type="button"
+                                class="ym-dashlet-remove"
+                                :disabled="lockDashboard"
+                                :aria-label="$t('dashboard.removeDashlet')"
+                                @click="removeDashlet(dashlet.id)"
+                            >
+                                <i class="bi bi-x-lg" />
+                            </button>
+                        </header>
+
+                        <div v-if="dashlet.type === 'activities'" class="ym-activity-list">
+                            <article v-for="activity in activities" :key="activity.title" class="ym-activity-item">
+                                <a href="#" class="ym-activity-title">{{ activity.title }}</a>
+                                <p class="ym-activity-meta">
+                                    <span
+                                        :class="[
+                                            'ym-status-pill',
+                                            activity.stateClass === 'pending' ? 'ym-status-pill--pending' : '',
+                                            activity.stateClass === 'started' ? 'ym-status-pill--started' : '',
+                                        ]"
+                                    >
+                                        {{ activity.state }}
+                                    </span>
+                                    <span>{{ activity.when }}</span>
+                                    <span>{{ activity.context }}</span>
+                                </p>
+                            </article>
+                            <a href="#" class="ym-show-more">{{ $t('dashboard.showMore') }}</a>
+                        </div>
+
+                        <div v-else-if="dashlet.type === 'calendar'">
+                            <div class="ym-calendar-grid">
+                                <div v-for="day in weekDays" :key="day" class="ym-calendar-day-name">{{ day }}</div>
+
+                                <div
+                                    v-for="cell in calendarCells"
+                                    :key="`${cell.date}-${cell.muted ? 'm' : 'a'}`"
+                                    :class="['ym-calendar-cell', { 'ym-calendar-cell--muted': cell.muted }]"
+                                >
+                                    <span class="ym-calendar-date">{{ cell.date }}</span>
+                                    <span
+                                        v-for="event in cell.events"
+                                        :key="event.text"
+                                        :class="['ym-event-chip', event.colorClass]"
+                                    >
+                                        {{ event.text }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-else-if="dashlet.type === 'cases'" class="ym-section">
+                            <div class="ym-case-list">
+                                <article v-for="caseItem in cases" :key="caseItem.id" class="ym-case-row">
+                                    <span class="ym-case-id">{{ caseItem.id }}</span>
+                                    <div>
+                                        <p class="ym-case-name">{{ caseItem.title }}</p>
+                                        <p class="ym-case-meta">
+                                            <span :class="['ym-status-pill', caseItem.priority === 'High' ? 'ym-status-pill--pending' : '']">
+                                                {{ caseItem.priority }}
+                                            </span>
+                                            <span>{{ caseItem.type }}</span>
+                                            <span>{{ caseItem.customer }}</span>
+                                        </p>
+                                    </div>
+                                </article>
+                            </div>
+                        </div>
+
+                        <div v-else-if="dashlet.type === 'lead-source'" class="ym-section">
+                            <div class="ym-pie-wrap">
+                                <div class="ym-pie" role="img" :aria-label="$t('dashboard.opportunitiesByLeadSource')" />
+                                <div class="ym-legend">
+                                    <div v-for="item in leadSources" :key="item.name" class="ym-legend-item">
+                                        <span class="ym-legend-dot" :style="{ background: item.color }" />
+                                        <span>{{ $t(item.name) }} ({{ item.value }}%)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-else-if="dashlet.type === 'memo'" class="ym-section">
+                            <p class="ym-card-note">{{ $t('dashboard.memoHint') }}</p>
+                            <div class="ym-note-banner">
+                                {{ $t('dashboard.memoContent') }}
+                            </div>
+                        </div>
+
+                        <div v-else class="ym-section">
+                            <p class="ym-card-note">{{ dashlet.description }}</p>
+                            <div class="ym-list">
+                                <div v-for="item in dashlet.previewRows" :key="item" class="ym-list-item">
+                                    <span>{{ item }}</span>
+                                    <span class="ym-list-meta">{{ $t('dashboard.preview') }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                </template>
+            </Draggable>
+        </section>
+    </template>
+
+    <template v-else>
+        <div
+            :key="renderKey"
+        >
+            <div
+                v-if="dashboardNotice"
+                class="ym-info-row"
+                style="border-radius: 0.42rem; margin-bottom: 0.75rem;"
+            >
+                <i class="bi bi-info-circle ym-info-icon" />
+                <span>{{ dashboardNotice }}</span>
+            </div>
+
+            <template v-if="activeView === 'homepage'">
+                <div class="ym-stat-strip">
+                    <div v-for="metric in dashboardConfig.metrics" :key="metric.label" class="ym-stat">
+                        <p class="ym-stat-label">{{ metric.label }}</p>
+                        <p class="ym-stat-value">{{ metric.value }}</p>
+                        <p class="ym-stat-note">{{ metric.note }}</p>
+                    </div>
                 </div>
 
-                <template v-if="activeView === 'homepage'">
-                    <div class="ym-stat-strip">
-                        <div v-for="metric in dashboardConfig.metrics" :key="metric.label" class="ym-stat">
-                            <p class="ym-stat-label">{{ metric.label }}</p>
-                            <p class="ym-stat-value">{{ metric.value }}</p>
-                            <p class="ym-stat-note">{{ metric.note }}</p>
-                        </div>
-                    </div>
-
-                    <div class="ym-page-cols">
-                        <div class="ym-pane">
-                            <div class="ym-pane-head">
-                                <div class="ym-pane-title-wrap">
-                                    <i :class="['bi', dashboardConfig.primaryPanel.icon, 'ym-pane-icon']" />
-                                    <h2 class="ym-pane-title">{{ dashboardConfig.primaryPanel.title }}</h2>
-                                </div>
-                            </div>
-                            <div class="ym-pane-body">
-                                <div class="ym-row-list">
-                                    <div
-                                        v-for="item in dashboardConfig.primaryPanel.rows"
-                                        :key="item.title"
-                                        class="ym-row"
-                                    >
-                                        <div class="ym-row-main">
-                                            <p class="ym-row-title">{{ item.title }}</p>
-                                            <p class="ym-row-meta">{{ item.meta }}</p>
-                                        </div>
-                                        <div class="ym-row-aside">
-                                            <span :class="badgeClass(item.tone)">{{ item.badge }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="ym-pane">
-                            <div class="ym-pane-head">
-                                <div class="ym-pane-title-wrap">
-                                    <i :class="['bi', dashboardConfig.secondaryPanel.icon, 'ym-pane-icon']" />
-                                    <h2 class="ym-pane-title">{{ dashboardConfig.secondaryPanel.title }}</h2>
-                                </div>
-                            </div>
-                            <div class="ym-pane-body">
-                                <div class="ym-row-list">
-                                    <div
-                                        v-for="item in dashboardConfig.secondaryPanel.rows"
-                                        :key="item.title"
-                                        class="ym-row"
-                                    >
-                                        <div class="ym-row-main">
-                                            <p class="ym-row-title">{{ item.title }}</p>
-                                            <p class="ym-row-meta">{{ item.meta }}</p>
-                                        </div>
-                                        <div class="ym-row-aside">
-                                            <span :class="badgeClass(item.tone)">{{ item.badge }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="ym-pane mt-4">
-                        <div class="ym-pane-head">
-                            <div class="ym-pane-title-wrap">
-                                <i class="bi bi-calendar-week ym-pane-icon" />
-                                <h2 class="ym-pane-title">{{ dashboardConfig.weeklyPanel.title }}</h2>
-                            </div>
-                        </div>
-                        <div class="ym-pane-body">
-                            <div class="ym-timetable-scroll">
-                                <div class="ym-timetable">
-                                    <div
-                                        v-for="day in dashboardConfig.weeklyPanel.days"
-                                        :key="day.day"
-                                        class="ym-timetable-col"
-                                    >
-                                        <div class="ym-timetable-head">
-                                            <p class="ym-timetable-day">{{ day.dayShort }}</p>
-                                            <p class="ym-timetable-date">{{ day.date }}</p>
-                                        </div>
-                                        <div class="ym-timetable-body">
-                                            <div
-                                                v-for="entry in day.entries"
-                                                :key="entry.title"
-                                                :class="['ym-timetable-slot', { 'ym-timetable-slot--coach': canViewCoachDashboard }]"
-                                            >
-                                                <p class="ym-timetable-time">{{ entry.time }}</p>
-                                                <p class="ym-timetable-name">{{ entry.title }}</p>
-                                                <p class="ym-timetable-sub">{{ entry.meta }}</p>
-                                            </div>
-                                            <div v-if="!day.entries.length" class="ym-timetable-empty">
-                                                {{ dashboardConfig.weeklyPanel.emptyMessage }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </template>
-
-                <template v-else-if="currentViewConfig">
+                <div class="ym-page-cols">
                     <div class="ym-pane">
                         <div class="ym-pane-head">
                             <div class="ym-pane-title-wrap">
-                                <i :class="['bi', currentViewConfig.icon, 'ym-pane-icon']" />
-                                <h2 class="ym-pane-title">{{ currentViewConfig.title }}</h2>
+                                <i :class="['bi', dashboardConfig.primaryPanel.icon, 'ym-pane-icon']" />
+                                <h2 class="ym-pane-title">{{ dashboardConfig.primaryPanel.title }}</h2>
                             </div>
                         </div>
                         <div class="ym-pane-body">
                             <div class="ym-row-list">
                                 <div
-                                    v-for="item in currentViewConfig.rows"
+                                    v-for="item in dashboardConfig.primaryPanel.rows"
                                     :key="item.title"
                                     class="ym-row"
                                 >
@@ -1070,94 +990,187 @@ onBeforeUnmount(() => {
                                     </div>
                                 </div>
                             </div>
-                            <div class="ym-info-row">
-                                <i class="bi bi-info-circle ym-info-icon" />
-                                <span>{{ currentViewConfig.note }}</span>
+                        </div>
+                    </div>
+
+                    <div class="ym-pane">
+                        <div class="ym-pane-head">
+                            <div class="ym-pane-title-wrap">
+                                <i :class="['bi', dashboardConfig.secondaryPanel.icon, 'ym-pane-icon']" />
+                                <h2 class="ym-pane-title">{{ dashboardConfig.secondaryPanel.title }}</h2>
+                            </div>
+                        </div>
+                        <div class="ym-pane-body">
+                            <div class="ym-row-list">
+                                <div
+                                    v-for="item in dashboardConfig.secondaryPanel.rows"
+                                    :key="item.title"
+                                    class="ym-row"
+                                >
+                                    <div class="ym-row-main">
+                                        <p class="ym-row-title">{{ item.title }}</p>
+                                        <p class="ym-row-meta">{{ item.meta }}</p>
+                                    </div>
+                                    <div class="ym-row-aside">
+                                        <span :class="badgeClass(item.tone)">{{ item.badge }}</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </template>
-            </div>
-        </template>
-
-        <Modal :show="showEditDashboardModal" :title="$t('dashboard.editDashboardTabs')" @close="showEditDashboardModal = false">
-            <div class="ym-dashboard-modal-actions">
-                <button type="button" class="ym-btn-sm" @click="saveDashboardTabs">{{ $t('common.save') }}</button>
-                <button type="button" class="ym-btn-outline" @click="showEditDashboardModal = false">{{ $t('common.cancel') }}</button>
-            </div>
-
-            <p v-if="dashboardTabError" class="ym-field-error">{{ dashboardTabError }}</p>
-
-            <p class="ym-card-note">
-                {{ $t('dashboard.configureTabsNote') }}
-            </p>
-
-            <div class="ym-tab-editor-list mt-3">
-                <div v-for="(tab, index) in dashboardTabsDraft" :key="tab.id" class="ym-tab-editor-row">
-                    <span class="ym-tab-handle" aria-hidden="true">
-                        <i class="bi bi-grip-vertical" />
-                    </span>
-                    <input v-model="tab.label" type="text" class="ym-input" />
-                    <button
-                        type="button"
-                        class="ym-tab-remove"
-                        :disabled="dashboardTabsDraft.length === 1"
-                        @click="removeDashboardTab(index)"
-                    >
-                        <i class="bi bi-x-lg" />
-                    </button>
                 </div>
 
-                <div class="ym-tab-editor-row ym-tab-editor-row--add">
-                    <input
-                        v-model="newDashboardTabLabel"
-                        type="text"
-                        class="ym-input"
-                        :placeholder="$t('dashboard.typeAndPressEnter')"
-                        @keydown.enter.prevent="addDashboardTab"
-                    />
-                    <button type="button" class="ym-tab-add" :disabled="dashboardTabsDraft.length >= maxTopTabs" @click="addDashboardTab">
-                        <i class="bi bi-plus-lg" />
-                    </button>
+                <div class="ym-pane mt-4">
+                    <div class="ym-pane-head">
+                        <div class="ym-pane-title-wrap">
+                            <i class="bi bi-calendar-week ym-pane-icon" />
+                            <h2 class="ym-pane-title">{{ dashboardConfig.weeklyPanel.title }}</h2>
+                        </div>
+                    </div>
+                    <div class="ym-pane-body">
+                        <div class="ym-timetable-scroll">
+                            <div class="ym-timetable">
+                                <div
+                                    v-for="day in dashboardConfig.weeklyPanel.days"
+                                    :key="day.day"
+                                    class="ym-timetable-col"
+                                >
+                                    <div class="ym-timetable-head">
+                                        <p class="ym-timetable-day">{{ day.dayShort }}</p>
+                                        <p class="ym-timetable-date">{{ day.date }}</p>
+                                    </div>
+                                    <div class="ym-timetable-body">
+                                        <div
+                                            v-for="entry in day.entries"
+                                            :key="entry.title"
+                                            :class="['ym-timetable-slot', { 'ym-timetable-slot--coach': canViewCoachDashboard }]"
+                                        >
+                                            <p class="ym-timetable-time">{{ entry.time }}</p>
+                                            <p class="ym-timetable-name">{{ entry.title }}</p>
+                                            <p class="ym-timetable-sub">{{ entry.meta }}</p>
+                                        </div>
+                                        <div v-if="!day.entries.length" class="ym-timetable-empty">
+                                            {{ dashboardConfig.weeklyPanel.emptyMessage }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </template>
 
-            <label v-if="canAccessAdmin" class="ym-lock-toggle mt-3">
-                <span>{{ $t('dashboard.lockDashboard') }}</span>
-                <input v-model="lockDashboard" type="checkbox" />
-            </label>
-        </Modal>
+            <template v-else-if="currentViewConfig">
+                <div class="ym-pane">
+                    <div class="ym-pane-head">
+                        <div class="ym-pane-title-wrap">
+                            <i :class="['bi', currentViewConfig.icon, 'ym-pane-icon']" />
+                            <h2 class="ym-pane-title">{{ currentViewConfig.title }}</h2>
+                        </div>
+                    </div>
+                    <div class="ym-pane-body">
+                        <div class="ym-row-list">
+                            <div
+                                v-for="item in currentViewConfig.rows"
+                                :key="item.title"
+                                class="ym-row"
+                            >
+                                <div class="ym-row-main">
+                                    <p class="ym-row-title">{{ item.title }}</p>
+                                    <p class="ym-row-meta">{{ item.meta }}</p>
+                                </div>
+                                <div class="ym-row-aside">
+                                    <span :class="badgeClass(item.tone)">{{ item.badge }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ym-info-row">
+                            <i class="bi bi-info-circle ym-info-icon" />
+                            <span>{{ currentViewConfig.note }}</span>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </template>
 
-        <Modal
-            v-if="canAccessAdmin"
-            :show="showAddDashletModal"
-            :title="$t('dashboard.addDashlet')"
-            @close="showAddDashletModal = false"
-        >
-            <label class="ym-search-wrap ym-dashboard-modal-search" :aria-label="$t('common.search')">
-                <i class="bi bi-search ym-search-icon" />
-                <input
-                    v-model="dashletSearchQuery"
-                    type="search"
-                    class="ym-search"
-                    :placeholder="$t('common.search')"
-                    :aria-label="$t('common.search')"
-                />
-            </label>
+    <Modal :show="showEditDashboardModal" :title="$t('dashboard.editDashboardTabs')" @close="showEditDashboardModal = false">
+        <div class="ym-dashboard-modal-actions">
+            <button type="button" class="ym-btn-sm" @click="saveDashboardTabs">{{ $t('common.save') }}</button>
+            <button type="button" class="ym-btn-outline" @click="showEditDashboardModal = false">{{ $t('common.cancel') }}</button>
+        </div>
 
-            <div class="ym-dashlet-catalog">
+        <p v-if="dashboardTabError" class="ym-field-error">{{ dashboardTabError }}</p>
+
+        <p class="ym-card-note">
+            {{ $t('dashboard.configureTabsNote') }}
+        </p>
+
+        <div class="ym-tab-editor-list mt-3">
+            <div v-for="(tab, index) in dashboardTabsDraft" :key="tab.id" class="ym-tab-editor-row">
+                <span class="ym-tab-handle" aria-hidden="true">
+                    <i class="bi bi-grip-vertical" />
+                </span>
+                <input v-model="tab.label" type="text" class="ym-input" />
                 <button
-                    v-for="item in filteredDashletCatalog"
-                    :key="item.id"
                     type="button"
-                    class="ym-dashlet-catalog-item"
-                    :disabled="isDashletActive(item.id)"
-                    @click="addDashlet(item)"
+                    class="ym-tab-remove"
+                    :disabled="dashboardTabsDraft.length === 1"
+                    @click="removeDashboardTab(index)"
                 >
-                    <span>{{ item.title }}</span>
-                    <small>{{ isDashletActive(item.id) ? $t('dashboard.added') : $t('dashboard.add') }}</small>
+                    <i class="bi bi-x-lg" />
                 </button>
             </div>
-        </Modal>
-    </AppLayout>
+
+            <div class="ym-tab-editor-row ym-tab-editor-row--add">
+                <input
+                    v-model="newDashboardTabLabel"
+                    type="text"
+                    class="ym-input"
+                    :placeholder="$t('dashboard.typeAndPressEnter')"
+                    @keydown.enter.prevent="addDashboardTab"
+                />
+                <button type="button" class="ym-tab-add" :disabled="dashboardTabsDraft.length >= maxTopTabs" @click="addDashboardTab">
+                    <i class="bi bi-plus-lg" />
+                </button>
+            </div>
+        </div>
+
+        <label v-if="canAccessAdmin" class="ym-lock-toggle mt-3">
+            <span>{{ $t('dashboard.lockDashboard') }}</span>
+            <input v-model="lockDashboard" type="checkbox" />
+        </label>
+    </Modal>
+
+    <Modal
+        v-if="canAccessAdmin"
+        :show="showAddDashletModal"
+        :title="$t('dashboard.addDashlet')"
+        @close="showAddDashletModal = false"
+    >
+        <label class="ym-search-wrap ym-dashboard-modal-search" :aria-label="$t('common.search')">
+            <i class="bi bi-search ym-search-icon" />
+            <input
+                v-model="dashletSearchQuery"
+                type="search"
+                class="ym-search"
+                :placeholder="$t('common.search')"
+                :aria-label="$t('common.search')"
+            />
+        </label>
+
+        <div class="ym-dashlet-catalog">
+            <button
+                v-for="item in filteredDashletCatalog"
+                :key="item.id"
+                type="button"
+                class="ym-dashlet-catalog-item"
+                :disabled="isDashletActive(item.id)"
+                @click="addDashlet(item)"
+            >
+                <span>{{ item.title }}</span>
+                <small>{{ isDashletActive(item.id) ? $t('dashboard.added') : $t('dashboard.add') }}</small>
+            </button>
+        </div>
+    </Modal>
 </template>
