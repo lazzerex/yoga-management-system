@@ -1,7 +1,6 @@
 <script setup>
 import { computed } from 'vue';
 import { trans as t } from 'laravel-vue-i18n';
-import AppLayout from '@/Layouts/AppLayout.vue';
 
 const props = defineProps({
     sessions: Array,
@@ -51,90 +50,95 @@ const weeklyFocus = computed(() => [
     { label: t('member.currentStreak'), note: t('member.consecutiveWeeks'), value: t('member.fiveWeeks') },
 ]);
 </script>
+<script>
+import AppLayout from '@/Layouts/AppLayout.vue';
+export default {
+    layout: (h, page) => h(AppLayout, { title: t('member.mySchedule') }, () => page),
+};
+</script>
+
 
 <template>
-    <AppLayout :title="$t('member.mySchedule')">
+    <div class="ym-pane">
+        <div class="ym-pane-head">
+            <div class="ym-pane-title-wrap">
+                <i class="bi bi-calendar-week ym-pane-icon" />
+                <h2 class="ym-pane-title">{{ $t('member.personalWeeklyCalendar') }}</h2>
+            </div>
+        </div>
+        <div class="ym-pane-body">
+            <div class="ym-timetable-scroll">
+                <div class="ym-timetable">
+                    <div v-for="day in weeklySchedule" :key="day.day" class="ym-timetable-col">
+                        <div class="ym-timetable-head">
+                            <p class="ym-timetable-day">{{ day.day }}</p>
+                            <p class="ym-timetable-date">{{ day.date }}</p>
+                        </div>
+                        <div class="ym-timetable-body">
+                            <div
+                                v-for="session in day.sessions"
+                                :key="session.title"
+                                class="ym-timetable-slot"
+                            >
+                                <p class="ym-timetable-time">{{ session.time }}</p>
+                                <p class="ym-timetable-name">{{ session.title }}</p>
+                                <p class="ym-timetable-sub">{{ session.meta }}</p>
+                            </div>
+                            <div v-if="!day.sessions.length" class="ym-timetable-empty">&mdash;</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ym-page-cols mt-4">
         <div class="ym-pane">
             <div class="ym-pane-head">
                 <div class="ym-pane-title-wrap">
-                    <i class="bi bi-calendar-week ym-pane-icon" />
-                    <h2 class="ym-pane-title">{{ $t('member.personalWeeklyCalendar') }}</h2>
+                    <i class="bi bi-bell ym-pane-icon" />
+                    <h2 class="ym-pane-title">{{ $t('member.upcomingHighlights') }}</h2>
                 </div>
             </div>
             <div class="ym-pane-body">
-                <div class="ym-timetable-scroll">
-                    <div class="ym-timetable">
-                        <div v-for="day in weeklySchedule" :key="day.day" class="ym-timetable-col">
-                            <div class="ym-timetable-head">
-                                <p class="ym-timetable-day">{{ day.day }}</p>
-                                <p class="ym-timetable-date">{{ day.date }}</p>
-                            </div>
-                            <div class="ym-timetable-body">
-                                <div
-                                    v-for="session in day.sessions"
-                                    :key="session.title"
-                                    class="ym-timetable-slot"
-                                >
-                                    <p class="ym-timetable-time">{{ session.time }}</p>
-                                    <p class="ym-timetable-name">{{ session.title }}</p>
-                                    <p class="ym-timetable-sub">{{ session.meta }}</p>
-                                </div>
-                                <div v-if="!day.sessions.length" class="ym-timetable-empty">&mdash;</div>
-                            </div>
+                <div class="ym-row-list">
+                    <div v-for="highlight in highlights" :key="highlight.title" class="ym-row">
+                        <div class="ym-row-main">
+                            <p class="ym-row-title">{{ highlight.title }}</p>
+                            <p class="ym-row-meta">{{ highlight.meta }}</p>
+                        </div>
+                        <div class="ym-row-aside">
+                            <span class="ym-tag">{{ highlight.type }}</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="ym-page-cols mt-4">
-            <div class="ym-pane">
-                <div class="ym-pane-head">
-                    <div class="ym-pane-title-wrap">
-                        <i class="bi bi-bell ym-pane-icon" />
-                        <h2 class="ym-pane-title">{{ $t('member.upcomingHighlights') }}</h2>
-                    </div>
-                </div>
-                <div class="ym-pane-body">
-                    <div class="ym-row-list">
-                        <div v-for="highlight in highlights" :key="highlight.title" class="ym-row">
-                            <div class="ym-row-main">
-                                <p class="ym-row-title">{{ highlight.title }}</p>
-                                <p class="ym-row-meta">{{ highlight.meta }}</p>
-                            </div>
-                            <div class="ym-row-aside">
-                                <span class="ym-tag">{{ highlight.type }}</span>
-                            </div>
-                        </div>
-                    </div>
+        <div class="ym-pane">
+            <div class="ym-pane-head">
+                <div class="ym-pane-title-wrap">
+                    <i class="bi bi-bar-chart ym-pane-icon" />
+                    <h2 class="ym-pane-title">{{ $t('member.weeklyFocus') }}</h2>
                 </div>
             </div>
-
-            <div class="ym-pane">
-                <div class="ym-pane-head">
-                    <div class="ym-pane-title-wrap">
-                        <i class="bi bi-bar-chart ym-pane-icon" />
-                        <h2 class="ym-pane-title">{{ $t('member.weeklyFocus') }}</h2>
-                    </div>
-                </div>
-                <div class="ym-pane-body">
-                    <div class="ym-row-list">
-                        <div v-for="focus in weeklyFocus" :key="focus.label" class="ym-row">
-                            <div class="ym-row-main">
-                                <p class="ym-row-title">{{ focus.label }}</p>
-                                <p class="ym-row-meta">{{ focus.note }}</p>
-                            </div>
-                            <div class="ym-row-aside">
-                                <span class="ym-chip">{{ focus.value }}</span>
-                            </div>
+            <div class="ym-pane-body">
+                <div class="ym-row-list">
+                    <div v-for="focus in weeklyFocus" :key="focus.label" class="ym-row">
+                        <div class="ym-row-main">
+                            <p class="ym-row-title">{{ focus.label }}</p>
+                            <p class="ym-row-meta">{{ focus.note }}</p>
+                        </div>
+                        <div class="ym-row-aside">
+                            <span class="ym-chip">{{ focus.value }}</span>
                         </div>
                     </div>
-                    <div class="ym-info-row">
-                        <i class="bi bi-info-circle ym-info-icon" />
-                        <span>{{ $t('member.recoveryTip') }}</span>
-                    </div>
+                </div>
+                <div class="ym-info-row">
+                    <i class="bi bi-info-circle ym-info-icon" />
+                    <span>{{ $t('member.recoveryTip') }}</span>
                 </div>
             </div>
         </div>
-    </AppLayout>
+    </div>
 </template>
