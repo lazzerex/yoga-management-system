@@ -1,13 +1,13 @@
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
-import { router, usePage } from '@inertiajs/vue3';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { Link, router, usePage } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import { loadLanguageAsync, trans as t, currentLocale } from 'laravel-vue-i18n';
 import NavMenuLink from '@/Components/UI/NavMenuLink.vue';
 import SidebarMenuItem from '@/Components/UI/SidebarMenuItem.vue';
 import { useSidebarMenuState } from '@/Composables/useSidebarMenuState.js';
 
-defineProps({
+const props = defineProps({
     title: {
         type: String,
         default: 'Dashboard',
@@ -66,6 +66,63 @@ const isMenuItemActive = (href) => {
         || page.url.startsWith(`${path}/`)
         || page.url.startsWith(`${path}?`);
 };
+
+// Single indicator that measures the currently active sidebar link and
+// slides to it. If the active link isn't visible (e.g. inside a collapsed
+// group), there's nothing to slide from, so it fades in at the new spot
+// instead — `top`/`height` and `opacity` transition independently in CSS.
+const sideNavRef = ref(null);
+const sideIndicatorStyle = ref({ top: '0px', height: '0px', opacity: 0 });
+
+const updateSideIndicator = () => {
+    const activeEl = sideNavRef.value?.querySelector('.ym-side-link--active');
+    if (!activeEl) {
+        sideIndicatorStyle.value = { ...sideIndicatorStyle.value, opacity: 0 };
+        return;
+    }
+
+    sideIndicatorStyle.value = {
+        top: `${activeEl.offsetTop}px`,
+        height: `${activeEl.offsetHeight}px`,
+        opacity: 1,
+    };
+};
+
+onMounted(() => nextTick(updateSideIndicator));
+watch(() => page.url, () => nextTick(updateSideIndicator));
+watch(openMenuItems, () => nextTick(updateSideIndicator));
+
+const flattenMenuItems = (groups) => {
+    const flat = [];
+    const walk = (items) => {
+        for (const item of items) {
+            if (item.href) flat.push({ href: item.href, label: item.label });
+            if (item.children?.length) walk(item.children);
+        }
+    };
+    groups.forEach((group) => walk(group.items));
+    return flat;
+};
+
+const breadcrumbs = computed(() => {
+    if (isOnDashboard.value) {
+        return [{ label: props.title, current: true }];
+    }
+
+    const crumbs = [{ label: t('dashboard.homepage'), href: route('cms.dashboard') }];
+
+    const matched = flattenMenuItems(sidebarMenu.value)
+        .filter((item) => isMenuItemActive(item.href))
+        .sort((a, b) => b.href.length - a.href.length)[0];
+
+    if (matched && matched.label !== props.title) {
+        crumbs.push({ label: matched.label, href: matched.href });
+    }
+
+    crumbs.push({ label: props.title, current: true });
+
+    return crumbs;
+});
 const roleLabel = computed(() => {
     const role = userRole.value;
     if (!role) return 'guest';
@@ -74,6 +131,30 @@ const roleLabel = computed(() => {
 const sidebarOpen = ref(false);
 const toggleSidebar = () => { sidebarOpen.value = !sidebarOpen.value; };
 const closeSidebar = () => { sidebarOpen.value = false; };
+
+const readStoredSidebarCollapsed = () => {
+    try {
+        return localStorage.getItem('ym-sidebar-collapsed') === '1';
+    } catch {
+        return false;
+    }
+};
+
+const sidebarCollapsed = ref(readStoredSidebarCollapsed());
+const toggleSidebarCollapsed = () => {
+    sidebarCollapsed.value = !sidebarCollapsed.value;
+    try {
+        localStorage.setItem('ym-sidebar-collapsed', sidebarCollapsed.value ? '1' : '0');
+    } catch {
+        // ignore — collapse still works for this session, just won't persist
+    }
+};
+
+// Collapsing hides the group labels (display:none, instant) which shifts every
+// item below it upward immediately — no need to wait for the width transition,
+// vertical stacking doesn't depend on it. Measuring right away avoids a stale
+// position followed by a jump.
+watch(sidebarCollapsed, () => nextTick(updateSideIndicator));
 
 const notificationsOpen = ref(false);
 const profileMenuOpen = ref(false);
@@ -364,16 +445,25 @@ const logout = () => {
     <div class="ym-shell">
         <div v-if="sidebarOpen" class="ym-sidebar-backdrop" @click="closeSidebar" />
 
-        <aside class="ym-sidebar" :class="{ 'ym-sidebar--open': sidebarOpen }">
+        <aside class="ym-sidebar" :class="{ 'ym-sidebar--open': sidebarOpen, 'ym-sidebar--collapsed': sidebarCollapsed }">
             <div class="ym-brand">
                 <p class="ym-brand-mark">YM</p>
-                <div>
+                <div class="ym-brand-text">
                     <p class="ym-brand-title">{{ $t('layout.brand.title') }}</p>
-                    <p class="ym-brand-subtitle">{{ $t('layout.brand.subtitle') }}</p>
                 </div>
+
+                <button
+                    type="button"
+                    class="ym-sidebar-collapse-toggle"
+                    :aria-label="$t('common.toggleSidebar')"
+                    @click="toggleSidebarCollapsed"
+                >
+                    <i :class="sidebarCollapsed ? 'bi bi-chevron-right' : 'bi bi-chevron-left'" />
+                </button>
             </div>
 
-            <nav class="ym-side-nav">
+            <nav ref="sideNavRef" class="ym-side-nav">
+                <span class="ym-side-active-indicator" :style="sideIndicatorStyle" />
                 <section v-for="group in sidebarMenu" :key="group.key" class="ym-side-group-wrap">
                     <p class="ym-side-group">{{ group.label }}</p>
                     <SidebarMenuItem
@@ -535,6 +625,16 @@ const logout = () => {
                         </div>
                     </div>
                 </div>
+
+                <nav v-if="breadcrumbs.length > 1" class="ym-breadcrumb" aria-label="breadcrumb">
+                    <template v-for="(crumb, index) in breadcrumbs" :key="index">
+                        <i v-if="index > 0" class="bi bi-chevron-right ym-breadcrumb-sep" />
+                        <Link v-if="crumb.href && !crumb.current" :href="crumb.href" class="ym-breadcrumb-link">
+                            {{ crumb.label }}
+                        </Link>
+                        <span v-else class="ym-breadcrumb-current">{{ crumb.label }}</span>
+                    </template>
+                </nav>
 
                 <nav v-if="isOnDashboard" class="ym-top-links">
                     <NavMenuLink
