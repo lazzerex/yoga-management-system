@@ -53,7 +53,7 @@ const iconStyles = computed(() => {
 </script>
 
 <template>
-    <Link v-if="href" :href="href" :class="linkClasses">
+    <Link v-if="href" :href="href" :class="linkClasses" prefetch="hover">
         <span class="ym-nav-item-content">
             <i v-if="icon" :class="['bi', icon, 'ym-nav-item-icon']" :style="iconStyles" />
             <span class="ym-nav-item-text">{{ label }}</span>
