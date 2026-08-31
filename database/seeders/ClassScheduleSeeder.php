@@ -14,15 +14,15 @@ class ClassScheduleSeeder extends Seeder
     public function run(): void
     {
         $branches = Branch::orderBy('name')->get();
-        $coachProfile = CoachProfile::first();
+        $coachProfiles = CoachProfile::orderBy('id')->get();
         $classTypes = ClassType::orderBy('name')->get();
 
-        if ($branches->isEmpty() || ! $coachProfile || $classTypes->count() < 2) {
+        if ($branches->isEmpty() || $coachProfiles->isEmpty() || $classTypes->count() < 2) {
             return;
         }
 
-        // One coach, so every slot below is a distinct day+time — no double-booking
-        // across branches even though they all share the same seeded coach.
+        // Every slot below is a distinct day+time pair, so round-robining coaches
+        // across schedules can never double-book a coach.
         $slots = [
             ['day_of_week' => 1, 'start_time' => '07:00', 'duration_minutes' => 60],
             ['day_of_week' => 3, 'start_time' => '18:00', 'duration_minutes' => 75],
@@ -54,6 +54,7 @@ class ClassScheduleSeeder extends Seeder
             for ($i = 0; $i < $scheduleCount; $i++) {
                 $slot = $slots[$slotIndex % count($slots)];
                 $classType = $classTypes[$slotIndex % $classTypes->count()];
+                $coachProfile = $coachProfiles[$slotIndex % $coachProfiles->count()];
                 $slotIndex++;
 
                 ClassSchedule::updateOrCreate(
