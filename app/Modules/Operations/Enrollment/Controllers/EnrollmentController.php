@@ -10,7 +10,6 @@ use App\Modules\Operations\Enrollment\Actions\CreateEnrollmentAction;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Inertia\Response;
 
 class EnrollmentController extends Controller
@@ -40,7 +39,14 @@ class EnrollmentController extends Controller
                 ->values()
             : collect();
 
-        $waitlistRanks = $this->waitlistRanks($myEnrollments);
+        $waitlistRanks = $myEnrollments
+            ->where('status', 'waitlisted')
+            ->mapWithKeys(fn (Enrollment $e) => [
+                $e->id => Enrollment::where('class_session_id', $e->class_session_id)
+                    ->where('status', 'waitlisted')
+                    ->where('enrolled_at', '<', $e->enrolled_at)
+                    ->count() + 1,
+            ]);
 
         return inertia('Member/MyClasses', [
             'myEnrollments' => $myEnrollments->map(function (Enrollment $e) use ($cutoffHours, $waitlistRanks) {
@@ -50,7 +56,7 @@ class EnrollmentController extends Controller
                 return [
                     'id' => $e->id,
                     'status' => $e->status,
-                    'waitlist_position' => $waitlistRanks[$e->id] ?? null,
+                    'waitlist_position' => $waitlistRanks->get($e->id),
                     'can_cancel' => now()->addHours($cutoffHours)->lessThanOrEqualTo($start),
                     'cancel_deadline' => $start->copy()->subHours($cutoffHours)->toIso8601String(),
                     'enrolled_at' => $e->enrolled_at?->toIso8601String(),
@@ -209,21 +215,5 @@ class EnrollmentController extends Controller
         $action->execute($enrollment);
 
         return back()->with('success', ['key' => 'flash.enrollmentCancelled']);
-    }
-
-    private function waitlistRanks(Collection $myEnrollments): array
-    {
-        $ranks = [];
-
-        foreach ($myEnrollments->where('status', 'waitlisted') as $enrollment) {
-            $earlier = Enrollment::where('class_session_id', $enrollment->class_session_id)
-                ->where('status', 'waitlisted')
-                ->where('enrolled_at', '<', $enrollment->enrolled_at)
-                ->count();
-
-            $ranks[$enrollment->id] = $earlier + 1;
-        }
-
-        return $ranks;
     }
 }

@@ -5,12 +5,9 @@
     .ym-stat-strip {
         display: flex;
         border: 1px solid var(--ym-panel-border);
-        border-radius: 0.58rem;
+        border-radius: var(--ym-radius);
         background: var(--ym-surface);
-        box-shadow:
-            inset 0 1px 0 #ffffff,
-            inset 0 -1px 0 #d4dce7,
-            0 2px 0 #ccd5e2;
+        box-shadow: var(--ym-shadow);
         overflow: hidden;
         margin-bottom: 1rem;
     }
@@ -65,11 +62,8 @@
     .ym-pane {
         background: var(--ym-surface);
         border: 1px solid var(--ym-panel-border);
-        border-radius: 0.58rem;
-        box-shadow:
-            inset 0 1px 0 #ffffff,
-            inset 0 -1px 0 #d4dce7,
-            0 2px 0 #ccd5e2;
+        border-radius: var(--ym-radius);
+        box-shadow: var(--ym-shadow);
         overflow: hidden;
         position: relative;
         --ym-pane-accent: #5f83c2;
@@ -78,15 +72,12 @@
         --ym-pane-row-hover: #f6f9ff;
         --ym-pane-info-bg: #eff4ff;
         --ym-pane-info-border: #dfe8f6;
-        transition: transform 140ms ease, box-shadow 140ms ease;
+        transition: transform var(--ym-dur) var(--ym-ease), box-shadow var(--ym-dur) var(--ym-ease);
     }
 
     .ym-pane:hover {
-        transform: translateY(-1px);
-        box-shadow:
-            inset 0 1px 0 #ffffff,
-            inset 0 -1px 0 #d4dce7,
-            0 3px 0 #c7d1de;
+        transform: translateY(-2px);
+        box-shadow: var(--ym-shadow-lift);
     }
 
     .ym-pane::before {
