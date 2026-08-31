@@ -49,6 +49,9 @@ class AppServiceProvider extends ServiceProvider
             AppMenuItem::make('nav.studentProfiles', '/cms/operations/students')
                 ->icon('bi-person-lines-fill')->iconColor('#5f77cf')->group('nav.operations')->order(17)
                 ->permissions('operations.students.view'),
+            AppMenuItem::make('nav.enrollments', '/cms/operations/enrollments')
+                ->icon('bi-journal-check')->iconColor('#3fa07e')->group('nav.operations')->order(18)
+                ->permissions('operations.enrollments.view'),
 
             // Member group
             AppMenuItem::make('nav.myMembership', '/cms/member/my-membership')
@@ -56,9 +59,6 @@ class AppServiceProvider extends ServiceProvider
                 ->permissions('member.dashboard.view'),
             AppMenuItem::make('nav.myClasses', '/cms/member/my-classes')
                 ->icon('bi-people')->iconColor('#3f7ec4')->group('nav.member')->order(21)
-                ->permissions('member.dashboard.view'),
-            AppMenuItem::make('nav.mySchedule', '/cms/member/my-schedule')
-                ->icon('bi-calendar-check')->iconColor('#6a78c8')->group('nav.member')->order(22)
                 ->permissions('member.dashboard.view'),
 
             // Coach group
