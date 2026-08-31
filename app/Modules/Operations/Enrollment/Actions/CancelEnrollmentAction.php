@@ -8,16 +8,13 @@ use Illuminate\Validation\ValidationException;
 
 class CancelEnrollmentAction
 {
-    // No cutoff length was specified by the business; 2h before session start is a placeholder
-    // pending a real number from the client.
-    private const CUTOFF_HOURS = 2;
-
     public function execute(Enrollment $enrollment): Enrollment
     {
         $classSession = $enrollment->classSession;
         $sessionStart = Carbon::parse($classSession->session_date.' '.$classSession->start_time);
+        $cutoffHours = (int) config('enrollment.cancel_cutoff_hours');
 
-        if (now()->addHours(self::CUTOFF_HOURS)->greaterThan($sessionStart)) {
+        if (now()->addHours($cutoffHours)->greaterThan($sessionStart)) {
             throw ValidationException::withMessages([
                 'enrollment' => __('flash.enrollmentCutoffPassed'),
             ]);
