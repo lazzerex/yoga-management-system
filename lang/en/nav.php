@@ -16,6 +16,7 @@ return [
     'files' => 'Files',
     'coaches' => 'Coach Profiles',
     'studentProfiles' => 'Student Profiles',
+    'enrollments' => 'Enrollments',
     'myMembership' => 'My Membership',
     'myClasses' => 'My Classes',
     'mySchedule' => 'My Schedule',
