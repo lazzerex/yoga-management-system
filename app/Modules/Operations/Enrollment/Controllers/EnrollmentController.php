@@ -7,8 +7,10 @@ use App\Models\ClassSession;
 use App\Models\Enrollment;
 use App\Modules\Operations\Enrollment\Actions\CancelEnrollmentAction;
 use App\Modules\Operations\Enrollment\Actions\CreateEnrollmentAction;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Inertia\Response;
 
 class EnrollmentController extends Controller
@@ -16,10 +18,20 @@ class EnrollmentController extends Controller
     public function index(Request $request): Response
     {
         $studentProfile = $request->user()->studentProfile;
-        $branchId = $request->attributes->get('currentBranch')?->id;
+        $cutoffHours = (int) config('enrollment.cancel_cutoff_hours');
 
         $myEnrollments = $studentProfile
-            ? Enrollment::with(['classSession.branch:id,name', 'classSession.room:id,name', 'classSession.classType:id,name', 'classSession.coachProfile.user:id,name'])
+            ? Enrollment::with([
+                'classSession' => fn ($q) => $q->withCount([
+                    'enrollments as session_booked_count' => fn ($q) => $q->where('status', 'booked'),
+                    'enrollments as session_waitlist_count' => fn ($q) => $q->where('status', 'waitlisted'),
+                ]),
+                'classSession.branch:id,name,address',
+                'classSession.room:id,name,capacity',
+                'classSession.classType:id,name,description',
+                'classSession.coachProfile:id,user_id,bio,years_experience',
+                'classSession.coachProfile.user:id,name',
+            ])
                 ->where('student_profile_id', $studentProfile->id)
                 ->where('status', '!=', 'cancelled')
                 ->whereHas('classSession', fn ($q) => $q->where('session_date', '>=', now()->toDateString()))
@@ -28,43 +40,92 @@ class EnrollmentController extends Controller
                 ->values()
             : collect();
 
+        $waitlistRanks = $this->waitlistRanks($myEnrollments);
+
+        return inertia('Member/MyClasses', [
+            'myEnrollments' => $myEnrollments->map(function (Enrollment $e) use ($cutoffHours, $waitlistRanks) {
+                $session = $e->classSession;
+                $start = Carbon::parse($session->session_date.' '.$session->start_time);
+
+                return [
+                    'id' => $e->id,
+                    'status' => $e->status,
+                    'waitlist_position' => $waitlistRanks[$e->id] ?? null,
+                    'can_cancel' => now()->addHours($cutoffHours)->lessThanOrEqualTo($start),
+                    'cancel_deadline' => $start->copy()->subHours($cutoffHours)->toIso8601String(),
+                    'enrolled_at' => $e->enrolled_at?->toIso8601String(),
+                    'session_date' => $session->session_date,
+                    'start_time' => substr($session->start_time, 0, 5),
+                    'end_time' => substr($session->end_time, 0, 5),
+                    'class_type_id' => $session->class_type_id,
+                    'class_type_name' => $session->classType->name,
+                    'class_type_description' => $session->classType->description,
+                    'coach_name' => $session->coachProfile->user->name,
+                    'coach_bio' => $session->coachProfile->bio,
+                    'coach_years_experience' => $session->coachProfile->years_experience,
+                    'branch_name' => $session->branch->name,
+                    'branch_address' => $session->branch->address,
+                    'room_name' => $session->room->name,
+                    'room_capacity' => $session->room->capacity,
+                    'capacity' => $session->capacity,
+                    'booked_count' => $session->session_booked_count,
+                    'waitlist_count' => $session->session_waitlist_count,
+                    'spots_left' => max(0, $session->capacity - $session->session_booked_count),
+                    'cancelUrl' => route('member.enrollments.destroy', $e->id),
+                ];
+            }),
+            'openSessionsCount' => $this->availableSessionsQuery($request)->count(),
+            'cancelCutoffHours' => $cutoffHours,
+        ]);
+    }
+
+    public function browse(Request $request): Response
+    {
+        $availableSessions = $this->availableSessionsQuery($request)
+            ->with(['branch:id,name', 'room:id,name', 'classType:id,name', 'coachProfile.user:id,name'])
+            ->withCount([
+                'enrollments as booked_count' => fn ($q) => $q->where('status', 'booked'),
+                'enrollments as waitlist_count' => fn ($q) => $q->where('status', 'waitlisted'),
+            ])
+            ->orderBy('session_date')
+            ->orderBy('start_time')
+            ->get();
+
+        return inertia('Member/BookClass', [
+            'availableSessions' => $availableSessions->map(fn (ClassSession $s) => [
+                'id' => $s->id,
+                'session_date' => $s->session_date,
+                'start_time' => substr($s->start_time, 0, 5),
+                'end_time' => substr($s->end_time, 0, 5),
+                'class_type_id' => $s->class_type_id,
+                'class_type_name' => $s->classType->name,
+                'coach_profile_id' => $s->coach_profile_id,
+                'coach_name' => $s->coachProfile->user->name,
+                'branch_name' => $s->branch->name,
+                'room_name' => $s->room->name,
+                'capacity' => $s->capacity,
+                'booked_count' => $s->booked_count,
+                'spots_left' => max(0, $s->capacity - $s->booked_count),
+                'waitlist_count' => $s->waitlist_count,
+                'bookUrl' => route('member.enrollments.store', $s->id),
+            ])->values(),
+        ]);
+    }
+
+    private function availableSessionsQuery(Request $request)
+    {
+        $studentProfile = $request->user()->studentProfile;
+        $branchId = $request->attributes->get('currentBranch')?->id;
+
         $enrolledSessionIds = $studentProfile
             ? Enrollment::where('student_profile_id', $studentProfile->id)->where('status', '!=', 'cancelled')->pluck('class_session_id')
             : collect();
 
-        $availableSessions = ClassSession::with(['branch:id,name', 'room:id,name', 'classType:id,name', 'coachProfile.user:id,name'])
-            ->withCount(['enrollments as booked_count' => fn ($q) => $q->where('status', 'booked')])
+        return ClassSession::query()
             ->upcoming()
             ->where('status', 'scheduled')
             ->when($branchId, fn ($q) => $q->where('branch_id', $branchId))
-            ->whereNotIn('id', $enrolledSessionIds)
-            ->orderBy('session_date')
-            ->orderBy('start_time')
-            ->paginate(10);
-
-        return inertia('Member/MyClasses', [
-            'myEnrollments' => $myEnrollments->map(fn (Enrollment $e) => [
-                'id' => $e->id,
-                'status' => $e->status,
-                'session_date' => $e->classSession->session_date,
-                'start_time' => substr($e->classSession->start_time, 0, 5),
-                'class_type_name' => $e->classSession->classType->name,
-                'coach_name' => $e->classSession->coachProfile->user->name,
-                'branch_name' => $e->classSession->branch->name,
-                'cancelUrl' => route('member.enrollments.destroy', $e->id),
-            ]),
-            'availableSessions' => $availableSessions->through(fn (ClassSession $s) => [
-                'id' => $s->id,
-                'session_date' => $s->session_date,
-                'start_time' => substr($s->start_time, 0, 5),
-                'class_type_name' => $s->classType->name,
-                'coach_name' => $s->coachProfile->user->name,
-                'branch_name' => $s->branch->name,
-                'room_name' => $s->room->name,
-                'isFull' => $s->booked_count >= $s->capacity,
-                'bookUrl' => route('member.enrollments.store', $s->id),
-            ]),
-        ]);
+            ->whereNotIn('id', $enrolledSessionIds);
     }
 
     public function mySchedule(Request $request): Response
@@ -85,10 +146,40 @@ class EnrollmentController extends Controller
             'sessions' => $sessions->map(fn (ClassSession $s) => [
                 'session_date' => $s->session_date,
                 'start_time' => substr($s->start_time, 0, 5),
+                'end_time' => substr($s->end_time, 0, 5),
                 'class_type_name' => $s->classType->name,
                 'branch_name' => $s->branch->name,
                 'room_name' => $s->room->name,
             ]),
+        ]);
+    }
+
+    public function adminIndex(Request $request): Response
+    {
+        $branchId = $request->attributes->get('currentBranch')?->id;
+        $status = $request->string('status')->toString();
+
+        $enrollments = Enrollment::query()
+            ->with(['studentProfile.user:id,name', 'classSession.classType:id,name', 'classSession.coachProfile.user:id,name'])
+            ->whereHas('classSession', fn ($q) => $q->when($branchId, fn ($q) => $q->where('branch_id', $branchId)))
+            ->when(in_array($status, ['booked', 'waitlisted', 'cancelled'], true), fn ($q) => $q->where('status', $status))
+            ->orderByDesc('enrolled_at')
+            ->paginate(20)
+            ->withQueryString();
+
+        return inertia('Operations/Enrollments/Index', [
+            'enrollments' => $enrollments->through(fn (Enrollment $e) => [
+                'id' => $e->id,
+                'status' => $e->status,
+                'student_name' => $e->studentProfile->user->name,
+                'class_type_name' => $e->classSession->classType->name,
+                'coach_name' => $e->classSession->coachProfile->user->name,
+                'session_date' => $e->classSession->session_date,
+                'start_time' => substr($e->classSession->start_time, 0, 5),
+                'enrolled_at' => $e->enrolled_at?->toDateTimeString(),
+                'cancelUrl' => $e->status !== 'cancelled' ? route('operations.enrollments.admin-cancel', $e->id) : null,
+            ]),
+            'filters' => ['status' => $status ?: null],
         ]);
     }
 
@@ -97,9 +188,11 @@ class EnrollmentController extends Controller
         $studentProfile = $request->user()->studentProfile;
         abort_unless($studentProfile, 403);
 
-        $action->execute($studentProfile, $classSession);
+        $enrollment = $action->execute($studentProfile, $classSession);
 
-        return back()->with('success', ['key' => 'flash.enrollmentCreated']);
+        $key = $enrollment->status === 'waitlisted' ? 'flash.enrollmentWaitlisted' : 'flash.enrollmentBooked';
+
+        return back()->with('success', ['key' => $key]);
     }
 
     public function destroy(Request $request, Enrollment $enrollment, CancelEnrollmentAction $action): RedirectResponse
@@ -116,5 +209,21 @@ class EnrollmentController extends Controller
         $action->execute($enrollment);
 
         return back()->with('success', ['key' => 'flash.enrollmentCancelled']);
+    }
+
+    private function waitlistRanks(Collection $myEnrollments): array
+    {
+        $ranks = [];
+
+        foreach ($myEnrollments->where('status', 'waitlisted') as $enrollment) {
+            $earlier = Enrollment::where('class_session_id', $enrollment->class_session_id)
+                ->where('status', 'waitlisted')
+                ->where('enrolled_at', '<', $enrollment->enrolled_at)
+                ->count();
+
+            $ranks[$enrollment->id] = $earlier + 1;
+        }
+
+        return $ranks;
     }
 }
