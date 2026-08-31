@@ -5,6 +5,7 @@ namespace App\Modules\Operations\Enrollment\Actions;
 use App\Models\ClassSession;
 use App\Models\Enrollment;
 use App\Models\StudentProfile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class CreateEnrollmentAction
@@ -17,24 +18,26 @@ class CreateEnrollmentAction
             ]);
         }
 
-        $alreadyEnrolled = $classSession->enrollments()
-            ->where('student_profile_id', $studentProfile->id)
-            ->where('status', '!=', 'cancelled')
-            ->exists();
+        return DB::transaction(function () use ($studentProfile, $classSession) {
+            $active = $classSession->enrollments()
+                ->where('status', '!=', 'cancelled')
+                ->lockForUpdate()
+                ->get();
 
-        if ($alreadyEnrolled) {
-            throw ValidationException::withMessages([
-                'enrollment' => __('flash.enrollmentAlreadyExists'),
+            if ($active->contains('student_profile_id', $studentProfile->id)) {
+                throw ValidationException::withMessages([
+                    'enrollment' => __('flash.enrollmentAlreadyExists'),
+                ]);
+            }
+
+            $bookedCount = $active->where('status', 'booked')->count();
+
+            return Enrollment::create([
+                'student_profile_id' => $studentProfile->id,
+                'class_session_id' => $classSession->id,
+                'status' => $bookedCount < $classSession->capacity ? 'booked' : 'waitlisted',
+                'enrolled_at' => now(),
             ]);
-        }
-
-        $bookedCount = $classSession->enrollments()->where('status', 'booked')->count();
-
-        return Enrollment::create([
-            'student_profile_id' => $studentProfile->id,
-            'class_session_id' => $classSession->id,
-            'status' => $bookedCount < $classSession->capacity ? 'booked' : 'waitlisted',
-            'enrolled_at' => now(),
-        ]);
+        });
     }
 }
