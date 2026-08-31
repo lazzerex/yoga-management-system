@@ -2,8 +2,8 @@
     .ym-surface {
         background: var(--ym-surface);
         border: 1px solid var(--ym-panel-border);
-        border-radius: 0.58rem;
-        box-shadow: 0 1px 1px rgba(13, 22, 35, 0.04);
+        border-radius: var(--ym-radius);
+        box-shadow: var(--ym-shadow-sm);
     }
 
     .ym-lang-toggle { min-width: 2rem; }
@@ -43,7 +43,7 @@
         background: var(--ym-primary);
         color: #ffffff;
         padding: 0.4rem 0.8rem;
-        border-radius: 0.5rem;
+        border-radius: var(--ym-radius-sm);
         font-size: 0.82rem;
         font-weight: 700;
         cursor: pointer;
@@ -52,10 +52,14 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
+        transition: background var(--ym-dur) var(--ym-ease), border-color var(--ym-dur) var(--ym-ease), transform var(--ym-dur) var(--ym-ease);
     }
 
     .ym-btn-primary:hover,
     .ym-btn-sm:hover { background: var(--ym-primary-strong); border-color: var(--ym-primary-strong); }
+
+    .ym-btn-primary:active,
+    .ym-btn-sm:active { transform: translateY(1px); }
 
     .ym-btn-outline {
         border: 1px solid #ced8e3;
@@ -123,8 +127,8 @@
         width: min(920px, 100%);
         background: #f4f6f9;
         border: 1px solid #d6dde7;
-        border-radius: 0.62rem;
-        box-shadow: 0 20px 44px rgba(15, 23, 42, 0.22);
+        border-radius: var(--ym-radius);
+        box-shadow: 0 16px 48px rgba(20, 30, 50, 0.18);
     }
 
     .ym-modal-fade-enter-active,
