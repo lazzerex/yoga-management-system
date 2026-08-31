@@ -1,35 +1,39 @@
 <script setup>
 import { computed } from 'vue';
-import { trans as t } from 'laravel-vue-i18n';
+import { trans as t, getActiveLanguage } from 'laravel-vue-i18n';
 
 const props = defineProps({
     sessions: Array,
 });
 
+const locale = computed(() => (getActiveLanguage() === 'vi' ? 'vi-VN' : 'en-US'));
+
 const dayShortKeys = [
-    'dashboard.sundayShort',
-    'dashboard.mondayShort',
-    'dashboard.tuesdayShort',
-    'dashboard.wednesdayShort',
-    'dashboard.thursdayShort',
-    'dashboard.fridayShort',
-    'dashboard.saturdayShort',
+    'dashboard.sundayShort', 'dashboard.mondayShort', 'dashboard.tuesdayShort', 'dashboard.wednesdayShort',
+    'dashboard.thursdayShort', 'dashboard.fridayShort', 'dashboard.saturdayShort',
 ];
+
+const ymd = (date) => {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+};
 
 const weeklySchedule = computed(() => {
     const days = [];
     for (let i = 0; i < 7; i++) {
         const date = new Date();
         date.setDate(date.getDate() + i);
-        const isoDate = date.toISOString().slice(0, 10);
+        const isoDate = ymd(date);
 
         days.push({
             day: t(dayShortKeys[date.getDay()]),
-            date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+            date: date.toLocaleDateString(locale.value, { month: 'short', day: 'numeric' }),
             sessions: props.sessions
                 .filter((session) => session.session_date === isoDate)
                 .map((session) => ({
-                    time: session.start_time,
+                    time: `${session.start_time}–${session.end_time}`,
                     title: session.class_type_name,
                     meta: `${session.branch_name} · ${session.room_name}`,
                 })),
@@ -38,27 +42,30 @@ const weeklySchedule = computed(() => {
     return days;
 });
 
-const highlights = computed(() => [
-    { title: t('member.scheduleHighlightForm'), meta: t('member.scheduleHighlightFormMeta'), type: t('member.coachNoteLabel') },
-    { title: t('member.scheduleHighlightBreathwork'), meta: t('member.scheduleHighlightBreathworkMeta'), type: t('member.workshopLabel') },
-    { title: t('member.scheduleHighlightAssessment'), meta: t('member.scheduleHighlightAssessmentMeta'), type: t('member.assessmentLabel') },
-]);
-
-const weeklyFocus = computed(() => [
-    { label: t('member.totalSessionsPlanned'), note: t('member.bookedAndConfirmed'), value: '7' },
-    { label: t('member.intensityBalance'), note: t('member.highVsRecovery'), value: '3 : 4' },
-    { label: t('member.currentStreak'), note: t('member.consecutiveWeeks'), value: t('member.fiveWeeks') },
-]);
+const nextSession = computed(() => props.sessions[0] ?? null);
 </script>
 <script>
 import AppLayout from '@/Layouts/AppLayout.vue';
+import { trans as t } from 'laravel-vue-i18n';
 export default {
     layout: (h, page) => h(AppLayout, { title: t('member.mySchedule') }, () => page),
 };
 </script>
 
-
 <template>
+    <div class="ym-stat-strip">
+        <div class="ym-stat">
+            <p class="ym-stat-label">{{ $t('member.totalSessionsPlanned') }}</p>
+            <p class="ym-stat-value">{{ sessions.length }}</p>
+            <p class="ym-stat-note">{{ $t('member.bookedAndConfirmed') }}</p>
+        </div>
+        <div class="ym-stat">
+            <p class="ym-stat-label">{{ $t('member.nextSession') }}</p>
+            <p class="ym-stat-value">{{ nextSession ? `${nextSession.start_time}` : '—' }}</p>
+            <p v-if="nextSession" class="ym-stat-note">{{ nextSession.class_type_name }}</p>
+        </div>
+    </div>
+
     <div class="ym-pane">
         <div class="ym-pane-head">
             <div class="ym-pane-title-wrap">
@@ -89,55 +96,9 @@ export default {
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <div class="ym-page-cols mt-4">
-        <div class="ym-pane">
-            <div class="ym-pane-head">
-                <div class="ym-pane-title-wrap">
-                    <i class="bi bi-bell ym-pane-icon" />
-                    <h2 class="ym-pane-title">{{ $t('member.upcomingHighlights') }}</h2>
-                </div>
-            </div>
-            <div class="ym-pane-body">
-                <div class="ym-row-list">
-                    <div v-for="highlight in highlights" :key="highlight.title" class="ym-row">
-                        <div class="ym-row-main">
-                            <p class="ym-row-title">{{ highlight.title }}</p>
-                            <p class="ym-row-meta">{{ highlight.meta }}</p>
-                        </div>
-                        <div class="ym-row-aside">
-                            <span class="ym-tag">{{ highlight.type }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="ym-pane">
-            <div class="ym-pane-head">
-                <div class="ym-pane-title-wrap">
-                    <i class="bi bi-bar-chart ym-pane-icon" />
-                    <h2 class="ym-pane-title">{{ $t('member.weeklyFocus') }}</h2>
-                </div>
-            </div>
-            <div class="ym-pane-body">
-                <div class="ym-row-list">
-                    <div v-for="focus in weeklyFocus" :key="focus.label" class="ym-row">
-                        <div class="ym-row-main">
-                            <p class="ym-row-title">{{ focus.label }}</p>
-                            <p class="ym-row-meta">{{ focus.note }}</p>
-                        </div>
-                        <div class="ym-row-aside">
-                            <span class="ym-chip">{{ focus.value }}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="ym-info-row">
-                    <i class="bi bi-info-circle ym-info-icon" />
-                    <span>{{ $t('member.recoveryTip') }}</span>
-                </div>
+            <div v-if="!sessions.length" class="ym-info-row">
+                <i class="bi bi-info-circle ym-info-icon" />
+                <span>{{ $t('member.noClasses') }}</span>
             </div>
         </div>
     </div>
