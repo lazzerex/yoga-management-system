@@ -1,6 +1,6 @@
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
-import { Link, router, usePage } from '@inertiajs/vue3';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import { loadLanguageAsync, trans as t, currentLocale } from 'laravel-vue-i18n';
 import NavMenuLink from '@/Components/UI/NavMenuLink.vue';
@@ -91,6 +91,56 @@ const updateSideIndicator = () => {
 onMounted(() => nextTick(updateSideIndicator));
 watch(() => page.url, () => nextTick(updateSideIndicator));
 watch(openMenuItems, () => nextTick(updateSideIndicator));
+
+// Member "My classes" section sub navigation. Rendered inside the persistent
+// topbar so the underline indicator can slide as the member moves between the
+// bookings / book / schedule pages instead of remounting on every visit.
+const memberClassTabs = computed(() => {
+    currentLocale.value;
+
+    const path = page.url.split('?')[0];
+    const tab = (name, label, icon) => ({
+        label,
+        icon,
+        href: route(name),
+        active: path === route(name, undefined, false),
+    });
+
+    return [
+        tab('member.my-classes', t('member.tabBookings'), 'bi-journal-bookmark'),
+        tab('member.classes.book', t('member.tabBook'), 'bi-calendar-plus'),
+        tab('member.my-schedule', t('member.tabSchedule'), 'bi-calendar-week'),
+    ];
+});
+const showMemberSubnav = computed(() => memberClassTabs.value.some((tab) => tab.active));
+
+const topbarRef = ref(null);
+const subnavRef = ref(null);
+const subIndicatorStyle = ref({ left: '0px', width: '0px', opacity: 0 });
+
+const updateSubIndicator = () => {
+    const idx = memberClassTabs.value.findIndex((tab) => tab.active);
+    const el = subnavRef.value?.querySelectorAll('.ym-subnav-tab')[idx];
+    if (!el) {
+        subIndicatorStyle.value = { ...subIndicatorStyle.value, opacity: 0 };
+        return;
+    }
+    subIndicatorStyle.value = { left: `${el.offsetLeft}px`, width: `${el.offsetWidth}px`, opacity: 1 };
+};
+
+let topbarObserver;
+onMounted(() => {
+    nextTick(updateSubIndicator);
+    if (topbarRef.value && 'ResizeObserver' in window) {
+        topbarObserver = new ResizeObserver(() => {
+            document.documentElement.style.setProperty('--ym-topbar-h', `${topbarRef.value.offsetHeight}px`);
+        });
+        topbarObserver.observe(topbarRef.value);
+    }
+});
+onBeforeUnmount(() => topbarObserver?.disconnect());
+watch(() => page.url, () => nextTick(updateSubIndicator));
+watch(currentLocale, () => nextTick(updateSubIndicator));
 
 const flattenMenuItems = (groups) => {
     const flat = [];
@@ -442,6 +492,8 @@ const logout = () => {
 </script>
 
 <template>
+    <Head :title="title" />
+
     <div class="ym-shell">
         <div v-if="sidebarOpen" class="ym-sidebar-backdrop" @click="closeSidebar" />
 
@@ -483,7 +535,7 @@ const logout = () => {
         </aside>
 
         <div class="ym-workspace">
-            <header class="ym-topbar">
+            <header ref="topbarRef" class="ym-topbar">
                 <div class="ym-topbar-row">
                     <div class="ym-topbar-head">
                         <button
@@ -634,6 +686,20 @@ const logout = () => {
                         </Link>
                         <span v-else class="ym-breadcrumb-current">{{ crumb.label }}</span>
                     </template>
+                </nav>
+
+                <nav v-if="showMemberSubnav" ref="subnavRef" class="ym-subnav-bar" aria-label="section navigation">
+                    <Link
+                        v-for="tab in memberClassTabs"
+                        :key="tab.href"
+                        :href="tab.href"
+                        class="ym-subnav-tab"
+                        :class="{ 'is-active': tab.active }"
+                    >
+                        <i :class="`bi ${tab.icon}`" />
+                        {{ tab.label }}
+                    </Link>
+                    <span class="ym-subnav-indicator" :style="subIndicatorStyle" />
                 </nav>
 
                 <nav v-if="isOnDashboard" class="ym-top-links">
