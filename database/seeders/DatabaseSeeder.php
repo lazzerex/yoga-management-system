@@ -24,10 +24,13 @@ class DatabaseSeeder extends Seeder
             ClassTypeSeeder::class,
             CoachProfileSeeder::class,
             StudentProfileSeeder::class,
+            DemoPeopleSeeder::class,
             ClassScheduleSeeder::class,
         ]);
 
         app(GenerateClassSessionsAction::class)->execute();
+
+        $this->call(EnrollmentSeeder::class);
 
         // WithoutModelEvents suppresses the User::booted() saved hook during
         // seeding, so backfill spatie roles explicitly here — see menu.md 10.4.
