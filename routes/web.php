@@ -119,6 +119,10 @@ Route::prefix('cms')->group(function () {
                 Route::get('/tuition-fees', fn () => inertia('Operations/TuitionFees'))->name('tuition-fees');
             });
 
+            Route::middleware('permission:operations.enrollments.view')->group(function () {
+                Route::get('/enrollments', [EnrollmentController::class, 'adminIndex'])->name('enrollments.index');
+            });
+
             Route::middleware('permission:operations.enrollments.manage')->group(function () {
                 Route::delete('/enrollments/{enrollment}', [EnrollmentController::class, 'adminCancel'])->name('enrollments.admin-cancel');
             });
@@ -127,6 +131,7 @@ Route::prefix('cms')->group(function () {
         Route::middleware('permission:member.dashboard.view')->prefix('member')->name('member.')->group(function () {
             Route::get('/my-membership', fn () => inertia('Member/MyMembership'))->name('my-membership');
             Route::get('/my-classes', [EnrollmentController::class, 'index'])->name('my-classes');
+            Route::get('/book', [EnrollmentController::class, 'browse'])->name('classes.book');
             Route::get('/my-schedule', [EnrollmentController::class, 'mySchedule'])->name('my-schedule');
 
             Route::middleware('permission:member.enrollments.manage')->group(function () {
