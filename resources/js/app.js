@@ -6,7 +6,7 @@ import { ZiggyVue } from 'ziggy-js';
 import { i18nVue, loadLanguageAsync } from 'laravel-vue-i18n';
 
 createInertiaApp({
-    title: (title) => `${title} - Yoga Management`,
+    title: (title) => (title ? `${title} - Yoga Management` : 'Yoga Management'),
     resolve: (name) =>
         resolvePageComponent(
             `./Pages/${name}.vue`,
