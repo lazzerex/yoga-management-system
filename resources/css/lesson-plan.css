@@ -1,0 +1,104 @@
+.ym-plan-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid transparent;
+}
+
+.ym-plan-status--draft {
+    background: #f1f0ee;
+    color: #6b6862;
+    border-color: #ddd9d2;
+}
+
+.ym-plan-status--pending {
+    background: #fdf3e3;
+    color: #96661a;
+    border-color: #f0dcb8;
+}
+
+.ym-plan-status--approved {
+    background: #e9f5ef;
+    color: #2c7a5a;
+    border-color: #c4e4d5;
+}
+
+.ym-plan-status--rejected {
+    background: #fceceb;
+    color: #a63d34;
+    border-color: #f0cdc9;
+}
+
+.ym-plan-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.9rem;
+    margin-top: 1.1rem;
+}
+
+.ym-plan-meta dt {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #8a867f;
+}
+
+.ym-plan-meta dd {
+    margin-top: 0.2rem;
+    font-weight: 500;
+}
+
+.ym-plan-body {
+    margin-top: 1.4rem;
+}
+
+.ym-plan-heading {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+}
+
+.ym-plan-body .ym-plan-heading:not(:first-child) {
+    margin-top: 1.2rem;
+}
+
+.ym-plan-text {
+    color: #55524c;
+    white-space: pre-line;
+}
+
+.ym-plan-sequence {
+    background: #faf9f7;
+    border: 1px solid #e7e3dc;
+    border-radius: 0.5rem;
+    padding: 0.8rem 0.9rem;
+    font-family: inherit;
+    white-space: pre-wrap;
+    color: #45423d;
+}
+
+.ym-review-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+}
+
+.ym-review-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+}
+
+.ym-review-meta {
+    font-size: 0.8rem;
+    color: #8a867f;
+}
+
+.ym-review-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
