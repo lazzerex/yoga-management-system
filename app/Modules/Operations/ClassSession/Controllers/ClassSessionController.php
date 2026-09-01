@@ -93,7 +93,7 @@ class ClassSessionController extends Controller
                 'status' => $classSession->status,
                 'is_overridden' => $classSession->is_overridden,
             ],
-            'rooms' => Room::where('branch_id', $classSession->branch_id)->active()->orderBy('name')->get(['id', 'name']),
+            'rooms' => Room::where('branch_id', $classSession->branch_id)->active()->orderBy('name')->get(['id', 'name', 'capacity']),
             'coachProfiles' => CoachProfile::with('user:id,name')->active()->get(['id', 'user_id'])
                 ->map(fn (CoachProfile $c) => ['id' => $c->id, 'name' => $c->user->name]),
             'endpoints' => [
