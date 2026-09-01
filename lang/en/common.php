@@ -15,6 +15,7 @@ return [
     'jumpBackToRecentPages' => 'Jump back to recent pages',
     'seeReleaseNotes' => 'See release notes',
     'save' => 'Save',
+    'close' => 'Close',
     'cancel' => 'Cancel',
     'delete' => 'Delete',
     'edit' => 'Edit',
