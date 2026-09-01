@@ -33,14 +33,6 @@ jobs:
           cp .env.example .env
           php artisan key:generate
 
-      # Advisory until the 29 pre-existing violations are formatted; then drop this line.
-      - name: Lint (Pint)
-        run: ./vendor/bin/pint --test
-        continue-on-error: true
-
-      - name: Tests
-        run: php artisan test
-
       - uses: pnpm/action-setup@v4
         with:
           version: 10
@@ -54,5 +46,14 @@ jobs:
       - name: Install JS dependencies
         run: pnpm install --frozen-lockfile
 
+      # Before the tests: rendering any page needs public/build/manifest.json.
       - name: Build assets
         run: pnpm build
+
+      # Advisory until the 29 pre-existing violations are formatted; then drop this line.
+      - name: Lint (Pint)
+        run: ./vendor/bin/pint --test
+        continue-on-error: true
+
+      - name: Tests
+        run: php artisan test
