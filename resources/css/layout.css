@@ -1,8 +1,6 @@
 @layer components {
     .ym-shell {
         min-height: 100vh;
-        display: grid;
-        grid-template-columns: auto minmax(0, 1fr);
     }
 
     .ym-sidebar {
@@ -11,26 +9,35 @@
         border-right: 1px solid var(--ym-sidebar-border);
         display: flex;
         flex-direction: column;
-        min-height: 100vh;
-        position: sticky;
+        /* Fixed, not sticky: whole rail stays put. Scrolling lives on .ym-side-nav. */
+        position: fixed;
         top: 0;
+        left: 0;
+        height: 100vh;
         z-index: 49;
-        transition: width 220ms ease;
+        transition: width var(--ym-collapse-dur) var(--ym-ease);
     }
 
     .ym-sidebar--collapsed { width: 76px; }
 
-    .ym-sidebar--collapsed .ym-brand { justify-content: center; padding-inline: 0.5rem; gap: 0; }
+    .ym-sidebar--collapsed .ym-brand {
+        flex-direction: column;
+        justify-content: center;
+        padding-inline: 0.5rem;
+        gap: 0.4rem;
+    }
 
     .ym-brand-text {
         overflow: hidden;
         white-space: nowrap;
         max-width: 200px;
+        max-height: 3rem;
         opacity: 1;
-        transition: opacity 160ms ease, max-width 220ms ease;
+        transition: opacity 200ms ease, max-width var(--ym-collapse-dur) var(--ym-ease),
+            max-height var(--ym-collapse-dur) var(--ym-ease);
     }
 
-    .ym-sidebar--collapsed .ym-brand-text { opacity: 0; max-width: 0; }
+    .ym-sidebar--collapsed .ym-brand-text { opacity: 0; max-width: 0; max-height: 0; }
 
     .ym-sidebar--collapsed .ym-side-group,
     .ym-sidebar--collapsed .ym-side-link-badge,
@@ -48,12 +55,12 @@
         display: none;
         position: absolute;
         top: 50%;
-        right: -1.03rem;
+        right: 0.55rem;
         transform: translateY(-50%);
-        width: 2.06rem;
-        height: 2.06rem;
-        font-size: 0.95rem;
-        border-radius: 9999px;
+        width: 1.75rem;
+        height: 1.75rem;
+        font-size: 0.85rem;
+        border-radius: var(--ym-radius-sm);
         border: 1px solid #d4dce7;
         background: #ffffff;
         color: #5d6c81;
@@ -61,11 +68,18 @@
         justify-content: center;
         cursor: pointer;
         z-index: 30;
-        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12);
         transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
     }
 
     .ym-sidebar-collapse-toggle:hover { background: #f2f6fb; color: #35495f; border-color: #c9d3e0; }
+
+    .ym-sidebar-collapse-toggle:focus-visible { outline: 2px solid var(--ym-primary); outline-offset: 2px; }
+
+    /* 76px rail: stack under the mark instead of overlapping it. */
+    .ym-sidebar--collapsed .ym-sidebar-collapse-toggle {
+        position: static;
+        transform: none;
+    }
 
     @media (min-width: 1024px) {
         .ym-sidebar-collapse-toggle { display: inline-flex; }
@@ -76,7 +90,7 @@
         display: flex;
         align-items: center;
         gap: 0.75rem;
-        transition: gap 220ms ease, padding-inline 220ms ease;
+        transition: gap var(--ym-collapse-dur) var(--ym-ease), padding-inline var(--ym-collapse-dur) var(--ym-ease);
         padding: 1rem 0.9rem 0.85rem;
         border-bottom: 1px solid var(--ym-sidebar-border);
     }
@@ -105,20 +119,26 @@
     .ym-side-nav {
         position: relative;
         padding: 0.65rem 0.6rem;
+        flex: 1;
+        min-height: 0;
         overflow-y: auto;
+        overflow-x: hidden;
         display: grid;
+        grid-auto-rows: max-content;
         gap: 0.72rem;
     }
 
     .ym-side-active-indicator {
         position: absolute;
-        left: 0.6rem;
+        left: 0;
         width: 4px;
         border-radius: 0 4px 4px 0;
         background: var(--ym-link-strong);
         opacity: 0;
         pointer-events: none;
-        transition: top 220ms ease, height 220ms ease, opacity 150ms ease;
+        /* Child links are position:relative, so they paint over an unlayered bar. */
+        z-index: 1;
+        transition: top 220ms ease, left 220ms ease, height 220ms ease, opacity 150ms ease;
     }
 
     .ym-side-group-wrap { display: grid; gap: 0.18rem; }
@@ -171,7 +191,7 @@
         align-items: center;
         gap: 0.52rem;
         min-width: 0;
-        transition: gap 220ms ease;
+        transition: gap var(--ym-collapse-dur) var(--ym-ease);
     }
 
     .ym-nav-item-icon {
@@ -188,7 +208,7 @@
         text-overflow: ellipsis;
         max-width: 220px;
         opacity: 1;
-        transition: opacity 160ms ease, max-width 220ms ease;
+        transition: opacity 200ms ease, max-width var(--ym-collapse-dur) var(--ym-ease);
     }
 
     .ym-sidebar--collapsed .ym-nav-item-text { opacity: 0; max-width: 0; }
@@ -243,8 +263,9 @@
         transform: translateY(-50%);
     }
 
+    /* The active bar sits right beside it; both markers at once crowds the row. */
     .ym-side-children .ym-side-link--active::before {
-        border-color: #2f4f7d;
+        opacity: 0;
     }
 
     .ym-side-separator {
@@ -263,6 +284,16 @@
         min-width: 0;
         display: flex;
         flex-direction: column;
+    }
+
+    /* Rail is out of flow, so the workspace reserves its width. */
+    @media (min-width: 1024px) {
+        .ym-workspace {
+            margin-left: 268px;
+            transition: margin-left var(--ym-collapse-dur) var(--ym-ease);
+        }
+
+        .ym-shell--collapsed .ym-workspace { margin-left: 76px; }
     }
 
     .ym-topbar {
@@ -706,19 +737,41 @@
     .ym-top-link .ym-nav-item-content { gap: 0; }
     .ym-btn-icon { font-size: 0.76rem; margin-right: 0.36rem; }
     .ym-main { padding: 1rem 1.35rem 1.5rem; }
-    .ym-main-alert { margin-bottom: 0.85rem; }
+    /* Floating: an in-flow alert at the top of main is off-screen whenever the
+       action was triggered further down a long page. */
+    .ym-alert-stack {
+        position: fixed;
+        top: calc(var(--ym-topbar-h, 118px) + 0.85rem);
+        right: 1.25rem;
+        z-index: 30;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        width: min(26rem, calc(100vw - 2.5rem));
+        pointer-events: none;
+    }
+
+    .ym-alert-stack > * { pointer-events: auto; }
+
+    .ym-main-alert {
+        margin-bottom: 0;
+        box-shadow: var(--ym-shadow-lift);
+    }
+
+    @media (max-width: 640px) {
+        .ym-alert-stack {
+            right: 0.9rem;
+            left: 0.9rem;
+            width: auto;
+        }
+    }
 
     @media (min-width: 768px) {
         .ym-main { padding: 1.15rem 1.5rem 1.7rem; }
     }
 
     @media (max-width: 1023px) {
-        .ym-shell { grid-template-columns: 1fr; }
-
         .ym-sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
             height: 100dvh;
             z-index: 50;
             transform: translateX(-100%);
