@@ -21,12 +21,23 @@ class StudentProfileController extends Controller
 
     public function index(Request $request): Response
     {
+        $user = $request->user();
+        $seesEveryone = $user->can('operations.students.view.any');
+        $coachProfileId = $user->coachProfile?->id;
+
+        // Without the .any permission the directory narrows to students booked into the viewer's own sessions.
+        $scope = fn ($query) => $query->when(! $seesEveryone, fn ($q) => $q
+            ->whereHas('enrollments', fn ($e) => $e
+                ->where('status', 'booked')
+                ->whereHas('classSession', fn ($s) => $s->where('coach_profile_id', $coachProfileId))));
+
         // medical_notes intentionally excluded from the list query, not just the response shape.
         $profiles = StudentProfile::with('user:id,name,username')
             ->select(['id', 'user_id', 'goals', 'is_active'])
+            ->tap($scope)
             ->orderBy('id')
             ->paginate(20);
-        $canManage = $request->user()->can('operations.students.manage');
+        $canManage = $user->can('operations.students.manage');
 
         return inertia('Operations/StudentProfiles/Index', [
             'canManage' => $canManage,
@@ -37,8 +48,8 @@ class StudentProfileController extends Controller
                 'is_active' => $profile->is_active,
             ]),
             'stats' => [
-                'total' => StudentProfile::count(),
-                'active' => StudentProfile::active()->count(),
+                'total' => StudentProfile::query()->tap($scope)->count(),
+                'active' => StudentProfile::active()->tap($scope)->count(),
             ],
             'endpoints' => [
                 'create' => $canManage ? route('operations.students.create') : null,
