@@ -8,15 +8,15 @@ use Illuminate\Validation\ValidationException;
 
 class CancelEnrollmentAction
 {
-    public function execute(Enrollment $enrollment): Enrollment
+    public function execute(Enrollment $enrollment, bool $enforceCutoff = true): Enrollment
     {
         $classSession = $enrollment->classSession;
         $sessionStart = Carbon::parse($classSession->session_date.' '.$classSession->start_time);
         $cutoffHours = (int) config('enrollment.cancel_cutoff_hours');
 
-        if (now()->addHours($cutoffHours)->greaterThan($sessionStart)) {
+        if ($enforceCutoff && now()->addHours($cutoffHours)->greaterThan($sessionStart)) {
             throw ValidationException::withMessages([
-                'enrollment' => __('flash.enrollmentCutoffPassed'),
+                'action' => __('flash.enrollmentCutoffPassed'),
             ]);
         }
 
