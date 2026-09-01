@@ -21,7 +21,7 @@ const teachingSchedule = computed(() => {
     for (let i = 0; i < 7; i++) {
         const date = new Date();
         date.setDate(date.getDate() + i);
-        const isoDate = date.toISOString().slice(0, 10);
+        const isoDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
         days.push({
             day: t(dayShortKeys[date.getDay()]),
