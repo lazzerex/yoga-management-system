@@ -15,6 +15,7 @@ return [
     'jumpBackToRecentPages' => 'Quay lại trang gần đây',
     'seeReleaseNotes' => 'Xem ghi chú phiên bản',
     'save' => 'Lưu',
+    'close' => 'Đóng',
     'cancel' => 'Hủy',
     'delete' => 'Xóa',
     'edit' => 'Sửa',
