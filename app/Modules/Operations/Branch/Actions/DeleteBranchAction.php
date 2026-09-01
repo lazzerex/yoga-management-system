@@ -11,7 +11,7 @@ class DeleteBranchAction
     {
         if ($branch->rooms()->exists()) {
             throw ValidationException::withMessages([
-                'branch' => __('flash.branchHasRooms'),
+                'action' => __('flash.branchHasRooms'),
             ]);
         }
 
