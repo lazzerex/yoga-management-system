@@ -11,7 +11,8 @@ class DeleteCoachProfileAction
     {
         $inUse = $coachProfile->classSchedules()->exists()
             || $coachProfile->classSessions()->exists()
-            || $coachProfile->teacherAttendances()->exists();
+            || $coachProfile->teacherAttendances()->exists()
+            || $coachProfile->lessonPlans()->exists();
 
         if ($inUse) {
             throw ValidationException::withMessages([
