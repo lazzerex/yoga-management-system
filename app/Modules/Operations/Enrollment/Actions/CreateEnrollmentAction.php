@@ -14,7 +14,7 @@ class CreateEnrollmentAction
     {
         if ($classSession->status !== 'scheduled' || $classSession->session_date < now()->toDateString()) {
             throw ValidationException::withMessages([
-                'enrollment' => __('flash.enrollmentSessionUnavailable'),
+                'action' => __('flash.enrollmentSessionUnavailable'),
             ]);
         }
 
@@ -26,7 +26,7 @@ class CreateEnrollmentAction
 
             if ($active->contains('student_profile_id', $studentProfile->id)) {
                 throw ValidationException::withMessages([
-                    'enrollment' => __('flash.enrollmentAlreadyExists'),
+                    'action' => __('flash.enrollmentAlreadyExists'),
                 ]);
             }
 
