@@ -3,6 +3,7 @@
 use App\Modules\Admin\AuditLog\Controllers\AuditLogController;
 use App\Modules\Admin\LoginLog\Controllers\LoginLogController;
 use App\Modules\Admin\User\Controllers\UserController;
+use App\Modules\Operations\Attendance\Controllers\AttendanceController;
 use App\Modules\Operations\Branch\Controllers\BranchController;
 use App\Modules\Operations\ClassSchedule\Controllers\ClassScheduleController;
 use App\Modules\Operations\ClassSession\Controllers\ClassSessionController;
@@ -103,7 +104,15 @@ Route::prefix('cms')->group(function () {
             });
 
             Route::middleware('permission:operations.attendance.view')->group(function () {
-                Route::get('/teacher-attendance', fn () => inertia('Operations/TeacherAttendance'))->name('teacher-attendance');
+                Route::get('/teacher-attendance', [AttendanceController::class, 'index'])->name('teacher-attendance');
+                Route::get('/attendance/reports', [AttendanceController::class, 'reports'])->name('attendance.reports');
+                Route::get('/attendance/{classSession}', [AttendanceController::class, 'roster'])->name('attendance.roster');
+            });
+
+            Route::middleware('permission:operations.attendance.manage')->prefix('attendance')->name('attendance.')->group(function () {
+                Route::post('/{classSession}/check-in', [AttendanceController::class, 'checkIn'])->name('check-in');
+                Route::post('/{classSession}/check-out', [AttendanceController::class, 'checkOut'])->name('check-out');
+                Route::post('/{classSession}/mark', [AttendanceController::class, 'mark'])->name('mark');
             });
 
             Route::middleware('permission:operations.plans.view')->group(function () {
