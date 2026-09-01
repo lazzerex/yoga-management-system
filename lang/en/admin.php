@@ -78,5 +78,6 @@ return [
         'remove_role' => 'Remove Role',
         'delete_user' => 'Delete User',
         'view_student_medical_notes' => 'View Medical Notes',
+        'cancel_enrollment' => 'Cancel Enrollment',
     ],
 ];
