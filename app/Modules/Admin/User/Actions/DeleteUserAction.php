@@ -9,7 +9,8 @@ class DeleteUserAction
     public function __construct(private AuditUserAction $audit) {}
 
     public function execute(User $user, ?User $actor): void {
-        $this->audit->execute($actor, 'delete_user', $user, ['role' => $user->role]);
+        $role = $user->role;
         $user->delete();
+        $this->audit->execute($actor, 'delete_user', $user, ['role' => $role]);
     }
 }
