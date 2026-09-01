@@ -32,6 +32,11 @@ class ClassType extends Model
         return $this->hasMany(ClassSession::class);
     }
 
+    public function lessonPlans(): HasMany
+    {
+        return $this->hasMany(LessonPlan::class);
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
