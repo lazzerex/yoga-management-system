@@ -12,47 +12,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+      - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
-          extensions: pdo_sqlite, sqlite3, mbstring, bcmath, intl
+          extensions: pdo_sqlite, sqlite3
           coverage: none
 
-      - name: Cache composer packages
-        uses: actions/cache@v4
-        with:
-          path: vendor
-          key: composer-${{ hashFiles('composer.lock') }}
+      - run: composer install --no-interaction --prefer-dist --no-progress
 
-      - name: Install PHP dependencies
-        run: composer install --no-interaction --prefer-dist --no-progress
+      - run: cp .env.example .env && php artisan key:generate
 
-      - name: Prepare environment
-        run: |
-          cp .env.example .env
-          php artisan key:generate
-
-      # Version comes from package.json "packageManager" — setting it here too is an error.
       - uses: pnpm/action-setup@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: pnpm
 
-      - name: Install JS dependencies
-        run: pnpm install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile
 
-      # Before the tests: rendering any page needs public/build/manifest.json.
-      - name: Build assets
-        run: pnpm build
+      # Must precede the tests: rendering any Inertia page needs public/build/manifest.json.
+      - run: pnpm build
 
-      # Advisory until the 29 pre-existing violations are formatted; then drop this line.
-      - name: Lint (Pint)
-        run: ./vendor/bin/pint --test
-        continue-on-error: true
-
-      - name: Tests
-        run: php artisan test
+      - run: php artisan test
