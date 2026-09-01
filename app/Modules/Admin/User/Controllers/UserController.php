@@ -14,6 +14,7 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Validation\ValidationException;
 use Inertia\Response;
 
 class UserController extends Controller
@@ -115,12 +116,21 @@ class UserController extends Controller
 
     public function destroy(Request $request, User $user, DeleteUserAction $action): RedirectResponse
     {
+        // Validation errors, not flash: a flash redirect reads as success and closes the dialog.
         if ($request->user()?->is($user)) {
-            return back()->with('error', ['key' => 'flash.cannotDeleteOwnAccount']);
+            $this->deleteBlocked('flash.cannotDeleteOwnAccount');
         }
 
         if ($this->isRemovingLastAdmin($user, 'member')) {
-            return $this->lastAdminRequiredError();
+            $this->deleteBlocked('flash.lastAdminRequired');
+        }
+
+        if ($user->coachProfile) {
+            $this->deleteBlocked('flash.cannotDeleteUserHasCoachProfile');
+        }
+
+        if ($user->studentProfile) {
+            $this->deleteBlocked('flash.cannotDeleteUserHasStudentProfile');
         }
 
         $name = $user->name;
@@ -130,6 +140,11 @@ class UserController extends Controller
     }
 
 
+
+    private function deleteBlocked(string $key): never
+    {
+        throw ValidationException::withMessages(['action' => __($key)]);
+    }
 
     private function selfDemotionError(): RedirectResponse
     {
