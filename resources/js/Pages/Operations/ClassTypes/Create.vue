@@ -44,7 +44,7 @@ export default {
 
             <div class="ym-actions">
                 <button type="submit" class="ym-btn-sm" :disabled="form.processing">
-                    {{ $t('operations.createClassType') }}
+                    {{ $t('common.create') }}
                 </button>
                 <Link :href="endpoints.index" class="ym-btn-ghost">{{ $t('common.cancel') }}</Link>
             </div>
