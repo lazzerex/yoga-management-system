@@ -48,6 +48,7 @@ const ACTION_BADGE_CLASSES = {
     remove_role: 'ym-action-badge--role-remove',
     delete_user: 'ym-action-badge--delete',
     view_student_medical_notes: 'ym-action-badge--update',
+    cancel_enrollment: 'ym-action-badge--delete',
 };
 
 const actionBadgeClass = (action) => ACTION_BADGE_CLASSES[action] ?? '';
@@ -80,6 +81,8 @@ const formatMeta = (action, meta) => {
             return t('admin.wasRole', { role: t(`admin.roles.${meta.role}`) });
         case 'view_student_medical_notes':
             return '—';
+        case 'cancel_enrollment':
+            return `${meta.class} · ${meta.session_date}`;
         default:
             return '—';
     }
@@ -135,6 +138,7 @@ export default {
                 <option value="remove_role">{{ $t('admin.auditActions.remove_role') }}</option>
                 <option value="delete_user">{{ $t('admin.auditActions.delete_user') }}</option>
                 <option value="view_student_medical_notes">{{ $t('admin.auditActions.view_student_medical_notes') }}</option>
+                <option value="cancel_enrollment">{{ $t('admin.auditActions.cancel_enrollment') }}</option>
             </select>
             <button v-if="hasActiveFilters" @click="resetFilters" class="ym-log-clear-btn">
                 {{ $t('admin.clear') }}
