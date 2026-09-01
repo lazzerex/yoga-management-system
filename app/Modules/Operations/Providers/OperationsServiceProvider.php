@@ -30,7 +30,13 @@ class OperationsServiceProvider extends ServiceProvider
                     ]),
                 AppMenuItem::make('nav.plans', '/cms/operations/lesson-planning')
                     ->icon('bi-calendar-check')->iconColor('#6a78c8')->group('nav.operations')->order(13)
-                    ->permissions('operations.plans.view')->badge('nav.approval'),
+                    ->permissions('operations.plans.view')->badge('nav.approval')
+                    ->addItems([
+                        AppMenuItem::make('nav.planList', '/cms/operations/lesson-planning')
+                            ->icon('bi-calendar-check')->permissions('operations.plans.view'),
+                        AppMenuItem::make('nav.planApprovalQueue', '/cms/operations/lesson-planning/pending')
+                            ->icon('bi-clipboard-check')->permissions('operations.plans.review'),
+                    ]),
                 AppMenuItem::make('nav.tuition', '/cms/operations/tuition-fees')
                     ->icon('bi-cash-stack')->iconColor('#32a06f')->group('nav.operations')->order(14)
                     ->permissions('operations.tuition.view'),
