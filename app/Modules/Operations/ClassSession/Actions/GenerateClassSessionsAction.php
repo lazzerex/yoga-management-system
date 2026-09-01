@@ -10,13 +10,13 @@ class GenerateClassSessionsAction
 {
     private const WEEKS_AHEAD = 8;
 
-    public function execute(): int
+    public function execute(int $weeksBack = 0): int
     {
         $created = 0;
         $lastDate = now()->copy()->addWeeks(self::WEEKS_AHEAD)->toDateString();
 
         foreach (ClassSchedule::active()->get() as $schedule) {
-            $cursor = now()->copy()->startOfDay();
+            $cursor = now()->copy()->subWeeks($weeksBack)->startOfDay();
 
             while ($cursor->toDateString() < $lastDate) {
                 if ($cursor->dayOfWeek === (int) $schedule->day_of_week) {
@@ -60,6 +60,7 @@ class GenerateClassSessionsAction
             'start_time' => $schedule->start_time,
             'end_time' => Carbon::parse($schedule->start_time)->addMinutes($schedule->duration_minutes)->format('H:i:s'),
             'capacity' => $schedule->capacity,
+            'status' => $date < now()->toDateString() ? 'done' : 'scheduled',
         ]);
 
         return 1;
