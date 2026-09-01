@@ -1,45 +1,22 @@
 <script setup>
+import { Link } from '@inertiajs/vue3';
+import { trans as t } from 'laravel-vue-i18n';
 
-const plans = [
-    {
-        name: 'Hip Mobility - Intermediate Flow',
-        teacher: 'Mia Tran',
-        branch: 'Downtown',
-        date: 'Apr 22',
-        status: 'Pending',
-        statusClass: 'ym-status-pill--pending',
-    },
-    {
-        name: 'Breathwork Foundations',
-        teacher: 'Emily Rogers',
-        branch: 'Westside',
-        date: 'Apr 23',
-        status: 'Approved',
-        statusClass: 'ym-status-pill--started',
-    },
-    {
-        name: 'Kids Yoga Focus Session',
-        teacher: 'Ari Gomez',
-        branch: 'Uptown',
-        date: 'Apr 24',
-        status: 'Revision',
-        statusClass: '',
-    },
-    {
-        name: 'Yin Recovery for Athletes',
-        teacher: 'Daniel Park',
-        branch: 'Riverside',
-        date: 'Apr 25',
-        status: 'Pending',
-        statusClass: 'ym-status-pill--pending',
-    },
-];
+defineProps({
+    plans: Object,
+    stats: Object,
+    canManage: Boolean,
+    endpoints: Object,
+});
+
+const statusLabel = (status) => t(`operations.status${status.charAt(0).toUpperCase()}${status.slice(1)}`);
+const levelLabel = (level) => t(`operations.level${level.charAt(0).toUpperCase()}${level.slice(1)}`);
 </script>
 <script>
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { trans as t } from 'laravel-vue-i18n';
 export default {
-    layout: (h, page) => h(AppLayout, { title: t('operations.lessonPlanning') }, () => page),
+    layout: (h, page) => h(AppLayout, { title: t('operations.lessonPlans') }, () => page),
 };
 </script>
 
@@ -47,46 +24,85 @@ export default {
 <template>
     <div class="ym-stat-strip">
         <div class="ym-stat">
-            <p class="ym-stat-label">{{ $t('operations.pendingApproval') }}</p>
-            <p class="ym-stat-value">14</p>
-            <p class="ym-stat-note">6 {{ $t('operations.waitingOver48h') }}</p>
+            <p class="ym-stat-label">{{ $t('operations.statusDraft') }}</p>
+            <p class="ym-stat-value">{{ stats.draft }}</p>
         </div>
         <div class="ym-stat">
-            <p class="ym-stat-label">{{ $t('operations.approvedThisWeek') }}</p>
-            <p class="ym-stat-value">22</p>
-            <p class="ym-stat-note">{{ $t('operations.avgReviewTime') }}</p>
+            <p class="ym-stat-label">{{ $t('operations.statusPending') }}</p>
+            <p class="ym-stat-value">{{ stats.pending }}</p>
         </div>
         <div class="ym-stat">
-            <p class="ym-stat-label">{{ $t('operations.needsRevision') }}</p>
-            <p class="ym-stat-value">5</p>
-            <p class="ym-stat-note">{{ $t('operations.feedbackSent') }}</p>
+            <p class="ym-stat-label">{{ $t('operations.statusApproved') }}</p>
+            <p class="ym-stat-value">{{ stats.approved }}</p>
+        </div>
+        <div class="ym-stat">
+            <p class="ym-stat-label">{{ $t('operations.statusRejected') }}</p>
+            <p class="ym-stat-value">{{ stats.rejected }}</p>
         </div>
     </div>
 
-    <div class="ym-pane">
-        <div class="ym-pane-head">
-            <div class="ym-pane-title-wrap">
-                <i class="bi bi-clipboard-check ym-pane-icon" />
-                <h2 class="ym-pane-title">{{ $t('operations.approvalQueue') }}</h2>
+    <section class="ym-surface ym-section">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="ym-title">
+                    {{ $t('operations.lessonPlans') }}
+                    <span class="ym-count-badge">{{ plans.total }}</span>
+                </h2>
+                <p class="ym-subtitle">{{ $t('operations.lessonPlansSubtitle') }}</p>
+            </div>
+            <div class="ym-inline-actions">
+                <Link v-if="endpoints.pending" :href="endpoints.pending" class="ym-btn-outline">
+                    {{ $t('operations.approvalQueue') }}
+                </Link>
+                <Link v-if="endpoints.create" :href="endpoints.create" class="ym-btn-sm">
+                    {{ $t('operations.createLessonPlan') }}
+                </Link>
             </div>
         </div>
-        <div class="ym-pane-body">
-            <div class="ym-row-list">
-                <div v-for="plan in plans" :key="plan.name" class="ym-row">
-                    <div class="ym-row-main">
-                        <p class="ym-row-title">{{ plan.name }}</p>
-                        <p class="ym-row-meta">{{ plan.teacher }} · {{ plan.branch }} · {{ plan.date }}</p>
-                    </div>
-                    <div class="ym-row-aside">
-                        <span :class="['ym-status-pill', plan.statusClass]">{{ plan.status }}</span>
-                        <button type="button" class="ym-btn-outline">{{ $t('operations.review') }}</button>
-                    </div>
-                </div>
-            </div>
-            <div class="ym-info-row">
-                <i class="bi bi-info-circle ym-info-icon" />
-                <span>{{ $t('operations.lessonPlaceholder') }}</span>
-            </div>
+
+        <div class="ym-table-wrap">
+            <table class="ym-table">
+                <thead>
+                    <tr>
+                        <th class="ym-th">{{ $t('operations.planTitle') }}</th>
+                        <th class="ym-th">{{ $t('operations.planClassType') }}</th>
+                        <th class="ym-th">{{ $t('operations.planCoach') }}</th>
+                        <th class="ym-th">{{ $t('operations.planBranch') }}</th>
+                        <th class="ym-th">{{ $t('operations.planLevel') }}</th>
+                        <th class="ym-th">{{ $t('operations.status') }}</th>
+                        <th class="ym-th">{{ $t('operations.actions') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="plan in plans.data" :key="plan.id" class="ym-tr">
+                        <td class="ym-td font-medium">{{ plan.title }}</td>
+                        <td class="ym-td text-neutral-500">{{ plan.class_type_name }}</td>
+                        <td class="ym-td text-neutral-500">{{ plan.coach_name }}</td>
+                        <td class="ym-td text-neutral-500">{{ plan.branch_name }}</td>
+                        <td class="ym-td text-neutral-500">{{ levelLabel(plan.level) }}</td>
+                        <td class="ym-td">
+                            <span :class="['ym-plan-status', `ym-plan-status--${plan.status}`]">{{ statusLabel(plan.status) }}</span>
+                        </td>
+                        <td class="ym-td">
+                            <Link class="ym-btn-outline" :href="plan.showUrl">{{ $t('operations.planDetails') }}</Link>
+                        </td>
+                    </tr>
+                    <tr v-if="!plans.data.length">
+                        <td class="ym-td text-neutral-500" colspan="7">{{ $t('operations.noLessonPlans') }}</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-    </div>
+
+        <div v-if="plans.links.length > 3" class="ym-pagination">
+            <Link
+                v-for="link in plans.links"
+                :key="link.label"
+                :href="link.url ?? '#'"
+                v-html="link.label"
+                :class="['ym-page-link', { 'ym-page-link--active': link.active, 'ym-page-link--disabled': !link.url }]"
+                preserve-scroll
+            />
+        </div>
+    </section>
 </template>
