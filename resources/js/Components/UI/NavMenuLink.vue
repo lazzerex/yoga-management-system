@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 
 const emit = defineEmits(['tab-click']);
 
@@ -43,6 +43,13 @@ const linkClasses = computed(() => {
     return ['ym-side-link', { 'ym-side-link--active': props.active }];
 });
 
+// Inertia keys its prefetch cache on the visit params, headers included, but not on who
+// is signed in. Without this, a page prefetched on hover by one account is replayed to the
+// next account signed in on this browser, auth props and all. Stamping the viewer's id
+// makes entries from another account unmatchable.
+const page = usePage();
+const prefetchHeaders = computed(() => ({ 'X-Viewer-Id': String(page.props.auth?.user?.id ?? 'guest') }));
+
 const iconStyles = computed(() => {
     if (props.variant === 'sidebar' && props.iconColor) {
         return { '--ym-nav-icon-color': props.iconColor };
@@ -53,7 +60,7 @@ const iconStyles = computed(() => {
 </script>
 
 <template>
-    <Link v-if="href" :href="href" :class="linkClasses" prefetch="hover">
+    <Link v-if="href" :href="href" :class="linkClasses" prefetch="hover" :headers="prefetchHeaders">
         <span class="ym-nav-item-content">
             <i v-if="icon" :class="['bi', icon, 'ym-nav-item-icon']" :style="iconStyles" />
             <span class="ym-nav-item-text">{{ label }}</span>
