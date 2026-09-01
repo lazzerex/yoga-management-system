@@ -89,7 +89,7 @@ const sidebarMenu = computed(() => {
     }));
 });
 
-const { openMenuItems, toggleMenuItem } = useSidebarMenuState();
+const { openMenuItems, toggleMenuItem } = useSidebarMenuState(page.props.auth?.user?.id ?? null);
 
 const isMenuItemActive = (href) => {
     if (!href) return false;
@@ -199,6 +199,38 @@ const flattenMenuItems = (groups) => {
     return flat;
 };
 
+// A parent and its first child often share one href (Lesson Plans / All Plans), and
+// isMenuItemActive matches on prefix, so several items can match at once. Only the
+// longest match is the page you are on — anything shorter is an ancestor.
+const activeHref = computed(() => flattenMenuItems(sidebarMenu.value)
+    .map((item) => item.href)
+    .filter((href) => isMenuItemActive(href))
+    .sort((a, b) => b.length - a.length)[0] ?? null);
+
+const isMenuLinkActive = (href) => !!href && href === activeHref.value;
+
+// Ancestors of the active item, so the breadcrumb reads Home > Lesson Plans > Approval Queue.
+const activeTrail = computed(() => {
+    if (!activeHref.value) return [];
+
+    const walk = (items, trail) => {
+        for (const item of items) {
+            const next = [...trail, item];
+            if (item.href === activeHref.value) return next;
+
+            const found = walk(item.children ?? [], next);
+            if (found) return found;
+        }
+        return null;
+    };
+
+    for (const group of sidebarMenu.value) {
+        const found = walk(group.items, []);
+        if (found) return found;
+    }
+    return [];
+});
+
 const breadcrumbs = computed(() => {
     if (isOnDashboard.value) {
         return [{ label: props.title, current: true }];
@@ -206,15 +238,15 @@ const breadcrumbs = computed(() => {
 
     const crumbs = [{ label: t('dashboard.homepage'), href: route('cms.dashboard') }];
 
-    const matched = flattenMenuItems(sidebarMenu.value)
-        .filter((item) => isMenuItemActive(item.href))
-        .sort((a, b) => b.href.length - a.href.length)[0];
+    activeTrail.value.forEach((item) => crumbs.push({ label: item.label, href: item.href }));
 
-    if (matched && matched.label !== props.title) {
-        crumbs.push({ label: matched.label, href: matched.href });
+    const last = crumbs[crumbs.length - 1];
+    if (last.label === props.title) {
+        delete last.href;
+        last.current = true;
+    } else {
+        crumbs.push({ label: props.title, current: true });
     }
-
-    crumbs.push({ label: props.title, current: true });
 
     return crumbs;
 });
@@ -282,8 +314,33 @@ const switchBranch = (branchId) => {
     branchSwitcherOpen.value = false;
     branchSwitching.value = true;
     document.cookie = `branch_id=${branchId}; path=/; SameSite=Lax`;
-    router.reload({
-        onFinish: () => { branchSwitching.value = false; },
+
+    // Sidebar links prefetch on hover, so a page you hovered before switching is already
+    // cached with the old branch's data — and a visit to that URL would be served from
+    // that cache without ever reaching the server. Every cached page is branch-stale now.
+    router.flushAll();
+
+    // Page 3 of the old branch usually doesn't exist in the new one, which reads as
+    // an empty page. Non-paging filters (date, month, status) stay — they aren't branch-bound.
+    const url = new URL(window.location.href);
+    [...url.searchParams.keys()]
+        .filter((key) => key.toLowerCase().endsWith('page'))
+        .forEach((key) => url.searchParams.delete(key));
+
+    // Cleared on every terminal outcome, not just success — a server error must not
+    // leave the switcher spinning with no way back to another branch.
+    const done = () => { branchSwitching.value = false; };
+
+    router.visit(`${url.pathname}${url.search}`, {
+        preserveState: true,
+        preserveScroll: true,
+        // Inertia keys the prefetch cache on visit params including headers, and flushAll()
+        // leaves in-flight prefetches behind. This is what router.reload() sends, and it is
+        // what keeps this visit from ever being answered by a hover prefetch.
+        headers: { 'Cache-Control': 'no-cache' },
+        onFinish: done,
+        onError: done,
+        onCancel: done,
     });
 };
 
@@ -532,6 +589,9 @@ onBeforeUnmount(() => {
 
 const logout = () => {
     closeMenus();
+    // Signing out is an Inertia visit, not a page load, so prefetched pages would otherwise
+    // stay in memory after the session ends.
+    router.flushAll();
     router.post(route('logout'));
 };
 </script>
@@ -568,7 +628,7 @@ const logout = () => {
                         :key="item.href ?? item.labelKey"
                         :item="item"
                         :open-items="openMenuItems"
-                        :is-active="isMenuItemActive"
+                        :is-active="isMenuLinkActive"
                         :toggle="toggleMenuItem"
                     />
                 </section>
@@ -603,7 +663,6 @@ const logout = () => {
                                 type="button"
                                 class="ym-btn-sm ym-branch-switch-btn"
                                 :class="{ 'ym-branch-switch-btn--busy': branchSwitching }"
-                                :disabled="branchSwitching"
                                 aria-haspopup="menu"
                                 :aria-expanded="branchSwitcherOpen"
                                 @click.stop="toggleBranchSwitcher"
