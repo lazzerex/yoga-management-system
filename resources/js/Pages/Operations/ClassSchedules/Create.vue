@@ -1,6 +1,7 @@
 <script setup>
 import { computed, watch } from 'vue';
 import { Link, useForm } from '@inertiajs/vue3';
+import { trans as t } from 'laravel-vue-i18n';
 import Field from '@/Components/Form/Field.vue';
 import TextInput from '@/Components/Form/TextInput.vue';
 import Select from '@/Components/Form/Select.vue';
@@ -51,11 +52,32 @@ const form = useForm({
 const roomOptions = computed(() =>
     props.rooms
         .filter((room) => String(room.branch_id) === form.branch_id)
-        .map((room) => ({ value: String(room.id), label: room.name }))
+        .map((room) => ({ value: String(room.id), label: `${room.name} (${room.capacity})` }))
 );
+
+const selectedRoom = computed(() => props.rooms.find((room) => String(room.id) === form.room_id) ?? null);
+
+const capacityHint = computed(() => {
+    if (!selectedRoom.value) {
+        return '';
+    }
+
+    return Number(form.capacity) > selectedRoom.value.capacity
+        ? t('operations.capacityExceedsRoomHint', { count: selectedRoom.value.capacity })
+        : t('operations.roomCapacityHint', { count: selectedRoom.value.capacity });
+});
+
+const capacityOverRoom = computed(() => !!selectedRoom.value && Number(form.capacity) > selectedRoom.value.capacity);
 
 watch(() => form.branch_id, (branchId) => {
     form.room_id = firstRoomForBranch(branchId);
+});
+
+// Branch switcher reloads props without remounting, so the form follows it manually.
+watch(() => props.selectedBranchId, (branchId) => {
+    if (branchId) {
+        form.branch_id = String(branchId);
+    }
 });
 
 const submit = () => {
@@ -98,8 +120,8 @@ export default {
             <Field :label="$t('operations.durationMinutes')" :error="form.errors.duration_minutes">
                 <TextInput v-model="form.duration_minutes" type="number" />
             </Field>
-            <Field :label="$t('operations.capacity')" :error="form.errors.capacity">
-                <TextInput v-model="form.capacity" type="number" />
+            <Field :label="$t('operations.capacity')" :error="form.errors.capacity" :hint="capacityHint" :hint-warn="capacityOverRoom">
+                <TextInput v-model="form.capacity" type="number" :max="selectedRoom?.capacity" />
             </Field>
             <Checkbox v-model="form.is_active" :label="$t('operations.active')" />
 
