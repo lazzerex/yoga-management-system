@@ -14,6 +14,8 @@ return [
     'attendanceBoard' => 'Attendance Board',
     'attendanceReports' => 'Attendance Reports',
     'plans' => 'Lesson Plans',
+    'planList' => 'All Plans',
+    'planApprovalQueue' => 'Approval Queue',
     'tuition' => 'Tuition',
     'files' => 'Files',
     'coaches' => 'Coach Profiles',

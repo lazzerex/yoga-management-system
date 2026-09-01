@@ -14,6 +14,8 @@ return [
     'attendanceBoard' => 'Bảng điểm danh',
     'attendanceReports' => 'Báo cáo điểm danh',
     'plans' => 'Giáo án',
+    'planList' => 'Tất cả giáo án',
+    'planApprovalQueue' => 'Hàng chờ duyệt',
     'tuition' => 'Học phí',
     'files' => 'Tệp',
     'coaches' => 'Hồ sơ Giáo viên',
