@@ -15,6 +15,12 @@ class DeleteBranchAction
             ]);
         }
 
+        if ($branch->lessonPlans()->exists()) {
+            throw ValidationException::withMessages([
+                'action' => __('flash.branchHasLessonPlans'),
+            ]);
+        }
+
         $branch->delete();
     }
 }
