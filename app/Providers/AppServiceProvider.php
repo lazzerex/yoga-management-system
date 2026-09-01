@@ -33,7 +33,13 @@ class AppServiceProvider extends ServiceProvider
                 ->permissions('operations.sessions.view'),
             AppMenuItem::make('nav.attendance', '/cms/operations/teacher-attendance')
                 ->icon('bi-clipboard-check')->iconColor('#4f81cf')->group('nav.operations')->order(12)
-                ->permissions('operations.attendance.view'),
+                ->permissions('operations.attendance.view')
+                ->addItems([
+                    AppMenuItem::make('nav.attendanceBoard', '/cms/operations/teacher-attendance')
+                        ->icon('bi-clipboard-check')->permissions('operations.attendance.view'),
+                    AppMenuItem::make('nav.attendanceReports', '/cms/operations/attendance/reports')
+                        ->icon('bi-bar-chart')->permissions('operations.attendance.view'),
+                ]),
             AppMenuItem::make('nav.plans', '/cms/operations/lesson-planning')
                 ->icon('bi-calendar-check')->iconColor('#6a78c8')->group('nav.operations')->order(13)
                 ->permissions('operations.plans.view')->badge('nav.approval'),
