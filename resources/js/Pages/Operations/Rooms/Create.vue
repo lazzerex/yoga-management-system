@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 import { Link, useForm } from '@inertiajs/vue3';
 import Field from '@/Components/Form/Field.vue';
 import TextInput from '@/Components/Form/TextInput.vue';
@@ -21,6 +21,13 @@ const form = useForm({
     name: '',
     capacity: '',
     is_active: true,
+});
+
+// Branch switcher reloads props without remounting, so the form follows it manually.
+watch(() => props.selectedBranchId, (branchId) => {
+    if (branchId) {
+        form.branch_id = String(branchId);
+    }
 });
 
 const submit = () => {
