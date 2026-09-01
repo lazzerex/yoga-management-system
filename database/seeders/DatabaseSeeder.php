@@ -33,6 +33,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             EnrollmentSeeder::class,
             AttendanceSeeder::class,
+            LessonPlanSeeder::class,
         ]);
 
         // WithoutModelEvents suppresses the User::booted() saved hook during
