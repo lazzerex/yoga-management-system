@@ -78,5 +78,6 @@ return [
         'remove_role' => 'Xóa Vai trò',
         'delete_user' => 'Xóa Người dùng',
         'view_student_medical_notes' => 'Xem Ghi chú Y tế',
+        'cancel_enrollment' => 'Huỷ đăng ký lớp',
     ],
 ];
