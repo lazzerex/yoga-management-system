@@ -53,6 +53,11 @@ class ClassSession extends Model
         return $this->hasMany(Enrollment::class);
     }
 
+    public function teacherAttendances(): HasMany
+    {
+        return $this->hasMany(TeacherAttendance::class);
+    }
+
     public function scopeUpcoming(Builder $query): Builder
     {
         return $query->where('session_date', '>=', now()->toDateString());
