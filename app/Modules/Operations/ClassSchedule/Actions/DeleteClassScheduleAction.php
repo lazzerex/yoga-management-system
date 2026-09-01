@@ -11,7 +11,7 @@ class DeleteClassScheduleAction
     {
         if ($classSchedule->classSessions()->exists()) {
             throw ValidationException::withMessages([
-                'classSchedule' => __('flash.scheduleHasSessions'),
+                'action' => __('flash.scheduleHasSessions'),
             ]);
         }
 
