@@ -9,7 +9,7 @@ class DeleteClassTypeAction
 {
     public function execute(ClassType $classType): void
     {
-        if ($classType->classSchedules()->exists() || $classType->classSessions()->exists()) {
+        if ($classType->classSchedules()->exists() || $classType->classSessions()->exists() || $classType->lessonPlans()->exists()) {
             throw ValidationException::withMessages([
                 'action' => __('flash.classTypeInUse'),
             ]);
