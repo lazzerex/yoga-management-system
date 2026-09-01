@@ -17,8 +17,7 @@ class EnrollmentSeeder extends Seeder
             return;
         }
 
-        $sessions = ClassSession::where('status', 'scheduled')
-            ->where('session_date', '>=', now()->toDateString())
+        $sessions = ClassSession::whereIn('status', ['scheduled', 'done'])
             ->orderBy('session_date')
             ->get();
 
