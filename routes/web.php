@@ -10,6 +10,7 @@ use App\Modules\Operations\ClassSession\Controllers\ClassSessionController;
 use App\Modules\Operations\ClassType\Controllers\ClassTypeController;
 use App\Modules\Operations\CoachProfile\Controllers\CoachProfileController;
 use App\Modules\Operations\Enrollment\Controllers\EnrollmentController;
+use App\Modules\Operations\LessonPlan\Controllers\LessonPlanController;
 use App\Modules\Operations\Room\Controllers\RoomController;
 use App\Modules\Operations\StudentProfile\Controllers\StudentProfileController;
 use App\Modules\Profile\Controllers\ProfileController;
@@ -116,8 +117,31 @@ Route::prefix('cms')->group(function () {
             });
 
             Route::middleware('permission:operations.plans.view')->group(function () {
-                Route::get('/lesson-planning', fn () => inertia('Operations/LessonPlanning'))->name('lesson-planning');
+                Route::get('/lesson-planning', [LessonPlanController::class, 'index'])->name('lesson-planning');
+            });
 
+            // Static segments are declared before /{lessonPlan} or the wildcard swallows them.
+            Route::prefix('lesson-planning')->name('lesson-plans.')->group(function () {
+                Route::middleware('permission:operations.plans.manage')->group(function () {
+                    Route::get('/create', [LessonPlanController::class, 'create'])->name('create');
+                    Route::post('/', [LessonPlanController::class, 'store'])->name('store');
+                });
+
+                Route::middleware('permission:operations.plans.review')->group(function () {
+                    Route::get('/pending', [LessonPlanController::class, 'pending'])->name('pending');
+                    Route::post('/{lessonPlan}/review', [LessonPlanController::class, 'review'])->name('review');
+                });
+
+                Route::middleware('permission:operations.plans.view')->group(function () {
+                    Route::get('/{lessonPlan}', [LessonPlanController::class, 'show'])->name('show');
+                });
+
+                Route::middleware('permission:operations.plans.manage')->group(function () {
+                    Route::get('/{lessonPlan}/edit', [LessonPlanController::class, 'edit'])->name('edit');
+                    Route::patch('/{lessonPlan}', [LessonPlanController::class, 'update'])->name('update');
+                    Route::delete('/{lessonPlan}', [LessonPlanController::class, 'destroy'])->name('destroy');
+                    Route::post('/{lessonPlan}/submit', [LessonPlanController::class, 'submit'])->name('submit');
+                });
             });
 
             Route::middleware('permission:operations.files.view')->group(function () {
