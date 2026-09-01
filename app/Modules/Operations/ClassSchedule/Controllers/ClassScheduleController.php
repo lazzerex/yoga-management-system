@@ -89,7 +89,7 @@ class ClassScheduleController extends Controller
     {
         return [
             'branches' => Branch::active()->orderBy('name')->get(['id', 'name']),
-            'rooms' => Room::with('branch:id,name')->active()->orderBy('name')->get(['id', 'branch_id', 'name']),
+            'rooms' => Room::with('branch:id,name')->active()->orderBy('name')->get(['id', 'branch_id', 'name', 'capacity']),
             'classTypes' => ClassType::active()->orderBy('name')->get(['id', 'name']),
             'coachProfiles' => CoachProfile::with('user:id,name')->active()->get(['id', 'user_id'])
                 ->map(fn (CoachProfile $c) => ['id' => $c->id, 'name' => $c->user->name]),
