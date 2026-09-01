@@ -6,6 +6,7 @@ import { loadLanguageAsync, trans as t, currentLocale } from 'laravel-vue-i18n';
 import NavMenuLink from '@/Components/UI/NavMenuLink.vue';
 import SidebarMenuItem from '@/Components/UI/SidebarMenuItem.vue';
 import { useSidebarMenuState } from '@/Composables/useSidebarMenuState.js';
+import { claimedActionErrors } from '@/Composables/useActionError.js';
 
 const props = defineProps({
     title: {
@@ -35,6 +36,37 @@ const resolveFlashMessage = (message) => {
 };
 
 const flash = computed(() => page.props.flash ?? {});
+
+// Reserved key for business-rule failures, which pages with no form would otherwise drop.
+const actionError = computed(() => {
+    const errors = page.props.errors;
+
+    return errors === claimedActionErrors.value ? null : (errors?.action ?? null);
+});
+
+const dismissed = ref({ success: false, error: false, action: false });
+let successTimer = null;
+
+const visible = (kind) => !dismissed.value[kind];
+
+const dismiss = (kind) => {
+    dismissed.value[kind] = true;
+};
+
+watch(
+    () => [flash.value.success, flash.value.error, actionError.value],
+    () => {
+        dismissed.value = { success: false, error: false, action: false };
+        clearTimeout(successTimer);
+
+        if (flash.value.success) {
+            successTimer = setTimeout(() => dismiss('success'), 6000);
+        }
+    },
+    { immediate: true },
+);
+
+onBeforeUnmount(() => clearTimeout(successTimer));
 const userName = computed(() => page.props.auth?.user?.name ?? 'Guest');
 const userRole = computed(() => page.props.auth?.user?.role ?? 'member');
 const canAccessAdmin = computed(() => page.props.auth?.user?.canAccessAdmin ?? false);
@@ -72,18 +104,31 @@ const isMenuItemActive = (href) => {
 // group), there's nothing to slide from, so it fades in at the new spot
 // instead — `top`/`height` and `opacity` transition independently in CSS.
 const sideNavRef = ref(null);
-const sideIndicatorStyle = ref({ top: '0px', height: '0px', opacity: 0 });
+const sideIndicatorStyle = ref({ top: '0px', left: '0px', height: '0px', opacity: 0 });
 
 const updateSideIndicator = () => {
-    const activeEl = sideNavRef.value?.querySelector('.ym-side-link--active');
-    if (!activeEl) {
+    let target = sideNavRef.value?.querySelector('.ym-side-link--active');
+
+    // A collapsed rail or a closed group hides the active child (offsetParent goes null),
+    // so mark the parent row it belongs to rather than collapsing to the top of the nav.
+    while (target && target.offsetParent === null) {
+        const parentRow = target.closest('.ym-side-parent')?.querySelector(':scope > .ym-side-link--parent');
+        target = parentRow && parentRow !== target ? parentRow : null;
+    }
+
+    if (!target) {
         sideIndicatorStyle.value = { ...sideIndicatorStyle.value, opacity: 0 };
         return;
     }
 
+    // offsetLeft keeps the bar against the active link, which is indented for children.
+    // Children sit a little further left so the bar clears their highlight pill.
+    const childInset = target.closest('.ym-side-children') ? 9 : 0;
+
     sideIndicatorStyle.value = {
-        top: `${activeEl.offsetTop}px`,
-        height: `${activeEl.offsetHeight}px`,
+        top: `${target.offsetTop}px`,
+        left: `${target.offsetLeft - childInset}px`,
+        height: `${target.offsetHeight}px`,
         opacity: 1,
     };
 };
@@ -494,7 +539,7 @@ const logout = () => {
 <template>
     <Head :title="title" />
 
-    <div class="ym-shell">
+    <div class="ym-shell" :class="{ 'ym-shell--collapsed': sidebarCollapsed }">
         <div v-if="sidebarOpen" class="ym-sidebar-backdrop" @click="closeSidebar" />
 
         <aside class="ym-sidebar" :class="{ 'ym-sidebar--open': sidebarOpen, 'ym-sidebar--collapsed': sidebarCollapsed }">
@@ -751,8 +796,35 @@ const logout = () => {
             </header>
 
             <main class="ym-main">
-                <div v-if="flash.success" class="ym-alert-success ym-main-alert">{{ resolveFlashMessage(flash.success) }}</div>
-                <div v-if="flash.error" class="ym-alert-error ym-main-alert">{{ resolveFlashMessage(flash.error) }}</div>
+                <div class="ym-alert-stack">
+                <Transition name="ym-alert-fade">
+                    <div v-if="flash.success && visible('success')" class="ym-alert-success ym-main-alert">
+                        <i class="bi bi-check-circle ym-alert-icon" />
+                        <span class="ym-alert-text">{{ resolveFlashMessage(flash.success) }}</span>
+                        <button type="button" class="ym-alert-close" :aria-label="$t('common.close')" @click="dismiss('success')">
+                            <i class="bi bi-x-lg" />
+                        </button>
+                    </div>
+                </Transition>
+                <Transition name="ym-alert-fade">
+                    <div v-if="flash.error && visible('error')" class="ym-alert-error ym-main-alert">
+                        <i class="bi bi-exclamation-triangle ym-alert-icon" />
+                        <span class="ym-alert-text">{{ resolveFlashMessage(flash.error) }}</span>
+                        <button type="button" class="ym-alert-close" :aria-label="$t('common.close')" @click="dismiss('error')">
+                            <i class="bi bi-x-lg" />
+                        </button>
+                    </div>
+                </Transition>
+                <Transition name="ym-alert-fade">
+                    <div v-if="actionError && visible('action')" class="ym-alert-error ym-main-alert">
+                        <i class="bi bi-exclamation-triangle ym-alert-icon" />
+                        <span class="ym-alert-text">{{ actionError }}</span>
+                        <button type="button" class="ym-alert-close" :aria-label="$t('common.close')" @click="dismiss('action')">
+                            <i class="bi bi-x-lg" />
+                        </button>
+                    </div>
+                </Transition>
+                </div>
                 <slot />
             </main>
         </div>
