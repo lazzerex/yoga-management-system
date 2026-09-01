@@ -1,14 +1,12 @@
 <script setup>
 import { computed, ref } from 'vue';
-import { router, usePage } from '@inertiajs/vue3';
+import { router } from '@inertiajs/vue3';
 import { trans as t, getActiveLanguage } from 'laravel-vue-i18n';
 
 const props = defineProps({
     availableSessions: Array,
 });
 
-const page = usePage();
-const errors = computed(() => page.props.errors ?? {});
 const locale = computed(() => (getActiveLanguage() === 'vi' ? 'vi-VN' : 'en-US'));
 
 const ymd = (date) => {
@@ -305,7 +303,6 @@ export default {
                         </button>
                     </div>
 
-                    <div v-if="errors.enrollment" class="ym-alert-error">{{ errors.enrollment }}</div>
 
                     <div v-if="!visibleSessions.length" class="ym-book-empty">
                         <i class="bi bi-wind" />
