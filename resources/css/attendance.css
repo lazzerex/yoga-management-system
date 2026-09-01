@@ -1,0 +1,119 @@
+@layer components {
+
+    .ym-at-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .ym-at-stack > * + * { margin-top: 1.1rem; }
+
+    .ym-at-reports-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.1rem;
+    }
+
+    @media (min-width: 1200px) {
+        .ym-at-reports-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .ym-at-reports-grid > .ym-pane { margin: 0; }
+    }
+
+    .ym-at-roster-head {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .ym-at-clock {
+        display: block;
+        margin-top: 0.2rem;
+        color: var(--ym-muted);
+        font-size: 0.72rem;
+    }
+
+    .ym-at-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+    }
+
+    .ym-at-bulk {
+        display: flex;
+        gap: 0.35rem;
+        margin: 0.6rem 0;
+    }
+
+    .ym-at-seg {
+        display: inline-flex;
+        border: 1px solid var(--ym-panel-border);
+        border-radius: var(--ym-radius-sm);
+        overflow: hidden;
+    }
+
+    .ym-at-seg-btn {
+        padding: 0.22rem 0.6rem;
+        border: 0;
+        border-right: 1px solid var(--ym-panel-border);
+        background: #fff;
+        color: var(--ym-muted);
+        font-size: 0.74rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background var(--ym-dur) var(--ym-ease), color var(--ym-dur) var(--ym-ease);
+    }
+
+    .ym-at-seg-btn:last-child {
+        border-right: 0;
+    }
+
+    .ym-at-seg-btn:hover {
+        background: var(--ym-bg-2);
+    }
+
+    .ym-at-seg-btn--on {
+        background: var(--ym-primary);
+        color: #fff;
+    }
+
+    .ym-at-note-input {
+        width: 100%;
+        min-width: 8rem;
+        padding: 0.25rem 0.45rem;
+        border: 1px solid var(--ym-panel-border);
+        border-radius: var(--ym-radius-sm);
+        background: #fff;
+        font-size: 0.78rem;
+    }
+
+    .ym-at-save {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 0.85rem;
+    }
+
+    .ym-at-rate {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+    }
+
+    .ym-at-rate-bar {
+        display: block;
+        width: 4.5rem;
+        height: 0.35rem;
+        border-radius: 999px;
+        background: var(--ym-bg-2);
+        overflow: hidden;
+    }
+
+    .ym-at-rate-bar > span {
+        display: block;
+        height: 100%;
+        border-radius: 999px;
+        background: var(--ym-primary);
+    }
+}
