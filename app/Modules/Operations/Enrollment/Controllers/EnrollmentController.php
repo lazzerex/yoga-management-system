@@ -5,6 +5,7 @@ namespace App\Modules\Operations\Enrollment\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\ClassSession;
 use App\Models\Enrollment;
+use App\Modules\Admin\User\Actions\AuditUserAction;
 use App\Modules\Operations\Enrollment\Actions\CancelEnrollmentAction;
 use App\Modules\Operations\Enrollment\Actions\CreateEnrollmentAction;
 use Carbon\Carbon;
@@ -210,9 +211,20 @@ class EnrollmentController extends Controller
         return back()->with('success', ['key' => 'flash.enrollmentCancelled']);
     }
 
-    public function adminCancel(Enrollment $enrollment, CancelEnrollmentAction $action): RedirectResponse
+    public function adminCancel(Request $request, Enrollment $enrollment, CancelEnrollmentAction $action, AuditUserAction $audit): RedirectResponse
     {
-        $action->execute($enrollment);
+        $enrollment->load(['studentProfile.user:id,name', 'classSession.classType:id,name']);
+        $previousStatus = $enrollment->status;
+
+        // Staff are not bound by the member cutoff.
+        $action->execute($enrollment, enforceCutoff: false);
+
+        $audit->execute($request->user(), 'cancel_enrollment', $enrollment->studentProfile->user, [
+            'enrollment_id' => $enrollment->id,
+            'from' => $previousStatus,
+            'class' => $enrollment->classSession->classType->name,
+            'session_date' => $enrollment->classSession->session_date,
+        ]);
 
         return back()->with('success', ['key' => 'flash.enrollmentCancelled']);
     }
