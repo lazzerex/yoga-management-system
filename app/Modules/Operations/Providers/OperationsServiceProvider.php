@@ -48,7 +48,7 @@ class OperationsServiceProvider extends ServiceProvider
                     ->permissions('operations.coaches.view'),
                 AppMenuItem::make('nav.studentProfiles', '/cms/operations/students')
                     ->icon('bi-person-lines-fill')->iconColor('#5f77cf')->group('nav.operations')->order(17)
-                    ->permissions('operations.students.view'),
+                    ->permissions('operations.students.view.any'),
                 AppMenuItem::make('nav.enrollments', '/cms/operations/enrollments')
                     ->icon('bi-journal-check')->iconColor('#3fa07e')->group('nav.operations')->order(18)
                     ->permissions('operations.enrollments.view'),
@@ -63,8 +63,8 @@ class OperationsServiceProvider extends ServiceProvider
                 AppMenuItem::make('nav.myClasses', '/cms/coach/my-classes')
                     ->icon('bi-people')->iconColor('#3f7ec4')->group('nav.coach')->order(30)
                     ->permissions('coach.dashboard.view'),
-                AppMenuItem::make('nav.myStudents', '/cms/coach/my-students')
-                    ->icon('bi-clipboard-check')->iconColor('#4f81cf')->group('nav.coach')->order(31)
+                AppMenuItem::make('nav.myStudents', '/cms/operations/students')
+                    ->icon('bi-person-lines-fill')->iconColor('#4f81cf')->group('nav.coach')->order(31)
                     ->permissions('coach.dashboard.view'),
                 AppMenuItem::make('nav.teachingSchedule', '/cms/coach/my-teaching-schedule')
                     ->icon('bi-calendar-check')->iconColor('#6a78c8')->group('nav.coach')->order(32)
