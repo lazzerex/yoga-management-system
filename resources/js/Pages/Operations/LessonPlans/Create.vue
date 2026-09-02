@@ -5,7 +5,7 @@ import { trans as t } from 'laravel-vue-i18n';
 import Field from '@/Components/Form/Field.vue';
 import TextInput from '@/Components/Form/TextInput.vue';
 import Select from '@/Components/Form/Select.vue';
-import Textarea from '@/Components/Form/Textarea.vue';
+import Textarea from '@/Components/Form/TextArea.vue';
 
 const props = defineProps({
     options: Object,

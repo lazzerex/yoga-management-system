@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { Link, router, useForm } from '@inertiajs/vue3';
 import { trans as t } from 'laravel-vue-i18n';
 import Field from '@/Components/Form/Field.vue';
-import Textarea from '@/Components/Form/Textarea.vue';
+import Textarea from '@/Components/Form/TextArea.vue';
 import Modal from '@/Components/UI/Modal.vue';
 
 const props = defineProps({

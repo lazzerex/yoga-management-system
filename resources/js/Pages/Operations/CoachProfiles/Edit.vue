@@ -4,7 +4,7 @@ import { Link, useForm } from '@inertiajs/vue3';
 import Field from '@/Components/Form/Field.vue';
 import TextInput from '@/Components/Form/TextInput.vue';
 import MultiSelect from '@/Components/Form/MultiSelect.vue';
-import Textarea from '@/Components/Form/Textarea.vue';
+import Textarea from '@/Components/Form/TextArea.vue';
 import Checkbox from '@/Components/Form/Checkbox.vue';
 
 const props = defineProps({

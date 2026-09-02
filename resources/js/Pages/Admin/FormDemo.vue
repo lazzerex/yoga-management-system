@@ -3,7 +3,7 @@ import { reactive, ref } from 'vue';
 import { trans as t } from 'laravel-vue-i18n';
 import Field from '@/Components/Form/Field.vue';
 import TextInput from '@/Components/Form/TextInput.vue';
-import TextArea from '@/Components/Form/Textarea.vue';
+import TextArea from '@/Components/Form/TextArea.vue';
 import Checkbox from '@/Components/Form/Checkbox.vue';
 import Radio from '@/Components/Form/Radio.vue';
 import Select from '@/Components/Form/Select.vue';

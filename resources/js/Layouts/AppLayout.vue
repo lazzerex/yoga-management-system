@@ -5,8 +5,8 @@ import { route } from 'ziggy-js';
 import { loadLanguageAsync, trans as t, currentLocale } from 'laravel-vue-i18n';
 import NavMenuLink from '@/Components/UI/NavMenuLink.vue';
 import SidebarMenuItem from '@/Components/UI/SidebarMenuItem.vue';
-import { useSidebarMenuState } from '@/Composables/useSidebarMenuState.js';
-import { claimedActionErrors } from '@/Composables/useActionError.js';
+import { useSidebarMenuState } from '@/composables/useSidebarMenuState.js';
+import { claimedActionErrors } from '@/composables/useActionError.js';
 
 const props = defineProps({
     title: {

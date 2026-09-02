@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch, onUnmounted } from 'vue';
 import { usePage } from '@inertiajs/vue3';
-import { claimedActionErrors } from '@/Composables/useActionError.js';
+import { claimedActionErrors } from '@/composables/useActionError.js';
 
 const props = defineProps({
     show: Boolean,
