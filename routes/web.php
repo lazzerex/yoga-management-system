@@ -175,7 +175,6 @@ Route::prefix('cms')->group(function () {
 
         Route::middleware('permission:coach.dashboard.view')->prefix('coach')->name('coach.')->group(function () {
             Route::get('/my-classes', [ClassSessionController::class, 'myClasses'])->name('my-classes');
-            Route::get('/my-students', fn () => inertia('Coach/MyStudents'))->name('my-students');
             Route::get('/my-teaching-schedule', [ClassSessionController::class, 'myTeachingSchedule'])->name('my-teaching-schedule');
         });
 
