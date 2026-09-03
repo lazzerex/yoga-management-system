@@ -15,7 +15,7 @@ class MembershipController extends Controller
         $studentProfileId = $request->user()->studentProfile?->id;
 
         $invoices = Invoice::with('branch:id,name')
-            ->withSum('payments', 'amount')
+            ->withSum('recordedPayments', 'amount')
             ->when($studentProfileId, fn ($q) => $q->where('student_profile_id', $studentProfileId), fn ($q) => $q->whereRaw('1 = 0'))
             ->orderByDesc('issued_at')
             ->orderByDesc('id')
