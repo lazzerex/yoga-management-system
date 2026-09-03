@@ -15,6 +15,12 @@ class DeleteStudentProfileAction
             ]);
         }
 
+        if ($studentProfile->invoices()->exists()) {
+            throw ValidationException::withMessages([
+                'action' => __('flash.studentProfileHasInvoices'),
+            ]);
+        }
+
         $studentProfile->delete();
     }
 }
