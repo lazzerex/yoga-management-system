@@ -38,6 +38,15 @@ return [
             'report' => false,
         ],
 
+        // uploads never go on "local": serve => true publishes it at GET /storage/{path}.
+        'media' => [
+            'driver' => 'local',
+            'root' => storage_path('app/media'),
+            'serve' => false,
+            'throw' => false,
+            'report' => false,
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
