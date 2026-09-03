@@ -1,11 +1,12 @@
 <script setup>
 import { computed } from 'vue';
-import { Link, useForm } from '@inertiajs/vue3';
+import { Link, router, useForm } from '@inertiajs/vue3';
 import { trans as t } from 'laravel-vue-i18n';
 import Field from '@/Components/Form/Field.vue';
 import TextInput from '@/Components/Form/TextInput.vue';
 import Select from '@/Components/Form/Select.vue';
 import Textarea from '@/Components/Form/TextArea.vue';
+import FileInput from '@/Components/Form/FileInput.vue';
 
 const props = defineProps({
     plan: Object,
@@ -33,10 +34,15 @@ const form = useForm({
     asana_sequence: props.plan.asana_sequence,
     duration_minutes: String(props.plan.duration_minutes),
     level: props.plan.level,
+    attachments: [],
 });
 
 const submit = () => {
     form.patch(props.endpoints.update);
+};
+
+const removeAttachment = (attachment) => {
+    router.delete(attachment.deleteUrl, { preserveScroll: true });
 };
 </script>
 <script>
@@ -77,6 +83,18 @@ export default {
             </Field>
             <Field :label="$t('operations.planAsanaSequence')" :error="form.errors.asana_sequence">
                 <Textarea v-model="form.asana_sequence" />
+            </Field>
+
+            <Field :label="$t('operations.planAttachments')" :error="form.errors.attachments" :hint="$t('operations.attachmentHint')" bare>
+                <ul v-if="plan.attachments.length" class="ym-file-list">
+                    <li v-for="attachment in plan.attachments" :key="attachment.id" class="ym-file-row">
+                        <a :href="attachment.showUrl" target="_blank" class="ym-file-name">{{ attachment.name }}</a>
+                        <button v-if="attachment.deleteUrl" type="button" class="ym-btn-danger" @click="removeAttachment(attachment)">
+                            {{ $t('operations.delete') }}
+                        </button>
+                    </li>
+                </ul>
+                <FileInput v-model="form.attachments" multiple accept="application/pdf,image/jpeg,image/png" />
             </Field>
 
             <div class="ym-actions">

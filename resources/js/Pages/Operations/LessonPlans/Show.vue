@@ -5,6 +5,7 @@ import { trans as t } from 'laravel-vue-i18n';
 import Field from '@/Components/Form/Field.vue';
 import Textarea from '@/Components/Form/TextArea.vue';
 import Modal from '@/Components/UI/Modal.vue';
+import { formatBytes } from '@/composables/useBytes.js';
 
 const props = defineProps({
     plan: Object,
@@ -97,6 +98,15 @@ export default {
 
             <h3 class="ym-plan-heading">{{ $t('operations.planAsanaSequence') }}</h3>
             <pre class="ym-plan-sequence">{{ plan.asana_sequence }}</pre>
+
+            <h3 class="ym-plan-heading">{{ $t('operations.planAttachments') }}</h3>
+            <ul v-if="plan.attachments.length" class="ym-file-list">
+                <li v-for="attachment in plan.attachments" :key="attachment.id" class="ym-file-row">
+                    <a :href="attachment.showUrl" target="_blank" class="ym-file-name">{{ attachment.name }}</a>
+                    <span class="ym-chip">{{ formatBytes(attachment.size) }}</span>
+                </li>
+            </ul>
+            <p v-else class="ym-card-note">{{ $t('operations.noAttachments') }}</p>
         </div>
     </section>
 

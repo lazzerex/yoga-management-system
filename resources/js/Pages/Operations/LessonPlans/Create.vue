@@ -6,6 +6,7 @@ import Field from '@/Components/Form/Field.vue';
 import TextInput from '@/Components/Form/TextInput.vue';
 import Select from '@/Components/Form/Select.vue';
 import Textarea from '@/Components/Form/TextArea.vue';
+import FileInput from '@/Components/Form/FileInput.vue';
 
 const props = defineProps({
     options: Object,
@@ -33,6 +34,7 @@ const form = useForm({
     asana_sequence: '',
     duration_minutes: '60',
     level: props.options.levels[0] ?? '',
+    attachments: [],
 });
 
 // router.reload() from the branch switcher updates props without remounting, so seed again by hand.
@@ -84,6 +86,10 @@ export default {
             </Field>
             <Field :label="$t('operations.planAsanaSequence')" :error="form.errors.asana_sequence">
                 <Textarea v-model="form.asana_sequence" />
+            </Field>
+
+            <Field :label="$t('operations.planAttachments')" :error="form.errors.attachments" :hint="$t('operations.attachmentHint')">
+                <FileInput v-model="form.attachments" multiple accept="application/pdf,image/jpeg,image/png" />
             </Field>
 
             <div class="ym-actions">
