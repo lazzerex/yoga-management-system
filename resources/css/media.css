@@ -1,0 +1,129 @@
+.ym-file-input {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    align-items: flex-start;
+}
+
+.ym-file-native {
+    font-size: 0.82rem;
+    color: #5b6472;
+}
+
+.ym-file-native::file-selector-button {
+    margin-right: 0.6rem;
+    padding: 0.32rem 0.7rem;
+    border: 1px solid #d6d9de;
+    border-radius: 0.4rem;
+    background: #f7f8fa;
+    color: #3c4452;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.ym-file-chosen {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.8rem;
+    color: #4a525f;
+}
+
+.ym-file-list {
+    margin: 0.4rem 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.35rem;
+}
+
+.ym-file-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    padding: 0.35rem 0.55rem;
+    border: 1px solid #e6e8ec;
+    border-radius: 0.45rem;
+    background: #fbfbfc;
+}
+
+.ym-file-name {
+    font-size: 0.83rem;
+    color: #3a6ea8;
+    text-decoration: none;
+    word-break: break-all;
+}
+
+.ym-file-name:hover {
+    text-decoration: underline;
+}
+
+.ym-avatar-field {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.ym-avatar-thumb {
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 0.5rem;
+    object-fit: cover;
+    border: 1px solid #e2e5ea;
+    background: #f4f5f7;
+}
+
+.ym-avatar-thumb--empty {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #8a93a1;
+}
+
+.ym-folder-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+    gap: 0.65rem;
+    margin-top: 0.85rem;
+}
+
+.ym-folder {
+    display: grid;
+    gap: 0.15rem;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid #e4e7ec;
+    border-radius: 0.6rem;
+    background: #fbfcfd;
+    text-align: left;
+    cursor: pointer;
+}
+
+.ym-folder:hover {
+    border-color: #c9d3e2;
+}
+
+.ym-folder--active {
+    border-color: #7d9cc8;
+    background: #eef3fb;
+}
+
+.ym-folder-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #2f3742;
+}
+
+.ym-folder-meta {
+    font-size: 0.76rem;
+    color: #8a93a1;
+}
+
+.ym-invoice-status--voided {
+    background: #f4f2f2;
+    color: #8a8481;
+    border-color: #ddd6d4;
+    text-decoration: line-through;
+}
