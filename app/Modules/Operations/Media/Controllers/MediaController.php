@@ -4,6 +4,7 @@ namespace App\Modules\Operations\Media\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Modules\Operations\Media\Actions\AuthorizeMediaAccessAction;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -19,6 +20,7 @@ class MediaController extends Controller
         abort_unless($this->access->canDownload($request->user(), $media), 403);
 
         $conversion = $request->query('conversion') === 'thumb' && $media->hasGeneratedConversion('thumb') ? 'thumb' : '';
+        /** @var FilesystemAdapter $disk */
         $disk = Storage::disk($media->disk);
         $path = $media->getPathRelativeToRoot($conversion);
 
