@@ -19,7 +19,7 @@ class CoachProfileController extends Controller
 {
     public function index(Request $request): Response
     {
-        $profiles = CoachProfile::with(['user:id,name,username', 'classTypes:id,name'])
+        $profiles = CoachProfile::with(['user:id,name,username', 'classTypes:id,name', 'media'])
             ->orderBy('id')
             ->paginate(20);
         $canManage = $request->user()->can('operations.coaches.manage');
@@ -31,6 +31,7 @@ class CoachProfileController extends Controller
                 'user_name' => $profile->user->name,
                 'years_experience' => $profile->years_experience,
                 'class_types' => $profile->classTypes->pluck('name'),
+                'avatar_url' => $this->avatarUrl($profile),
                 'is_active' => $profile->is_active,
             ]),
             'stats' => [
@@ -57,7 +58,7 @@ class CoachProfileController extends Controller
 
     public function edit(CoachProfile $coachProfile): Response
     {
-        $coachProfile->load(['user:id,name', 'classTypes:id']);
+        $coachProfile->load(['user:id,name', 'classTypes:id', 'media']);
 
         return inertia('Operations/CoachProfiles/Edit', [
             'coachProfile' => [
@@ -68,6 +69,7 @@ class CoachProfileController extends Controller
                 'certifications' => $coachProfile->certifications,
                 'class_type_ids' => $coachProfile->classTypes->pluck('id'),
                 'is_active' => $coachProfile->is_active,
+                'avatar_url' => $this->avatarUrl($coachProfile),
             ],
             'classTypes' => ClassType::active()->orderBy('name')->get(['id', 'name']),
             'endpoints' => [
@@ -93,6 +95,13 @@ class CoachProfileController extends Controller
         return redirect()
             ->route('operations.coaches.index')
             ->with('success', ['key' => 'flash.coachProfileUpdated', 'params' => ['name' => $coachProfile->user->name]]);
+    }
+
+    private function avatarUrl(CoachProfile $profile): ?string
+    {
+        $avatar = $profile->getFirstMedia('avatar');
+
+        return $avatar ? route('operations.files.show', [$avatar, 'conversion' => 'thumb']) : null;
     }
 
     public function destroy(CoachProfile $coachProfile, DeleteCoachProfileAction $action): RedirectResponse
