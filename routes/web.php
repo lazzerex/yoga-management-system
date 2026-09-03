@@ -11,6 +11,8 @@ use App\Modules\Operations\ClassType\Controllers\ClassTypeController;
 use App\Modules\Operations\CoachProfile\Controllers\CoachProfileController;
 use App\Modules\Operations\Enrollment\Controllers\EnrollmentController;
 use App\Modules\Operations\LessonPlan\Controllers\LessonPlanController;
+use App\Modules\Operations\Media\Controllers\FileLibraryController;
+use App\Modules\Operations\Media\Controllers\MediaController;
 use App\Modules\Operations\Room\Controllers\RoomController;
 use App\Modules\Operations\StudentProfile\Controllers\StudentProfileController;
 use App\Modules\Operations\Tuition\Controllers\InvoiceController;
@@ -148,8 +150,13 @@ Route::prefix('cms')->group(function () {
             });
 
             Route::middleware('permission:operations.files.view')->group(function () {
-                Route::get('/file-library', fn () => inertia('Operations/FileLibrary'))->name('file-library');
+                Route::get('/file-library', [FileLibraryController::class, 'index'])->name('file-library');
             });
+
+            // No permission middleware on the download: a file is authorised by the record
+            // it hangs off, so a member can fetch their own avatar without library access.
+            Route::get('/files/{media}', [MediaController::class, 'show'])->whereNumber('media')->name('files.show');
+            Route::delete('/files/{media}', [MediaController::class, 'destroy'])->whereNumber('media')->name('files.destroy');
 
             Route::middleware('permission:operations.tuition.view')->group(function () {
                 Route::get('/tuition-fees', [InvoiceController::class, 'index'])->name('tuition-fees');
@@ -182,6 +189,7 @@ Route::prefix('cms')->group(function () {
 
                     Route::middleware('permission:operations.tuition.manage')->whereNumber('invoice')->group(function () {
                         Route::post('/{invoice}/payments', [InvoiceController::class, 'recordPayment'])->name('payments.store');
+                        Route::post('/{invoice}/payments/{payment}/void', [InvoiceController::class, 'voidPayment'])->scopeBindings()->name('payments.void');
                         Route::post('/{invoice}/waive', [InvoiceController::class, 'waive'])->name('waive');
                         Route::delete('/{invoice}', [InvoiceController::class, 'destroy'])->name('destroy');
                     });
