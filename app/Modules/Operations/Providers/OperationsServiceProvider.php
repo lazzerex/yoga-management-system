@@ -11,6 +11,13 @@ class OperationsServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
+        Eventy::addFilter('backend_settings_menu', function (array $items) {
+            $items[] = AppMenuItem::make('nav.tuitionPlans', '/cms/operations/tuition-fees/plans')
+                ->permissions('operations.tuition.manage');
+
+            return $items;
+        }, 10, 1);
+
         Eventy::addAction('register_backend_menu', function (MenuRegistry $menu) {
             $menu->addItems([
                 AppMenuItem::make('nav.centers', '/cms/operations/yoga-center')
