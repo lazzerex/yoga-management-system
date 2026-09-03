@@ -31,4 +31,5 @@ return [
     'openQuickMenu' => 'Open quick menu',
     'openDashboardOptions' => 'Open dashboard options',
     'switchLang' => 'Switch to Vietnamese',
+    'clear' => 'Clear',
 ];

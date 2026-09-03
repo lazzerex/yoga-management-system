@@ -196,6 +196,11 @@ return [
     */
 
     'attributes' => [
+        'avatar' => 'photo',
+        'attachments' => 'attachments',
+        'attachments.*' => 'attachment',
+        'proof' => 'proof of payment',
+        'void_reason' => 'reason',
         'amount' => 'amount',
         'branch_id' => 'branch',
         'class_type_id' => 'class type',

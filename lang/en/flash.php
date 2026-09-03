@@ -78,4 +78,8 @@ return [
     'studentProfileHasEnrollments' => 'Cannot delete a student profile that has class enrollments. Deactivate it instead.',
     'cannotDeleteUserHasCoachProfile' => 'This user has a coach profile. Delete the profile before deleting the account.',
     'cannotDeleteUserHasStudentProfile' => 'This user has a student profile. Delete the profile before deleting the account.',
+
+    'fileDeleted' => 'File ":name" deleted.',
+    'paymentVoided' => 'Payment voided.',
+    'paymentAlreadyVoided' => 'This payment is already voided.',
 ];
