@@ -19,6 +19,8 @@ class UpdateStudentProfileRequest extends FormRequest
             'medical_notes' => ['nullable', 'string', 'max:2000'],
             'goals' => ['nullable', 'string', 'max:1000'],
             'is_active' => ['boolean'],
+            'avatar' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp', 'mimetypes:image/jpeg,image/png,image/webp', 'max:2048'],
+            'remove_avatar' => ['boolean'],
         ];
     }
 }
