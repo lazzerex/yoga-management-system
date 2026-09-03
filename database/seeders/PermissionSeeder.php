@@ -30,6 +30,7 @@ class PermissionSeeder extends Seeder
             'operations.plans.review',
             'operations.files.view',
             'operations.tuition.view',
+            'operations.tuition.manage',
             'operations.enrollments.view',
             'operations.enrollments.manage',
             'member.dashboard.view',
@@ -71,6 +72,7 @@ class PermissionSeeder extends Seeder
             'operations.plans.review',
             'operations.files.view',
             'operations.tuition.view',
+            'operations.tuition.manage',
             'operations.enrollments.view',
             'operations.enrollments.manage',
             'admin.users.view',
@@ -100,7 +102,6 @@ class PermissionSeeder extends Seeder
         $member->syncPermissions([
             'operations.center.view',
             'operations.sessions.view',
-            'operations.tuition.view',
             'member.dashboard.view',
             'member.enrollments.manage',
         ]);
