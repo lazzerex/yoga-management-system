@@ -17,6 +17,7 @@ return [
     'planList' => 'Tất cả giáo án',
     'planApprovalQueue' => 'Hàng chờ duyệt',
     'tuition' => 'Học phí',
+    'tuitionPlans' => 'Gói học phí',
     'files' => 'Tệp',
     'coaches' => 'Hồ sơ Giáo viên',
     'studentProfiles' => 'Hồ sơ Học viên',

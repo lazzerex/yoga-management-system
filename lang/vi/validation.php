@@ -143,8 +143,8 @@ return [
     'uuid' => 'Trường :attribute phải là UUID hợp lệ.',
 
     'custom' => [
-        'attribute-name' => [
-            'rule-name' => 'custom-message',
+        'session_count' => [
+            'required_if' => 'Gói theo số buổi phải ghi rõ số buổi được cấp.',
         ],
     ],
 
@@ -154,5 +154,28 @@ return [
         'email' => 'email',
         'password' => 'mật khẩu',
         'role' => 'vai trò',
+        'amount' => 'số tiền',
+        'branch_id' => 'chi nhánh',
+        'class_type_id' => 'loại lớp',
+        'description' => 'mô tả',
+        'due_date' => 'ngày đến hạn',
+        'duration_days' => 'thời hạn',
+        'is_active' => 'trạng thái hoạt động',
+        'issued_at' => 'ngày lập',
+        'items' => 'chi tiết hoá đơn',
+        'items.*.description' => 'diễn giải',
+        'items.*.quantity' => 'số lượng',
+        'items.*.tuition_plan_id' => 'gói học phí',
+        'items.*.unit_price' => 'đơn giá',
+        'method' => 'hình thức thanh toán',
+        'note' => 'ghi chú',
+        'paid_at' => 'ngày thanh toán',
+        'price_amount' => 'học phí',
+        'reference' => 'mã tham chiếu',
+        'session_count' => 'số buổi',
+        'student_profile_id' => 'học viên',
+        'tuition_plan_id' => 'gói học phí',
+        'type' => 'loại gói',
+        'unit_price' => 'đơn giá',
     ],
 ];
