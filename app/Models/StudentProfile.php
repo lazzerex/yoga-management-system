@@ -33,6 +33,11 @@ class StudentProfile extends Model
         return $this->hasMany(Enrollment::class);
     }
 
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
