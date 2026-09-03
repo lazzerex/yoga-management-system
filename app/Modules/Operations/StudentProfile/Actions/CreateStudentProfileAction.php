@@ -8,6 +8,15 @@ class CreateStudentProfileAction
 {
     public function execute(array $validated): StudentProfile
     {
-        return StudentProfile::create($validated);
+        $avatar = $validated['avatar'] ?? null;
+        unset($validated['avatar'], $validated['remove_avatar']);
+
+        $profile = StudentProfile::create($validated);
+
+        if ($avatar) {
+            $profile->addMedia($avatar)->toMediaCollection('avatar');
+        }
+
+        return $profile;
     }
 }
