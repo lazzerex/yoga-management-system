@@ -35,7 +35,8 @@ class UpdateLessonPlanRequest extends FormRequest
             'duration_minutes' => ['required', 'integer', 'min:5', 'max:600'],
             'level' => ['required', Rule::in(LessonPlan::LEVELS)],
             'attachments' => ['array', function ($attribute, $value, $fail) {
-                $held = $this->route('lessonPlan')?->getMedia('attachments')->count() ?? 0;
+                $plan = $this->route('lessonPlan');
+                $held = $plan instanceof LessonPlan ? $plan->getMedia('attachments')->count() : 0;
                 if ($held + count($value ?? []) > LessonPlan::MAX_ATTACHMENTS) {
                     $fail(__('operations.attachmentLimit', ['max' => LessonPlan::MAX_ATTACHMENTS]));
                 }
