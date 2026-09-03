@@ -1,19 +1,15 @@
-﻿<script setup>
+<script setup>
+import { Link } from '@inertiajs/vue3';
+import { trans as t } from 'laravel-vue-i18n';
+import { formatVnd } from '@/composables/useMoney.js';
 
-const records = [
-    { student: 'Alice Chen', plan: 'Unlimited Monthly', amount: '$120', due: 'May 01', status: 'Paid' },
-    { student: 'Ben Walker', plan: '10-Class Pass', amount: '$150', due: 'May 05', status: 'Pending' },
-    { student: 'Clara Park', plan: 'Unlimited Monthly', amount: '$120', due: 'Apr 28', status: 'Overdue' },
-    { student: 'David Tran', plan: 'Drop-In (x5)', amount: '$90', due: 'May 10', status: 'Pending' },
-    { student: 'Emma Lee', plan: 'Annual Premium', amount: '$960', due: 'May 03', status: 'Paid' },
-];
+defineProps({
+    invoices: Object,
+    stats: Object,
+    endpoints: Object,
+});
 
-const channels = [
-    { method: 'Bank Transfer', count: 82, pct: '45%' },
-    { method: 'Credit Card', count: 58, pct: '32%' },
-    { method: 'Cash', count: 27, pct: '15%' },
-    { method: 'E-Wallet', count: 15, pct: '8%' },
-];
+const statusLabel = (status) => t(`operations.invoiceStatus${status.charAt(0).toUpperCase()}${status.slice(1)}`);
 </script>
 <script>
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -28,81 +24,84 @@ export default {
     <div class="ym-stat-strip">
         <div class="ym-stat">
             <p class="ym-stat-label">{{ $t('operations.collectedThisMonth') }}</p>
-            <p class="ym-stat-value">$18,240</p>
-            <p class="ym-stat-note">{{ $t('operations.ofMonthlyTarget') }}</p>
+            <p class="ym-stat-value">{{ formatVnd(stats.collected) }}</p>
         </div>
         <div class="ym-stat">
-            <p class="ym-stat-label">{{ $t('operations.pendingInvoices') }}</p>
-            <p class="ym-stat-value">34</p>
-            <p class="ym-stat-note">$6,200 {{ $t('operations.outstanding') }}</p>
+            <p class="ym-stat-label">{{ $t('operations.outstanding') }}</p>
+            <p class="ym-stat-value">{{ formatVnd(stats.outstanding) }}</p>
+            <p class="ym-stat-note">{{ $t('operations.openInvoices', { count: stats.openCount }) }}</p>
         </div>
         <div class="ym-stat">
             <p class="ym-stat-label">{{ $t('operations.overdue') }}</p>
-            <p class="ym-stat-value">12</p>
-            <p class="ym-stat-note">{{ $t('operations.followUpNeeded') }}</p>
+            <p class="ym-stat-value">{{ stats.overdueCount }}</p>
         </div>
     </div>
 
-    <div class="ym-page-cols ym-page-cols--6040">
-        <div class="ym-pane">
-            <div class="ym-pane-head">
-                <div class="ym-pane-title-wrap">
-                    <i class="bi bi-receipt ym-pane-icon" />
-                    <h2 class="ym-pane-title">{{ $t('operations.tuitionRecords') }}</h2>
-                </div>
+    <section class="ym-surface ym-section">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="ym-title">
+                    {{ $t('operations.tuitionFees') }}
+                    <span class="ym-count-badge">{{ invoices.total }}</span>
+                </h2>
+                <p class="ym-subtitle">{{ $t('operations.tuitionSubtitle') }}</p>
             </div>
-            <div class="ym-pane-body">
-                <div class="ym-table-wrap">
-                    <table class="ym-table">
-                        <thead>
-                            <tr>
-                                <th class="ym-th">{{ $t('operations.student') }}</th>
-                                <th class="ym-th">{{ $t('operations.plan') }}</th>
-                                <th class="ym-th">{{ $t('operations.amount') }}</th>
-                                <th class="ym-th">{{ $t('operations.dueDate') }}</th>
-                                <th class="ym-th">{{ $t('operations.status') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="r in records" :key="r.student" class="ym-tr">
-                                <td class="ym-td font-medium">{{ r.student }}</td>
-                                <td class="ym-td">{{ r.plan }}</td>
-                                <td class="ym-td">{{ r.amount }}</td>
-                                <td class="ym-td">{{ r.due }}</td>
-                                <td class="ym-td">
-                                    <span class="ym-tag">{{ r.status }}</span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+            <div class="ym-inline-actions">
+                <a :href="endpoints.export" class="ym-btn-outline">{{ $t('common.export') }}</a>
+                <Link v-if="endpoints.plans" :href="endpoints.plans" class="ym-btn-outline">
+                    {{ $t('operations.tuitionPlans') }}
+                </Link>
+                <Link v-if="endpoints.create" :href="endpoints.create" class="ym-btn-sm">
+                    {{ $t('operations.createInvoice') }}
+                </Link>
             </div>
         </div>
 
-        <div class="ym-pane">
-            <div class="ym-pane-head">
-                <div class="ym-pane-title-wrap">
-                    <i class="bi bi-credit-card ym-pane-icon" />
-                    <h2 class="ym-pane-title">{{ $t('operations.collectionChannels') }}</h2>
-                </div>
-            </div>
-            <div class="ym-pane-body">
-                <div class="ym-row-list">
-                    <div v-for="ch in channels" :key="ch.method" class="ym-row">
-                        <div class="ym-row-main">
-                            <p class="ym-row-title">{{ ch.method }}</p>
-                            <p class="ym-row-meta">{{ ch.count }} {{ $t('operations.thisMonth') }}</p>
-                        </div>
-                        <div class="ym-row-aside">
-                            <span class="ym-chip">{{ ch.pct }}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="ym-info-row">
-                    <i class="bi bi-info-circle ym-info-icon" />
-                    <span>{{ $t('operations.tuitionPlaceholder') }}</span>
-                </div>
-            </div>
+        <div class="ym-table-wrap">
+            <table class="ym-table">
+                <thead>
+                    <tr>
+                        <th class="ym-th">{{ $t('operations.invoiceNumber') }}</th>
+                        <th class="ym-th">{{ $t('operations.student') }}</th>
+                        <th class="ym-th">{{ $t('operations.planBranch') }}</th>
+                        <th class="ym-th">{{ $t('operations.dueDate') }}</th>
+                        <th class="ym-th">{{ $t('operations.amount') }}</th>
+                        <th class="ym-th">{{ $t('operations.invoiceBalance') }}</th>
+                        <th class="ym-th">{{ $t('operations.status') }}</th>
+                        <th class="ym-th">{{ $t('operations.actions') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="invoice in invoices.data" :key="invoice.id" class="ym-tr">
+                        <td class="ym-td font-medium">{{ invoice.invoice_number }}</td>
+                        <td class="ym-td">{{ invoice.student_name }}</td>
+                        <td class="ym-td text-neutral-500">{{ invoice.branch_name }}</td>
+                        <td class="ym-td text-neutral-500">{{ invoice.due_date }}</td>
+                        <td class="ym-td">{{ formatVnd(invoice.total_amount) }}</td>
+                        <td class="ym-td">{{ formatVnd(invoice.balance) }}</td>
+                        <td class="ym-td">
+                            <span :class="['ym-invoice-status', `ym-invoice-status--${invoice.status}`]">{{ statusLabel(invoice.status) }}</span>
+                        </td>
+                        <td class="ym-td">
+                            <Link class="ym-btn-outline" :href="invoice.showUrl">{{ $t('operations.invoiceDetails') }}</Link>
+                        </td>
+                    </tr>
+                    <tr v-if="!invoices.data.length">
+                        <td class="ym-td text-neutral-500" colspan="8">{{ $t('operations.noInvoices') }}</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-    </div>
+
+        <div v-if="invoices.links.length > 3" class="ym-pagination">
+            <Link
+                v-for="link in invoices.links"
+                :key="link.label"
+                :href="link.url ?? '#'"
+                v-html="link.label"
+                :class="['ym-page-link', { 'ym-page-link--active': link.active, 'ym-page-link--disabled': !link.url }]"
+                preserve-scroll
+            />
+        </div>
+    </section>
 </template>
