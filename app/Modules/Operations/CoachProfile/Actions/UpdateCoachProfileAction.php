@@ -9,10 +9,21 @@ class UpdateCoachProfileAction
     public function execute(CoachProfile $coachProfile, array $validated): CoachProfile
     {
         $classTypeIds = $validated['class_type_ids'] ?? [];
-        unset($validated['class_type_ids']);
+        $avatar = $validated['avatar'] ?? null;
+        $removeAvatar = (bool) ($validated['remove_avatar'] ?? false);
+        unset($validated['class_type_ids'], $validated['avatar'], $validated['remove_avatar']);
 
         $coachProfile->update($validated);
         $coachProfile->classTypes()->sync($classTypeIds);
+
+        if ($removeAvatar) {
+            $coachProfile->clearMediaCollection('avatar');
+        }
+
+        // The collection is singleFile, so a new upload replaces the one held.
+        if ($avatar) {
+            $coachProfile->addMedia($avatar)->toMediaCollection('avatar');
+        }
 
         return $coachProfile;
     }
