@@ -13,6 +13,9 @@ use App\Modules\Operations\Enrollment\Controllers\EnrollmentController;
 use App\Modules\Operations\LessonPlan\Controllers\LessonPlanController;
 use App\Modules\Operations\Room\Controllers\RoomController;
 use App\Modules\Operations\StudentProfile\Controllers\StudentProfileController;
+use App\Modules\Operations\Tuition\Controllers\InvoiceController;
+use App\Modules\Operations\Tuition\Controllers\MembershipController;
+use App\Modules\Operations\Tuition\Controllers\TuitionPlanController;
 use App\Modules\Profile\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -149,7 +152,40 @@ Route::prefix('cms')->group(function () {
             });
 
             Route::middleware('permission:operations.tuition.view')->group(function () {
-                Route::get('/tuition-fees', fn () => inertia('Operations/TuitionFees'))->name('tuition-fees');
+                Route::get('/tuition-fees', [InvoiceController::class, 'index'])->name('tuition-fees');
+            });
+
+            // Static segments are declared before /{invoice} or the wildcard swallows them.
+            Route::prefix('tuition-fees')->group(function () {
+                Route::middleware('permission:operations.tuition.manage')->name('tuition-plans.')->prefix('plans')->group(function () {
+                    Route::get('/', [TuitionPlanController::class, 'index'])->name('index');
+                    Route::get('/create', [TuitionPlanController::class, 'create'])->name('create');
+                    Route::post('/', [TuitionPlanController::class, 'store'])->name('store');
+                    Route::get('/{tuitionPlan}/edit', [TuitionPlanController::class, 'edit'])->name('edit');
+                    Route::patch('/{tuitionPlan}', [TuitionPlanController::class, 'update'])->name('update');
+                    Route::delete('/{tuitionPlan}', [TuitionPlanController::class, 'destroy'])->name('destroy');
+                });
+
+                Route::name('invoices.')->group(function () {
+                    Route::middleware('permission:operations.tuition.view')->group(function () {
+                        Route::get('/export', [InvoiceController::class, 'export'])->name('export');
+                    });
+
+                    Route::middleware('permission:operations.tuition.manage')->group(function () {
+                        Route::get('/create', [InvoiceController::class, 'create'])->name('create');
+                        Route::post('/', [InvoiceController::class, 'store'])->name('store');
+                    });
+
+                    Route::middleware('permission:operations.tuition.view')->group(function () {
+                        Route::get('/{invoice}', [InvoiceController::class, 'show'])->whereNumber('invoice')->name('show');
+                    });
+
+                    Route::middleware('permission:operations.tuition.manage')->whereNumber('invoice')->group(function () {
+                        Route::post('/{invoice}/payments', [InvoiceController::class, 'recordPayment'])->name('payments.store');
+                        Route::post('/{invoice}/waive', [InvoiceController::class, 'waive'])->name('waive');
+                        Route::delete('/{invoice}', [InvoiceController::class, 'destroy'])->name('destroy');
+                    });
+                });
             });
 
             Route::middleware('permission:operations.enrollments.view')->group(function () {
@@ -162,7 +198,7 @@ Route::prefix('cms')->group(function () {
         });
 
         Route::middleware('permission:member.dashboard.view')->prefix('member')->name('member.')->group(function () {
-            Route::get('/my-membership', fn () => inertia('Member/MyMembership'))->name('my-membership');
+            Route::get('/my-membership', [MembershipController::class, 'show'])->name('my-membership');
             Route::get('/my-classes', [EnrollmentController::class, 'index'])->name('my-classes');
             Route::get('/book', [EnrollmentController::class, 'browse'])->name('classes.book');
             Route::get('/my-schedule', [EnrollmentController::class, 'mySchedule'])->name('my-schedule');
