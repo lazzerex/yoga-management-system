@@ -1,0 +1,79 @@
+.ym-invoice-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid transparent;
+}
+
+.ym-invoice-status--unpaid {
+    background: #f1f0ee;
+    color: #6b6862;
+    border-color: #ddd9d2;
+}
+
+.ym-invoice-status--partial {
+    background: #fdf3e3;
+    color: #96661a;
+    border-color: #f0dcb8;
+}
+
+.ym-invoice-status--paid {
+    background: #e9f5ef;
+    color: #2c7a5a;
+    border-color: #c4e4d5;
+}
+
+.ym-invoice-status--overdue {
+    background: #fceceb;
+    color: #a63d34;
+    border-color: #f0cdc9;
+}
+
+.ym-invoice-status--waived {
+    background: #eef0f8;
+    color: #4f5a8a;
+    border-color: #d3d8ec;
+}
+
+.ym-invoice-heading {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+}
+
+.ym-invoice-line {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.4fr) minmax(0, 0.6fr) minmax(0, 0.9fr) minmax(0, 0.9fr);
+    gap: 0.8rem;
+    align-items: start;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid #ece8e1;
+}
+
+@media (max-width: 900px) {
+    .ym-invoice-line {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+.ym-invoice-line-end {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    justify-content: flex-end;
+    padding-top: 1.35rem;
+}
+
+.ym-invoice-line-fixed,
+.ym-invoice-line-total {
+    font-weight: 500;
+    padding-top: 0.45rem;
+}
+
+.ym-invoice-total {
+    margin-left: auto;
+    font-weight: 600;
+}
