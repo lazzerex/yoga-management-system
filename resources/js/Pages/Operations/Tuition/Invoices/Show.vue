@@ -7,6 +7,8 @@ import TextInput from '@/Components/Form/TextInput.vue';
 import Select from '@/Components/Form/Select.vue';
 import DatePicker from '@/Components/Form/DatePicker.vue';
 import MoneyInput from '@/Components/Form/MoneyInput.vue';
+import FileInput from '@/Components/Form/FileInput.vue';
+import Textarea from '@/Components/Form/TextArea.vue';
 import Modal from '@/Components/UI/Modal.vue';
 import { formatVnd } from '@/composables/useMoney.js';
 
@@ -21,6 +23,7 @@ const formatDate = (value) => new Date(value).toLocaleString();
 
 const confirmingDelete = ref(false);
 const confirmingWaive = ref(false);
+const voiding = ref(null);
 
 const methodOptions = props.methods.map((method) => ({
     value: method,
@@ -33,12 +36,25 @@ const paymentForm = useForm({
     paid_at: new Date().toISOString().slice(0, 10),
     reference: '',
     note: '',
+    proof: null,
 });
 
 const pay = () => {
     paymentForm.post(props.endpoints.payment, {
         preserveScroll: true,
-        onSuccess: () => paymentForm.reset('reference', 'note'),
+        onSuccess: () => paymentForm.reset('reference', 'note', 'proof'),
+    });
+};
+
+const voidForm = useForm({ void_reason: '' });
+
+const confirmVoid = () => {
+    voidForm.post(voiding.value.voidUrl, {
+        preserveScroll: true,
+        onSuccess: () => {
+            voiding.value = null;
+            voidForm.reset();
+        },
     });
 };
 
@@ -155,6 +171,9 @@ export default {
             <Field :label="$t('operations.paymentReference')" :error="paymentForm.errors.reference">
                 <TextInput v-model="paymentForm.reference" />
             </Field>
+            <Field :label="$t('operations.paymentProof')" :error="paymentForm.errors.proof" :hint="$t('operations.paymentProofHint')">
+                <FileInput v-model="paymentForm.proof" accept="application/pdf,image/jpeg,image/png" />
+            </Field>
             <div class="ym-actions">
                 <button type="submit" class="ym-btn-sm" :disabled="paymentForm.processing">{{ $t('common.save') }}</button>
             </div>
@@ -165,7 +184,9 @@ export default {
         <h3 class="ym-invoice-heading">{{ $t('operations.paymentHistory') }}</h3>
         <ul v-if="invoice.payments.length" class="ym-review-list">
             <li v-for="payment in invoice.payments" :key="payment.id" class="ym-review-item">
-                <span class="ym-invoice-status ym-invoice-status--paid">{{ formatVnd(payment.amount) }}</span>
+                <span :class="['ym-invoice-status', payment.status === 'voided' ? 'ym-invoice-status--voided' : 'ym-invoice-status--paid']">
+                    {{ formatVnd(payment.amount) }}
+                </span>
                 <div class="ym-review-body">
                     <p class="ym-review-meta">
                         {{ $t(`operations.method${payment.method.charAt(0).toUpperCase()}${payment.method.slice(1)}`) }}
@@ -173,11 +194,36 @@ export default {
                         · {{ payment.recorded_by ?? '-' }}
                     </p>
                     <p v-if="payment.reference" class="ym-plan-text">{{ payment.reference }}</p>
+                    <p v-if="payment.status === 'voided'" class="ym-plan-text">
+                        {{ $t('operations.paymentVoidedOn', { date: formatDate(payment.voided_at), name: payment.voided_by ?? '-' }) }}
+                        — {{ payment.void_reason }}
+                    </p>
+                </div>
+                <div class="ym-inline-actions">
+                    <a v-if="payment.proofUrl" :href="payment.proofUrl" target="_blank" class="ym-btn-outline">
+                        {{ $t('operations.viewProof') }}
+                    </a>
+                    <button v-if="payment.voidUrl" type="button" class="ym-btn-danger" @click="voiding = payment">
+                        {{ $t('operations.voidPayment') }}
+                    </button>
                 </div>
             </li>
         </ul>
         <p v-else class="ym-card-note">{{ $t('operations.noPayments') }}</p>
     </section>
+
+    <Modal :show="!!voiding" :title="$t('operations.voidPaymentTitle')" @close="voiding = null">
+        <p class="ym-card-note">{{ $t('operations.confirmVoidPayment', { amount: formatVnd(voiding?.amount ?? 0) }) }}</p>
+        <Field :label="$t('operations.voidReason')" :error="voidForm.errors.void_reason">
+            <Textarea v-model="voidForm.void_reason" />
+        </Field>
+        <div class="ym-confirm-modal-actions">
+            <button type="button" class="ym-btn-outline" @click="voiding = null">{{ $t('common.cancel') }}</button>
+            <button type="button" class="ym-btn-danger" :disabled="voidForm.processing" @click="confirmVoid">
+                {{ $t('operations.voidPayment') }}
+            </button>
+        </div>
+    </Modal>
 
     <Modal :show="confirmingWaive" :title="$t('operations.waiveInvoiceTitle')" @close="confirmingWaive = false">
         <p class="ym-card-note">{{ $t('operations.confirmWaiveInvoice', { number: invoice.invoice_number }) }}</p>
