@@ -17,6 +17,7 @@ use App\Modules\Operations\LessonPlan\Actions\UpdateLessonPlanAction;
 use App\Modules\Operations\LessonPlan\Requests\ReviewLessonPlanRequest;
 use App\Modules\Operations\LessonPlan\Requests\StoreLessonPlanRequest;
 use App\Modules\Operations\LessonPlan\Requests\UpdateLessonPlanRequest;
+use App\Modules\Operations\Media\Actions\AuthorizeMediaAccessAction;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -24,6 +25,8 @@ use Inertia\Response;
 
 class LessonPlanController extends Controller
 {
+    public function __construct(private AuthorizeMediaAccessAction $access) {}
+
     public function index(Request $request): Response
     {
         $user = $request->user();
@@ -108,6 +111,7 @@ class LessonPlanController extends Controller
             'coachProfile.user:id,name',
             'classSession.classType:id,name',
             'reviews.reviewer:id,name',
+            'media',
         ]);
 
         $owns = $this->owns($user, $lessonPlan);
@@ -120,6 +124,7 @@ class LessonPlanController extends Controller
                 'objective' => $lessonPlan->objective,
                 'asana_sequence' => $lessonPlan->asana_sequence,
                 'session_label' => $lessonPlan->classSession ? $this->sessionLabel($lessonPlan->classSession) : null,
+                'attachments' => $this->attachments($user, $lessonPlan),
             ],
             'reviews' => $lessonPlan->reviews->sortByDesc('reviewed_at')->values()->map(fn ($review) => [
                 'id' => $review->id,
@@ -142,6 +147,8 @@ class LessonPlanController extends Controller
     {
         abort_unless($this->owns($request->user(), $lessonPlan) && $lessonPlan->isEditable(), 403);
 
+        $lessonPlan->load('media');
+
         return inertia('Operations/LessonPlans/Edit', [
             'plan' => [
                 'id' => $lessonPlan->id,
@@ -154,6 +161,8 @@ class LessonPlanController extends Controller
                 'duration_minutes' => $lessonPlan->duration_minutes,
                 'level' => $lessonPlan->level,
                 'status' => $lessonPlan->status,
+                'attachments' => $this->attachments($request->user(), $lessonPlan),
+                'max_attachments' => LessonPlan::MAX_ATTACHMENTS,
             ],
             'options' => $this->formOptions($request),
             'endpoints' => [
@@ -203,6 +212,18 @@ class LessonPlanController extends Controller
         return back()->with('success', [
             'key' => $validated['action'] === 'approved' ? 'flash.lessonPlanApproved' : 'flash.lessonPlanRejected',
         ]);
+    }
+
+    private function attachments(User $user, LessonPlan $plan): array
+    {
+        return $plan->getMedia('attachments')->map(fn ($media) => [
+            'id' => $media->id,
+            'name' => $media->name,
+            'file_name' => $media->file_name,
+            'size' => (int) $media->size,
+            'showUrl' => route('operations.files.show', $media),
+            'deleteUrl' => $this->access->canDelete($user, $media) ? route('operations.files.destroy', $media) : null,
+        ])->all();
     }
 
     private function row(LessonPlan $plan): array
