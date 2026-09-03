@@ -7,6 +7,7 @@ import Select from '@/Components/Form/Select.vue';
 import MultiSelect from '@/Components/Form/MultiSelect.vue';
 import Textarea from '@/Components/Form/TextArea.vue';
 import Checkbox from '@/Components/Form/Checkbox.vue';
+import FileInput from '@/Components/Form/FileInput.vue';
 
 const props = defineProps({
     users: Array,
@@ -24,6 +25,7 @@ const form = useForm({
     certifications: '',
     class_type_ids: [],
     is_active: true,
+    avatar: null,
 });
 
 const submit = () => {
@@ -59,6 +61,11 @@ export default {
             </Field>
             <Field :label="$t('operations.certifications')" :error="form.errors.certifications">
                 <Textarea v-model="form.certifications" />
+            </Field>
+            <Field :label="$t('operations.avatar')" :error="form.errors.avatar" :hint="$t('operations.avatarHint')">
+                <div class="ym-avatar-field">
+                    <FileInput v-model="form.avatar" accept="image/jpeg,image/png,image/webp" />
+                </div>
             </Field>
             <Checkbox v-model="form.is_active" :label="$t('operations.active')" />
 

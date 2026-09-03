@@ -6,6 +6,7 @@ import TextInput from '@/Components/Form/TextInput.vue';
 import MultiSelect from '@/Components/Form/MultiSelect.vue';
 import Textarea from '@/Components/Form/TextArea.vue';
 import Checkbox from '@/Components/Form/Checkbox.vue';
+import FileInput from '@/Components/Form/FileInput.vue';
 
 const props = defineProps({
     coachProfile: Object,
@@ -21,6 +22,8 @@ const form = useForm({
     certifications: props.coachProfile.certifications ?? '',
     class_type_ids: [...props.coachProfile.class_type_ids],
     is_active: props.coachProfile.is_active,
+    avatar: null,
+    remove_avatar: false,
 });
 
 const submit = () => {
@@ -54,6 +57,13 @@ export default {
             <Field :label="$t('operations.certifications')" :error="form.errors.certifications">
                 <Textarea v-model="form.certifications" />
             </Field>
+            <Field :label="$t('operations.avatar')" :error="form.errors.avatar" :hint="$t('operations.avatarHint')">
+                <div class="ym-avatar-field">
+                    <img v-if="coachProfile.avatar_url && !form.remove_avatar" :src="coachProfile.avatar_url" class="ym-avatar-thumb" alt="" />
+                    <FileInput v-model="form.avatar" accept="image/jpeg,image/png,image/webp" />
+                </div>
+            </Field>
+            <Checkbox v-if="coachProfile.avatar_url" v-model="form.remove_avatar" :label="$t('operations.removeAvatar')" />
             <Checkbox v-model="form.is_active" :label="$t('operations.active')" />
 
             <div class="ym-actions">
