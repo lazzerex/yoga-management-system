@@ -9,9 +9,18 @@ class CreateLessonPlanAction
 {
     public function execute(array $validated, CoachProfile $coachProfile): LessonPlan
     {
-        return LessonPlan::create($validated + [
+        $attachments = $validated['attachments'] ?? [];
+        unset($validated['attachments']);
+
+        $plan = LessonPlan::create($validated + [
             'coach_profile_id' => $coachProfile->id,
             'status' => 'draft',
         ]);
+
+        foreach ($attachments as $attachment) {
+            $plan->addMedia($attachment)->toMediaCollection('attachments');
+        }
+
+        return $plan;
     }
 }

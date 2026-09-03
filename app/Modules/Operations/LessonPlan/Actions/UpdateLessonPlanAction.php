@@ -15,7 +15,14 @@ class UpdateLessonPlanAction
             ]);
         }
 
+        $attachments = $validated['attachments'] ?? [];
+        unset($validated['attachments']);
+
         $lessonPlan->update($validated);
+
+        foreach ($attachments as $attachment) {
+            $lessonPlan->addMedia($attachment)->toMediaCollection('attachments');
+        }
 
         return $lessonPlan;
     }
