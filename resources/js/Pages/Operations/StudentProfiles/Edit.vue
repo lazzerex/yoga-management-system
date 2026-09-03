@@ -4,6 +4,7 @@ import Field from '@/Components/Form/Field.vue';
 import TextInput from '@/Components/Form/TextInput.vue';
 import Textarea from '@/Components/Form/TextArea.vue';
 import Checkbox from '@/Components/Form/Checkbox.vue';
+import FileInput from '@/Components/Form/FileInput.vue';
 
 const props = defineProps({
     studentProfile: Object,
@@ -16,6 +17,8 @@ const form = useForm({
     emergency_contact_phone: props.studentProfile.emergency_contact_phone ?? '',
     goals: props.studentProfile.goals ?? '',
     is_active: props.studentProfile.is_active,
+    avatar: null,
+    remove_avatar: false,
     ...(props.canViewMedical ? { medical_notes: props.studentProfile.medical_notes ?? '' } : {}),
 });
 
@@ -51,6 +54,13 @@ export default {
                 <Textarea v-model="form.medical_notes" />
             </Field>
             <p v-else class="ym-card-note">{{ $t('operations.medicalNotesRestricted') }}</p>
+            <Field :label="$t('operations.avatar')" :error="form.errors.avatar" :hint="$t('operations.avatarHint')">
+                <div class="ym-avatar-field">
+                    <img v-if="studentProfile.avatar_url && !form.remove_avatar" :src="studentProfile.avatar_url" class="ym-avatar-thumb" alt="" />
+                    <FileInput v-model="form.avatar" accept="image/jpeg,image/png,image/webp" />
+                </div>
+            </Field>
+            <Checkbox v-if="studentProfile.avatar_url" v-model="form.remove_avatar" :label="$t('operations.removeAvatar')" />
             <Checkbox v-model="form.is_active" :label="$t('operations.active')" />
 
             <div class="ym-actions">

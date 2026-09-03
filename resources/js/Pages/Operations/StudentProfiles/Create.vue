@@ -6,6 +6,7 @@ import TextInput from '@/Components/Form/TextInput.vue';
 import Select from '@/Components/Form/Select.vue';
 import Textarea from '@/Components/Form/TextArea.vue';
 import Checkbox from '@/Components/Form/Checkbox.vue';
+import FileInput from '@/Components/Form/FileInput.vue';
 
 const props = defineProps({
     users: Array,
@@ -21,6 +22,7 @@ const form = useForm({
     emergency_contact_phone: '',
     goals: '',
     is_active: true,
+    avatar: null,
     ...(props.canViewMedical ? { medical_notes: '' } : {}),
 });
 
@@ -59,6 +61,11 @@ export default {
                 <Textarea v-model="form.medical_notes" />
             </Field>
             <p v-else class="ym-card-note">{{ $t('operations.medicalNotesRestricted') }}</p>
+            <Field :label="$t('operations.avatar')" :error="form.errors.avatar" :hint="$t('operations.avatarHint')">
+                <div class="ym-avatar-field">
+                    <FileInput v-model="form.avatar" accept="image/jpeg,image/png,image/webp" />
+                </div>
+            </Field>
             <Checkbox v-model="form.is_active" :label="$t('operations.active')" />
 
             <div class="ym-actions">

@@ -59,6 +59,7 @@ export default {
             <table class="ym-table">
                 <thead>
                     <tr>
+                        <th class="ym-th">{{ $t('operations.avatar') }}</th>
                         <th class="ym-th">{{ $t('operations.studentUser') }}</th>
                         <th class="ym-th">{{ $t('operations.goals') }}</th>
                         <th class="ym-th">{{ $t('operations.status') }}</th>
@@ -67,6 +68,10 @@ export default {
                 </thead>
                 <tbody>
                     <tr v-for="profile in profiles.data" :key="profile.id" class="ym-tr">
+                        <td class="ym-td">
+                            <img v-if="profile.avatar_url" :src="profile.avatar_url" class="ym-avatar-thumb" alt="" />
+                            <span v-else class="ym-avatar-thumb ym-avatar-thumb--empty">{{ profile.user_name.charAt(0) }}</span>
+                        </td>
                         <td class="ym-td font-medium">{{ profile.user_name }}</td>
                         <td class="ym-td text-neutral-500">{{ profile.goals ?? '-' }}</td>
                         <td class="ym-td">
@@ -86,7 +91,7 @@ export default {
                         </td>
                     </tr>
                     <tr v-if="!profiles.data.length">
-                        <td class="ym-td text-neutral-500" :colspan="canManage ? 4 : 3">{{ $t('operations.noStudents') }}</td>
+                        <td class="ym-td text-neutral-500" :colspan="canManage ? 5 : 4">{{ $t('operations.noStudents') }}</td>
                     </tr>
                 </tbody>
             </table>
