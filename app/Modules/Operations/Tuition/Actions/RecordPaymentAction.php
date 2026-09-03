@@ -34,26 +34,20 @@ class RecordPaymentAction
             $payment = $locked->payments()->create([
                 'recorded_by_user_id' => $recordedBy->id,
                 'amount' => $amount,
+                'status' => 'recorded',
                 'method' => $validated['method'],
                 'paid_at' => $validated['paid_at'],
                 'reference' => $validated['reference'] ?? null,
                 'note' => $validated['note'] ?? null,
             ]);
 
-            $locked->update(['status' => $this->statusFor($locked)]);
+            if (! empty($validated['proof'])) {
+                $payment->addMedia($validated['proof'])->toMediaCollection('proof');
+            }
+
+            $locked->update(['status' => $locked->statusFromPayments()]);
 
             return $payment;
         });
-    }
-
-    private function statusFor(Invoice $invoice): string
-    {
-        $paid = (int) $invoice->payments()->sum('amount');
-
-        return match (true) {
-            $paid >= $invoice->total_amount => 'paid',
-            $paid > 0 => 'partial',
-            default => 'unpaid',
-        };
     }
 }
