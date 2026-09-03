@@ -34,6 +34,8 @@ class StoreLessonPlanRequest extends FormRequest
             'asana_sequence' => ['required', 'string', 'max:5000'],
             'duration_minutes' => ['required', 'integer', 'min:5', 'max:600'],
             'level' => ['required', Rule::in(LessonPlan::LEVELS)],
+            'attachments' => ['array', 'max:'.LessonPlan::MAX_ATTACHMENTS],
+            'attachments.*' => ['file', 'mimes:pdf,jpg,jpeg,png', 'mimetypes:application/pdf,image/jpeg,image/png', 'max:5120'],
         ];
     }
 }

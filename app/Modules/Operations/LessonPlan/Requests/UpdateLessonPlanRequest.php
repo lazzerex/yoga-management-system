@@ -34,6 +34,13 @@ class UpdateLessonPlanRequest extends FormRequest
             'asana_sequence' => ['required', 'string', 'max:5000'],
             'duration_minutes' => ['required', 'integer', 'min:5', 'max:600'],
             'level' => ['required', Rule::in(LessonPlan::LEVELS)],
+            'attachments' => ['array', function ($attribute, $value, $fail) {
+                $held = $this->route('lessonPlan')?->getMedia('attachments')->count() ?? 0;
+                if ($held + count($value ?? []) > LessonPlan::MAX_ATTACHMENTS) {
+                    $fail(__('operations.attachmentLimit', ['max' => LessonPlan::MAX_ATTACHMENTS]));
+                }
+            }],
+            'attachments.*' => ['file', 'mimes:pdf,jpg,jpeg,png', 'mimetypes:application/pdf,image/jpeg,image/png', 'max:5120'],
         ];
     }
 }
