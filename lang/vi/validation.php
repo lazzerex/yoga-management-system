@@ -149,6 +149,11 @@ return [
     ],
 
     'attributes' => [
+        'avatar' => 'ảnh',
+        'attachments' => 'tệp đính kèm',
+        'attachments.*' => 'tệp đính kèm',
+        'proof' => 'chứng từ thanh toán',
+        'void_reason' => 'lý do',
         'name' => 'tên',
         'username' => 'tên đăng nhập',
         'email' => 'email',

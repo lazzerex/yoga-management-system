@@ -78,4 +78,8 @@ return [
     'studentProfileHasEnrollments' => 'Không thể xóa hồ sơ học viên đã có đăng ký lớp. Hãy ngừng kích hoạt thay vì xóa.',
     'cannotDeleteUserHasCoachProfile' => 'Người dùng này đang có hồ sơ giáo viên. Hãy xóa hồ sơ trước khi xóa tài khoản.',
     'cannotDeleteUserHasStudentProfile' => 'Người dùng này đang có hồ sơ học viên. Hãy xóa hồ sơ trước khi xóa tài khoản.',
+
+    'fileDeleted' => 'Đã xoá tệp ":name".',
+    'paymentVoided' => 'Đã huỷ hiệu lực khoản thanh toán.',
+    'paymentAlreadyVoided' => 'Khoản thanh toán này đã bị huỷ hiệu lực.',
 ];

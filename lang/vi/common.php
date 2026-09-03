@@ -31,4 +31,5 @@ return [
     'openQuickMenu' => 'Mở menu nhanh',
     'openDashboardOptions' => 'Mở tùy chọn dashboard',
     'switchLang' => 'Chuyển sang tiếng Anh',
+    'clear' => 'Xoá',
 ];
