@@ -11,9 +11,11 @@ use App\Models\TuitionPlan;
 use App\Modules\Operations\Tuition\Actions\CreateInvoiceAction;
 use App\Modules\Operations\Tuition\Actions\DeleteInvoiceAction;
 use App\Modules\Operations\Tuition\Actions\RecordPaymentAction;
+use App\Modules\Operations\Tuition\Actions\VoidPaymentAction;
 use App\Modules\Operations\Tuition\Actions\WaiveInvoiceAction;
 use App\Modules\Operations\Tuition\Requests\StoreInvoiceRequest;
 use App\Modules\Operations\Tuition\Requests\StorePaymentRequest;
+use App\Modules\Operations\Tuition\Requests\VoidPaymentRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Response;
@@ -27,7 +29,7 @@ class InvoiceController extends Controller
         $canManage = $request->user()->can('operations.tuition.manage');
 
         $invoices = Invoice::with(['studentProfile.user:id,name', 'branch:id,name'])
-            ->withSum('payments', 'amount')
+            ->withSum('recordedPayments', 'amount')
             ->tap($scope)
             ->orderByDesc('id')
             ->paginate(20);
@@ -77,6 +79,8 @@ class InvoiceController extends Controller
             'branch:id,name',
             'items',
             'payments.recordedBy:id,name',
+            'payments.voidedBy:id,name',
+            'payments.media',
         ]);
 
         $canManage = $request->user()->can('operations.tuition.manage');
@@ -97,10 +101,20 @@ class InvoiceController extends Controller
                 'payments' => $invoice->payments->sortByDesc('paid_at')->values()->map(fn (Payment $payment) => [
                     'id' => $payment->id,
                     'amount' => $payment->amount,
+                    'status' => $payment->status,
                     'method' => $payment->method,
                     'paid_at' => $payment->paid_at->toIso8601String(),
                     'reference' => $payment->reference,
                     'recorded_by' => $payment->recordedBy?->name,
+                    'voided_at' => $payment->voided_at?->toIso8601String(),
+                    'voided_by' => $payment->voidedBy?->name,
+                    'void_reason' => $payment->void_reason,
+                    'proofUrl' => $payment->getFirstMedia('proof')
+                        ? route('operations.files.show', $payment->getFirstMedia('proof'))
+                        : null,
+                    'voidUrl' => $canManage && ! $payment->isVoided()
+                        ? route('operations.invoices.payments.void', [$invoice, $payment])
+                        : null,
                 ]),
             ],
             'methods' => Payment::METHODS,
@@ -118,6 +132,13 @@ class InvoiceController extends Controller
         $action->execute($invoice, $request->validated(), $request->user());
 
         return back()->with('success', ['key' => 'flash.paymentRecorded']);
+    }
+
+    public function voidPayment(VoidPaymentRequest $request, Invoice $invoice, Payment $payment, VoidPaymentAction $action): RedirectResponse
+    {
+        $action->execute($payment, $request->validated(), $request->user());
+
+        return back()->with('success', ['key' => 'flash.paymentVoided']);
     }
 
     public function waive(Invoice $invoice, WaiveInvoiceAction $action): RedirectResponse
@@ -147,7 +168,7 @@ class InvoiceController extends Controller
             fputcsv($handle, ['Invoice', 'Student', 'Branch', 'Issued', 'Due', 'Status', 'Total', 'Paid', 'Balance']);
 
             Invoice::with(['studentProfile.user:id,name', 'branch:id,name'])
-                ->withSum('payments', 'amount')
+                ->withSum('recordedPayments', 'amount')
                 ->tap($scope)
                 ->orderBy('id')
                 ->chunk(200, function ($invoices) use ($handle) {
@@ -196,10 +217,10 @@ class InvoiceController extends Controller
 
     private function stats(callable $scope): array
     {
-        $open = Invoice::query()->tap($scope)->open()->withSum('payments', 'amount')->get();
+        $open = Invoice::query()->tap($scope)->open()->withSum('recordedPayments', 'amount')->get();
 
         return [
-            'collected' => (int) Payment::whereHas('invoice', fn ($q) => $q->tap($scope))
+            'collected' => (int) Payment::recorded()->whereHas('invoice', fn ($q) => $q->tap($scope))
                 ->whereBetween('paid_at', [now()->startOfMonth(), now()->endOfMonth()])
                 ->sum('amount'),
             'outstanding' => (int) $open->sum(fn (Invoice $invoice) => $invoice->balance()),
