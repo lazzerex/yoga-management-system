@@ -32,7 +32,7 @@ class StudentProfileController extends Controller
                 ->whereHas('classSession', fn ($s) => $s->where('coach_profile_id', $coachProfileId))));
 
         // medical_notes intentionally excluded from the list query, not just the response shape.
-        $profiles = StudentProfile::with('user:id,name,username')
+        $profiles = StudentProfile::with(['user:id,name,username', 'media'])
             ->select(['id', 'user_id', 'goals', 'is_active'])
             ->tap($scope)
             ->orderBy('id')
@@ -46,6 +46,7 @@ class StudentProfileController extends Controller
                 'user_name' => $profile->user->name,
                 'goals' => $profile->goals,
                 'is_active' => $profile->is_active,
+                'avatar_url' => $this->avatarUrl($profile),
             ]),
             'stats' => [
                 'total' => StudentProfile::query()->tap($scope)->count(),
@@ -71,7 +72,7 @@ class StudentProfileController extends Controller
 
     public function edit(Request $request, StudentProfile $studentProfile): Response
     {
-        $studentProfile->load('user:id,name');
+        $studentProfile->load(['user:id,name', 'media']);
         $canViewMedical = $request->user()->can('operations.students.medical.view');
 
         if ($canViewMedical) {
@@ -87,6 +88,7 @@ class StudentProfileController extends Controller
                 'medical_notes' => $canViewMedical ? $studentProfile->medical_notes : null,
                 'goals' => $studentProfile->goals,
                 'is_active' => $studentProfile->is_active,
+                'avatar_url' => $this->avatarUrl($studentProfile),
             ],
             'canViewMedical' => $canViewMedical,
             'endpoints' => [
@@ -124,6 +126,13 @@ class StudentProfileController extends Controller
         return redirect()
             ->route('operations.students.index')
             ->with('success', ['key' => 'flash.studentProfileUpdated', 'params' => ['name' => $studentProfile->user->name]]);
+    }
+
+    private function avatarUrl(StudentProfile $profile): ?string
+    {
+        $avatar = $profile->getFirstMedia('avatar');
+
+        return $avatar ? route('operations.files.show', [$avatar, 'conversion' => 'thumb']) : null;
     }
 
     public function destroy(StudentProfile $studentProfile, DeleteStudentProfileAction $action): RedirectResponse
