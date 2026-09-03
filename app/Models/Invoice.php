@@ -49,9 +49,38 @@ class Invoice extends Model
         return $this->hasMany(Payment::class);
     }
 
+    /** Voided payments keep their row and their proof but leave every balance. */
+    public function recordedPayments(): HasMany
+    {
+        return $this->payments()->recorded();
+    }
+
     public function paidAmount(): int
     {
-        return (int) ($this->payments_sum_amount ?? $this->payments->sum('amount'));
+        if ($this->recorded_payments_sum_amount !== null) {
+            return (int) $this->recorded_payments_sum_amount;
+        }
+
+        if ($this->relationLoaded('payments')) {
+            return (int) $this->payments->where('status', 'recorded')->sum('amount');
+        }
+
+        return (int) $this->recordedPayments()->sum('amount');
+    }
+
+    public function statusFromPayments(): string
+    {
+        if ($this->status === 'waived') {
+            return 'waived';
+        }
+
+        $paid = (int) $this->recordedPayments()->sum('amount');
+
+        return match (true) {
+            $paid >= $this->total_amount => 'paid',
+            $paid > 0 => 'partial',
+            default => 'unpaid',
+        };
     }
 
     public function balance(): int
