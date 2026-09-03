@@ -53,18 +53,24 @@ const dismiss = (kind) => {
     dismissed.value[kind] = true;
 };
 
-watch(
-    () => [flash.value.success, flash.value.error, actionError.value],
-    () => {
-        dismissed.value = { success: false, error: false, action: false };
-        clearTimeout(successTimer);
+// An alert belongs to a response, not to a message: raising the same error twice
+// must announce it twice, so dismissals are cleared per visit rather than when the
+// text happens to change.
+const announce = () => {
+    dismissed.value = { success: false, error: false, action: false };
+    clearTimeout(successTimer);
 
-        if (flash.value.success) {
-            successTimer = setTimeout(() => dismiss('success'), 6000);
-        }
-    },
-    { immediate: true },
-);
+    if (flash.value.success) {
+        successTimer = setTimeout(() => dismiss('success'), 6000);
+    }
+};
+
+announce();
+
+// Keyed to the page Inertia actually applies, not to any request that finishes:
+// a hover prefetch completes without delivering props and must not resurrect a
+// dismissed alert, while a repeated identical error still arrives as fresh props.
+watch(() => page.props, announce);
 
 onBeforeUnmount(() => clearTimeout(successTimer));
 const userName = computed(() => page.props.auth?.user?.name ?? 'Guest');
