@@ -21,6 +21,7 @@ class StorePaymentRequest extends FormRequest
             'paid_at' => ['required', 'date'],
             'reference' => ['nullable', 'string', 'max:255'],
             'note' => ['nullable', 'string', 'max:255'],
+            'proof' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'mimetypes:application/pdf,image/jpeg,image/png', 'max:5120'],
         ];
     }
 }
