@@ -21,6 +21,12 @@ class DeleteBranchAction
             ]);
         }
 
+        if ($branch->tuitionPlans()->exists() || $branch->invoices()->exists()) {
+            throw ValidationException::withMessages([
+                'action' => __('flash.branchHasInvoices'),
+            ]);
+        }
+
         $branch->delete();
     }
 }
