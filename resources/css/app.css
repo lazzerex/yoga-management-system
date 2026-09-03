@@ -9,6 +9,7 @@
 @import './enrollment.css';
 @import './attendance.css';
 @import './lesson-plan.css';
+@import './tuition.css';
 @import './dashboard.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
