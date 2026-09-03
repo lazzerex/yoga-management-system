@@ -34,6 +34,8 @@ class DatabaseSeeder extends Seeder
             EnrollmentSeeder::class,
             AttendanceSeeder::class,
             LessonPlanSeeder::class,
+            TuitionPlanSeeder::class,
+            InvoiceSeeder::class,
         ]);
 
         // WithoutModelEvents suppresses the User::booted() saved hook during
