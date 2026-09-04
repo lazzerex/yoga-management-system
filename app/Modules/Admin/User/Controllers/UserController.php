@@ -2,6 +2,8 @@
 
 namespace App\Modules\Admin\User\Controllers;
 
+use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Modules\Admin\User\Actions\CreateUserAction;
 use App\Modules\Admin\User\Actions\DeleteUserAction;
 use App\Modules\Admin\User\Actions\UpdateUserAction;
@@ -9,8 +11,6 @@ use App\Modules\Admin\User\Actions\UpdateUserRoleAction;
 use App\Modules\Admin\User\Requests\StoreUserRequest;
 use App\Modules\Admin\User\Requests\UpdateUserRequest;
 use App\Modules\Admin\User\Requests\UpdateUserRoleRequest;
-use App\Http\Controllers\Controller;
-use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -19,7 +19,6 @@ use Inertia\Response;
 
 class UserController extends Controller
 {
-
     public function create(): Response
     {
         return inertia('Admin/Users/Create', [
@@ -47,14 +46,24 @@ class UserController extends Controller
         ]);
     }
 
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $search = $request->string('search')->toString();
+        $role = $request->string('role')->toString();
+        $sort = $request->string('sort')->toString();
+
         $users = User::withMax('loginLogs as last_login', 'logged_in_at')
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
+            ->when($search !== '', fn ($q) => $q->where(fn ($w) => $w
+                ->where('name', 'like', "%{$search}%")
+                ->orWhere('username', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%")))
+            ->when(in_array($role, ['admin', 'coach', 'member'], true), fn ($q) => $q->where('role', $role))
+            ->when($sort === 'last_login', fn ($q) => $q->orderByDesc('last_login'), fn ($q) => $q->orderBy('created_at', 'desc'))
+            ->paginate(20)
+            ->withQueryString();
 
         return inertia('Admin/Users/Index', [
-            'users' => $users->through(fn(User $user) => [
+            'users' => $users->through(fn (User $user) => [
                 'id' => $user->id,
                 'name' => $user->name,
                 'username' => $user->username,
@@ -65,8 +74,10 @@ class UserController extends Controller
                     ? Carbon::parse($user->last_login)->format('Y-m-d H:i')
                     : null,
             ]),
+            'filters' => ['search' => $search, 'role' => $role, 'sort' => $sort],
             'endpoints' => [
                 'create' => route('admin.users.create'),
+                'index' => route('admin.users.index'),
             ],
         ]);
     }
@@ -139,8 +150,6 @@ class UserController extends Controller
         return back()->with('success', ['key' => 'flash.userDeleted', 'params' => ['name' => $name]]);
     }
 
-
-
     private function deleteBlocked(string $key): never
     {
         throw ValidationException::withMessages(['action' => __($key)]);
@@ -169,5 +178,4 @@ class UserController extends Controller
 
         return User::where('role', 'admin')->count() <= 1;
     }
-
 }
