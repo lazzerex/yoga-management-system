@@ -16,13 +16,14 @@ class UpdateCoachProfileAction
         $coachProfile->update($validated);
         $coachProfile->classTypes()->sync($classTypeIds);
 
+        // The avatar hangs off the user, so it survives the profile being replaced.
         if ($removeAvatar) {
-            $coachProfile->clearMediaCollection('avatar');
+            $coachProfile->user->clearMediaCollection('avatar');
         }
 
         // The collection is singleFile, so a new upload replaces the one held.
         if ($avatar) {
-            $coachProfile->addMedia($avatar)->toMediaCollection('avatar');
+            $coachProfile->user->addMedia($avatar)->toMediaCollection('avatar');
         }
 
         return $coachProfile;
