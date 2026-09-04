@@ -3,13 +3,19 @@ import { ref } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import Modal from '@/Components/UI/Modal.vue';
+import FilterBar from '@/Components/UI/FilterBar.vue';
+import { useFilters } from '@/composables/useFilters.js';
 
-defineProps({
+const props = defineProps({
     profiles: Object,
     stats: Object,
+    filters: Object,
+    options: Object,
     endpoints: Object,
     canManage: Boolean,
 });
+
+const { filters, active, reset } = useFilters(props.endpoints.index, props.filters);
 
 const pendingDelete = ref(null);
 
@@ -54,6 +60,24 @@ export default {
                 {{ $t('operations.createCoach') }}
             </Link>
         </div>
+
+        <FilterBar :active="active" @reset="reset">
+            <input
+                v-model="filters.search"
+                type="search"
+                class="ym-log-search"
+                :placeholder="$t('operations.searchByName')"
+            />
+            <select v-model="filters.class_type_id" class="ym-log-filter-select">
+                <option value="">{{ $t('operations.allClassTypes') }}</option>
+                <option v-for="type in options.classTypes" :key="type.id" :value="type.id">{{ type.name }}</option>
+            </select>
+            <select v-model="filters.status" class="ym-log-filter-select">
+                <option value="">{{ $t('operations.allStatuses') }}</option>
+                <option value="active">{{ $t('operations.statusActive') }}</option>
+                <option value="inactive">{{ $t('operations.statusInactive') }}</option>
+            </select>
+        </FilterBar>
 
         <div class="ym-table-wrap">
             <table class="ym-table">
