@@ -28,4 +28,8 @@ return [
     'sessionsTotal' => 'Sessions Total',
     'mobile' => 'Mobile',
     'desktop' => 'Desktop',
+    'profilePicture' => 'Profile picture',
+    'pictureHint' => 'JPG, PNG or WebP, up to 2 MB.',
+    'accountDetails' => 'Account details',
+    'editAccount' => 'Edit details',
 ];
