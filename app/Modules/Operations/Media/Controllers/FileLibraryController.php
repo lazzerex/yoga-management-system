@@ -19,8 +19,7 @@ class FileLibraryController extends Controller
 {
     /** Keyed by the model that owns the file; the UI calls these folders. */
     private const KINDS = [
-        'coaches' => CoachProfile::class,
-        'students' => StudentProfile::class,
+        'people' => User::class,
         'lessonPlans' => LessonPlan::class,
         'payments' => Payment::class,
     ];
@@ -36,8 +35,7 @@ class FileLibraryController extends Controller
 
         $files = Media::query()
             ->with(['model' => fn (MorphTo $model) => $model->morphWith([
-                CoachProfile::class => ['user:id,name'],
-                StudentProfile::class => ['user:id,name'],
+                User::class => ['coachProfile:id,user_id', 'studentProfile:id,user_id'],
                 Payment::class => ['invoice:id,invoice_number'],
             ])])
             ->tap($scope)
@@ -71,25 +69,32 @@ class FileLibraryController extends Controller
 
         return function (Builder $query) use ($user, $coachProfileId) {
             $query->where(function (Builder $q) use ($user, $coachProfileId) {
-                $q->whereRaw('1 = 0');
+                // Own avatar first: every viewer keeps their own picture whatever else they hold.
+                $q->orWhere(fn (Builder $w) => $w
+                    ->where('model_type', User::class)
+                    ->where('model_id', $user->id));
+
+                if ($user->can('admin.users.view')) {
+                    $q->orWhere('model_type', User::class);
+                }
 
                 if ($user->can('operations.coaches.view')) {
-                    $q->orWhere('model_type', CoachProfile::class);
-                } elseif ($coachProfileId) {
                     $q->orWhere(fn (Builder $w) => $w
-                        ->where('model_type', CoachProfile::class)
-                        ->where('model_id', $coachProfileId));
+                        ->where('model_type', User::class)
+                        ->whereIn('model_id', CoachProfile::query()->select('user_id')));
                 }
 
                 if ($user->can('operations.students.view.any')) {
-                    $q->orWhere('model_type', StudentProfile::class);
+                    $q->orWhere(fn (Builder $w) => $w
+                        ->where('model_type', User::class)
+                        ->whereIn('model_id', StudentProfile::query()->select('user_id')));
                 } elseif ($user->can('operations.students.view') && $coachProfileId) {
                     $q->orWhere(fn (Builder $w) => $w
-                        ->where('model_type', StudentProfile::class)
+                        ->where('model_type', User::class)
                         ->whereIn('model_id', StudentProfile::whereHas('enrollments', fn ($e) => $e
                             ->where('status', 'booked')
                             ->whereHas('classSession', fn ($s) => $s->where('coach_profile_id', $coachProfileId)))
-                            ->select('id')));
+                            ->select('user_id')));
                 }
 
                 if ($user->can('operations.plans.view.any')) {
@@ -151,7 +156,7 @@ class FileLibraryController extends Controller
         $owner = $media->model;
 
         return match (true) {
-            $owner instanceof CoachProfile, $owner instanceof StudentProfile => $owner->user->name,
+            $owner instanceof User => $owner->name,
             $owner instanceof LessonPlan => $owner->title,
             $owner instanceof Payment => $owner->invoice->invoice_number,
             default => '-',
