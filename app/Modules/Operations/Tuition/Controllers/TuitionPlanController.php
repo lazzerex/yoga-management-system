@@ -11,19 +11,33 @@ use App\Modules\Operations\Tuition\Actions\UpdateTuitionPlanAction;
 use App\Modules\Operations\Tuition\Requests\StoreTuitionPlanRequest;
 use App\Modules\Operations\Tuition\Requests\UpdateTuitionPlanRequest;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Response;
 
 class TuitionPlanController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $plans = TuitionPlan::with('branch:id,name')->orderBy('name')->paginate(20);
+        $search = $request->string('search')->toString();
+        $type = $request->string('type')->toString();
+        $status = $request->string('status')->toString();
+
+        $plans = TuitionPlan::with('branch:id,name')
+            ->when($search !== '', fn ($q) => $q->where('name', 'like', "%{$search}%"))
+            ->when(in_array($type, TuitionPlan::TYPES, true), fn ($q) => $q->where('type', $type))
+            ->when(in_array($status, ['active', 'inactive'], true), fn ($q) => $q->where('is_active', $status === 'active'))
+            ->orderBy('name')
+            ->paginate(20)
+            ->withQueryString();
 
         return inertia('Operations/Tuition/Plans/Index', [
             'plans' => $plans->through(fn (TuitionPlan $plan) => $this->row($plan)),
+            'filters' => ['search' => $search, 'type' => $type, 'status' => $status],
+            'options' => ['types' => TuitionPlan::TYPES],
             'endpoints' => [
                 'create' => route('operations.tuition-plans.create'),
                 'invoices' => route('operations.tuition-fees'),
+                'index' => route('operations.tuition-plans.index'),
             ],
         ]);
     }
