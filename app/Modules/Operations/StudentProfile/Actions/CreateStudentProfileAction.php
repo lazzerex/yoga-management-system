@@ -14,7 +14,7 @@ class CreateStudentProfileAction
         $profile = StudentProfile::create($validated);
 
         if ($avatar) {
-            $profile->addMedia($avatar)->toMediaCollection('avatar');
+            $profile->user->addMedia($avatar)->toMediaCollection('avatar');
         }
 
         return $profile;
