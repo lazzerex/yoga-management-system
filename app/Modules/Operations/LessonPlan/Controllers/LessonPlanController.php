@@ -32,10 +32,20 @@ class LessonPlanController extends Controller
         $user = $request->user();
         $scope = $this->visibleScope($request);
 
+        $search = $request->string('search')->toString();
+        $status = $request->string('status')->toString();
+        $classTypeId = $request->integer('class_type_id');
+        $coachProfileId = $request->integer('coach_profile_id');
+
         $plans = LessonPlan::with(['classType:id,name', 'branch:id,name', 'coachProfile.user:id,name'])
             ->tap($scope)
+            ->when($search !== '', fn ($q) => $q->where('title', 'like', "%{$search}%"))
+            ->when(in_array($status, LessonPlan::STATUSES, true), fn ($q) => $q->where('status', $status))
+            ->when($classTypeId, fn ($q) => $q->where('class_type_id', $classTypeId))
+            ->when($coachProfileId, fn ($q) => $q->where('coach_profile_id', $coachProfileId))
             ->orderByDesc('id')
-            ->paginate(20);
+            ->paginate(20)
+            ->withQueryString();
 
         $counts = LessonPlan::query()->tap($scope)
             ->selectRaw('status, count(*) as total')
@@ -49,9 +59,25 @@ class LessonPlanController extends Controller
             'plans' => $plans->through(fn (LessonPlan $plan) => $this->row($plan)),
             'stats' => collect(LessonPlan::STATUSES)->mapWithKeys(fn (string $status) => [$status => (int) ($counts[$status] ?? 0)]),
             'canManage' => $canManage,
+            'filters' => [
+                'search' => $search,
+                'status' => $status,
+                'class_type_id' => $classTypeId ?: '',
+                'coach_profile_id' => $coachProfileId ?: '',
+            ],
+            'options' => [
+                'statuses' => LessonPlan::STATUSES,
+                'classTypes' => ClassType::active()->orderBy('name')->get(['id', 'name']),
+                'coaches' => $canReview
+                    ? CoachProfile::active()->with('user:id,name')->get()
+                        ->map(fn (CoachProfile $profile) => ['id' => $profile->id, 'name' => $profile->user->name])
+                        ->sortBy('name')->values()
+                    : [],
+            ],
             'endpoints' => [
                 'create' => $canManage ? route('operations.lesson-plans.create') : null,
                 'pending' => $canReview ? route('operations.lesson-plans.pending') : null,
+                'index' => route('operations.lesson-planning'),
             ],
         ]);
     }
