@@ -3,6 +3,7 @@
 use App\Modules\Admin\AuditLog\Controllers\AuditLogController;
 use App\Modules\Admin\LoginLog\Controllers\LoginLogController;
 use App\Modules\Admin\User\Controllers\UserController;
+use App\Modules\Dashboard\Controllers\DashboardController;
 use App\Modules\Operations\Attendance\Controllers\AttendanceController;
 use App\Modules\Operations\Branch\Controllers\BranchController;
 use App\Modules\Operations\ClassSchedule\Controllers\ClassScheduleController;
@@ -31,8 +32,9 @@ Route::prefix('cms')->group(function () {
     });
 
     Route::middleware(['auth'])->group(function () {
-        Route::get('/dashboard', fn () => inertia('Dashboard'))->name('cms.dashboard');
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('cms.dashboard');
         Route::get('/profile', [ProfileController::class, 'show'])->name('cms.profile.show');
+        Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('cms.profile.avatar');
 
         Route::prefix('operations')->name('operations.')->group(function () {
             Route::middleware('permission:operations.center.view')->group(function () {
