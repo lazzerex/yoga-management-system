@@ -15,12 +15,12 @@ class UpdateStudentProfileAction
         $studentProfile->update($validated);
 
         if ($removeAvatar) {
-            $studentProfile->clearMediaCollection('avatar');
+            $studentProfile->user->clearMediaCollection('avatar');
         }
 
         // The collection is singleFile, so a new upload replaces the one held.
         if ($avatar) {
-            $studentProfile->addMedia($avatar)->toMediaCollection('avatar');
+            $studentProfile->user->addMedia($avatar)->toMediaCollection('avatar');
         }
 
         return $studentProfile;
