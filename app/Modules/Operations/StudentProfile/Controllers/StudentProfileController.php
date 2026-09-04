@@ -32,11 +32,19 @@ class StudentProfileController extends Controller
                 ->whereHas('classSession', fn ($s) => $s->where('coach_profile_id', $coachProfileId))));
 
         // medical_notes intentionally excluded from the list query, not just the response shape.
-        $profiles = StudentProfile::with(['user:id,name,username', 'media'])
+        $search = $request->string('search')->toString();
+        $status = $request->string('status')->toString();
+
+        $profiles = StudentProfile::with(['user:id,name,username', 'user.media'])
             ->select(['id', 'user_id', 'goals', 'is_active'])
             ->tap($scope)
+            ->when($search !== '', fn ($q) => $q->whereHas('user', fn ($u) => $u
+                ->where('name', 'like', "%{$search}%")
+                ->orWhere('username', 'like', "%{$search}%")))
+            ->when(in_array($status, ['active', 'inactive'], true), fn ($q) => $q->where('is_active', $status === 'active'))
             ->orderBy('id')
-            ->paginate(20);
+            ->paginate(20)
+            ->withQueryString();
         $canManage = $user->can('operations.students.manage');
 
         return inertia('Operations/StudentProfiles/Index', [
@@ -52,8 +60,10 @@ class StudentProfileController extends Controller
                 'total' => StudentProfile::query()->tap($scope)->count(),
                 'active' => StudentProfile::active()->tap($scope)->count(),
             ],
+            'filters' => ['search' => $search, 'status' => $status],
             'endpoints' => [
                 'create' => $canManage ? route('operations.students.create') : null,
+                'index' => route('operations.students.index'),
             ],
         ]);
     }
@@ -72,7 +82,7 @@ class StudentProfileController extends Controller
 
     public function edit(Request $request, StudentProfile $studentProfile): Response
     {
-        $studentProfile->load(['user:id,name', 'media']);
+        $studentProfile->load(['user:id,name', 'user.media']);
         $canViewMedical = $request->user()->can('operations.students.medical.view');
 
         if ($canViewMedical) {
@@ -130,7 +140,7 @@ class StudentProfileController extends Controller
 
     private function avatarUrl(StudentProfile $profile): ?string
     {
-        $avatar = $profile->getFirstMedia('avatar');
+        $avatar = $profile->user->getFirstMedia('avatar');
 
         return $avatar ? route('operations.files.show', [$avatar, 'conversion' => 'thumb']) : null;
     }
