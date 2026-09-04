@@ -11,6 +11,9 @@ importers:
       '@inertiajs/vue3':
         specifier: ^3.0.3
         version: 3.0.3(axios@1.15.1)(vue@3.5.32)
+      apexcharts:
+        specifier: ^7.1.0
+        version: 7.1.0
       axios:
         specifier: ^1.15.0
         version: 1.15.1
@@ -23,6 +26,9 @@ importers:
       vue:
         specifier: ^3.5.32
         version: 3.5.32
+      vue3-apexcharts:
+        specifier: ^1.11.1
+        version: 1.11.1(apexcharts@7.1.0)(vue@3.5.32)
       vuedraggable:
         specifier: ^4.1.0
         version: 4.1.0(vue@3.5.32)
@@ -356,6 +362,13 @@ packages:
   ansi-styles@4.3.0:
     resolution: {integrity: sha512-zbB9rCJAT1rbjiVDb2hqKFHNYLxgtk8NURxZ3IZwD3F6NtxbXZQCnnSi1Lkx+IDohdPlFp222wVALIheZJQSEg==}
     engines: {node: '>=8'}
+
+  apex-commons@0.5.0:
+    resolution: {integrity: sha512-xz83SgPREE1wGtoflvxjwJtcjzl5bKTz2/bDxWCZNL6QVjUNE47kMg/1Zqt0bSh6eOnmFCWlTDc3RU8o85N+wg==}
+
+  apexcharts@7.1.0:
+    resolution: {integrity: sha512-zO43jUhHBNz+riahvkVvlqYw8Zpog5KtpdVSc9PbvOiXAmPBaSSoleUtO83NktObHZ9LnNt3M4MdYx7m+aSDMw==}
+    engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
 
   asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
@@ -760,6 +773,12 @@ packages:
       yaml:
         optional: true
 
+  vue3-apexcharts@1.11.1:
+    resolution: {integrity: sha512-MbN3vg8bMG19wc0Lm1HkeQvODgLm56DgpIxtNUO0xpf/JCzYWVGE4jzXp2JISzy2s3Kul1yOxNQUYsLvKQ5L9g==}
+    peerDependencies:
+      apexcharts: '>=5.10.0'
+      vue: '>=3.0.0'
+
   vue@3.5.32:
     resolution: {integrity: sha512-vM4z4Q9tTafVfMAK7IVzmxg34rSzTFMyIe0UUEijUCkn9+23lj0WRfA83dg7eQZIUlgOSGrkViIaCfqSAUXsMw==}
     peerDependencies:
@@ -1059,6 +1078,12 @@ snapshots:
   ansi-styles@4.3.0:
     dependencies:
       color-convert: 2.0.1
+
+  apex-commons@0.5.0: {}
+
+  apexcharts@7.1.0:
+    dependencies:
+      apex-commons: 0.5.0
 
   asynckit@0.4.0: {}
 
@@ -1388,6 +1413,11 @@ snapshots:
     optionalDependencies:
       fsevents: 2.3.3
       jiti: 2.6.1
+
+  vue3-apexcharts@1.11.1(apexcharts@7.1.0)(vue@3.5.32):
+    dependencies:
+      apexcharts: 7.1.0
+      vue: 3.5.32
 
   vue@3.5.32:
     dependencies:
