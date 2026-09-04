@@ -1,49 +1,40 @@
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
-import { route } from 'ziggy-js';
 import { getActiveLanguage } from 'laravel-vue-i18n';
+import FilterBar from '@/Components/UI/FilterBar.vue';
+import { useFilters } from '@/composables/useFilters.js';
 
 const props = defineProps({
     sessions: Array,
     filters: Object,
+    options: Object,
     stats: Object,
     endpoints: Object,
 });
 
-const date = ref(props.filters.date);
+// The date is part of the filter set, so moving day keeps the coach and status choices.
+const { filters, active, reset } = useFilters(props.endpoints.index, props.filters, []);
 const busyId = ref(null);
-
-watch(date, (value) => {
-    if (!value || value === props.filters.date) {
-        return;
-    }
-
-    router.get(route('operations.teacher-attendance'), { date: value }, {
-        preserveState: true,
-        preserveScroll: true,
-        replace: true,
-    });
-});
 
 // Local parts, not toISOString(): UTC conversion lands on the wrong day east of GMT.
 const ymd = (date) =>
     `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
 const shiftDate = (days) => {
-    const next = new Date(`${date.value}T00:00:00`);
+    const next = new Date(`${filters.value.date}T00:00:00`);
     next.setDate(next.getDate() + days);
-    date.value = ymd(next);
+    filters.value.date = ymd(next);
 };
 
 const goToToday = () => {
-    date.value = ymd(new Date());
+    filters.value.date = ymd(new Date());
 };
 
 const locale = () => (getActiveLanguage() === 'vi' ? 'vi-VN' : 'en-US');
 
 const longDate = computed(() =>
-    new Intl.DateTimeFormat(locale(), { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date(`${date.value}T00:00:00`)),
+    new Intl.DateTimeFormat(locale(), { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date(`${filters.value.date}T00:00:00`)),
 );
 
 const clockTime = (value) =>
@@ -102,7 +93,7 @@ export default {
                     <button type="button" class="ym-btn-icon-btn" :title="$t('operations.attendancePrevDay')" @click="shiftDate(-1)">
                         <i class="bi bi-chevron-left" />
                     </button>
-                    <input v-model="date" type="date" class="ym-log-filter-select" />
+                    <input v-model="filters.date" type="date" class="ym-log-filter-select" />
                     <button type="button" class="ym-btn-icon-btn" :title="$t('operations.attendanceNextDay')" @click="shiftDate(1)">
                         <i class="bi bi-chevron-right" />
                     </button>
@@ -116,6 +107,19 @@ export default {
                 </div>
             </div>
             <div class="ym-pane-body">
+                <FilterBar :active="active" @reset="reset">
+                    <select v-if="options.coaches.length" v-model="filters.coach_profile_id" class="ym-log-filter-select">
+                        <option value="">{{ $t('operations.allCoaches') }}</option>
+                        <option v-for="coach in options.coaches" :key="coach.id" :value="coach.id">{{ coach.name }}</option>
+                    </select>
+                    <select v-model="filters.status" class="ym-log-filter-select">
+                        <option value="">{{ $t('operations.allStatuses') }}</option>
+                        <option value="scheduled">{{ $t('operations.statusScheduled') }}</option>
+                        <option value="cancelled">{{ $t('operations.statusCancelled') }}</option>
+                        <option value="done">{{ $t('operations.statusDone') }}</option>
+                    </select>
+                </FilterBar>
+
                 <div class="ym-table-wrap">
                     <table class="ym-table">
                         <thead>
