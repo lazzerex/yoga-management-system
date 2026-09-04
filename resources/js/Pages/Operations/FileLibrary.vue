@@ -1,9 +1,10 @@
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { ref } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
 import { trans as t } from 'laravel-vue-i18n';
 import Modal from '@/Components/UI/Modal.vue';
 import { formatBytes } from '@/composables/useBytes.js';
+import { useFilters } from '@/composables/useFilters.js';
 
 const props = defineProps({
     files: Object,
@@ -13,34 +14,18 @@ const props = defineProps({
     endpoints: Object,
 });
 
-const search = ref(props.filters?.search ?? '');
-const kind = ref(props.filters?.kind ?? '');
 const pendingDelete = ref(null);
 
-const hasActiveFilters = computed(() => search.value || kind.value);
+const { filters, active, reset } = useFilters(props.endpoints.index, {
+    search: props.filters?.search,
+    kind: props.filters?.kind,
+});
 
 const kindLabel = (value) => t(`operations.fileKind${value.charAt(0).toUpperCase()}${value.slice(1)}`);
 const formatDate = (value) => (value ? new Date(value).toLocaleDateString() : '-');
 
-let searchTimeout = null;
-
-const applyFilters = () => {
-    router.get(props.endpoints.index, {
-        search: search.value || undefined,
-        kind: kind.value || undefined,
-    }, { preserveState: true, preserveScroll: true, replace: true });
-};
-
-watch(search, () => {
-    clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(applyFilters, 350);
-});
-
-watch(kind, applyFilters);
-
-const resetFilters = () => {
-    search.value = '';
-    kind.value = '';
+const toggleFolder = (folderKind) => {
+    filters.value.kind = filters.value.kind === folderKind ? '' : folderKind;
 };
 
 const confirmDelete = () => {
@@ -78,8 +63,8 @@ export default {
                 v-for="folder in folders"
                 :key="folder.kind"
                 type="button"
-                :class="['ym-folder', { 'ym-folder--active': kind === folder.kind }]"
-                @click="kind = kind === folder.kind ? '' : folder.kind"
+                :class="['ym-folder', { 'ym-folder--active': filters.kind === folder.kind }]"
+                @click="toggleFolder(folder.kind)"
             >
                 <i class="bi bi-folder ym-pane-icon" />
                 <span class="ym-folder-name">{{ kindLabel(folder.kind) }}</span>
@@ -98,8 +83,8 @@ export default {
                 <p class="ym-subtitle">{{ $t('operations.fileLibrarySubtitle') }}</p>
             </div>
             <div class="ym-inline-actions">
-                <input v-model="search" type="search" class="ym-input" :placeholder="$t('common.search')" />
-                <button v-if="hasActiveFilters" type="button" class="ym-btn-ghost" @click="resetFilters">
+                <input v-model="filters.search" type="search" class="ym-input" :placeholder="$t('common.search')" />
+                <button v-if="active" type="button" class="ym-btn-ghost" @click="reset">
                     {{ $t('common.clearFilters') }}
                 </button>
             </div>
