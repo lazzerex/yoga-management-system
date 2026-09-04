@@ -20,13 +20,22 @@ class BranchController extends Controller
     public function index(Request $request): Response
     {
         $currentBranchId = $request->attributes->get('currentBranch')?->id;
+        $search = $request->string('search')->toString();
+        $status = $request->string('status')->toString();
 
-        $branches = Branch::orderBy('name')->paginate(20, pageName: 'branchesPage');
+        // One search box drives all three tabs: they are three views of the same centre.
+        $filter = fn ($query) => $query
+            ->when($search !== '', fn ($q) => $q->where('name', 'like', "%{$search}%"))
+            ->when(in_array($status, ['active', 'inactive'], true), fn ($q) => $q->where('is_active', $status === 'active'));
+
+        $branches = Branch::query()->tap($filter)->orderBy('name')->paginate(20, pageName: 'branchesPage')->withQueryString();
         $rooms = Room::with('branch:id,name')
             ->when($currentBranchId, fn ($q) => $q->where('branch_id', $currentBranchId))
+            ->tap($filter)
             ->orderBy('name')
-            ->paginate(20, pageName: 'roomsPage');
-        $classTypes = ClassType::orderBy('name')->paginate(20, pageName: 'classTypesPage');
+            ->paginate(20, pageName: 'roomsPage')
+            ->withQueryString();
+        $classTypes = ClassType::query()->tap($filter)->orderBy('name')->paginate(20, pageName: 'classTypesPage')->withQueryString();
         $canManage = $request->user()->can('operations.center.manage');
 
         return inertia('Operations/YogaCenter', [
@@ -64,10 +73,12 @@ class BranchController extends Controller
                 'total' => ClassType::count(),
                 'active' => ClassType::active()->count(),
             ],
+            'filters' => ['search' => $search, 'status' => $status],
             'endpoints' => [
                 'createBranch' => $canManage ? route('operations.branches.create') : null,
                 'createRoom' => $canManage ? route('operations.rooms.create') : null,
                 'createClassType' => $canManage ? route('operations.class-types.create') : null,
+                'index' => route('operations.yoga-center'),
             ],
         ]);
     }
