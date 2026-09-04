@@ -1,24 +1,18 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
-import { route } from 'ziggy-js';
 import { trans as t, getActiveLanguage } from 'laravel-vue-i18n';
 import Modal from '@/Components/UI/Modal.vue';
+import FilterBar from '@/Components/UI/FilterBar.vue';
+import { useFilters } from '@/composables/useFilters.js';
 
 const props = defineProps({
     enrollments: Object,
     filters: Object,
+    endpoints: Object,
 });
 
-const status = ref(props.filters.status ?? '');
-
-watch(status, (value) => {
-    router.get(route('operations.enrollments.index'), value ? { status: value } : {}, {
-        preserveState: true,
-        preserveScroll: true,
-        replace: true,
-    });
-});
+const { filters, active, reset } = useFilters(props.endpoints.index, props.filters);
 
 const locale = () => (getActiveLanguage() === 'vi' ? 'vi-VN' : 'en-US');
 
@@ -60,13 +54,24 @@ export default {
                 </h2>
                 <p class="ym-subtitle">{{ $t('operations.manageEnrollments') }}</p>
             </div>
-            <select v-model="status" class="ym-log-filter-select">
+        </div>
+
+        <FilterBar :active="active" @reset="reset">
+            <input
+                v-model="filters.search"
+                type="search"
+                class="ym-log-search"
+                :placeholder="$t('operations.searchByName')"
+            />
+            <select v-model="filters.status" class="ym-log-filter-select">
                 <option value="">{{ $t('operations.allStatuses') }}</option>
                 <option value="booked">{{ $t('operations.enrollmentStatusBooked') }}</option>
                 <option value="waitlisted">{{ $t('operations.enrollmentStatusWaitlisted') }}</option>
                 <option value="cancelled">{{ $t('operations.enrollmentStatusCancelled') }}</option>
             </select>
-        </div>
+            <input v-model="filters.from" type="date" class="ym-log-filter-select" :aria-label="$t('operations.fromDate')" />
+            <input v-model="filters.to" type="date" class="ym-log-filter-select" :aria-label="$t('operations.toDate')" />
+        </FilterBar>
 
         <div class="ym-table-wrap">
             <table class="ym-table">
