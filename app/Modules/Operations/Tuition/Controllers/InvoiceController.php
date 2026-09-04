@@ -11,6 +11,7 @@ use App\Models\TuitionPlan;
 use App\Modules\Operations\Tuition\Actions\CreateInvoiceAction;
 use App\Modules\Operations\Tuition\Actions\DeleteInvoiceAction;
 use App\Modules\Operations\Tuition\Actions\RecordPaymentAction;
+use App\Modules\Operations\Tuition\Actions\TuitionStatsAction;
 use App\Modules\Operations\Tuition\Actions\VoidPaymentAction;
 use App\Modules\Operations\Tuition\Actions\WaiveInvoiceAction;
 use App\Modules\Operations\Tuition\Requests\StoreInvoiceRequest;
@@ -23,24 +24,37 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class InvoiceController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request, TuitionStatsAction $stats): Response
     {
         $scope = $this->branchScope($request);
         $canManage = $request->user()->can('operations.tuition.manage');
 
+        $search = $request->string('search')->toString();
+        $status = $request->string('status')->toString();
+        $overdue = $request->boolean('overdue');
+
         $invoices = Invoice::with(['studentProfile.user:id,name', 'branch:id,name'])
             ->withSum('recordedPayments', 'amount')
             ->tap($scope)
+            ->when($search !== '', fn ($q) => $q->where(fn ($w) => $w
+                ->where('invoice_number', 'like', "%{$search}%")
+                ->orWhereHas('studentProfile.user', fn ($u) => $u->where('name', 'like', "%{$search}%"))))
+            ->when(in_array($status, Invoice::STATUSES, true), fn ($q) => $q->where('status', $status))
+            ->when($overdue, fn ($q) => $q->overdue())
             ->orderByDesc('id')
-            ->paginate(20);
+            ->paginate(20)
+            ->withQueryString();
 
         return inertia('Operations/TuitionFees', [
             'invoices' => $invoices->through(fn (Invoice $invoice) => $this->row($invoice)),
-            'stats' => $this->stats($scope),
+            'stats' => $stats->execute($request->attributes->get('currentBranch')?->id),
+            'filters' => ['search' => $search, 'status' => $status, 'overdue' => $overdue ? '1' : ''],
+            'options' => ['statuses' => Invoice::STATUSES],
             'endpoints' => [
                 'create' => $canManage ? route('operations.invoices.create') : null,
                 'plans' => $canManage ? route('operations.tuition-plans.index') : null,
                 'export' => route('operations.invoices.export'),
+                'index' => route('operations.tuition-fees'),
             ],
         ]);
     }
@@ -212,20 +226,6 @@ class InvoiceController extends Controller
             'paid_amount' => $invoice->paidAmount(),
             'balance' => $invoice->balance(),
             'showUrl' => route('operations.invoices.show', $invoice->id),
-        ];
-    }
-
-    private function stats(callable $scope): array
-    {
-        $open = Invoice::query()->tap($scope)->open()->withSum('recordedPayments', 'amount')->get();
-
-        return [
-            'collected' => (int) Payment::recorded()->whereHas('invoice', fn ($q) => $q->tap($scope))
-                ->whereBetween('paid_at', [now()->startOfMonth(), now()->endOfMonth()])
-                ->sum('amount'),
-            'outstanding' => (int) $open->sum(fn (Invoice $invoice) => $invoice->balance()),
-            'openCount' => $open->count(),
-            'overdueCount' => Invoice::query()->tap($scope)->overdue()->count(),
         ];
     }
 }
