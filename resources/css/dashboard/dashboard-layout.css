@@ -19,6 +19,32 @@
     .ym-dashlet-span-8,
     .ym-dashlet-span-12 { grid-column: span 12; }
 
+    /* Analytics views, unlike the draggable board, read as a fixed rhythm: a row of
+       four figures, then paired cards. Rows stretch so two cards of unequal content
+       still line up, and the card body centres inside whatever height the row takes. */
+    .ym-analytics-grid {
+        display: grid;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        gap: 0.88rem;
+        align-items: stretch;
+    }
+
+    .ym-analytics-card {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .ym-analytics-card > .ym-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .ym-analytics-card > .ym-section > * {
+        width: 100%;
+    }
+
     .ym-dashlet-end-target {
         border: 1px dashed #b2c4d9;
         background:
