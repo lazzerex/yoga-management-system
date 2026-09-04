@@ -3,6 +3,9 @@
 namespace App\Modules\Profile\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Modules\Profile\Requests\UpdateAvatarRequest;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Inertia\Response;
@@ -13,7 +16,7 @@ class ProfileController extends Controller
     {
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
             abort(401);
         }
 
@@ -34,6 +37,7 @@ class ProfileController extends Controller
         return inertia('Profile/Show', [
             'profile' => [
                 'name' => $user->name,
+                'avatar_url' => $this->avatarUrl($user),
                 'username' => $user->username,
                 'email' => $user->email,
                 'role' => $user->role,
@@ -50,6 +54,34 @@ class ProfileController extends Controller
                     : null,
             ],
             'recentLogins' => $recentLogins,
+            'endpoints' => [
+                'avatar' => route('cms.profile.avatar'),
+                'account' => route('user-profile-information.update'),
+            ],
         ]);
+    }
+
+    public function updateAvatar(UpdateAvatarRequest $request): RedirectResponse
+    {
+        $user = $request->user();
+        $validated = $request->validated();
+
+        if ($validated['remove_avatar'] ?? false) {
+            $user->clearMediaCollection('avatar');
+        }
+
+        // The collection is singleFile, so a new upload replaces the one held.
+        if ($validated['avatar'] ?? null) {
+            $user->addMedia($validated['avatar'])->toMediaCollection('avatar');
+        }
+
+        return back()->with('success', ['key' => 'flash.avatarUpdated']);
+    }
+
+    private function avatarUrl(User $user): ?string
+    {
+        $avatar = $user->getFirstMedia('avatar');
+
+        return $avatar ? route('operations.files.show', [$avatar, 'conversion' => 'thumb']) : null;
     }
 }
