@@ -5,10 +5,13 @@ namespace App\Modules\Operations\ClassSession\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\ClassSchedule;
 use App\Models\ClassSession;
+use App\Models\ClassType;
 use App\Models\CoachProfile;
 use App\Models\Room;
+use App\Modules\Operations\ClassSession\Actions\CoachWeeklyScheduleAction;
 use App\Modules\Operations\ClassSession\Actions\UpdateClassSessionAction;
 use App\Modules\Operations\ClassSession\Requests\UpdateClassSessionRequest;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -19,13 +22,24 @@ class ClassSessionController extends Controller
     public function index(Request $request): Response
     {
         $branchId = $request->attributes->get('currentBranch')?->id;
+        $classTypeId = $request->integer('class_type_id');
+        $coachProfileId = $request->integer('coach_profile_id');
+        $status = $request->string('status')->toString();
+        $from = $this->validDate($request->string('from')->toString());
+        $to = $this->validDate($request->string('to')->toString());
 
         $sessions = ClassSession::with(['branch:id,name', 'room:id,name', 'classType:id,name', 'coachProfile.user:id,name'])
-            ->upcoming()
+            ->when($from === null, fn ($q) => $q->upcoming())
             ->when($branchId, fn ($q) => $q->where('branch_id', $branchId))
+            ->when($classTypeId, fn ($q) => $q->where('class_type_id', $classTypeId))
+            ->when($coachProfileId, fn ($q) => $q->where('coach_profile_id', $coachProfileId))
+            ->when(in_array($status, ['scheduled', 'cancelled', 'done'], true), fn ($q) => $q->where('status', $status))
+            ->when($from, fn ($q) => $q->where('session_date', '>=', $from))
+            ->when($to, fn ($q) => $q->where('session_date', '<=', $to))
             ->orderBy('session_date')
             ->orderBy('start_time')
-            ->paginate(20, pageName: 'sessionsPage');
+            ->paginate(20, pageName: 'sessionsPage')
+            ->withQueryString();
 
         $schedules = ClassSchedule::with(['branch:id,name', 'room:id,name', 'classType:id,name', 'coachProfile.user:id,name'])
             ->when($branchId, fn ($q) => $q->where('branch_id', $branchId))
@@ -68,9 +82,23 @@ class ClassSessionController extends Controller
                 'activeSchedules' => ClassSchedule::active()
                     ->when($branchId, fn ($q) => $q->where('branch_id', $branchId))->count(),
             ],
+            'filters' => [
+                'class_type_id' => $classTypeId ?: '',
+                'coach_profile_id' => $coachProfileId ?: '',
+                'status' => $status,
+                'from' => $from ?? '',
+                'to' => $to ?? '',
+            ],
+            'options' => [
+                'classTypes' => ClassType::active()->orderBy('name')->get(['id', 'name']),
+                'coaches' => CoachProfile::active()->with('user:id,name')->get()
+                    ->map(fn (CoachProfile $profile) => ['id' => $profile->id, 'name' => $profile->user->name])
+                    ->sortBy('name')->values(),
+            ],
             'endpoints' => [
                 'createSchedule' => $canManage ? route('operations.class-schedules.create') : null,
                 'generateSessions' => $canManage ? route('operations.class-schedules.generate-sessions') : null,
+                'index' => route('operations.academy'),
             ],
         ]);
     }
@@ -112,31 +140,10 @@ class ClassSessionController extends Controller
             ->with('success', ['key' => 'flash.classSessionUpdated']);
     }
 
-    public function myTeachingSchedule(Request $request): Response
+    public function myTeachingSchedule(Request $request, CoachWeeklyScheduleAction $schedule): Response
     {
-        $coachProfile = $request->user()->coachProfile;
-
-        $sessions = $coachProfile
-            ? ClassSession::with(['branch:id,name', 'room:id,name', 'classType:id,name'])
-                ->withCount(['enrollments as booked_count' => fn ($q) => $q->where('status', 'booked')])
-                ->where('coach_profile_id', $coachProfile->id)
-                ->where('status', '!=', 'cancelled')
-                ->whereBetween('session_date', [now()->toDateString(), now()->addDays(6)->toDateString()])
-                ->orderBy('session_date')
-                ->orderBy('start_time')
-                ->get()
-            : collect();
-
         return inertia('Coach/MyTeachingSchedule', [
-            'sessions' => $sessions->map(fn (ClassSession $session) => [
-                'id' => $session->id,
-                'session_date' => $session->session_date,
-                'start_time' => substr($session->start_time, 0, 5),
-                'class_type_name' => $session->classType->name,
-                'branch_name' => $session->branch->name,
-                'room_name' => $session->room->name,
-                'students' => $session->booked_count,
-            ]),
+            'sessions' => $schedule->execute($request->user()->coachProfile),
         ]);
     }
 
@@ -184,5 +191,15 @@ class ClassSessionController extends Controller
                 'avgFillRate' => $totalCapacity > 0 ? (int) round($totalStudents / $totalCapacity * 100) : 0,
             ],
         ]);
+    }
+
+    /** A filter value that is not a date is ignored rather than reaching the query. */
+    private function validDate(string $value): ?string
+    {
+        try {
+            return $value === '' ? null : Carbon::createFromFormat('Y-m-d', $value)->toDateString();
+        } catch (\Throwable) {
+            return null;
+        }
     }
 }
