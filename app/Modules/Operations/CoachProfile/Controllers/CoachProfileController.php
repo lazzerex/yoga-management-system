@@ -19,9 +19,19 @@ class CoachProfileController extends Controller
 {
     public function index(Request $request): Response
     {
-        $profiles = CoachProfile::with(['user:id,name,username', 'classTypes:id,name', 'media'])
+        $search = $request->string('search')->toString();
+        $classTypeId = $request->integer('class_type_id');
+        $status = $request->string('status')->toString();
+
+        $profiles = CoachProfile::with(['user:id,name,username', 'user.media', 'classTypes:id,name'])
+            ->when($search !== '', fn ($q) => $q->whereHas('user', fn ($u) => $u
+                ->where('name', 'like', "%{$search}%")
+                ->orWhere('username', 'like', "%{$search}%")))
+            ->when($classTypeId, fn ($q) => $q->whereHas('classTypes', fn ($c) => $c->where('class_types.id', $classTypeId)))
+            ->when(in_array($status, ['active', 'inactive'], true), fn ($q) => $q->where('is_active', $status === 'active'))
             ->orderBy('id')
-            ->paginate(20);
+            ->paginate(20)
+            ->withQueryString();
         $canManage = $request->user()->can('operations.coaches.manage');
 
         return inertia('Operations/CoachProfiles/Index', [
@@ -38,8 +48,11 @@ class CoachProfileController extends Controller
                 'total' => CoachProfile::count(),
                 'active' => CoachProfile::active()->count(),
             ],
+            'filters' => ['search' => $search, 'class_type_id' => $classTypeId ?: '', 'status' => $status],
+            'options' => ['classTypes' => ClassType::active()->orderBy('name')->get(['id', 'name'])],
             'endpoints' => [
                 'create' => $canManage ? route('operations.coaches.create') : null,
+                'index' => route('operations.coaches.index'),
             ],
         ]);
     }
@@ -58,7 +71,7 @@ class CoachProfileController extends Controller
 
     public function edit(CoachProfile $coachProfile): Response
     {
-        $coachProfile->load(['user:id,name', 'classTypes:id', 'media']);
+        $coachProfile->load(['user:id,name', 'user.media', 'classTypes:id']);
 
         return inertia('Operations/CoachProfiles/Edit', [
             'coachProfile' => [
@@ -99,7 +112,7 @@ class CoachProfileController extends Controller
 
     private function avatarUrl(CoachProfile $profile): ?string
     {
-        $avatar = $profile->getFirstMedia('avatar');
+        $avatar = $profile->user->getFirstMedia('avatar');
 
         return $avatar ? route('operations.files.show', [$avatar, 'conversion' => 'thumb']) : null;
     }
