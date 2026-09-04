@@ -2,12 +2,18 @@
 import { Link } from '@inertiajs/vue3';
 import { trans as t } from 'laravel-vue-i18n';
 import { formatVnd } from '@/composables/useMoney.js';
+import FilterBar from '@/Components/UI/FilterBar.vue';
+import { useFilters } from '@/composables/useFilters.js';
 
-defineProps({
+const props = defineProps({
     invoices: Object,
     stats: Object,
+    filters: Object,
+    options: Object,
     endpoints: Object,
 });
+
+const { filters, active, reset } = useFilters(props.endpoints.index, props.filters);
 
 const statusLabel = (status) => t(`operations.invoiceStatus${status.charAt(0).toUpperCase()}${status.slice(1)}`);
 </script>
@@ -56,6 +62,23 @@ export default {
                 </Link>
             </div>
         </div>
+
+        <FilterBar :active="active" @reset="reset">
+            <input
+                v-model="filters.search"
+                type="search"
+                class="ym-log-search"
+                :placeholder="$t('operations.searchInvoices')"
+            />
+            <select v-model="filters.status" class="ym-log-filter-select">
+                <option value="">{{ $t('operations.allStatuses') }}</option>
+                <option v-for="status in options.statuses" :key="status" :value="status">{{ statusLabel(status) }}</option>
+            </select>
+            <select v-model="filters.overdue" class="ym-log-filter-select">
+                <option value="">{{ $t('operations.allInvoices') }}</option>
+                <option value="1">{{ $t('operations.overdueOnly') }}</option>
+            </select>
+        </FilterBar>
 
         <div class="ym-table-wrap">
             <table class="ym-table">
