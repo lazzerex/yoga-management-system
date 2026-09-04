@@ -4,13 +4,13 @@ namespace App\Modules\Operations\Tuition\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Invoice;
-use App\Models\InvoiceItem;
+use App\Modules\Operations\Tuition\Actions\StudentEntitlementsAction;
 use Illuminate\Http\Request;
 use Inertia\Response;
 
 class MembershipController extends Controller
 {
-    public function show(Request $request): Response
+    public function show(Request $request, StudentEntitlementsAction $entitlements): Response
     {
         $studentProfileId = $request->user()->studentProfile?->id;
 
@@ -22,7 +22,7 @@ class MembershipController extends Controller
             ->get();
 
         return inertia('Member/MyMembership', [
-            'entitlements' => $this->entitlements($studentProfileId),
+            'entitlements' => $entitlements->execute($studentProfileId),
             'invoices' => $invoices->map(fn (Invoice $invoice) => [
                 'id' => $invoice->id,
                 'invoice_number' => $invoice->invoice_number,
@@ -36,29 +36,5 @@ class MembershipController extends Controller
             'outstanding' => (int) $invoices->filter(fn (Invoice $invoice) => in_array($invoice->status, Invoice::OPEN_STATUSES, true))
                 ->sum(fn (Invoice $invoice) => $invoice->balance()),
         ]);
-    }
-
-    /** Only paid lines grant access, and an undated line (a one-off charge) grants nothing ongoing. */
-    private function entitlements(?int $studentProfileId): array
-    {
-        if (! $studentProfileId) {
-            return [];
-        }
-
-        return InvoiceItem::whereHas('invoice', fn ($q) => $q
-            ->where('student_profile_id', $studentProfileId)
-            ->where('status', 'paid'))
-            ->whereNotNull('valid_until')
-            ->whereDate('valid_until', '>=', today())
-            ->orderBy('valid_until')
-            ->get()
-            ->map(fn (InvoiceItem $item) => [
-                'id' => $item->id,
-                'description' => $item->description,
-                'valid_from' => $item->valid_from?->toDateString(),
-                'valid_until' => $item->valid_until->toDateString(),
-                'sessions_granted' => $item->sessions_granted,
-            ])
-            ->all();
     }
 }
