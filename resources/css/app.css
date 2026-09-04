@@ -27,6 +27,32 @@
     /* Reserve the gutter so modals hiding body overflow don't widen the page. */
     html {
         scrollbar-gutter: stable;
+        scrollbar-width: thin;
+        scrollbar-color: var(--ym-scroll-thumb) transparent;
+    }
+
+    /* Firefox inherits the two properties above; WebKit and Blink need their own
+       pseudo-elements, applied to every scroll container rather than named ones. */
+    *::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+
+    *::-webkit-scrollbar-track,
+    *::-webkit-scrollbar-corner {
+        background: transparent;
+    }
+
+    *::-webkit-scrollbar-thumb {
+        background: var(--ym-scroll-thumb);
+        border: 2px solid transparent;
+        background-clip: padding-box;
+        border-radius: 999px;
+    }
+
+    *::-webkit-scrollbar-thumb:hover {
+        background: var(--ym-scroll-thumb-hover);
+        background-clip: padding-box;
     }
 
     body {
