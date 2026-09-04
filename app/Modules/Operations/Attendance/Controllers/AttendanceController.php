@@ -4,12 +4,14 @@ namespace App\Modules\Operations\Attendance\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\ClassSession;
+use App\Models\CoachProfile;
 use App\Models\StudentAttendance;
 use App\Models\TeacherAttendance;
 use App\Models\User;
 use App\Modules\Operations\Attendance\Actions\CheckInCoachAction;
 use App\Modules\Operations\Attendance\Actions\CheckOutCoachAction;
 use App\Modules\Operations\Attendance\Actions\MarkStudentAttendanceAction;
+use App\Modules\Operations\Attendance\Actions\SessionBoardStatsAction;
 use App\Modules\Operations\Attendance\Requests\MarkAttendanceRequest;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
@@ -18,11 +20,13 @@ use Inertia\Response;
 
 class AttendanceController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request, SessionBoardStatsAction $stats): Response
     {
         $user = $request->user();
         $date = $this->resolveDate($request->string('date')->toString());
         $branchId = $request->attributes->get('currentBranch')?->id;
+        $coachProfileId = $request->integer('coach_profile_id');
+        $status = $request->string('status')->toString();
 
         $sessions = ClassSession::with([
             'branch:id,name',
@@ -32,13 +36,12 @@ class AttendanceController extends Controller
             'coachProfile.user:id,name',
             'teacherAttendances',
         ])
-            ->withCount([
-                'enrollments as booked_count' => fn ($q) => $q->where('status', 'booked'),
-                'enrollments as marked_count' => fn ($q) => $q->where('status', 'booked')->whereHas('attendance'),
-            ])
+            ->withCount($stats->rosterCounts())
             ->where('session_date', $date)
             ->when($branchId, fn ($q) => $q->where('branch_id', $branchId))
             ->when(! $user->can('operations.attendance.manage.any'), fn ($q) => $q->where('coach_profile_id', $user->coachProfile?->id))
+            ->when($coachProfileId, fn ($q) => $q->where('coach_profile_id', $coachProfileId))
+            ->when(in_array($status, ['scheduled', 'cancelled', 'done'], true), fn ($q) => $q->where('status', $status))
             ->orderBy('start_time')
             ->get();
 
@@ -70,14 +73,22 @@ class AttendanceController extends Controller
 
         return inertia('Operations/TeacherAttendance', [
             'sessions' => $rows,
-            'filters' => ['date' => $date],
-            'stats' => [
-                'sessions' => $rows->count(),
-                'checkedIn' => $rows->whereNotNull('checked_in_at')->count(),
-                'rostersComplete' => $rows->filter(fn ($row) => $row['booked_count'] > 0 && $row['marked_count'] === $row['booked_count'])->count(),
+            'filters' => [
+                'date' => $date,
+                'coach_profile_id' => $coachProfileId ?: '',
+                'status' => $status,
             ],
+            'options' => [
+                'coaches' => $user->can('operations.attendance.manage.any')
+                    ? CoachProfile::active()->with('user:id,name')->get()
+                        ->map(fn (CoachProfile $profile) => ['id' => $profile->id, 'name' => $profile->user->name])
+                        ->sortBy('name')->values()
+                    : [],
+            ],
+            'stats' => $stats->fromSessions($sessions),
             'endpoints' => [
                 'reports' => route('operations.attendance.reports'),
+                'index' => route('operations.teacher-attendance'),
             ],
         ]);
     }
