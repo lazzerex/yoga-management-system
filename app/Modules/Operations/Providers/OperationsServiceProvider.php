@@ -11,13 +11,6 @@ class OperationsServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
-        Eventy::addFilter('backend_settings_menu', function (array $items) {
-            $items[] = AppMenuItem::make('nav.tuitionPlans', '/cms/operations/tuition-fees/plans')
-                ->permissions('operations.tuition.manage');
-
-            return $items;
-        }, 10, 1);
-
         Eventy::addAction('register_backend_menu', function (MenuRegistry $menu) {
             $menu->addItems([
                 AppMenuItem::make('nav.centers', '/cms/operations/yoga-center')
@@ -46,7 +39,13 @@ class OperationsServiceProvider extends ServiceProvider
                     ]),
                 AppMenuItem::make('nav.tuition', '/cms/operations/tuition-fees')
                     ->icon('bi-cash-stack')->iconColor('#32a06f')->group('nav.operations')->order(14)
-                    ->permissions('operations.tuition.view'),
+                    ->permissions('operations.tuition.view')
+                    ->addItems([
+                        AppMenuItem::make('nav.tuitionInvoices', '/cms/operations/tuition-fees')
+                            ->icon('bi-receipt')->permissions('operations.tuition.view'),
+                        AppMenuItem::make('nav.tuitionPlans', '/cms/operations/tuition-fees/plans')
+                            ->icon('bi-box-seam')->permissions('operations.tuition.manage'),
+                    ]),
                 AppMenuItem::make('nav.files', '/cms/operations/file-library')
                     ->icon('bi-folder2-open')->iconColor('#c97846')->group('nav.operations')->order(15)
                     ->permissions('operations.files.view'),
