@@ -2,10 +2,8 @@
 
 namespace App\Modules\Operations\Media\Actions;
 
-use App\Models\CoachProfile;
 use App\Models\LessonPlan;
 use App\Models\Payment;
-use App\Models\StudentProfile;
 use App\Models\User;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
@@ -20,8 +18,7 @@ class AuthorizeMediaAccessAction
         $owner = $media->model;
 
         return match (true) {
-            $owner instanceof CoachProfile => $owner->user_id === $user->id || $user->can('operations.coaches.view'),
-            $owner instanceof StudentProfile => $this->seesStudent($user, $owner),
+            $owner instanceof User => $this->seesUser($user, $owner),
             $owner instanceof LessonPlan => $this->seesLessonPlan($user, $owner),
             $owner instanceof Payment => $user->can('operations.tuition.manage'),
             default => false,
@@ -42,20 +39,35 @@ class AuthorizeMediaAccessAction
         }
 
         return match (true) {
-            $owner instanceof CoachProfile => $user->can('operations.coaches.manage'),
-            $owner instanceof StudentProfile => $user->can('operations.students.manage'),
+            $owner instanceof User => $this->manageUser($user, $owner),
             $owner instanceof LessonPlan => $this->ownsLessonPlan($user, $owner) && $owner->isEditable(),
             default => false,
         };
     }
 
-    /** Mirrors StudentProfileController::index: without .any the coach sees only students booked into their own sessions. */
-    private function seesStudent(User $user, StudentProfile $profile): bool
+    /** An avatar is readable by its owner, by whoever may see that person's directory entry. */
+    private function seesUser(User $user, User $owner): bool
     {
-        if ($profile->user_id === $user->id || $user->can('operations.students.view.any')) {
+        if ($owner->id === $user->id || $user->can('admin.users.view')) {
             return true;
         }
 
+        if ($owner->coachProfile && $user->can('operations.coaches.view')) {
+            return true;
+        }
+
+        $profile = $owner->studentProfile;
+
+        if (! $profile) {
+            return false;
+        }
+
+        if ($user->can('operations.students.view.any')) {
+            return true;
+        }
+
+        // Mirrors StudentProfileController::index: without .any the coach sees only
+        // students booked into their own sessions.
         $coachProfileId = $user->coachProfile?->id;
 
         return $user->can('operations.students.view')
@@ -64,6 +76,13 @@ class AuthorizeMediaAccessAction
                 ->where('status', 'booked')
                 ->whereHas('classSession', fn ($s) => $s->where('coach_profile_id', $coachProfileId))
                 ->exists();
+    }
+
+    private function manageUser(User $user, User $owner): bool
+    {
+        return $owner->id === $user->id
+            || ($owner->coachProfile && $user->can('operations.coaches.manage'))
+            || ($owner->studentProfile && $user->can('operations.students.manage'));
     }
 
     private function seesLessonPlan(User $user, LessonPlan $plan): bool
