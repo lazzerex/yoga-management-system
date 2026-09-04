@@ -40,7 +40,6 @@ return [
     'searchIp' => 'Search IP or identifier...',
     'allStatus' => 'All Status',
     'allDevices' => 'All Devices',
-    'clear' => 'Clear',
     'noLogs' => 'No login logs found.',
     'status' => 'Status',
     'user' => 'User',
@@ -80,4 +79,8 @@ return [
         'view_student_medical_notes' => 'View Medical Notes',
         'cancel_enrollment' => 'Cancel Enrollment',
     ],
+    'searchUsers' => 'Name, username or email',
+    'allRoles' => 'All roles',
+    'sortNewest' => 'Newest first',
+    'sortLastLogin' => 'Last sign-in',
 ];

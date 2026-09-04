@@ -82,4 +82,6 @@ return [
     'fileDeleted' => 'File ":name" deleted.',
     'paymentVoided' => 'Payment voided.',
     'paymentAlreadyVoided' => 'This payment is already voided.',
+    'avatarUpdated' => 'Profile picture updated.',
+    'accountUpdated' => 'Account details updated.',
 ];

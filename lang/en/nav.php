@@ -17,6 +17,7 @@ return [
     'planList' => 'All Plans',
     'planApprovalQueue' => 'Approval Queue',
     'tuition' => 'Tuition',
+    'tuitionInvoices' => 'Invoices',
     'tuitionPlans' => 'Tuition Plans',
     'files' => 'Files',
     'coaches' => 'Coach Profiles',
