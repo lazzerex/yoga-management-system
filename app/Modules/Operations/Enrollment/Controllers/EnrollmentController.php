@@ -165,11 +165,18 @@ class EnrollmentController extends Controller
     {
         $branchId = $request->attributes->get('currentBranch')?->id;
         $status = $request->string('status')->toString();
+        $search = $request->string('search')->toString();
+        $from = $this->validDate($request->string('from')->toString());
+        $to = $this->validDate($request->string('to')->toString());
 
         $enrollments = Enrollment::query()
             ->with(['studentProfile.user:id,name', 'classSession.classType:id,name', 'classSession.coachProfile.user:id,name'])
-            ->whereHas('classSession', fn ($q) => $q->when($branchId, fn ($q) => $q->where('branch_id', $branchId)))
+            ->whereHas('classSession', fn ($q) => $q
+                ->when($branchId, fn ($b) => $b->where('branch_id', $branchId))
+                ->when($from, fn ($b) => $b->where('session_date', '>=', $from))
+                ->when($to, fn ($b) => $b->where('session_date', '<=', $to)))
             ->when(in_array($status, ['booked', 'waitlisted', 'cancelled'], true), fn ($q) => $q->where('status', $status))
+            ->when($search !== '', fn ($q) => $q->whereHas('studentProfile.user', fn ($u) => $u->where('name', 'like', "%{$search}%")))
             ->orderByDesc('enrolled_at')
             ->paginate(20)
             ->withQueryString();
@@ -186,7 +193,13 @@ class EnrollmentController extends Controller
                 'enrolled_at' => $e->enrolled_at?->toDateTimeString(),
                 'cancelUrl' => $e->status !== 'cancelled' ? route('operations.enrollments.admin-cancel', $e->id) : null,
             ]),
-            'filters' => ['status' => $status ?: null],
+            'filters' => [
+                'status' => $status,
+                'search' => $search,
+                'from' => $from ?? '',
+                'to' => $to ?? '',
+            ],
+            'endpoints' => ['index' => route('operations.enrollments.index')],
         ]);
     }
 
@@ -227,5 +240,15 @@ class EnrollmentController extends Controller
         ]);
 
         return back()->with('success', ['key' => 'flash.enrollmentCancelled']);
+    }
+
+    /** A filter value that is not a date is ignored rather than reaching the query. */
+    private function validDate(string $value): ?string
+    {
+        try {
+            return $value === '' ? null : Carbon::createFromFormat('Y-m-d', $value)->toDateString();
+        } catch (\Throwable) {
+            return null;
+        }
     }
 }
