@@ -16,7 +16,7 @@ class CreateCoachProfileAction
         $profile->classTypes()->sync($classTypeIds);
 
         if ($avatar) {
-            $profile->addMedia($avatar)->toMediaCollection('avatar');
+            $profile->user->addMedia($avatar)->toMediaCollection('avatar');
         }
 
         return $profile;
