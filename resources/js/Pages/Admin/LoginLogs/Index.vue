@@ -1,7 +1,9 @@
 <script setup>
-import { ref, computed, watch } from 'vue';
-import { Link, router } from '@inertiajs/vue3';
+import { computed } from 'vue';
+import { Link } from '@inertiajs/vue3';
 import { trans as t } from 'laravel-vue-i18n';
+import FilterBar from '@/Components/UI/FilterBar.vue';
+import { useFilters } from '@/composables/useFilters.js';
 
 const props = defineProps({
     logs: Object,
@@ -9,38 +11,19 @@ const props = defineProps({
     endpoints: Object,
 });
 
-const search = ref(props.filters?.search ?? '');
-const status = ref(props.filters?.status ?? '');
-const device = ref(props.filters?.device ?? '');
-const sortDir = ref(props.filters?.sort_dir ?? 'desc');
-
-const hasActiveFilters = computed(() => search.value || status.value || device.value);
-
-let searchTimeout = null;
-
-function applyFilters() {
-    router.get(props.endpoints.self, {
-        search: search.value || undefined,
-        status: status.value || undefined,
-        device: device.value || undefined,
-        sort_dir: sortDir.value === 'desc' ? undefined : sortDir.value,
-    }, { preserveState: true, preserveScroll: true, replace: true });
-}
-
-watch(search, () => {
-    clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(applyFilters, 350);
+const { filters, active, reset } = useFilters(props.endpoints.self, {
+    search: props.filters?.search,
+    status: props.filters?.status,
+    device: props.filters?.device,
+    sort_dir: props.filters?.sort_dir,
 });
 
-watch([status, device, sortDir], applyFilters);
+// Newest first is the default, so it travels as an absent value rather than a filter.
+const sortDir = computed(() => (filters.value.sort_dir === 'asc' ? 'asc' : 'desc'));
 
-function toggleSort() {
-    sortDir.value = sortDir.value === 'desc' ? 'asc' : 'desc';
-}
-
-function resetFilters() {
-    router.get(props.endpoints.self, {}, { preserveState: false, replace: true });
-}
+const toggleSort = () => {
+    filters.value.sort_dir = filters.value.sort_dir === 'asc' ? '' : 'asc';
+};
 
 const statusBadgeClass = (status) =>
     status === 'failed' ? 'ym-action-badge--login-failed' : 'ym-action-badge--login-success';
@@ -95,27 +78,24 @@ export default {
             <Link :href="endpoints.audit_logs" class="ym-log-tab">{{ $t('admin.auditLogs') }}</Link>
         </div>
 
-        <div class="ym-log-filters">
+        <FilterBar :active="active" @reset="reset">
             <input
-                v-model="search"
+                v-model="filters.search"
                 type="search"
                 :placeholder="$t('admin.searchIp')"
                 class="ym-log-search"
             />
-            <select v-model="status" class="ym-log-filter-select">
+            <select v-model="filters.status" class="ym-log-filter-select">
                 <option value="">{{ $t('admin.allStatus') }}</option>
                 <option value="success">{{ $t('admin.success') }}</option>
                 <option value="failed">{{ $t('admin.failed') }}</option>
             </select>
-            <select v-model="device" class="ym-log-filter-select">
+            <select v-model="filters.device" class="ym-log-filter-select">
                 <option value="">{{ $t('admin.allDevices') }}</option>
                 <option value="desktop">{{ $t('profile.desktop') }}</option>
                 <option value="mobile">{{ $t('profile.mobile') }}</option>
             </select>
-            <button v-if="hasActiveFilters" @click="resetFilters" class="ym-log-clear-btn">
-                {{ $t('admin.clear') }}
-            </button>
-        </div>
+        </FilterBar>
 
         <div class="ym-table-wrap">
             <table class="ym-table">

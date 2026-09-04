@@ -1,7 +1,9 @@
 <script setup>
-import { ref, computed, watch } from 'vue';
-import { Link, router } from '@inertiajs/vue3';
+import { computed } from 'vue';
+import { Link } from '@inertiajs/vue3';
 import { trans as t } from 'laravel-vue-i18n';
+import FilterBar from '@/Components/UI/FilterBar.vue';
+import { useFilters } from '@/composables/useFilters.js';
 
 const props = defineProps({
     logs: Object,
@@ -9,36 +11,18 @@ const props = defineProps({
     endpoints: Object,
 });
 
-const search = ref(props.filters?.search ?? '');
-const action = ref(props.filters?.action ?? '');
-const sortDir = ref(props.filters?.sort_dir ?? 'desc');
-
-const hasActiveFilters = computed(() => search.value || action.value);
-
-let searchTimeout = null;
-
-function applyFilters() {
-    router.get(props.endpoints.self, {
-        search: search.value || undefined,
-        action: action.value || undefined,
-        sort_dir: sortDir.value === 'desc' ? undefined : sortDir.value,
-    }, { preserveState: true, preserveScroll: true, replace: true });
-}
-
-watch(search, () => {
-    clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(applyFilters, 350);
+const { filters, active, reset } = useFilters(props.endpoints.self, {
+    search: props.filters?.search,
+    action: props.filters?.action,
+    sort_dir: props.filters?.sort_dir,
 });
 
-watch([action, sortDir], applyFilters);
+// Newest first is the default, so it travels as an absent value rather than a filter.
+const sortDir = computed(() => (filters.value.sort_dir === 'asc' ? 'asc' : 'desc'));
 
-function toggleSort() {
-    sortDir.value = sortDir.value === 'desc' ? 'asc' : 'desc';
-}
-
-function resetFilters() {
-    router.get(props.endpoints.self, {}, { preserveState: false, replace: true });
-}
+const toggleSort = () => {
+    filters.value.sort_dir = filters.value.sort_dir === 'asc' ? '' : 'asc';
+};
 
 const ACTION_BADGE_CLASSES = {
     create_user: 'ym-action-badge--create',
@@ -122,14 +106,14 @@ export default {
             <Link :href="endpoints.self" class="ym-log-tab ym-log-tab--active">{{ $t('admin.auditLogs') }}</Link>
         </div>
 
-        <div class="ym-log-filters">
+        <FilterBar :active="active" @reset="reset">
             <input
-                v-model="search"
+                v-model="filters.search"
                 type="search"
                 :placeholder="$t('admin.searchPerformer')"
                 class="ym-log-search"
             />
-            <select v-model="action" class="ym-log-filter-select">
+            <select v-model="filters.action" class="ym-log-filter-select">
                 <option value="">{{ $t('admin.allActions') }}</option>
                 <option value="create_user">{{ $t('admin.auditActions.create_user') }}</option>
                 <option value="update_user_info">{{ $t('admin.auditActions.update_user_info') }}</option>
@@ -140,10 +124,7 @@ export default {
                 <option value="view_student_medical_notes">{{ $t('admin.auditActions.view_student_medical_notes') }}</option>
                 <option value="cancel_enrollment">{{ $t('admin.auditActions.cancel_enrollment') }}</option>
             </select>
-            <button v-if="hasActiveFilters" @click="resetFilters" class="ym-log-clear-btn">
-                {{ $t('admin.clear') }}
-            </button>
-        </div>
+        </FilterBar>
 
         <div class="ym-table-wrap">
             <table class="ym-table">
