@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Branch;
 use App\Models\ClassSession;
 use App\Models\Enrollment;
 use App\Models\StudentProfile;
@@ -12,37 +13,82 @@ class EnrollmentSeeder extends Seeder
     public function run(): void
     {
         $studentIds = StudentProfile::active()->pluck('id');
+        $branchIds = Branch::active()->orderBy('name')->pluck('id');
 
-        if ($studentIds->count() < 2) {
+        if ($studentIds->count() < 2 || $branchIds->isEmpty()) {
             return;
         }
 
+        // Members belong to a home branch and only occasionally practise elsewhere,
+        // which is what makes the per-branch student counts differ at all.
+        $homeBranch = $studentIds->mapWithKeys(fn (int $id, int $index) => [
+            $id => $branchIds[$index % $branchIds->count()],
+        ]);
+
         $sessions = ClassSession::whereIn('status', ['scheduled', 'done'])
             ->orderBy('session_date')
+            ->orderBy('start_time')
             ->get();
 
-        foreach ($sessions as $index => $session) {
-            // Every third session is deliberately pushed over capacity to seed a waitlist.
-            $fillRatio = $index % 3 === 0 ? 1.4 : (0.3 + ($index % 5) * 0.15);
-            $target = min($studentIds->count(), (int) ceil($session->capacity * $fillRatio));
+        $rows = [];
 
-            $picked = $studentIds->shuffle()->take($target)->values();
+        foreach ($sessions as $index => $session) {
+            // Fill varies by weekday and time of day as well as by session, so the
+            // occupancy heat map has hot and cold cells rather than one flat colour.
+            $hour = (int) substr($session->start_time, 0, 2);
+            $weekday = (int) date('w', strtotime($session->session_date));
+            $fillRatio = match (true) {
+                $index % 11 === 0 => 1.35,                     // a waitlist every so often
+                $hour >= 17 => 0.85 + ($index % 3) * 0.05,     // evenings are busy
+                $weekday === 0 || $weekday === 6 => 0.7,       // weekends middling
+                $hour <= 7 => 0.45 + ($index % 4) * 0.08,      // early mornings quieter
+                default => 0.55 + ($index % 5) * 0.06,
+            };
+
+            $target = min($studentIds->count(), (int) ceil($session->capacity * $fillRatio));
+            $locals = $studentIds->filter(fn (int $id) => $homeBranch[$id] === $session->branch_id)->shuffle();
+            // Only every third member ever travels, so the per-branch rosters stay distinct.
+            $visitors = $studentIds
+                ->filter(fn (int $id) => $homeBranch[$id] !== $session->branch_id && $id % 3 === 0)
+                ->shuffle();
+
+            // Four in five seats go to members of this branch; the rest are visitors.
+            $localShare = (int) ceil($target * 0.8);
+            $picked = $locals->take($localShare)->merge($visitors->take($target - $localShare));
+
+            // An oversubscribed session draws on the whole centre, which is the only
+            // way a waitlist forms once members mostly stay at their home branch.
+            if ($picked->count() < $target) {
+                $picked = $picked->merge($studentIds->diff($picked)->shuffle()->take($target - $picked->count()));
+            }
+
+            $picked = $picked->values();
             $booked = 0;
 
             foreach ($picked as $offset => $studentId) {
                 $status = $booked < $session->capacity ? 'booked' : 'waitlisted';
 
-                Enrollment::create([
+                // Roughly one booking in eleven is dropped again, so the bookings board
+                // and its status filter have cancellations to show.
+                $cancelled = ($session->id * 7 + $offset) % 11 === 0;
+                $enrolledAt = now()->subDays(7)->addMinutes($offset * 3);
+
+                $rows[] = [
                     'student_profile_id' => $studentId,
                     'class_session_id' => $session->id,
-                    'status' => $status,
-                    'enrolled_at' => now()->subDays(7)->addMinutes($offset * 3),
-                ]);
+                    'status' => $cancelled ? 'cancelled' : $status,
+                    'enrolled_at' => $enrolledAt,
+                    'cancelled_at' => $cancelled ? $enrolledAt->copy()->addDays(1) : null,
+                    'created_at' => $enrolledAt,
+                    'updated_at' => $cancelled ? $enrolledAt->copy()->addDays(1) : $enrolledAt,
+                ];
 
-                if ($status === 'booked') {
+                if (! $cancelled && $status === 'booked') {
                     $booked++;
                 }
             }
         }
+
+        collect($rows)->chunk(500)->each(fn ($chunk) => Enrollment::insert($chunk->all()));
     }
 }

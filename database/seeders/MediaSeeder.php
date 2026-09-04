@@ -14,11 +14,12 @@ class MediaSeeder extends Seeder
 
     public function run(): void
     {
-        CoachProfile::orderBy('id')->take(6)->get()
-            ->each(fn (CoachProfile $profile, int $index) => $this->attach($profile, 'avatar', $this->avatar($index)));
+        // The avatar belongs to the user behind the profile, not to the profile.
+        CoachProfile::with('user')->orderBy('id')->take(6)->get()
+            ->each(fn (CoachProfile $profile, int $index) => $this->attach($profile->user, 'avatar', $this->avatar($index)));
 
-        StudentProfile::orderBy('id')->take(8)->get()
-            ->each(fn (StudentProfile $profile, int $index) => $this->attach($profile, 'avatar', $this->avatar($index + 1)));
+        StudentProfile::with('user')->orderBy('id')->take(8)->get()
+            ->each(fn (StudentProfile $profile, int $index) => $this->attach($profile->user, 'avatar', $this->avatar($index + 1)));
 
         LessonPlan::orderBy('id')->take(4)->get()
             ->each(fn (LessonPlan $plan) => $this->attach($plan, 'attachments', $this->path('asana-sequence.pdf')));

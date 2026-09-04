@@ -20,16 +20,23 @@ class LessonPlanSeeder extends Seeder
             return;
         }
 
-        $statuses = ['draft', 'pending', 'approved', 'rejected'];
+        // Two pending per coach, so the approval queue is a queue rather than one row.
+        $statuses = ['draft', 'pending', 'approved', 'rejected', 'pending', 'approved'];
 
         foreach ($coaches as $index => $coach) {
-            $session = ClassSession::where('coach_profile_id', $coach->id)->upcoming()->orderBy('session_date')->first();
+            $sessions = ClassSession::where('coach_profile_id', $coach->id)
+                ->upcoming()
+                ->orderBy('session_date')
+                ->get();
 
-            if (! $session) {
+            if ($sessions->isEmpty()) {
                 continue;
             }
 
             foreach ($statuses as $offset => $status) {
+                // Rotating the session spreads a coach's plans over the branches they teach at.
+                $session = $sessions[($index + $offset) % $sessions->count()];
+
                 $plan = LessonPlan::create([
                     'coach_profile_id' => $coach->id,
                     'branch_id' => $session->branch_id,

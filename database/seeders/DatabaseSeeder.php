@@ -28,10 +28,13 @@ class DatabaseSeeder extends Seeder
             ClassScheduleSeeder::class,
         ]);
 
-        app(GenerateClassSessionsAction::class)->execute(weeksBack: 4);
+        // Twenty weeks back: enough history for the twelve-week trend charts, without
+        // seeding a year of enrolments nobody reads.
+        app(GenerateClassSessionsAction::class)->execute(weeksBack: 20);
 
         $this->call([
             EnrollmentSeeder::class,
+            SessionVarietySeeder::class,
             AttendanceSeeder::class,
             LessonPlanSeeder::class,
             TuitionPlanSeeder::class,
