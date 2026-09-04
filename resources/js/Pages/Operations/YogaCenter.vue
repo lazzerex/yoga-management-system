@@ -5,17 +5,23 @@ import { route } from 'ziggy-js';
 import { currentLocale, trans as t } from 'laravel-vue-i18n';
 import Modal from '@/Components/UI/Modal.vue';
 import TabBar from '@/Components/UI/TabBar.vue';
+import FilterBar from '@/Components/UI/FilterBar.vue';
+import { useFilters } from '@/composables/useFilters.js';
 
-defineProps({
+const props = defineProps({
     branches: Object,
     branchStats: Object,
     rooms: Object,
     roomStats: Object,
     classTypes: Object,
     classTypeStats: Object,
+    filters: Object,
     endpoints: Object,
     canManage: Boolean,
 });
+
+// One box narrows all three tabs; they are three views of the same centre.
+const { filters, active, reset } = useFilters(props.endpoints.index, props.filters);
 
 const tabs = computed(() => {
     currentLocale.value;
@@ -62,6 +68,20 @@ export default {
 
 <template>
     <TabBar v-model="activeTab" :tabs="tabs" />
+
+    <FilterBar :active="active" @reset="reset">
+        <input
+            v-model="filters.search"
+            type="search"
+            class="ym-log-search"
+            :placeholder="$t('operations.searchByName')"
+        />
+        <select v-model="filters.status" class="ym-log-filter-select">
+            <option value="">{{ $t('operations.allStatuses') }}</option>
+            <option value="active">{{ $t('operations.statusActive') }}</option>
+            <option value="inactive">{{ $t('operations.statusInactive') }}</option>
+        </select>
+    </FilterBar>
 
     <template v-if="activeTab === 'branches'">
         <div class="ym-stat-strip">
