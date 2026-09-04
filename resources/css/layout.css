@@ -712,6 +712,16 @@
         z-index: 60;
     }
 
+    .ym-top-links-indicator {
+        position: absolute;
+        bottom: -1px;
+        height: 2px;
+        background: #2c4463;
+        border-radius: 2px;
+        transition: left 220ms var(--ym-ease), width 220ms var(--ym-ease), opacity 160ms var(--ym-ease);
+        pointer-events: none;
+    }
+
     .ym-top-link {
         text-decoration: none;
         white-space: nowrap;
@@ -728,9 +738,9 @@
 
     .ym-top-link:hover { color: #364b67; }
 
+    /* The underline is the sliding indicator, not this link's own border. */
     .ym-top-link--active {
         color: #2c4463;
-        border-color: #9ca6b4;
         font-weight: 700;
     }
 
