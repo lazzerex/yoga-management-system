@@ -7,6 +7,7 @@ import NavMenuLink from '@/Components/UI/NavMenuLink.vue';
 import SidebarMenuItem from '@/Components/UI/SidebarMenuItem.vue';
 import { useSidebarMenuState } from '@/composables/useSidebarMenuState.js';
 import { claimedActionErrors } from '@/composables/useActionError.js';
+import { dismissToast, toasts } from '@/composables/useToasts.js';
 
 const props = defineProps({
     title: {
@@ -139,7 +140,10 @@ const updateSideIndicator = () => {
     };
 };
 
-onMounted(() => nextTick(updateSideIndicator));
+onMounted(() => {
+    nextTick(updateSideIndicator);
+    document.fonts?.ready.then(() => nextTick(updateSideIndicator));
+});
 watch(() => page.url, () => nextTick(updateSideIndicator));
 watch(openMenuItems, () => nextTick(updateSideIndicator));
 
@@ -182,6 +186,7 @@ const updateSubIndicator = () => {
 let topbarObserver;
 onMounted(() => {
     nextTick(updateSubIndicator);
+    document.fonts?.ready.then(() => nextTick(updateSubIndicator));
     if (topbarRef.value && 'ResizeObserver' in window) {
         topbarObserver = new ResizeObserver(() => {
             document.documentElement.style.setProperty('--ym-topbar-h', `${topbarRef.value.offsetHeight}px`);
@@ -242,7 +247,7 @@ const breadcrumbs = computed(() => {
         return [{ label: props.title, current: true }];
     }
 
-    const crumbs = [{ label: t('dashboard.homepage'), href: route('cms.dashboard') }];
+    const crumbs = [{ label: t('dashboard.viewDashboard'), href: route('cms.dashboard') }];
 
     activeTrail.value.forEach((item) => crumbs.push({ label: item.label, href: item.href }));
 
@@ -350,42 +355,34 @@ const switchBranch = (branchId) => {
     });
 };
 
-const roleTopMenuDefaults = computed(() => {
-    currentLocale.value;
-    if (canAccessAdmin.value) {
-        return [
-            { label: t('dashboard.homepage'), viewKey: 'homepage', href: route('cms.dashboard') },
-            { label: t('dashboard.mySchedule'), viewKey: 'my-schedule', href: route('cms.dashboard', { view: 'my-schedule' }) },
-            { label: t('dashboard.members'), viewKey: 'members', href: route('cms.dashboard', { view: 'members' }) },
-            { label: t('dashboard.attendance'), viewKey: 'attendance', href: route('cms.dashboard', { view: 'attendance' }) },
-            { label: t('dashboard.studioReports'), viewKey: 'studio-reports', href: route('cms.dashboard', { view: 'studio-reports' }) },
-            { label: t('dashboard.financials'), viewKey: 'financials', href: route('cms.dashboard', { view: 'financials' }) },
-        ];
-    }
+// The dashboard controller decides which views this viewer may open; the layout only
+// renders them. Off the dashboard there is nothing to render but the link back to it.
+// Renames and hidden tabs live for the session only; the tab list itself comes from
+// the server. Labels are translated where they are rendered, so switching language
+// re-labels the tabs without discarding what the viewer changed.
+const tabLabelOverrides = ref({});
+const hiddenTabKeys = ref([]);
 
-    if (canViewCoachDashboard.value) {
-        return [
-            { label: t('dashboard.homepage'), viewKey: 'homepage', href: route('cms.dashboard') },
-            { label: t('dashboard.overview'), viewKey: 'overview', href: '' },
-            { label: t('dashboard.myPerformance'), viewKey: 'my-performance', href: '' },
-            { label: t('dashboard.classStats'), viewKey: 'class-stats', href: '' },
-            { label: t('dashboard.studentProgress'), viewKey: 'student-progress', href: '' },
-            { label: t('dashboard.earnings'), viewKey: 'earnings', href: '' },
-        ];
-    }
+const dashboardTabs = computed(() => {
+    const tabs = page.props.tabs ?? [];
 
-    return [
-        { label: t('dashboard.homepage'), viewKey: 'homepage', href: route('cms.dashboard') },
-        { label: t('dashboard.overview'), viewKey: 'overview', href: '' },
-        { label: t('dashboard.myProgress'), viewKey: 'my-progress', href: '' },
-        { label: t('dashboard.attendance'), viewKey: 'attendance', href: '' },
-        { label: t('dashboard.payments'), viewKey: 'payments', href: '' },
-        { label: t('dashboard.achievements'), viewKey: 'achievements', href: '' },
-    ];
+    return tabs.length ? tabs : [{ viewKey: 'dashboard', labelKey: 'dashboard.viewDashboard' }];
 });
 
-const topMenuItems = ref([]);
-const coachMemberView = ref('homepage');
+const topMenuItems = computed(() => {
+    currentLocale.value;
+
+    return dashboardTabs.value
+        .filter((tab) => ! hiddenTabKeys.value.includes(tab.viewKey))
+        .map((tab) => ({
+            viewKey: tab.viewKey,
+            labelKey: tab.labelKey,
+            label: tabLabelOverrides.value[tab.viewKey] ?? t(tab.labelKey),
+            // Every tab names its view. Leaving it off sent the viewer back to the
+            // server's default, which made two tabs render the same page.
+            href: route('cms.dashboard', { view: tab.viewKey }),
+        }));
+});
 
 const notifications = [
     { titleKey: 'layout.notifications.leads', time: '2m ago' },
@@ -413,77 +410,65 @@ const userInitials = computed(() => {
         .join('');
 });
 
-const toViewKey = (value) => value
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+// Same trick as the sidebar rail: measure the active link and slide to it, rather
+// than animating a border that belongs to the link itself.
+const topNavRef = ref(null);
+const topIndicatorStyle = ref({ left: '0px', width: '0px', opacity: 0 });
 
-const normalizeTopTabs = (incomingTabs) => {
-    const fallbackTabs = roleTopMenuDefaults.value;
-    const normalized = incomingTabs
-        .slice(0, 6)
-        .map((tab, index) => {
-            const fallback = fallbackTabs[index] ?? fallbackTabs[fallbackTabs.length - 1];
-            const label = (tab?.label ?? '').toString().trim() || fallback.label;
-            const fallbackKey = index === 0 ? 'homepage' : fallback.viewKey;
-            const rawViewKey = (tab?.viewKey ?? toViewKey(label)) || fallbackKey;
-            const viewKey = index === 0 ? 'homepage' : rawViewKey;
-            const href = index === 0
-                ? route('cms.dashboard')
-                : ('href' in (tab ?? {}) ? tab.href : route('cms.dashboard', { view: viewKey }));
+const updateTopIndicator = () => {
+    const target = topNavRef.value?.querySelector('.ym-top-link--active');
 
-            return { label, viewKey, href };
-        });
-
-    while (normalized.length < 6) {
-        normalized.push({ ...fallbackTabs[normalized.length] });
+    if (! target) {
+        topIndicatorStyle.value = { ...topIndicatorStyle.value, opacity: 0 };
+        return;
     }
 
-    return normalized;
+    topIndicatorStyle.value = {
+        left: `${target.offsetLeft}px`,
+        width: `${target.offsetWidth}px`,
+        opacity: 1,
+    };
 };
+
+// The first measurement lands before the web font swaps in, and the swap changes
+// how wide every label is, so the bar has to be measured again once the font and
+// the nav's own size have settled.
+let topNavObserver;
+
+watch(topNavRef, (nav) => {
+    topNavObserver?.disconnect();
+
+    if (nav && 'ResizeObserver' in window) {
+        topNavObserver = new ResizeObserver(() => updateTopIndicator());
+        topNavObserver.observe(nav);
+    }
+
+    nextTick(updateTopIndicator);
+}, { immediate: true });
+
+onMounted(() => {
+    nextTick(updateTopIndicator);
+    document.fonts?.ready.then(() => nextTick(updateTopIndicator));
+});
+
+onBeforeUnmount(() => topNavObserver?.disconnect());
+
+watch(() => page.url, () => nextTick(updateTopIndicator));
+watch(topMenuItems, () => nextTick(updateTopIndicator));
+watch(currentLocale, () => nextTick(updateTopIndicator));
 
 const isOnDashboard = computed(() => page.url.startsWith(route('cms.dashboard', undefined, false)));
 
-const dashboardView = computed(() => {
-    if (!isOnDashboard.value) {
-        return '';
-    }
-
-    const query = page.url.split('?')[1] ?? '';
-    return new URLSearchParams(query).get('view') ?? 'homepage';
-});
+// Read from the page the server actually rendered, not from the query string: a
+// request with no view, or for a view this viewer may not open, lands elsewhere.
+const dashboardView = computed(() => (isOnDashboard.value ? page.props.view ?? '' : ''));
 
 const isTopNavActive = (item) => {
     if (!isOnDashboard.value) {
         return false;
     }
 
-    if (canAccessAdmin.value) {
-        return dashboardView.value === item.viewKey;
-    }
-
-    return coachMemberView.value === item.viewKey;
-};
-
-const getTopNavHref = (item) => {
-    if (canAccessAdmin.value) {
-        return item.href;
-    }
-
-    return '';
-};
-
-const handleTopTabClick = (item) => {
-    if (canAccessAdmin.value) {
-        return;
-    }
-
-    coachMemberView.value = item.viewKey;
-
-    window.dispatchEvent(new CustomEvent('ym-dashboard-action', {
-        detail: { action: 'view-change', viewKey: item.viewKey },
-    }));
+    return dashboardView.value === item.viewKey;
 };
 
 const closeMenus = () => {
@@ -527,10 +512,11 @@ const triggerDashboardAction = (action) => {
     window.dispatchEvent(new CustomEvent('ym-dashboard-action', {
         detail: {
             action,
-            tabs: topMenuItems.value.map((item) => ({
-                label: item.label,
-                viewKey: item.viewKey,
-                href: item.href,
+            tabs: dashboardTabs.value.map((tab) => ({
+                viewKey: tab.viewKey,
+                labelKey: tab.labelKey,
+                label: tabLabelOverrides.value[tab.viewKey] ?? null,
+                hidden: hiddenTabKeys.value.includes(tab.viewKey),
             })),
         },
     }));
@@ -545,11 +531,8 @@ const handleQuickAction = (action) => {
 };
 
 const handleDashboardTabsUpdated = (event) => {
-    const incomingTabs = event?.detail?.tabs;
-    if (Array.isArray(incomingTabs)) {
-        topMenuItems.value = normalizeTopTabs(incomingTabs);
-        coachMemberView.value = 'homepage';
-    }
+    tabLabelOverrides.value = event?.detail?.overrides ?? {};
+    hiddenTabKeys.value = event?.detail?.hidden ?? [];
 };
 
 const handleGlobalClick = (event) => {
@@ -575,15 +558,6 @@ const handleGlobalClick = (event) => {
 onMounted(() => {
     document.addEventListener('click', handleGlobalClick);
     window.addEventListener('ym-dashboard-tabs-updated', handleDashboardTabsUpdated);
-});
-
-watch([canAccessAdmin, canViewCoachDashboard], () => {
-    topMenuItems.value = roleTopMenuDefaults.value.map((item) => ({ ...item }));
-    coachMemberView.value = 'homepage';
-}, { immediate: true });
-
-watch(currentLocale, () => {
-    topMenuItems.value = roleTopMenuDefaults.value.map((item) => ({ ...item }));
 });
 
 watch(() => page.url, closeSidebar);
@@ -812,15 +786,16 @@ const logout = () => {
                     <span class="ym-subnav-indicator" :style="subIndicatorStyle" />
                 </nav>
 
-                <nav v-if="isOnDashboard" class="ym-top-links">
+                <nav v-if="isOnDashboard" ref="topNavRef" class="ym-top-links">
+                    <span class="ym-top-links-indicator" :style="topIndicatorStyle" />
+
                     <NavMenuLink
                         v-for="item in topMenuItems"
                         :key="item.viewKey"
-                        :href="getTopNavHref(item)"
+                        :href="item.href"
                         :label="item.label"
                         :active="isTopNavActive(item)"
                         variant="top"
-                        @tab-click="handleTopTabClick(item)"
                     />
 
                     <div ref="dashboardActionsRef" class="ym-header-menu-wrap ym-top-links-more">
@@ -889,6 +864,20 @@ const logout = () => {
                         </button>
                     </div>
                 </Transition>
+
+                <TransitionGroup name="ym-alert-fade">
+                    <div
+                        v-for="toast in toasts"
+                        :key="toast.id"
+                        :class="[toast.kind === 'error' ? 'ym-alert-error' : 'ym-alert-success', 'ym-main-alert']"
+                    >
+                        <i :class="['bi', toast.kind === 'error' ? 'bi-exclamation-triangle' : 'bi-check-circle', 'ym-alert-icon']" />
+                        <span class="ym-alert-text">{{ $t(toast.key, toast.params) }}</span>
+                        <button type="button" class="ym-alert-close" :aria-label="$t('common.close')" @click="dismissToast(toast.id)">
+                            <i class="bi bi-x-lg" />
+                        </button>
+                    </div>
+                </TransitionGroup>
                 </div>
                 <slot />
             </main>
