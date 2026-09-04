@@ -4,12 +4,17 @@ import { Link, router } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import Modal from '@/Components/UI/Modal.vue';
 import Checkbox from '@/Components/Form/Checkbox.vue';
+import FilterBar from '@/Components/UI/FilterBar.vue';
+import { useFilters } from '@/composables/useFilters.js';
 
 const props = defineProps({
     users: Object,
+    filters: Object,
     endpoints: Object,
     auth: Object,
 });
+
+const { filters, active, reset } = useFilters(props.endpoints.index, props.filters);
 
 const isCurrentUser = (id) => props.auth?.user?.id === id;
 
@@ -57,6 +62,25 @@ export default {
                 {{ $t('admin.createUser') }}
             </Link>
         </div>
+
+        <FilterBar :active="active" @reset="reset">
+            <input
+                v-model="filters.search"
+                type="search"
+                class="ym-log-search"
+                :placeholder="$t('admin.searchUsers')"
+            />
+            <select v-model="filters.role" class="ym-log-filter-select">
+                <option value="">{{ $t('admin.allRoles') }}</option>
+                <option value="admin">{{ $t('admin.roles.admin') }}</option>
+                <option value="coach">{{ $t('admin.roles.coach') }}</option>
+                <option value="member">{{ $t('admin.roles.member') }}</option>
+            </select>
+            <select v-model="filters.sort" class="ym-log-filter-select">
+                <option value="">{{ $t('admin.sortNewest') }}</option>
+                <option value="last_login">{{ $t('admin.sortLastLogin') }}</option>
+            </select>
+        </FilterBar>
 
         <div class="ym-table-wrap">
             <table class="ym-table">
