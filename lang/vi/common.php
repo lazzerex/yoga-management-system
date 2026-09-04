@@ -32,4 +32,5 @@ return [
     'openDashboardOptions' => 'Mở tùy chọn dashboard',
     'switchLang' => 'Chuyển sang tiếng Anh',
     'clear' => 'Xoá',
+    'remove' => 'Gỡ bỏ',
 ];

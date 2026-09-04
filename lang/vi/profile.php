@@ -28,4 +28,8 @@ return [
     'sessionsTotal' => 'Tổng Phiên',
     'mobile' => 'Di động',
     'desktop' => 'Máy tính',
+    'profilePicture' => 'Ảnh đại diện',
+    'pictureHint' => 'JPG, PNG hoặc WebP, tối đa 2 MB.',
+    'accountDetails' => 'Thông tin tài khoản',
+    'editAccount' => 'Sửa thông tin',
 ];

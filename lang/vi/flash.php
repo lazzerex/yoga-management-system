@@ -82,4 +82,6 @@ return [
     'fileDeleted' => 'Đã xoá tệp ":name".',
     'paymentVoided' => 'Đã huỷ hiệu lực khoản thanh toán.',
     'paymentAlreadyVoided' => 'Khoản thanh toán này đã bị huỷ hiệu lực.',
+    'avatarUpdated' => 'Đã cập nhật ảnh đại diện.',
+    'accountUpdated' => 'Đã cập nhật thông tin tài khoản.',
 ];

@@ -40,7 +40,6 @@ return [
     'searchIp' => 'Tìm kiếm IP hoặc định danh...',
     'allStatus' => 'Tất cả Trạng thái',
     'allDevices' => 'Tất cả Thiết bị',
-    'clear' => 'Xóa',
     'noLogs' => 'Không tìm thấy nhật ký đăng nhập.',
     'status' => 'Trạng thái',
     'user' => 'Người dùng',
@@ -80,4 +79,8 @@ return [
         'view_student_medical_notes' => 'Xem Ghi chú Y tế',
         'cancel_enrollment' => 'Huỷ đăng ký lớp',
     ],
+    'searchUsers' => 'Tên, tên đăng nhập hoặc email',
+    'allRoles' => 'Tất cả vai trò',
+    'sortNewest' => 'Mới nhất',
+    'sortLastLogin' => 'Lần đăng nhập cuối',
 ];
