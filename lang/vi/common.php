@@ -2,6 +2,12 @@
 
 return [
     'search' => 'Tìm kiếm',
+    'filters' => 'Bộ lọc',
+    'done' => 'Xong',
+    'from' => 'Từ ngày',
+    'to' => 'Đến ngày',
+    'chooseFile' => 'Chọn tệp',
+    'noFileChosen' => 'Chưa chọn tệp',
     'signOut' => 'Đăng xuất',
     'endSession' => 'Kết thúc phiên hiện tại',
     'markAllRead' => 'Đánh dấu đã đọc tất cả',
