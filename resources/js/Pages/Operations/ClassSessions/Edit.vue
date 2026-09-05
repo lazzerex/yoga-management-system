@@ -56,33 +56,40 @@ export default {
 
 
 <template>
-    <section class="ym-surface ym-section">
-        <h2 class="ym-title">{{ $t('operations.editSession') }}</h2>
-        <p class="ym-subtitle">
-            {{ classSession.class_type_name }} — {{ classSession.session_date }} {{ classSession.start_time }}
-            ({{ classSession.branch_name }})
-        </p>
-
-        <form class="ym-form-grid" @submit.prevent="submit">
-            <Field :label="$t('operations.room')" :error="form.errors.room_id">
-                <Select v-model="form.room_id" :options="roomOptions" />
-            </Field>
-            <Field :label="$t('operations.coach')" :error="form.errors.coach_profile_id">
-                <Select v-model="form.coach_profile_id" :options="coachOptions" />
-            </Field>
-            <Field :label="$t('operations.capacity')" :error="form.errors.capacity" :hint="capacityHint" :hint-warn="capacityOverRoom">
-                <TextInput v-model="form.capacity" type="number" :max="selectedRoom?.capacity" />
-            </Field>
-            <Field :label="$t('operations.status')" :error="form.errors.status">
-                <Select v-model="form.status" :options="statusOptions.map((s) => ({ value: s.value, label: $t(s.label) }))" />
-            </Field>
-
-            <div class="ym-actions">
-                <button type="submit" class="ym-btn-sm" :disabled="form.processing">
-                    {{ $t('common.save') }}
-                </button>
-                <Link :href="endpoints.index" class="ym-btn-ghost">{{ $t('common.cancel') }}</Link>
+    <div class="ym-ui ym-form-page">
+        <header class="ym-page-head">
+            <div>
+                <h1 class="ym-page-title">{{ $t('operations.editSession') }}</h1>
+                <p class="ym-page-sub">{{ classSession.class_type_name }} · {{ classSession.session_date }} {{ classSession.start_time }} · {{ classSession.branch_name }}</p>
             </div>
+        </header>
+
+        <form @submit.prevent="submit">
+            <section class="ym-card">
+                <div class="ym-card-body">
+                    <div class="ym-form-grid-2">
+                        <Field :label="$t('operations.room')" :error="form.errors.room_id">
+                            <Select v-model="form.room_id" :options="roomOptions" />
+                        </Field>
+                        <Field :label="$t('operations.coach')" :error="form.errors.coach_profile_id">
+                            <Select v-model="form.coach_profile_id" :options="coachOptions" />
+                        </Field>
+                        <Field :label="$t('operations.capacity')" :error="form.errors.capacity" :hint="capacityHint" :hint-warn="capacityOverRoom">
+                            <TextInput v-model="form.capacity" type="number" :max="selectedRoom?.capacity" />
+                        </Field>
+                        <Field :label="$t('operations.status')" :error="form.errors.status">
+                            <Select v-model="form.status" :options="statusOptions.map((s) => ({ value: s.value, label: $t(s.label) }))" />
+                        </Field>
+                    </div>
+                </div>
+
+                <div class="ym-form-foot">
+                    <Link :href="endpoints.index" class="ym-btn ym-btn--quiet">{{ $t('common.cancel') }}</Link>
+                    <button type="submit" class="ym-btn ym-btn--primary" :disabled="form.processing">
+                        {{ $t('common.save') }}
+                    </button>
+                </div>
+            </section>
         </form>
-    </section>
+    </div>
 </template>

@@ -30,25 +30,38 @@ export default {
 
 
 <template>
-    <section class="ym-surface ym-section">
-        <h2 class="ym-title">{{ $t('operations.editClassType') }}</h2>
-        <p class="ym-subtitle">{{ classType.name }}</p>
-
-        <form class="ym-form-grid" @submit.prevent="submit">
-            <Field :label="$t('operations.classTypeName')" :error="form.errors.name">
-                <TextInput v-model="form.name" />
-            </Field>
-            <Field :label="$t('operations.description')" :error="form.errors.description">
-                <Textarea v-model="form.description" />
-            </Field>
-            <Checkbox v-model="form.is_active" :label="$t('operations.active')" />
-
-            <div class="ym-actions">
-                <button type="submit" class="ym-btn-sm" :disabled="form.processing">
-                    {{ $t('common.save') }}
-                </button>
-                <Link :href="endpoints.index" class="ym-btn-ghost">{{ $t('common.cancel') }}</Link>
+    <div class="ym-ui ym-form-page">
+        <header class="ym-page-head">
+            <div>
+                <h1 class="ym-page-title">{{ $t('operations.editClassType') }}</h1>
+                <p class="ym-page-sub">{{ classType.name }}</p>
             </div>
+        </header>
+
+        <form @submit.prevent="submit">
+            <section class="ym-card">
+                <div class="ym-card-body">
+                    <div class="ym-form-grid-2">
+                        <Field :label="$t('operations.classTypeName')" :error="form.errors.name">
+                            <TextInput v-model="form.name" />
+                        </Field>
+                        <Field :label="$t('operations.description')" :error="form.errors.description">
+                            <Textarea v-model="form.description" />
+                        </Field>
+                    </div>
+
+                    <div class="mt-4">
+                        <Checkbox v-model="form.is_active" :label="$t('operations.active')" />
+                    </div>
+                </div>
+
+                <div class="ym-form-foot">
+                    <Link :href="endpoints.index" class="ym-btn ym-btn--quiet">{{ $t('common.cancel') }}</Link>
+                    <button type="submit" class="ym-btn ym-btn--primary" :disabled="form.processing">
+                        {{ $t('common.save') }}
+                    </button>
+                </div>
+            </section>
         </form>
-    </section>
+    </div>
 </template>

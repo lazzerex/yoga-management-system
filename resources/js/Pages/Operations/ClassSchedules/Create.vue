@@ -94,43 +94,56 @@ export default {
 
 
 <template>
-    <section class="ym-surface ym-section">
-        <h2 class="ym-title">{{ $t('operations.createSchedule') }}</h2>
-        <p class="ym-subtitle">{{ $t('operations.manageSchedules') }}</p>
-
-        <form class="ym-form-grid" @submit.prevent="submit">
-            <Field :label="$t('operations.branch')" :error="form.errors.branch_id">
-                <Select v-model="form.branch_id" :options="branchOptions" />
-            </Field>
-            <Field :label="$t('operations.room')" :error="form.errors.room_id">
-                <Select v-model="form.room_id" :options="roomOptions" />
-            </Field>
-            <Field :label="$t('operations.class')" :error="form.errors.class_type_id">
-                <Select v-model="form.class_type_id" :options="classTypeOptions" />
-            </Field>
-            <Field :label="$t('operations.coach')" :error="form.errors.coach_profile_id">
-                <Select v-model="form.coach_profile_id" :options="coachOptions" />
-            </Field>
-            <Field :label="$t('operations.dayOfWeek')" :error="form.errors.day_of_week">
-                <Select v-model="form.day_of_week" :options="dayOptions.map((d) => ({ value: d.value, label: $t(d.label) }))" />
-            </Field>
-            <Field :label="$t('operations.startTime')" :error="form.errors.start_time">
-                <TextInput v-model="form.start_time" type="time" />
-            </Field>
-            <Field :label="$t('operations.durationMinutes')" :error="form.errors.duration_minutes">
-                <TextInput v-model="form.duration_minutes" type="number" />
-            </Field>
-            <Field :label="$t('operations.capacity')" :error="form.errors.capacity" :hint="capacityHint" :hint-warn="capacityOverRoom">
-                <TextInput v-model="form.capacity" type="number" :max="selectedRoom?.capacity" />
-            </Field>
-            <Checkbox v-model="form.is_active" :label="$t('operations.active')" />
-
-            <div class="ym-actions">
-                <button type="submit" class="ym-btn-sm" :disabled="form.processing">
-                    {{ $t('common.create') }}
-                </button>
-                <Link :href="endpoints.index" class="ym-btn-ghost">{{ $t('common.cancel') }}</Link>
+    <div class="ym-ui ym-form-page">
+        <header class="ym-page-head">
+            <div>
+                <h1 class="ym-page-title">{{ $t('operations.createSchedule') }}</h1>
+                <p class="ym-page-sub">{{ $t('operations.manageSchedules') }}</p>
             </div>
+        </header>
+
+        <form @submit.prevent="submit">
+            <section class="ym-card">
+                <div class="ym-card-body">
+                    <div class="ym-form-grid-2">
+                        <Field :label="$t('operations.branch')" :error="form.errors.branch_id">
+                            <Select v-model="form.branch_id" :options="branchOptions" />
+                        </Field>
+                        <Field :label="$t('operations.room')" :error="form.errors.room_id">
+                            <Select v-model="form.room_id" :options="roomOptions" />
+                        </Field>
+                        <Field :label="$t('operations.class')" :error="form.errors.class_type_id">
+                            <Select v-model="form.class_type_id" :options="classTypeOptions" />
+                        </Field>
+                        <Field :label="$t('operations.coach')" :error="form.errors.coach_profile_id">
+                            <Select v-model="form.coach_profile_id" :options="coachOptions" />
+                        </Field>
+                        <Field :label="$t('operations.dayOfWeek')" :error="form.errors.day_of_week">
+                            <Select v-model="form.day_of_week" :options="dayOptions.map((d) => ({ value: d.value, label: $t(d.label) }))" />
+                        </Field>
+                        <Field :label="$t('operations.startTime')" :error="form.errors.start_time">
+                            <TextInput v-model="form.start_time" type="time" />
+                        </Field>
+                        <Field :label="$t('operations.durationMinutes')" :error="form.errors.duration_minutes">
+                            <TextInput v-model="form.duration_minutes" type="number" />
+                        </Field>
+                        <Field :label="$t('operations.capacity')" :error="form.errors.capacity" :hint="capacityHint" :hint-warn="capacityOverRoom">
+                            <TextInput v-model="form.capacity" type="number" :max="selectedRoom?.capacity" />
+                        </Field>
+                    </div>
+
+                    <div class="mt-4">
+                        <Checkbox v-model="form.is_active" :label="$t('operations.active')" />
+                    </div>
+                </div>
+
+                <div class="ym-form-foot">
+                    <Link :href="endpoints.index" class="ym-btn ym-btn--quiet">{{ $t('common.cancel') }}</Link>
+                    <button type="submit" class="ym-btn ym-btn--primary" :disabled="form.processing">
+                        {{ $t('common.create') }}
+                    </button>
+                </div>
+            </section>
         </form>
-    </section>
+    </div>
 </template>
