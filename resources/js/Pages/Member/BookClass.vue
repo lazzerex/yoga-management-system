@@ -207,8 +207,19 @@ export default {
 </script>
 
 <template>
-    <div class="ym-book">
-        <div class="ym-book-layout">
+    <div class="ym-ui">
+        <header class="ym-page-head">
+            <div>
+                <h1 class="ym-page-title">
+                    {{ $t('member.tabBook') }}
+                    <span class="ym-count">{{ visibleSessions.length }}</span>
+                </h1>
+                <p class="ym-page-sub">{{ $t('member.availableSessions') }}</p>
+            </div>
+        </header>
+
+        <div class="ym-book">
+            <div class="ym-book-layout">
             <aside class="ym-book-rail">
                 <section class="ym-book-card">
                     <div class="ym-book-card-head">
@@ -368,6 +379,7 @@ export default {
                     </TransitionGroup>
                 </section>
             </main>
+            </div>
         </div>
     </div>
 </template>

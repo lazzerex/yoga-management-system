@@ -131,7 +131,22 @@ export default {
 </script>
 
 <template>
-    <div class="ym-book">
+    <div class="ym-ui">
+        <header class="ym-page-head">
+            <div>
+                <h1 class="ym-page-title">
+                    {{ $t('member.myBookings') }}
+                    <span class="ym-count">{{ myEnrollments.length }}</span>
+                </h1>
+            </div>
+            <div class="ym-page-actions">
+                <Link :href="route('member.classes.book')" class="ym-btn ym-btn--primary">
+                    <i class="bi bi-plus-lg" /> {{ $t('member.tabBook') }}
+                </Link>
+            </div>
+        </header>
+
+        <div class="ym-book">
         <div class="ym-book-layout ym-book-layout--aside">
             <main class="ym-book-main-col">
                 <section class="ym-book-card">
@@ -243,7 +258,7 @@ export default {
                 </div>
             </aside>
         </div>
-    </div>
+        </div>
 
     <Modal :show="!!detail" :title="$t('member.bookingDetails')" @close="closeDetail">
         <div v-if="detail" class="ym-detail">
@@ -345,4 +360,5 @@ export default {
             </div>
         </div>
     </Modal>
+    </div>
 </template>

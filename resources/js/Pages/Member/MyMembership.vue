@@ -10,6 +10,14 @@ const props = defineProps({
 
 const statusLabel = (status) => t(`operations.invoiceStatus${status.charAt(0).toUpperCase()}${status.slice(1)}`);
 const current = props.entitlements[0] ?? null;
+
+const statusTone = {
+    paid: 'ok',
+    waived: 'neutral',
+    partial: 'info',
+    unpaid: 'warn',
+    overdue: 'danger',
+};
 </script>
 <script>
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -21,76 +29,95 @@ export default {
 
 
 <template>
-    <div class="ym-stat-strip">
-        <div class="ym-stat">
-            <p class="ym-stat-label">{{ $t('member.currentPlan') }}</p>
-            <p class="ym-stat-value">{{ current?.description ?? $t('member.noActivePlan') }}</p>
-            <p v-if="current" class="ym-stat-note">{{ $t('member.validUntil', { date: current.valid_until }) }}</p>
+    <div class="ym-ui">
+        <div class="ym-stats">
+            <div class="ym-stat-card">
+                <p class="ym-stat-card-label">{{ $t('member.currentPlan') }}</p>
+                <p class="ym-stat-card-value">{{ current?.description ?? $t('member.noActivePlan') }}</p>
+                <p v-if="current" class="ym-stat-card-note">{{ $t('member.validUntil', { date: current.valid_until }) }}</p>
+            </div>
+            <div class="ym-stat-card ym-stat-card--info">
+                <p class="ym-stat-card-label">{{ $t('member.sessionsIncluded') }}</p>
+                <p class="ym-stat-card-value">{{ current ? (current.sessions_granted ?? $t('member.unlimited')) : '—' }}</p>
+            </div>
+            <div class="ym-stat-card" :class="{ 'ym-stat-card--danger': outstanding > 0 }">
+                <p class="ym-stat-card-label">{{ $t('member.outstandingBalance') }}</p>
+                <p class="ym-stat-card-value">{{ formatVnd(outstanding) }}</p>
+            </div>
         </div>
-        <div class="ym-stat">
-            <p class="ym-stat-label">{{ $t('member.sessionsIncluded') }}</p>
-            <p class="ym-stat-value">{{ current ? (current.sessions_granted ?? $t('member.unlimited')) : '-' }}</p>
-        </div>
-        <div class="ym-stat">
-            <p class="ym-stat-label">{{ $t('member.outstandingBalance') }}</p>
-            <p class="ym-stat-value">{{ formatVnd(outstanding) }}</p>
-        </div>
+
+        <header class="ym-page-head">
+            <div>
+                <h1 class="ym-page-title">{{ $t('member.activeEntitlements') }}</h1>
+                <p class="ym-page-sub">{{ $t('member.activeEntitlementsSubtitle') }}</p>
+            </div>
+        </header>
+
+        <section class="ym-card">
+            <ul v-if="entitlements.length" class="ym-timeline">
+                <li v-for="entitlement in entitlements" :key="entitlement.id" class="ym-timeline-item">
+                    <span class="ym-timeline-mark"><i class="bi bi-patch-check" /></span>
+                    <div class="ym-timeline-body">
+                        <div class="ym-timeline-row">
+                            <span class="ym-timeline-amount">{{ entitlement.description }}</span>
+                            <span class="ym-tag ym-tag--ok">{{ $t('operations.invoiceStatusPaid') }}</span>
+                        </div>
+                        <p class="ym-timeline-meta">
+                            {{ entitlement.valid_from ?? '—' }} – {{ entitlement.valid_until }}
+                            <template v-if="entitlement.sessions_granted">
+                                · {{ $t('member.sessionsGranted', { count: entitlement.sessions_granted }) }}
+                            </template>
+                        </p>
+                    </div>
+                </li>
+            </ul>
+
+            <div v-else class="ym-empty">
+                <i class="bi bi-patch-question" />
+                <p>{{ $t('member.noActivePlanNote') }}</p>
+            </div>
+        </section>
+
+        <section class="ym-card">
+            <div class="ym-card-head">
+                <h2 class="ym-card-title">{{ $t('member.invoiceHistory') }}</h2>
+            </div>
+
+            <div class="ym-table-scroll">
+                <table class="ym-grid-table">
+                    <thead>
+                        <tr>
+                            <th>{{ $t('operations.invoiceNumber') }}</th>
+                            <th>{{ $t('operations.planBranch') }}</th>
+                            <th>{{ $t('operations.invoiceIssuedAt') }}</th>
+                            <th>{{ $t('operations.dueDate') }}</th>
+                            <th class="is-num">{{ $t('operations.amount') }}</th>
+                            <th class="is-num">{{ $t('operations.invoiceBalance') }}</th>
+                            <th>{{ $t('operations.status') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="invoice in invoices" :key="invoice.id">
+                            <td class="is-strong">{{ invoice.invoice_number }}</td>
+                            <td class="is-muted">{{ invoice.branch_name }}</td>
+                            <td class="is-muted ym-num">{{ invoice.issued_at }}</td>
+                            <td class="is-muted ym-num">{{ invoice.due_date }}</td>
+                            <td class="is-num">{{ formatVnd(invoice.total_amount) }}</td>
+                            <td class="is-num is-strong">{{ formatVnd(invoice.balance) }}</td>
+                            <td>
+                                <span class="ym-tag" :class="`ym-tag--${statusTone[invoice.status] ?? 'neutral'}`">
+                                    {{ statusLabel(invoice.status) }}
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div v-if="!invoices.length" class="ym-empty">
+                <i class="bi bi-receipt" />
+                <p>{{ $t('member.noInvoices') }}</p>
+            </div>
+        </section>
     </div>
-
-    <section class="ym-surface ym-section">
-        <h2 class="ym-title">{{ $t('member.activeEntitlements') }}</h2>
-        <p class="ym-subtitle">{{ $t('member.activeEntitlementsSubtitle') }}</p>
-
-        <ul v-if="entitlements.length" class="ym-review-list">
-            <li v-for="entitlement in entitlements" :key="entitlement.id" class="ym-review-item">
-                <span class="ym-invoice-status ym-invoice-status--paid">{{ $t('operations.invoiceStatusPaid') }}</span>
-                <div class="ym-review-body">
-                    <p class="font-medium">{{ entitlement.description }}</p>
-                    <p class="ym-review-meta">
-                        {{ entitlement.valid_from ?? '-' }} - {{ entitlement.valid_until }}
-                        <template v-if="entitlement.sessions_granted">
-                            · {{ $t('member.sessionsGranted', { count: entitlement.sessions_granted }) }}
-                        </template>
-                    </p>
-                </div>
-            </li>
-        </ul>
-        <p v-else class="ym-card-note">{{ $t('member.noActivePlanNote') }}</p>
-    </section>
-
-    <section class="ym-surface ym-section">
-        <h2 class="ym-title">{{ $t('member.invoiceHistory') }}</h2>
-
-        <div class="ym-table-wrap">
-            <table class="ym-table">
-                <thead>
-                    <tr>
-                        <th class="ym-th">{{ $t('operations.invoiceNumber') }}</th>
-                        <th class="ym-th">{{ $t('operations.planBranch') }}</th>
-                        <th class="ym-th">{{ $t('operations.invoiceIssuedAt') }}</th>
-                        <th class="ym-th">{{ $t('operations.dueDate') }}</th>
-                        <th class="ym-th">{{ $t('operations.amount') }}</th>
-                        <th class="ym-th">{{ $t('operations.invoiceBalance') }}</th>
-                        <th class="ym-th">{{ $t('operations.status') }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="invoice in invoices" :key="invoice.id" class="ym-tr">
-                        <td class="ym-td font-medium">{{ invoice.invoice_number }}</td>
-                        <td class="ym-td text-neutral-500">{{ invoice.branch_name }}</td>
-                        <td class="ym-td text-neutral-500">{{ invoice.issued_at }}</td>
-                        <td class="ym-td text-neutral-500">{{ invoice.due_date }}</td>
-                        <td class="ym-td">{{ formatVnd(invoice.total_amount) }}</td>
-                        <td class="ym-td">{{ formatVnd(invoice.balance) }}</td>
-                        <td class="ym-td">
-                            <span :class="['ym-invoice-status', `ym-invoice-status--${invoice.status}`]">{{ statusLabel(invoice.status) }}</span>
-                        </td>
-                    </tr>
-                    <tr v-if="!invoices.length">
-                        <td class="ym-td text-neutral-500" colspan="7">{{ $t('member.noInvoices') }}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
 </template>

@@ -53,28 +53,28 @@ export default {
 </script>
 
 <template>
-    <div class="ym-stat-strip">
-        <div class="ym-stat">
-            <p class="ym-stat-label">{{ $t('member.totalSessionsPlanned') }}</p>
-            <p class="ym-stat-value">{{ sessions.length }}</p>
-            <p class="ym-stat-note">{{ $t('member.bookedAndConfirmed') }}</p>
-        </div>
-        <div class="ym-stat">
-            <p class="ym-stat-label">{{ $t('member.nextSession') }}</p>
-            <p class="ym-stat-value">{{ nextSession ? `${nextSession.start_time}` : '—' }}</p>
-            <p v-if="nextSession" class="ym-stat-note">{{ nextSession.class_type_name }}</p>
-        </div>
-    </div>
-
-    <div class="ym-pane">
-        <div class="ym-pane-head">
-            <div class="ym-pane-title-wrap">
-                <i class="bi bi-calendar-week ym-pane-icon" />
-                <h2 class="ym-pane-title">{{ $t('member.personalWeeklyCalendar') }}</h2>
+    <div class="ym-ui">
+        <div class="ym-stats">
+            <div class="ym-stat-card">
+                <p class="ym-stat-card-label">{{ $t('member.totalSessionsPlanned') }}</p>
+                <p class="ym-stat-card-value">{{ sessions.length }}</p>
+                <p class="ym-stat-card-note">{{ $t('member.bookedAndConfirmed') }}</p>
+            </div>
+            <div class="ym-stat-card ym-stat-card--info">
+                <p class="ym-stat-card-label">{{ $t('member.nextSession') }}</p>
+                <p class="ym-stat-card-value">{{ nextSession ? `${nextSession.start_time}` : '—' }}</p>
+                <p v-if="nextSession" class="ym-stat-card-note">{{ nextSession.class_type_name }}</p>
             </div>
         </div>
-        <div class="ym-pane-body">
-            <div class="ym-timetable-scroll">
+
+        <header class="ym-page-head">
+            <div>
+                <h1 class="ym-page-title">{{ $t('member.personalWeeklyCalendar') }}</h1>
+            </div>
+        </header>
+
+        <section class="ym-card">
+            <div v-if="sessions.length" class="ym-card-body ym-timetable-scroll">
                 <div class="ym-timetable">
                     <div v-for="day in weeklySchedule" :key="day.day" class="ym-timetable-col">
                         <div class="ym-timetable-head">
@@ -96,10 +96,11 @@ export default {
                     </div>
                 </div>
             </div>
-            <div v-if="!sessions.length" class="ym-info-row">
-                <i class="bi bi-info-circle ym-info-icon" />
-                <span>{{ $t('member.noClasses') }}</span>
+
+            <div v-else class="ym-empty">
+                <i class="bi bi-calendar-week" />
+                <p>{{ $t('member.noClasses') }}</p>
             </div>
-        </div>
+        </section>
     </div>
 </template>
