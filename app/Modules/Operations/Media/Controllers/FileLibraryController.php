@@ -9,6 +9,7 @@ use App\Models\Payment;
 use App\Models\StudentProfile;
 use App\Models\User;
 use App\Modules\Operations\Media\Actions\AuthorizeMediaAccessAction;
+use App\Support\Table\SortsQueries;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Http\Request;
@@ -17,6 +18,8 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class FileLibraryController extends Controller
 {
+    use SortsQueries;
+
     /** Keyed by the model that owns the file; the UI calls these folders. */
     private const KINDS = [
         'people' => User::class,
@@ -32,8 +35,10 @@ class FileLibraryController extends Controller
         $scope = $this->visibleScope($user);
         $kind = $request->string('kind')->toString();
         $search = $request->string('search')->toString();
+        $from = $request->date('from')?->toDateString();
+        $to = $request->date('to')?->toDateString();
 
-        $files = Media::query()
+        $query = Media::query()
             ->with(['model' => fn (MorphTo $model) => $model->morphWith([
                 User::class => ['coachProfile:id,user_id', 'studentProfile:id,user_id'],
                 Payment::class => ['invoice:id,invoice_number'],
@@ -43,9 +48,16 @@ class FileLibraryController extends Controller
             ->when($search !== '', fn ($q) => $q->where(fn ($w) => $w
                 ->where('name', 'like', "%{$search}%")
                 ->orWhere('file_name', 'like', "%{$search}%")))
-            ->orderByDesc('id')
-            ->paginate(20)
-            ->withQueryString();
+            ->when($from, fn ($q) => $q->whereDate('created_at', '>=', $from))
+            ->when($to, fn ($q) => $q->whereDate('created_at', '<=', $to));
+
+        $sort = $this->applySort($query, $request, [
+            'name' => 'name',
+            'size' => 'size',
+            'created_at' => 'created_at',
+        ], 'id');
+
+        $files = $query->paginate(20)->withQueryString();
 
         return inertia('Operations/FileLibrary', [
             'files' => $files->through(fn (Media $media) => $this->row($user, $media)),
@@ -54,7 +66,7 @@ class FileLibraryController extends Controller
                 'totalSize' => (int) Media::query()->tap($scope)->sum('size'),
                 'totalFiles' => Media::query()->tap($scope)->count(),
             ],
-            'filters' => ['kind' => $kind, 'search' => $search],
+            'filters' => ['kind' => $kind, 'search' => $search, 'from' => $from ?? '', 'to' => $to ?? ''] + $sort,
             'endpoints' => ['index' => route('operations.file-library')],
         ]);
     }
