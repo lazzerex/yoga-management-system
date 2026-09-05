@@ -534,36 +534,32 @@
         flex-shrink: 0;
     }
 
-    /* ---- KPI row ---- */
+    /* ---- Summary metrics ----
+       One compact strip above a table: labels and figures inline, never a dashboard card. */
 
     .ym-stats {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
-        gap: 0.75rem;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: stretch;
         margin-bottom: 1rem;
-    }
-
-    .ym-stat-card {
-        position: relative;
-        padding: 0.85rem 1rem 0.9rem;
-        background: var(--u-surface);
         border: 1px solid var(--u-line);
         border-radius: var(--u-r);
+        background: var(--u-surface);
         box-shadow: var(--ym-shadow-sm);
         overflow: hidden;
     }
 
-    .ym-stat-card::before {
-        content: '';
-        position: absolute;
-        inset: 0 auto 0 0;
-        width: 3px;
-        background: var(--u-stat-accent, var(--u-brand));
+    .ym-stat-card {
+        position: relative;
+        display: flex;
+        align-items: baseline;
+        gap: 0.5rem;
+        flex: 1 1 auto;
+        min-width: 0;
+        padding: 0.6rem 1rem;
     }
 
-    .ym-stat-card--warn   { --u-stat-accent: var(--u-warn); }
-    .ym-stat-card--danger { --u-stat-accent: var(--u-danger); }
-    .ym-stat-card--info   { --u-stat-accent: var(--u-info); }
+    .ym-stat-card + .ym-stat-card { border-left: 1px solid var(--u-line); }
 
     .ym-stat-card-label {
         margin: 0;
@@ -572,22 +568,38 @@
         letter-spacing: 0.04em;
         text-transform: uppercase;
         color: var(--u-ink-4);
+        white-space: nowrap;
     }
 
     .ym-stat-card-value {
-        margin: 0.3rem 0 0;
-        font-size: 1.3rem;
-        font-weight: 750;
-        letter-spacing: -0.015em;
-        color: var(--u-ink);
+        margin: 0;
+        font-size: 1.05rem;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        color: var(--u-stat-accent, var(--u-ink));
         font-variant-numeric: tabular-nums;
-        line-height: 1.15;
+        line-height: 1.2;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
+    .ym-stat-card--warn   { --u-stat-accent: var(--u-warn); }
+    .ym-stat-card--danger { --u-stat-accent: var(--u-danger); }
+    .ym-stat-card--info   { --u-stat-accent: var(--u-info); }
+
     .ym-stat-card-note {
-        margin: 0.25rem 0 0;
-        font-size: 0.75rem;
+        margin: 0;
+        margin-left: auto;
+        padding-left: 0.5rem;
+        font-size: 0.74rem;
         color: var(--u-ink-4);
+        white-space: nowrap;
+    }
+
+    @media (max-width: 760px) {
+        .ym-stat-card { flex: 1 1 100%; }
+        .ym-stat-card + .ym-stat-card { border-left: 0; border-top: 1px solid var(--u-line); }
     }
 
     .ym-count {
