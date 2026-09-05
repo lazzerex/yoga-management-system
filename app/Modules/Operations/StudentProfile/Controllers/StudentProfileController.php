@@ -11,12 +11,15 @@ use App\Modules\Operations\StudentProfile\Actions\DeleteStudentProfileAction;
 use App\Modules\Operations\StudentProfile\Actions\UpdateStudentProfileAction;
 use App\Modules\Operations\StudentProfile\Requests\StoreStudentProfileRequest;
 use App\Modules\Operations\StudentProfile\Requests\UpdateStudentProfileRequest;
+use App\Support\Table\SortsQueries;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Response;
 
 class StudentProfileController extends Controller
 {
+    use SortsQueries;
+
     public function __construct(private AuditUserAction $audit) {}
 
     public function index(Request $request): Response
@@ -35,16 +38,19 @@ class StudentProfileController extends Controller
         $search = $request->string('search')->toString();
         $status = $request->string('status')->toString();
 
-        $profiles = StudentProfile::with(['user:id,name,username', 'user.media'])
+        $query = StudentProfile::with(['user:id,name,username', 'user.media'])
             ->select(['id', 'user_id', 'goals', 'is_active'])
             ->tap($scope)
             ->when($search !== '', fn ($q) => $q->whereHas('user', fn ($u) => $u
                 ->where('name', 'like', "%{$search}%")
                 ->orWhere('username', 'like', "%{$search}%")))
-            ->when(in_array($status, ['active', 'inactive'], true), fn ($q) => $q->where('is_active', $status === 'active'))
-            ->orderBy('id')
-            ->paginate(20)
-            ->withQueryString();
+            ->when(in_array($status, ['active', 'inactive'], true), fn ($q) => $q->where('is_active', $status === 'active'));
+
+        $sort = $this->applySort($query, $request, [
+            'is_active' => 'is_active',
+        ], 'id', 'asc');
+
+        $profiles = $query->paginate(20)->withQueryString();
         $canManage = $user->can('operations.students.manage');
 
         return inertia('Operations/StudentProfiles/Index', [
@@ -60,7 +66,7 @@ class StudentProfileController extends Controller
                 'total' => StudentProfile::query()->tap($scope)->count(),
                 'active' => StudentProfile::active()->tap($scope)->count(),
             ],
-            'filters' => ['search' => $search, 'status' => $status],
+            'filters' => ['search' => $search, 'status' => $status] + $sort,
             'endpoints' => [
                 'create' => $canManage ? route('operations.students.create') : null,
                 'index' => route('operations.students.index'),
