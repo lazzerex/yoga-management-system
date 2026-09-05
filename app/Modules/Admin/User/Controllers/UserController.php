@@ -11,6 +11,7 @@ use App\Modules\Admin\User\Actions\UpdateUserRoleAction;
 use App\Modules\Admin\User\Requests\StoreUserRequest;
 use App\Modules\Admin\User\Requests\UpdateUserRequest;
 use App\Modules\Admin\User\Requests\UpdateUserRoleRequest;
+use App\Support\Table\SortsQueries;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -19,6 +20,8 @@ use Inertia\Response;
 
 class UserController extends Controller
 {
+    use SortsQueries;
+
     public function create(): Response
     {
         return inertia('Admin/Users/Create', [
@@ -50,17 +53,23 @@ class UserController extends Controller
     {
         $search = $request->string('search')->toString();
         $role = $request->string('role')->toString();
-        $sort = $request->string('sort')->toString();
 
-        $users = User::withMax('loginLogs as last_login', 'logged_in_at')
+        $query = User::withMax('loginLogs as last_login', 'logged_in_at')
             ->when($search !== '', fn ($q) => $q->where(fn ($w) => $w
                 ->where('name', 'like', "%{$search}%")
                 ->orWhere('username', 'like', "%{$search}%")
                 ->orWhere('email', 'like', "%{$search}%")))
-            ->when(in_array($role, ['admin', 'coach', 'member'], true), fn ($q) => $q->where('role', $role))
-            ->when($sort === 'last_login', fn ($q) => $q->orderByDesc('last_login'), fn ($q) => $q->orderBy('created_at', 'desc'))
-            ->paginate(20)
-            ->withQueryString();
+            ->when(in_array($role, ['admin', 'coach', 'member'], true), fn ($q) => $q->where('role', $role));
+
+        $sort = $this->applySort($query, $request, [
+            'name' => 'name',
+            'username' => 'username',
+            'role' => 'role',
+            'created_at' => 'created_at',
+            'last_login' => 'last_login',
+        ], 'created_at');
+
+        $users = $query->paginate(20)->withQueryString();
 
         return inertia('Admin/Users/Index', [
             'users' => $users->through(fn (User $user) => [
@@ -74,7 +83,7 @@ class UserController extends Controller
                     ? Carbon::parse($user->last_login)->format('Y-m-d H:i')
                     : null,
             ]),
-            'filters' => ['search' => $search, 'role' => $role, 'sort' => $sort],
+            'filters' => ['search' => $search, 'role' => $role] + $sort,
             'endpoints' => [
                 'create' => route('admin.users.create'),
                 'index' => route('admin.users.index'),
