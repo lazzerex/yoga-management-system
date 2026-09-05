@@ -36,39 +36,70 @@ export default {
 
 
 <template>
-    <section class="ym-surface ym-section">
-        <h2 class="ym-title">{{ $t('operations.editStudent') }}</h2>
-        <p class="ym-subtitle">{{ studentProfile.user_name }}</p>
-
-        <form class="ym-form-grid" @submit.prevent="submit">
-            <Field :label="$t('operations.emergencyContactName')" :error="form.errors.emergency_contact_name">
-                <TextInput v-model="form.emergency_contact_name" />
-            </Field>
-            <Field :label="$t('operations.emergencyContactPhone')" :error="form.errors.emergency_contact_phone">
-                <TextInput v-model="form.emergency_contact_phone" />
-            </Field>
-            <Field :label="$t('operations.goals')" :error="form.errors.goals">
-                <Textarea v-model="form.goals" />
-            </Field>
-            <Field v-if="canViewMedical" :label="$t('operations.medicalNotes')" :error="form.errors.medical_notes">
-                <Textarea v-model="form.medical_notes" />
-            </Field>
-            <p v-else class="ym-card-note">{{ $t('operations.medicalNotesRestricted') }}</p>
-            <Field :label="$t('operations.avatar')" :error="form.errors.avatar" :hint="$t('operations.avatarHint')">
-                <div class="ym-avatar-field">
-                    <img v-if="studentProfile.avatar_url && !form.remove_avatar" :src="studentProfile.avatar_url" class="ym-avatar-thumb" alt="" />
-                    <FileInput v-model="form.avatar" accept="image/jpeg,image/png,image/webp" />
-                </div>
-            </Field>
-            <Checkbox v-if="studentProfile.avatar_url" v-model="form.remove_avatar" :label="$t('operations.removeAvatar')" />
-            <Checkbox v-model="form.is_active" :label="$t('operations.active')" />
-
-            <div class="ym-actions">
-                <button type="submit" class="ym-btn-sm" :disabled="form.processing">
-                    {{ $t('common.save') }}
-                </button>
-                <Link :href="endpoints.index" class="ym-btn-ghost">{{ $t('common.cancel') }}</Link>
+    <div class="ym-ui ym-form-page">
+        <header class="ym-page-head">
+            <div>
+                <h1 class="ym-page-title">{{ $t('operations.editStudent') }}</h1>
+                <p class="ym-page-sub">{{ studentProfile.user_name }}</p>
             </div>
+        </header>
+
+        <form @submit.prevent="submit">
+            <section class="ym-card">
+                <div class="ym-card-body">
+                    <div class="ym-form-grid-2">
+                        <Field :label="$t('operations.emergencyContactName')" :error="form.errors.emergency_contact_name">
+                            <TextInput v-model="form.emergency_contact_name" />
+                        </Field>
+                        <Field :label="$t('operations.emergencyContactPhone')" :error="form.errors.emergency_contact_phone">
+                            <TextInput v-model="form.emergency_contact_phone" />
+                        </Field>
+                        <Field class="ym-form-span" :label="$t('operations.goals')" :error="form.errors.goals">
+                            <Textarea v-model="form.goals" />
+                        </Field>
+                        <Field
+                            v-if="canViewMedical"
+                            class="ym-form-span"
+                            :label="$t('operations.medicalNotes')"
+                            :error="form.errors.medical_notes"
+                        >
+                            <Textarea v-model="form.medical_notes" />
+                        </Field>
+                        <p v-else class="ym-callout ym-form-span">
+                            <i class="bi bi-shield-lock" />
+                            <span>{{ $t('operations.medicalNotesRestricted') }}</span>
+                        </p>
+                        <Field
+                            class="ym-form-span"
+                            :label="$t('operations.avatar')"
+                            :error="form.errors.avatar"
+                            :hint="$t('operations.avatarHint')"
+                        >
+                            <div class="ym-avatar-row">
+                                <img
+                                    v-if="studentProfile.avatar_url && !form.remove_avatar"
+                                    :src="studentProfile.avatar_url"
+                                    class="ym-thumb"
+                                    alt=""
+                                />
+                                <FileInput v-model="form.avatar" accept="image/jpeg,image/png,image/webp" />
+                            </div>
+                        </Field>
+                    </div>
+
+                    <div class="ym-stack mt-4">
+                        <Checkbox v-if="studentProfile.avatar_url" v-model="form.remove_avatar" :label="$t('operations.removeAvatar')" />
+                        <Checkbox v-model="form.is_active" :label="$t('operations.active')" />
+                    </div>
+                </div>
+
+                <div class="ym-form-foot">
+                    <Link :href="endpoints.index" class="ym-btn ym-btn--quiet">{{ $t('common.cancel') }}</Link>
+                    <button type="submit" class="ym-btn ym-btn--primary" :disabled="form.processing">
+                        {{ $t('common.save') }}
+                    </button>
+                </div>
+            </section>
         </form>
-    </section>
+    </div>
 </template>
