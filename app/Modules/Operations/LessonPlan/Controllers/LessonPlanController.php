@@ -18,6 +18,7 @@ use App\Modules\Operations\LessonPlan\Requests\ReviewLessonPlanRequest;
 use App\Modules\Operations\LessonPlan\Requests\StoreLessonPlanRequest;
 use App\Modules\Operations\LessonPlan\Requests\UpdateLessonPlanRequest;
 use App\Modules\Operations\Media\Actions\AuthorizeMediaAccessAction;
+use App\Support\Table\SortsQueries;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -25,6 +26,8 @@ use Inertia\Response;
 
 class LessonPlanController extends Controller
 {
+    use SortsQueries;
+
     public function __construct(private AuthorizeMediaAccessAction $access) {}
 
     public function index(Request $request): Response
@@ -37,15 +40,21 @@ class LessonPlanController extends Controller
         $classTypeId = $request->integer('class_type_id');
         $coachProfileId = $request->integer('coach_profile_id');
 
-        $plans = LessonPlan::with(['classType:id,name', 'branch:id,name', 'coachProfile.user:id,name'])
+        $query = LessonPlan::with(['classType:id,name', 'branch:id,name', 'coachProfile.user:id,name'])
             ->tap($scope)
             ->when($search !== '', fn ($q) => $q->where('title', 'like', "%{$search}%"))
             ->when(in_array($status, LessonPlan::STATUSES, true), fn ($q) => $q->where('status', $status))
             ->when($classTypeId, fn ($q) => $q->where('class_type_id', $classTypeId))
-            ->when($coachProfileId, fn ($q) => $q->where('coach_profile_id', $coachProfileId))
-            ->orderByDesc('id')
-            ->paginate(20)
-            ->withQueryString();
+            ->when($coachProfileId, fn ($q) => $q->where('coach_profile_id', $coachProfileId));
+
+        $sort = $this->applySort($query, $request, [
+            'title' => 'title',
+            'level' => 'level',
+            'status' => ['draft', 'pending', 'approved', 'rejected'],
+            'duration_minutes' => 'duration_minutes',
+        ], 'id');
+
+        $plans = $query->paginate(20)->withQueryString();
 
         $counts = LessonPlan::query()->tap($scope)
             ->selectRaw('status, count(*) as total')
@@ -64,7 +73,7 @@ class LessonPlanController extends Controller
                 'status' => $status,
                 'class_type_id' => $classTypeId ?: '',
                 'coach_profile_id' => $coachProfileId ?: '',
-            ],
+            ] + $sort,
             'options' => [
                 'statuses' => LessonPlan::STATUSES,
                 'classTypes' => ClassType::active()->orderBy('name')->get(['id', 'name']),
