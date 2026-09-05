@@ -11,27 +11,34 @@ use App\Modules\Operations\CoachProfile\Actions\DeleteCoachProfileAction;
 use App\Modules\Operations\CoachProfile\Actions\UpdateCoachProfileAction;
 use App\Modules\Operations\CoachProfile\Requests\StoreCoachProfileRequest;
 use App\Modules\Operations\CoachProfile\Requests\UpdateCoachProfileRequest;
+use App\Support\Table\SortsQueries;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Response;
 
 class CoachProfileController extends Controller
 {
+    use SortsQueries;
+
     public function index(Request $request): Response
     {
         $search = $request->string('search')->toString();
         $classTypeId = $request->integer('class_type_id');
         $status = $request->string('status')->toString();
 
-        $profiles = CoachProfile::with(['user:id,name,username', 'user.media', 'classTypes:id,name'])
+        $query = CoachProfile::with(['user:id,name,username', 'user.media', 'classTypes:id,name'])
             ->when($search !== '', fn ($q) => $q->whereHas('user', fn ($u) => $u
                 ->where('name', 'like', "%{$search}%")
                 ->orWhere('username', 'like', "%{$search}%")))
             ->when($classTypeId, fn ($q) => $q->whereHas('classTypes', fn ($c) => $c->where('class_types.id', $classTypeId)))
-            ->when(in_array($status, ['active', 'inactive'], true), fn ($q) => $q->where('is_active', $status === 'active'))
-            ->orderBy('id')
-            ->paginate(20)
-            ->withQueryString();
+            ->when(in_array($status, ['active', 'inactive'], true), fn ($q) => $q->where('is_active', $status === 'active'));
+
+        $sort = $this->applySort($query, $request, [
+            'years_experience' => 'years_experience',
+            'is_active' => 'is_active',
+        ], 'id', 'asc');
+
+        $profiles = $query->paginate(20)->withQueryString();
         $canManage = $request->user()->can('operations.coaches.manage');
 
         return inertia('Operations/CoachProfiles/Index', [
@@ -48,7 +55,7 @@ class CoachProfileController extends Controller
                 'total' => CoachProfile::count(),
                 'active' => CoachProfile::active()->count(),
             ],
-            'filters' => ['search' => $search, 'class_type_id' => $classTypeId ?: '', 'status' => $status],
+            'filters' => ['search' => $search, 'class_type_id' => $classTypeId ?: '', 'status' => $status] + $sort,
             'options' => ['classTypes' => ClassType::active()->orderBy('name')->get(['id', 'name'])],
             'endpoints' => [
                 'create' => $canManage ? route('operations.coaches.create') : null,
