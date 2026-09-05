@@ -88,159 +88,215 @@ export default {
 
 
 <template>
-    <div class="ym-record-layout">
-        <div class="ym-record-main ym-surface">
-            <section class="ym-record-section">
-                <div class="ym-record-section-head">
-                    <p class="ym-record-group-title">{{ $t('profile.accountDetails') }}</p>
-                    <button v-if="!editingAccount" type="button" class="ym-btn-outline" @click="editingAccount = true">
-                        {{ $t('profile.editAccount') }}
-                    </button>
-                </div>
+    <div class="ym-ui">
+        <header class="ym-page-head">
+            <div>
+                <h1 class="ym-page-title">{{ props.profile.name }}</h1>
+                <p class="ym-page-sub">@{{ props.profile.username }}</p>
+            </div>
+        </header>
 
-                <form v-if="editingAccount" class="ym-record-account-form" @submit.prevent="submitAccount">
-                    <Field :label="$t('profile.fullName')" :error="accountForm.errors.name">
-                        <TextInput v-model="accountForm.name" />
-                    </Field>
-                    <Field :label="$t('profile.username')" :error="accountForm.errors.username">
-                        <TextInput v-model="accountForm.username" />
-                    </Field>
-                    <Field :label="$t('profile.email')" :error="accountForm.errors.email">
-                        <TextInput v-model="accountForm.email" type="email" />
-                    </Field>
-                    <div class="ym-inline-actions">
-                        <button type="submit" class="ym-btn-sm" :disabled="accountForm.processing">{{ $t('common.save') }}</button>
-                        <button type="button" class="ym-btn-outline" @click="editingAccount = false">{{ $t('common.cancel') }}</button>
+        <div class="ym-split">
+            <div>
+                <section class="ym-card">
+                    <div class="ym-card-head">
+                        <h2 class="ym-card-title">{{ $t('profile.accountDetails') }}</h2>
+                        <button
+                            v-if="!editingAccount"
+                            type="button"
+                            class="ym-btn ym-btn--outline ym-btn--sm"
+                            @click="editingAccount = true"
+                        >
+                            <i class="bi bi-pencil" /> {{ $t('profile.editAccount') }}
+                        </button>
                     </div>
-                </form>
 
-                <template v-else>
-                    <div class="ym-record-row ym-record-row--single">
-                        <div class="ym-rf">
-                            <p class="ym-rf-label">{{ $t('profile.username') }}</p>
-                            <p class="ym-rf-value">@{{ props.profile.username }}</p>
+                    <form v-if="editingAccount" @submit.prevent="submitAccount">
+                        <div class="ym-card-body">
+                            <div class="ym-form-grid-2">
+                                <Field :label="$t('profile.fullName')" :error="accountForm.errors.name">
+                                    <TextInput v-model="accountForm.name" />
+                                </Field>
+                                <Field :label="$t('profile.username')" :error="accountForm.errors.username">
+                                    <TextInput v-model="accountForm.username" />
+                                </Field>
+                                <Field class="ym-form-span" :label="$t('profile.email')" :error="accountForm.errors.email">
+                                    <TextInput v-model="accountForm.email" type="email" />
+                                </Field>
+                            </div>
+                        </div>
+                        <div class="ym-form-foot">
+                            <button type="button" class="ym-btn ym-btn--quiet" @click="editingAccount = false">
+                                {{ $t('common.cancel') }}
+                            </button>
+                            <button type="submit" class="ym-btn ym-btn--primary" :disabled="accountForm.processing">
+                                {{ $t('common.save') }}
+                            </button>
+                        </div>
+                    </form>
+
+                    <div v-else class="ym-card-body">
+                        <dl class="ym-kv">
+                            <div>
+                                <dt>{{ $t('profile.username') }}</dt>
+                                <dd>@{{ props.profile.username }}</dd>
+                            </div>
+                            <div>
+                                <dt>{{ $t('profile.fullName') }}</dt>
+                                <dd>{{ props.profile.name }}</dd>
+                            </div>
+                            <div>
+                                <dt>{{ $t('profile.email') }}</dt>
+                                <dd>{{ props.profile.email || $t('profile.notSet') }}</dd>
+                            </div>
+                            <div>
+                                <dt>{{ $t('profile.role') }}</dt>
+                                <dd><span class="ym-tag ym-tag--info">{{ roleLabel }}</span></dd>
+                            </div>
+                        </dl>
+                    </div>
+                </section>
+
+                <section class="ym-card">
+                    <div class="ym-card-head">
+                        <h2 class="ym-card-title">{{ $t('profile.securityAndAccess') }}</h2>
+                    </div>
+                    <div class="ym-card-body">
+                        <div class="ym-figure-row">
+                            <div>
+                                <p class="ym-figure-label">{{ $t('profile.twoFactorAuth') }}</p>
+                                <p class="ym-figure-value">
+                                    <span class="ym-tag" :class="props.security.two_factor_enabled ? 'ym-tag--ok' : 'ym-tag--neutral'">
+                                        {{ props.security.two_factor_enabled ? $t('profile.enabled') : $t('profile.notEnabled') }}
+                                    </span>
+                                </p>
+                                <p class="ym-note mt-1">
+                                    {{
+                                        props.security.two_factor_enabled
+                                            ? $t('profile.confirmedAt', { date: props.security.two_factor_confirmed_at })
+                                            : $t('profile.enable2fa')
+                                    }}
+                                </p>
+                            </div>
+                            <div>
+                                <p class="ym-figure-label">{{ $t('profile.totalSignIns') }}</p>
+                                <p class="ym-figure-value">{{ props.loginStats.total_sign_ins }}</p>
+                                <p class="ym-note mt-1">
+                                    {{ $t('profile.last') }}: {{ props.loginStats.last_login_at ?? $t('profile.noSignInsYet') }}
+                                </p>
+                            </div>
                         </div>
                     </div>
-                    <div class="ym-record-row">
-                        <div class="ym-rf">
-                            <p class="ym-rf-label">{{ $t('profile.fullName') }}</p>
-                            <p class="ym-rf-value">{{ props.profile.name }}</p>
-                        </div>
-                        <div class="ym-rf">
-                            <p class="ym-rf-label">{{ $t('profile.role') }}</p>
-                            <p class="ym-rf-value">
-                                <span :class="['ym-role-badge', `ym-role-${props.profile.role}`]">{{ roleLabel }}</span>
-                            </p>
-                        </div>
-                    </div>
-                    <div class="ym-record-row ym-record-row--single ym-record-row--last">
-                        <div class="ym-rf">
-                            <p class="ym-rf-label">{{ $t('profile.email') }}</p>
-                            <p class="ym-rf-value">{{ props.profile.email || $t('profile.notSet') }}</p>
-                        </div>
-                    </div>
-                </template>
-            </section>
+                </section>
 
-            <section class="ym-record-section ym-record-section--divided">
-                <p class="ym-record-group-title">{{ $t('profile.securityAndAccess') }}</p>
-                <div class="ym-record-row ym-record-row--last">
-                    <div class="ym-rf">
-                        <p class="ym-rf-label">{{ $t('profile.twoFactorAuth') }}</p>
-                        <p class="ym-rf-value">
-                            {{ props.security.two_factor_enabled ? $t('profile.enabled') : $t('profile.notEnabled') }}
-                        </p>
-                        <p class="ym-rf-note">
-                            {{
-                                props.security.two_factor_enabled
-                                    ? $t('profile.confirmedAt', { date: props.security.two_factor_confirmed_at })
-                                    : $t('profile.enable2fa')
-                            }}
-                        </p>
+                <section class="ym-card">
+                    <div class="ym-card-head">
+                        <h2 class="ym-card-title">{{ $t('profile.recentSignIns') }}</h2>
                     </div>
-                    <div class="ym-rf">
-                        <p class="ym-rf-label">{{ $t('profile.totalSignIns') }}</p>
-                        <p class="ym-rf-value">{{ props.loginStats.total_sign_ins }}</p>
-                        <p class="ym-rf-note">
-                            {{ $t('profile.last') }}: {{ props.loginStats.last_login_at ?? $t('profile.noSignInsYet') }}
-                        </p>
-                    </div>
-                </div>
-            </section>
 
-            <section class="ym-record-section ym-record-section--divided">
-                <p class="ym-record-group-title">{{ $t('profile.recentSignIns') }}</p>
-                <div v-if="props.recentLogins.length" class="ym-record-log-list">
-                    <div class="ym-record-log-head">
-                        <span>{{ $t('profile.device') }}</span>
-                        <span>{{ $t('profile.dateAndTime') }}</span>
-                        <span>{{ $t('profile.ipAddress') }}</span>
+                    <div v-if="props.recentLogins.length" class="ym-table-scroll">
+                        <table class="ym-grid-table">
+                            <thead>
+                                <tr>
+                                    <th>{{ $t('profile.device') }}</th>
+                                    <th>{{ $t('profile.dateAndTime') }}</th>
+                                    <th>{{ $t('profile.ipAddress') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    v-for="session in props.recentLogins"
+                                    :key="`${session.logged_in_at}-${session.ip_address}`"
+                                >
+                                    <td>
+                                        <span class="ym-tag ym-tag--neutral">
+                                            <i :class="session.device_type === 'mobile' ? 'bi bi-phone' : 'bi bi-laptop'" />
+                                            {{ formatDevice(session.device_type) }}
+                                        </span>
+                                    </td>
+                                    <td class="ym-num">{{ session.logged_in_at ?? $t('profile.unknown') }}</td>
+                                    <td class="is-muted ym-num">{{ session.ip_address }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <div
-                        v-for="session in props.recentLogins"
-                        :key="`${session.logged_in_at}-${session.ip_address}`"
-                        class="ym-record-log-row"
-                    >
-                        <span>
-                            <span :class="['ym-device-badge', `ym-device-${session.device_type}`]">
-                                {{ formatDevice(session.device_type) }}
-                            </span>
-                        </span>
-                        <span class="ym-record-log-time">{{ session.logged_in_at ?? $t('profile.unknown') }}</span>
-                        <span class="ym-record-log-ip">{{ session.ip_address }}</span>
+
+                    <div v-else class="ym-empty">
+                        <i class="bi bi-box-arrow-in-right" />
+                        <p>{{ $t('profile.noLoginActivity') }}</p>
                     </div>
-                </div>
-                <p v-else class="ym-record-empty">{{ $t('profile.noLoginActivity') }}</p>
-            </section>
+                </section>
+            </div>
+
+            <aside class="ym-split-rail">
+                <section class="ym-card ym-card--accent">
+                    <div class="ym-card-head">
+                        <h2 class="ym-card-title">{{ $t('profile.profilePicture') }}</h2>
+                    </div>
+
+                    <form @submit.prevent="submitAvatar">
+                        <div class="ym-card-body">
+                            <div class="ym-avatar-block">
+                                <img
+                                    v-if="props.profile.avatar_url"
+                                    :src="props.profile.avatar_url"
+                                    :alt="props.profile.name"
+                                    class="ym-avatar-lg"
+                                />
+                                <div v-else class="ym-avatar-lg ym-avatar-lg--initials">{{ initials }}</div>
+                                <p class="ym-avatar-name">{{ props.profile.name }}</p>
+                                <span class="ym-tag ym-tag--info">{{ roleLabel }}</span>
+                            </div>
+
+                            <Field class="mt-4" :error="avatarForm.errors.avatar" :label="$t('profile.profilePicture')">
+                                <FileInput
+                                    v-model="avatarForm.avatar"
+                                    accept="image/jpeg,image/png,image/webp"
+                                    :hint="$t('profile.pictureHint')"
+                                />
+                            </Field>
+                        </div>
+
+                        <div class="ym-form-foot">
+                            <button
+                                v-if="props.profile.avatar_url"
+                                type="button"
+                                class="ym-btn ym-btn--quiet ym-form-foot-lead"
+                                :disabled="avatarForm.processing"
+                                @click="removeAvatar"
+                            >
+                                {{ $t('common.remove') }}
+                            </button>
+                            <button
+                                type="submit"
+                                class="ym-btn ym-btn--primary"
+                                :disabled="avatarForm.processing || !avatarForm.avatar"
+                            >
+                                {{ $t('common.save') }}
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <section class="ym-card">
+                    <div class="ym-card-body">
+                        <dl class="ym-kv">
+                            <div>
+                                <dt>{{ $t('profile.joined') }}</dt>
+                                <dd>{{ props.profile.joined_at ?? $t('profile.unknown') }}</dd>
+                            </div>
+                            <div>
+                                <dt>{{ $t('profile.lastSignIn') }}</dt>
+                                <dd>{{ props.loginStats.last_login_at ?? $t('profile.never') }}</dd>
+                            </div>
+                            <div>
+                                <dt>{{ $t('profile.sessionsTotal') }}</dt>
+                                <dd class="ym-num">{{ props.loginStats.total_sign_ins }}</dd>
+                            </div>
+                        </dl>
+                    </div>
+                </section>
+            </aside>
         </div>
-
-        <aside class="ym-record-aside ym-surface">
-            <div class="ym-record-avatar-zone">
-                <img
-                    v-if="props.profile.avatar_url"
-                    :src="props.profile.avatar_url"
-                    :alt="props.profile.name"
-                    class="ym-record-avatar-img"
-                />
-                <div v-else class="ym-record-avatar">{{ initials }}</div>
-                <p class="ym-record-avatar-name">{{ props.profile.name }}</p>
-                <span :class="['ym-role-badge', `ym-role-${props.profile.role}`]">{{ roleLabel }}</span>
-            </div>
-
-            <form class="ym-record-avatar-form" @submit.prevent="submitAvatar">
-                <Field :label="$t('profile.profilePicture')" :error="avatarForm.errors.avatar">
-                    <FileInput v-model="avatarForm.avatar" accept="image/jpeg,image/png,image/webp" :hint="$t('profile.pictureHint')" />
-                </Field>
-                <div class="ym-inline-actions">
-                    <button type="submit" class="ym-btn-sm" :disabled="avatarForm.processing || !avatarForm.avatar">
-                        {{ $t('common.save') }}
-                    </button>
-                    <button
-                        v-if="props.profile.avatar_url"
-                        type="button"
-                        class="ym-btn-outline"
-                        :disabled="avatarForm.processing"
-                        @click="removeAvatar"
-                    >
-                        {{ $t('common.remove') }}
-                    </button>
-                </div>
-            </form>
-
-            <div class="ym-record-meta-list">
-                <div class="ym-record-meta-item">
-                    <p class="ym-rf-label">{{ $t('profile.joined') }}</p>
-                    <p class="ym-record-meta-val">{{ props.profile.joined_at ?? $t('profile.unknown') }}</p>
-                </div>
-                <div class="ym-record-meta-item">
-                    <p class="ym-rf-label">{{ $t('profile.lastSignIn') }}</p>
-                    <p class="ym-record-meta-val">{{ props.loginStats.last_login_at ?? $t('profile.never') }}</p>
-                </div>
-                <div class="ym-record-meta-item">
-                    <p class="ym-rf-label">{{ $t('profile.sessionsTotal') }}</p>
-                    <p class="ym-record-meta-val">{{ props.loginStats.total_sign_ins }}</p>
-                </div>
-            </div>
-        </aside>
     </div>
 </template>
