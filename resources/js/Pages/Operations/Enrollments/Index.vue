@@ -4,6 +4,8 @@ import { Link, router } from '@inertiajs/vue3';
 import { trans as t, getActiveLanguage } from 'laravel-vue-i18n';
 import Modal from '@/Components/UI/Modal.vue';
 import FilterBar from '@/Components/UI/FilterBar.vue';
+import DateRange from '@/Components/UI/DateRange.vue';
+import SortTh from '@/Components/UI/SortTh.vue';
 import { useFilters } from '@/composables/useFilters.js';
 
 const props = defineProps({
@@ -12,17 +14,17 @@ const props = defineProps({
     endpoints: Object,
 });
 
-const { filters, active, reset } = useFilters(props.endpoints.index, props.filters);
+const { filters, active, filterCount, reset, toggleSort } = useFilters(props.endpoints.index, props.filters);
 
 const locale = () => (getActiveLanguage() === 'vi' ? 'vi-VN' : 'en-US');
 
 const statusLabel = (value) => t(`operations.enrollmentStatus${value.charAt(0).toUpperCase()}${value.slice(1)}`);
 
-const statusClass = (value) => ({
-    booked: 'ym-status-pill--booked',
-    waitlisted: 'ym-status-pill--waitlist',
-    cancelled: '',
-}[value] ?? '');
+const statusTone = {
+    booked: 'ok',
+    waitlisted: 'warn',
+    cancelled: 'neutral',
+};
 
 const formatDateTime = (value) =>
     value ? new Intl.DateTimeFormat(locale(), { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : '—';
@@ -45,94 +47,108 @@ export default {
 </script>
 
 <template>
-    <section class="ym-surface ym-section">
-        <div class="flex items-center justify-between">
+    <div class="ym-ui">
+        <header class="ym-page-head">
             <div>
-                <h2 class="ym-title">
+                <h1 class="ym-page-title">
                     {{ $t('operations.enrollmentsTitle') }}
-                    <span class="ym-count-badge">{{ enrollments.total }}</span>
-                </h2>
-                <p class="ym-subtitle">{{ $t('operations.manageEnrollments') }}</p>
+                    <span class="ym-count">{{ enrollments.total }}</span>
+                </h1>
+                <p class="ym-page-sub">{{ $t('operations.manageEnrollments') }}</p>
             </div>
-        </div>
+        </header>
 
-        <FilterBar :active="active" @reset="reset">
-            <input
-                v-model="filters.search"
-                type="search"
-                class="ym-log-search"
-                :placeholder="$t('operations.searchByName')"
-            />
-            <select v-model="filters.status" class="ym-log-filter-select">
-                <option value="">{{ $t('operations.allStatuses') }}</option>
-                <option value="booked">{{ $t('operations.enrollmentStatusBooked') }}</option>
-                <option value="waitlisted">{{ $t('operations.enrollmentStatusWaitlisted') }}</option>
-                <option value="cancelled">{{ $t('operations.enrollmentStatusCancelled') }}</option>
-            </select>
-            <input v-model="filters.from" type="date" class="ym-log-filter-select" :aria-label="$t('operations.fromDate')" />
-            <input v-model="filters.to" type="date" class="ym-log-filter-select" :aria-label="$t('operations.toDate')" />
-        </FilterBar>
+        <section class="ym-card">
+            <div class="ym-filter-band">
+                <FilterBar
+                    v-model:search="filters.search"
+                    :search-placeholder="$t('operations.searchByName')"
+                    :count="filterCount"
+                    :active="active"
+                    @reset="reset"
+                >
+                    <label class="ym-filter-field">
+                        <span>{{ $t('operations.status') }}</span>
+                        <select v-model="filters.status" class="ym-log-filter-select">
+                            <option value="">{{ $t('operations.allStatuses') }}</option>
+                            <option value="booked">{{ $t('operations.enrollmentStatusBooked') }}</option>
+                            <option value="waitlisted">{{ $t('operations.enrollmentStatusWaitlisted') }}</option>
+                            <option value="cancelled">{{ $t('operations.enrollmentStatusCancelled') }}</option>
+                        </select>
+                    </label>
+                    <DateRange v-model:from="filters.from" v-model:to="filters.to" :label="$t('operations.date')" />
+                </FilterBar>
+            </div>
 
-        <div class="ym-table-wrap">
-            <table class="ym-table">
-                <thead>
-                    <tr>
-                        <th class="ym-th">{{ $t('operations.student') }}</th>
-                        <th class="ym-th">{{ $t('operations.class') }}</th>
-                        <th class="ym-th">{{ $t('operations.coach') }}</th>
-                        <th class="ym-th">{{ $t('operations.date') }}</th>
-                        <th class="ym-th">{{ $t('operations.status') }}</th>
-                        <th class="ym-th">{{ $t('operations.enrolledAt') }}</th>
-                        <th class="ym-th">{{ $t('operations.actions') }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="row in enrollments.data" :key="row.id" class="ym-tr">
-                        <td class="ym-td font-medium">{{ row.student_name }}</td>
-                        <td class="ym-td">{{ row.class_type_name }}</td>
-                        <td class="ym-td text-neutral-500">{{ row.coach_name }}</td>
-                        <td class="ym-td">{{ row.session_date }} {{ row.start_time }}</td>
-                        <td class="ym-td">
-                            <span class="ym-status-pill" :class="statusClass(row.status)">{{ statusLabel(row.status) }}</span>
-                        </td>
-                        <td class="ym-td text-neutral-500">{{ formatDateTime(row.enrolled_at) }}</td>
-                        <td class="ym-td">
-                            <button
-                                v-if="row.cancelUrl"
-                                type="button"
-                                class="ym-btn-danger"
-                                @click="pendingCancel = row"
-                            >
-                                {{ $t('operations.cancelEnrollment') }}
-                            </button>
-                        </td>
-                    </tr>
-                    <tr v-if="!enrollments.data.length">
-                        <td class="ym-td text-neutral-500" colspan="7">{{ $t('operations.noEnrollments') }}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+            <div class="ym-table-scroll">
+                <table class="ym-grid-table">
+                    <thead>
+                        <tr>
+                            <th>{{ $t('operations.student') }}</th>
+                            <th>{{ $t('operations.class') }}</th>
+                            <th>{{ $t('operations.coach') }}</th>
+                            <th>{{ $t('operations.date') }}</th>
+                            <SortTh field="status" :label="$t('operations.status')" :state="filters" @sort="toggleSort" />
+                            <SortTh field="enrolled_at" :label="$t('operations.enrolledAt')" :state="filters" @sort="toggleSort" />
+                            <th class="is-actions">{{ $t('operations.actions') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="row in enrollments.data" :key="row.id">
+                            <td class="is-strong">{{ row.student_name }}</td>
+                            <td>{{ row.class_type_name }}</td>
+                            <td class="is-muted">{{ row.coach_name }}</td>
+                            <td class="ym-num">{{ row.session_date }} {{ row.start_time }}</td>
+                            <td>
+                                <span class="ym-tag" :class="`ym-tag--${statusTone[row.status] ?? 'neutral'}`">
+                                    {{ statusLabel(row.status) }}
+                                </span>
+                            </td>
+                            <td class="is-muted ym-num">{{ formatDateTime(row.enrolled_at) }}</td>
+                            <td class="is-actions">
+                                <div class="ym-row-actions">
+                                    <button
+                                        v-if="row.cancelUrl"
+                                        type="button"
+                                        class="ym-btn ym-btn--danger-quiet ym-btn--sm"
+                                        @click="pendingCancel = row"
+                                    >
+                                        {{ $t('operations.cancelEnrollment') }}
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-        <div v-if="enrollments.links.length > 3" class="ym-pagination">
-            <Link
-                v-for="link in enrollments.links"
-                :key="link.label"
-                :href="link.url ?? '#'"
-                v-html="link.label"
-                :class="['ym-page-link', { 'ym-page-link--active': link.active, 'ym-page-link--disabled': !link.url }]"
-                preserve-scroll
-            />
-        </div>
-    </section>
+            <div v-if="!enrollments.data.length" class="ym-empty">
+                <i class="bi bi-journal-bookmark" />
+                <p>{{ $t('operations.noEnrollments') }}</p>
+            </div>
 
-    <Modal :show="!!pendingCancel" :title="$t('operations.cancelEnrollmentTitle')" @close="pendingCancel = null">
-        <p class="ym-card-note">
-            {{ $t('operations.confirmCancelEnrollment', { name: pendingCancel?.student_name, class: pendingCancel?.class_type_name }) }}
-        </p>
-        <div class="ym-confirm-modal-actions">
-            <button type="button" class="ym-btn-outline" @click="pendingCancel = null">{{ $t('common.cancel') }}</button>
-            <button type="button" class="ym-btn-danger" @click="confirmCancel">{{ $t('operations.cancelEnrollment') }}</button>
-        </div>
-    </Modal>
+            <div v-if="enrollments.links.length > 3" class="ym-card-foot">
+                <div class="ym-pagination">
+                    <Link
+                        v-for="link in enrollments.links"
+                        :key="link.label"
+                        :href="link.url ?? '#'"
+                        v-html="link.label"
+                        :class="['ym-page-link', { 'ym-page-link--active': link.active, 'ym-page-link--disabled': !link.url }]"
+                        preserve-scroll
+                    />
+                </div>
+            </div>
+        </section>
+
+        <Modal :show="!!pendingCancel" :title="$t('operations.cancelEnrollmentTitle')" @close="pendingCancel = null">
+            <p class="ym-note">
+                {{ $t('operations.confirmCancelEnrollment', { name: pendingCancel?.student_name, class: pendingCancel?.class_type_name }) }}
+            </p>
+            <div class="ym-confirm-modal-actions">
+                <button type="button" class="ym-btn ym-btn--outline" @click="pendingCancel = null">{{ $t('common.cancel') }}</button>
+                <button type="button" class="ym-btn ym-btn--danger" @click="confirmCancel">{{ $t('operations.cancelEnrollment') }}</button>
+            </div>
+        </Modal>
+    </div>
 </template>
