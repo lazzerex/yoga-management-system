@@ -39,34 +39,54 @@ export default {
 
 
 <template>
-    <section class="ym-surface ym-section">
-        <h2 class="ym-title">{{ $t('admin.createUser') }}</h2>
-        <p class="ym-subtitle">{{ $t('admin.addAccount') }}</p>
-        <form class="ym-form-grid" @submit.prevent="createUser">
-            <Field :label="$t('admin.name')" :error="form.errors.name">
-                <TextInput v-model="form.name" autocomplete="name" />
-            </Field>
-            <Field :label="$t('admin.username')" :error="form.errors.username">
-                <TextInput v-model="form.username" autocomplete="username" />
-            </Field>
-            <Field :label="$t('admin.email')" :error="form.errors.email">
-                <TextInput v-model="form.email" type="email" autocomplete="email" />
-            </Field>
-            <Field :label="$t('admin.role')" :error="form.errors.role">
-                <Select v-model="form.role" :options="roles" />
-            </Field>
-            <Field :label="$t('auth.password')" :error="form.errors.password">
-                <TextInput v-model="form.password" type="password" autocomplete="new-password" />
-            </Field>
-            <Field :label="$t('auth.confirmPassword')">
-                <TextInput v-model="form.password_confirmation" type="password" autocomplete="new-password" />
-            </Field>
-            <div class="ym-actions">
-                <button type="submit" class="ym-btn-sm" :disabled="form.processing">
-                    {{ form.processing ? $t('admin.creating') : $t('admin.createUser') }}
-                </button>
-                <Link :href="endpoints.index" class="ym-btn-ghost">{{ $t('admin.cancel') }}</Link>
+    <div class="ym-ui ym-form-page">
+        <header class="ym-page-head">
+            <div>
+                <h1 class="ym-page-title">{{ $t('admin.createUser') }}</h1>
+                <p class="ym-page-sub">{{ $t('admin.addAccount') }}</p>
             </div>
+        </header>
+
+        <form @submit.prevent="createUser">
+            <section class="ym-card">
+                <div class="ym-card-body">
+                    <div class="ym-form-grid-2">
+                        <Field :label="$t('admin.name')" :error="form.errors.name">
+                            <TextInput v-model="form.name" autocomplete="name" />
+                        </Field>
+                        <Field :label="$t('admin.username')" :error="form.errors.username">
+                            <TextInput v-model="form.username" autocomplete="username" />
+                        </Field>
+                        <Field :label="$t('admin.email')" :error="form.errors.email">
+                            <TextInput v-model="form.email" type="email" autocomplete="email" />
+                        </Field>
+                        <Field :label="$t('admin.role')" :error="form.errors.role">
+                            <Select v-model="form.role" :options="roles" />
+                        </Field>
+                    </div>
+                </div>
+
+                <div class="ym-card-subhead">
+                    <h2 class="ym-card-title">{{ $t('auth.password') }}</h2>
+                </div>
+                <div class="ym-card-body">
+                    <div class="ym-form-grid-2">
+                        <Field :label="$t('auth.password')" :error="form.errors.password">
+                            <TextInput v-model="form.password" type="password" autocomplete="new-password" />
+                        </Field>
+                        <Field :label="$t('auth.confirmPassword')">
+                            <TextInput v-model="form.password_confirmation" type="password" autocomplete="new-password" />
+                        </Field>
+                    </div>
+                </div>
+
+                <div class="ym-form-foot">
+                    <Link :href="endpoints.index" class="ym-btn ym-btn--quiet">{{ $t('admin.cancel') }}</Link>
+                    <button type="submit" class="ym-btn ym-btn--primary" :disabled="form.processing">
+                        {{ form.processing ? $t('admin.creating') : $t('admin.createUser') }}
+                    </button>
+                </div>
+            </section>
         </form>
-    </section>
+    </div>
 </template>
