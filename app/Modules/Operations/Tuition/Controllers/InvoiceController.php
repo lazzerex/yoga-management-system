@@ -17,6 +17,7 @@ use App\Modules\Operations\Tuition\Actions\WaiveInvoiceAction;
 use App\Modules\Operations\Tuition\Requests\StoreInvoiceRequest;
 use App\Modules\Operations\Tuition\Requests\StorePaymentRequest;
 use App\Modules\Operations\Tuition\Requests\VoidPaymentRequest;
+use App\Support\Table\SortsQueries;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Response;
@@ -24,6 +25,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class InvoiceController extends Controller
 {
+    use SortsQueries;
+
     public function index(Request $request, TuitionStatsAction $stats): Response
     {
         $scope = $this->branchScope($request);
@@ -32,8 +35,10 @@ class InvoiceController extends Controller
         $search = $request->string('search')->toString();
         $status = $request->string('status')->toString();
         $overdue = $request->boolean('overdue');
+        $from = $request->date('from')?->toDateString();
+        $to = $request->date('to')?->toDateString();
 
-        $invoices = Invoice::with(['studentProfile.user:id,name', 'branch:id,name'])
+        $query = Invoice::with(['studentProfile.user:id,name', 'branch:id,name'])
             ->withSum('recordedPayments', 'amount')
             ->tap($scope)
             ->when($search !== '', fn ($q) => $q->where(fn ($w) => $w
@@ -41,14 +46,28 @@ class InvoiceController extends Controller
                 ->orWhereHas('studentProfile.user', fn ($u) => $u->where('name', 'like', "%{$search}%"))))
             ->when(in_array($status, Invoice::STATUSES, true), fn ($q) => $q->where('status', $status))
             ->when($overdue, fn ($q) => $q->overdue())
-            ->orderByDesc('id')
-            ->paginate(20)
-            ->withQueryString();
+            ->when($from, fn ($q) => $q->where('due_date', '>=', $from))
+            ->when($to, fn ($q) => $q->where('due_date', '<=', $to));
+
+        $sort = $this->applySort($query, $request, [
+            'invoice_number' => 'invoice_number',
+            'due_date' => 'due_date',
+            'total_amount' => 'total_amount',
+            'status' => ['unpaid', 'partial', 'paid', 'waived'],
+        ], 'id');
+
+        $invoices = $query->paginate(20)->withQueryString();
 
         return inertia('Operations/TuitionFees', [
             'invoices' => $invoices->through(fn (Invoice $invoice) => $this->row($invoice)),
             'stats' => $stats->execute($request->attributes->get('currentBranch')?->id),
-            'filters' => ['search' => $search, 'status' => $status, 'overdue' => $overdue ? '1' : ''],
+            'filters' => [
+                'search' => $search,
+                'status' => $status,
+                'overdue' => $overdue ? '1' : '',
+                'from' => $from ?? '',
+                'to' => $to ?? '',
+            ] + $sort,
             'options' => ['statuses' => Invoice::STATUSES],
             'endpoints' => [
                 'create' => $canManage ? route('operations.invoices.create') : null,
