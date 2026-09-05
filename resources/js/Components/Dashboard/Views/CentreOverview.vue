@@ -14,7 +14,13 @@ const props = defineProps({
     endpoint: { type: String, required: true },
 });
 
-const { filters, active, reset } = useFilters(props.endpoint, props.filters, []);
+const { filters, active, filterCount, reset } = useFilters(props.endpoint, props.filters, []);
+
+// Built here rather than interpolated inside <option>, so each entry is a plain string.
+const windowOptions = computed(() => (props.options.windows ?? []).map((months) => ({
+    value: months,
+    label: t('dashboard.lastMonths', { count: months }),
+})));
 
 const money = computed(() => props.data.money ?? null);
 const activity = computed(() => props.data.activity ?? null);
@@ -41,18 +47,24 @@ const classTypes = computed(() => props.data.byClassType ?? []);
 </script>
 
 <template>
-    <FilterBar :active="active" @reset="reset">
-        <select v-model="filters.branch_id" class="ym-log-filter-select">
-            <option value="">{{ $t('dashboard.allBranches') }}</option>
-            <option v-for="branch in data.branches" :key="branch.id" :value="branch.id">{{ branch.name }}</option>
-        </select>
-        <select v-model="filters.months" class="ym-log-filter-select">
-            <option v-for="window in options.windows" :key="window" :value="window">
-                {{ $t('dashboard.lastMonths', { count: window }) }}
-            </option>
-        </select>
-        <span class="ym-card-note">{{ $t('dashboard.overviewIgnoresSwitcher') }}</span>
-    </FilterBar>
+    <div class="ym-ui ym-overview-filters">
+        <FilterBar :count="filterCount" :active="active" @reset="reset">
+            <label class="ym-filter-field">
+                <span>{{ $t('dashboard.filterBranch') }}</span>
+                <select v-model="filters.branch_id" class="ym-log-filter-select">
+                    <option value="">{{ $t('dashboard.allBranches') }}</option>
+                    <option v-for="branch in data.branches" :key="branch.id" :value="branch.id">{{ branch.name }}</option>
+                </select>
+            </label>
+
+            <label class="ym-filter-field">
+                <span>{{ $t('dashboard.filterWindow') }}</span>
+                <select v-model="filters.months" class="ym-log-filter-select">
+                    <option v-for="option in windowOptions" :key="option.value" :value="option.value">{{ option.label }}</option>
+                </select>
+            </label>
+        </FilterBar>
+    </div>
 
     <div class="ym-stat-strip">
         <div v-if="money" class="ym-stat">
