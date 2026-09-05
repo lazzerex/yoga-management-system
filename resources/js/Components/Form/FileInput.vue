@@ -28,24 +28,39 @@ const clear = () => {
     if (input.value) input.value.value = '';
     emit('update:modelValue', props.multiple ? [] : null);
 };
+
+const size = (bytes) => (bytes > 1048576 ? `${(bytes / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`);
 </script>
 
 <template>
-    <div class="ym-file-input">
-        <input
-            ref="input"
-            type="file"
-            class="ym-file-native"
-            :multiple="multiple"
-            :accept="accept"
-            @change="pick"
-        />
-        <ul v-if="chosen.length" class="ym-file-chosen">
-            <li v-for="file in chosen" :key="file.name">{{ file.name }}</li>
+    <div class="ym-file-picker">
+        <!-- The native control is the label's own input, so the button is the only visible trigger. -->
+        <label class="ym-file-trigger">
+            <input
+                ref="input"
+                type="file"
+                class="ym-file-hidden"
+                :multiple="multiple"
+                :accept="accept"
+                @change="pick"
+            />
+            <span class="ym-btn ym-btn--outline ym-btn--sm">
+                <i class="bi bi-paperclip" /> {{ $t('common.chooseFile') }}
+            </span>
+            <span v-if="!chosen.length" class="ym-file-none">{{ $t('common.noFileChosen') }}</span>
+        </label>
+
+        <ul v-if="chosen.length" class="ym-file-chips">
+            <li v-for="file in chosen" :key="file.name" class="ym-file-chip">
+                <i class="bi bi-file-earmark" />
+                <span class="ym-file-chip-name">{{ file.name }}</span>
+                <span class="ym-file-chip-size">{{ size(file.size) }}</span>
+                <button type="button" class="ym-file-chip-x" :aria-label="$t('common.clear')" @click="clear">
+                    <i class="bi bi-x-lg" />
+                </button>
+            </li>
         </ul>
-        <button v-if="chosen.length" type="button" class="ym-btn-ghost" @click="clear">
-            {{ $t('common.clear') }}
-        </button>
+
         <span v-if="hint" class="ym-field-hint">{{ hint }}</span>
     </div>
 </template>
