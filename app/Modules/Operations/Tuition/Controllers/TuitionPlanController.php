@@ -10,29 +10,39 @@ use App\Modules\Operations\Tuition\Actions\DeleteTuitionPlanAction;
 use App\Modules\Operations\Tuition\Actions\UpdateTuitionPlanAction;
 use App\Modules\Operations\Tuition\Requests\StoreTuitionPlanRequest;
 use App\Modules\Operations\Tuition\Requests\UpdateTuitionPlanRequest;
+use App\Support\Table\SortsQueries;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Response;
 
 class TuitionPlanController extends Controller
 {
+    use SortsQueries;
+
     public function index(Request $request): Response
     {
         $search = $request->string('search')->toString();
         $type = $request->string('type')->toString();
         $status = $request->string('status')->toString();
 
-        $plans = TuitionPlan::with('branch:id,name')
+        $query = TuitionPlan::with('branch:id,name')
             ->when($search !== '', fn ($q) => $q->where('name', 'like', "%{$search}%"))
             ->when(in_array($type, TuitionPlan::TYPES, true), fn ($q) => $q->where('type', $type))
-            ->when(in_array($status, ['active', 'inactive'], true), fn ($q) => $q->where('is_active', $status === 'active'))
-            ->orderBy('name')
-            ->paginate(20)
-            ->withQueryString();
+            ->when(in_array($status, ['active', 'inactive'], true), fn ($q) => $q->where('is_active', $status === 'active'));
+
+        $sort = $this->applySort($query, $request, [
+            'name' => 'name',
+            'type' => 'type',
+            'price_amount' => 'price_amount',
+            'session_count' => 'session_count',
+            'duration_days' => 'duration_days',
+        ], 'name', 'asc');
+
+        $plans = $query->paginate(20)->withQueryString();
 
         return inertia('Operations/Tuition/Plans/Index', [
             'plans' => $plans->through(fn (TuitionPlan $plan) => $this->row($plan)),
-            'filters' => ['search' => $search, 'type' => $type, 'status' => $status],
+            'filters' => ['search' => $search, 'type' => $type, 'status' => $status] + $sort,
             'options' => ['types' => TuitionPlan::TYPES],
             'endpoints' => [
                 'create' => route('operations.tuition-plans.create'),
