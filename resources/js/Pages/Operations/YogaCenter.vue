@@ -70,17 +70,6 @@ export default {
         <TabBar v-model="activeTab" :tabs="tabs" />
 
         <template v-if="activeTab === 'branches'">
-            <div class="ym-stats">
-                <div class="ym-stat-card">
-                    <p class="ym-stat-card-label">{{ $t('operations.totalBranches') }}</p>
-                    <p class="ym-stat-card-value">{{ branchStats.total }}</p>
-                </div>
-                <div class="ym-stat-card ym-stat-card--info">
-                    <p class="ym-stat-card-label">{{ $t('operations.activeBranches') }}</p>
-                    <p class="ym-stat-card-value">{{ branchStats.active }}</p>
-                </div>
-            </div>
-
             <header class="ym-page-head">
                 <div>
                     <h1 class="ym-page-title">
@@ -95,6 +84,17 @@ export default {
                     </Link>
                 </div>
             </header>
+
+            <div class="ym-stats">
+                <div class="ym-stat-card">
+                    <p class="ym-stat-card-label">{{ $t('operations.totalBranches') }}</p>
+                    <p class="ym-stat-card-value">{{ branchStats.total }}</p>
+                </div>
+                <div class="ym-stat-card ym-stat-card--info">
+                    <p class="ym-stat-card-label">{{ $t('operations.activeBranches') }}</p>
+                    <p class="ym-stat-card-value">{{ branchStats.active }}</p>
+                </div>
+            </div>
 
             <section class="ym-card">
                 <div class="ym-filter-band">
@@ -177,17 +177,6 @@ export default {
         </template>
 
         <template v-else-if="activeTab === 'rooms'">
-            <div class="ym-stats">
-                <div class="ym-stat-card">
-                    <p class="ym-stat-card-label">{{ $t('operations.totalRooms') }}</p>
-                    <p class="ym-stat-card-value">{{ roomStats.total }}</p>
-                </div>
-                <div class="ym-stat-card ym-stat-card--info">
-                    <p class="ym-stat-card-label">{{ $t('operations.activeRooms') }}</p>
-                    <p class="ym-stat-card-value">{{ roomStats.active }}</p>
-                </div>
-            </div>
-
             <header class="ym-page-head">
                 <div>
                     <h1 class="ym-page-title">
@@ -202,6 +191,17 @@ export default {
                     </Link>
                 </div>
             </header>
+
+            <div class="ym-stats">
+                <div class="ym-stat-card">
+                    <p class="ym-stat-card-label">{{ $t('operations.totalRooms') }}</p>
+                    <p class="ym-stat-card-value">{{ roomStats.total }}</p>
+                </div>
+                <div class="ym-stat-card ym-stat-card--info">
+                    <p class="ym-stat-card-label">{{ $t('operations.activeRooms') }}</p>
+                    <p class="ym-stat-card-value">{{ roomStats.active }}</p>
+                </div>
+            </div>
 
             <section class="ym-card">
                 <div class="ym-filter-band">
@@ -284,17 +284,6 @@ export default {
         </template>
 
         <template v-else>
-            <div class="ym-stats">
-                <div class="ym-stat-card">
-                    <p class="ym-stat-card-label">{{ $t('operations.totalClassTypes') }}</p>
-                    <p class="ym-stat-card-value">{{ classTypeStats.total }}</p>
-                </div>
-                <div class="ym-stat-card ym-stat-card--info">
-                    <p class="ym-stat-card-label">{{ $t('operations.activeClassTypes') }}</p>
-                    <p class="ym-stat-card-value">{{ classTypeStats.active }}</p>
-                </div>
-            </div>
-
             <header class="ym-page-head">
                 <div>
                     <h1 class="ym-page-title">
@@ -309,6 +298,17 @@ export default {
                     </Link>
                 </div>
             </header>
+
+            <div class="ym-stats">
+                <div class="ym-stat-card">
+                    <p class="ym-stat-card-label">{{ $t('operations.totalClassTypes') }}</p>
+                    <p class="ym-stat-card-value">{{ classTypeStats.total }}</p>
+                </div>
+                <div class="ym-stat-card ym-stat-card--info">
+                    <p class="ym-stat-card-label">{{ $t('operations.activeClassTypes') }}</p>
+                    <p class="ym-stat-card-value">{{ classTypeStats.active }}</p>
+                </div>
+            </div>
 
             <section class="ym-card">
                 <div class="ym-filter-band">
