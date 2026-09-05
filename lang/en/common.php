@@ -2,6 +2,12 @@
 
 return [
     'search' => 'Search',
+    'filters' => 'Filters',
+    'done' => 'Done',
+    'from' => 'From',
+    'to' => 'To',
+    'chooseFile' => 'Choose file',
+    'noFileChosen' => 'No file chosen',
     'signOut' => 'Sign Out',
     'endSession' => 'End current session',
     'markAllRead' => 'Mark all read',
