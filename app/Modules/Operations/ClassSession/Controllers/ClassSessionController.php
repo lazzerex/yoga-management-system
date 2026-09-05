@@ -11,6 +11,7 @@ use App\Models\Room;
 use App\Modules\Operations\ClassSession\Actions\CoachWeeklyScheduleAction;
 use App\Modules\Operations\ClassSession\Actions\UpdateClassSessionAction;
 use App\Modules\Operations\ClassSession\Requests\UpdateClassSessionRequest;
+use App\Support\Table\SortsQueries;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -19,6 +20,8 @@ use Inertia\Response;
 
 class ClassSessionController extends Controller
 {
+    use SortsQueries;
+
     public function index(Request $request): Response
     {
         $branchId = $request->attributes->get('currentBranch')?->id;
@@ -28,16 +31,21 @@ class ClassSessionController extends Controller
         $from = $this->validDate($request->string('from')->toString());
         $to = $this->validDate($request->string('to')->toString());
 
-        $sessions = ClassSession::with(['branch:id,name', 'room:id,name', 'classType:id,name', 'coachProfile.user:id,name'])
+        $query = ClassSession::with(['branch:id,name', 'room:id,name', 'classType:id,name', 'coachProfile.user:id,name'])
             ->when($from === null, fn ($q) => $q->upcoming())
             ->when($branchId, fn ($q) => $q->where('branch_id', $branchId))
             ->when($classTypeId, fn ($q) => $q->where('class_type_id', $classTypeId))
             ->when($coachProfileId, fn ($q) => $q->where('coach_profile_id', $coachProfileId))
             ->when(in_array($status, ['scheduled', 'cancelled', 'done'], true), fn ($q) => $q->where('status', $status))
             ->when($from, fn ($q) => $q->where('session_date', '>=', $from))
-            ->when($to, fn ($q) => $q->where('session_date', '<=', $to))
-            ->orderBy('session_date')
-            ->orderBy('start_time')
+            ->when($to, fn ($q) => $q->where('session_date', '<=', $to));
+
+        $sort = $this->applySort($query, $request, [
+            'session_date' => 'session_date',
+            'status' => ['scheduled', 'done', 'cancelled'],
+        ], 'session_date', 'asc');
+
+        $sessions = $query->orderBy('start_time')
             ->paginate(20, pageName: 'sessionsPage')
             ->withQueryString();
 
@@ -88,7 +96,7 @@ class ClassSessionController extends Controller
                 'status' => $status,
                 'from' => $from ?? '',
                 'to' => $to ?? '',
-            ],
+            ] + $sort,
             'options' => [
                 'classTypes' => ClassType::active()->orderBy('name')->get(['id', 'name']),
                 'coaches' => CoachProfile::active()->with('user:id,name')->get()
