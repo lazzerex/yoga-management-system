@@ -4,12 +4,15 @@ namespace App\Modules\Admin\AuditLog\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
+use App\Support\Table\SortsQueries;
 use Illuminate\Http\Request;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AuditLogController extends Controller
 {
+    use SortsQueries;
+
     private const VALID_ACTIONS = ['create_user', 'update_user_info', 'change_password', 'assign_role', 'remove_role', 'delete_user', 'view_student_medical_notes', 'cancel_enrollment'];
 
     public function index(Request $request): Response
@@ -28,14 +31,27 @@ class AuditLogController extends Controller
             });
         }
 
-        $sortDir = $request->input('sort_dir', 'desc') === 'asc' ? 'asc' : 'desc';
-        $query->orderBy('created_at', $sortDir);
+        $from = $request->date('from')?->toDateString();
+        $to = $request->date('to')?->toDateString();
+
+        $query->when($from, fn ($q) => $q->whereDate('created_at', '>=', $from))
+            ->when($to, fn ($q) => $q->whereDate('created_at', '<=', $to));
+
+        $sort = $this->applySort($query, $request, [
+            'action' => 'action',
+            'created_at' => 'created_at',
+        ], 'created_at');
 
         $logs = $query->paginate(15)->withQueryString();
 
         return inertia('Admin/AuditLogs/Index', [
             'logs' => $logs,
-            'filters' => $request->only(['action', 'search', 'sort_dir']),
+            'filters' => [
+                'action' => $request->string('action')->toString(),
+                'search' => $request->string('search')->toString(),
+                'from' => $from ?? '',
+                'to' => $to ?? '',
+            ] + $sort,
             'endpoints' => [
                 'self' => route('admin.audit-logs.index'),
                 'export' => route('admin.audit-logs.export'),
