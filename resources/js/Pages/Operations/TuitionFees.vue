@@ -3,6 +3,8 @@ import { Link } from '@inertiajs/vue3';
 import { trans as t } from 'laravel-vue-i18n';
 import { formatVnd } from '@/composables/useMoney.js';
 import FilterBar from '@/Components/UI/FilterBar.vue';
+import DateRange from '@/Components/UI/DateRange.vue';
+import SortTh from '@/Components/UI/SortTh.vue';
 import { useFilters } from '@/composables/useFilters.js';
 
 const props = defineProps({
@@ -13,9 +15,17 @@ const props = defineProps({
     endpoints: Object,
 });
 
-const { filters, active, reset } = useFilters(props.endpoints.index, props.filters);
+const { filters, active, filterCount, reset, toggleSort } = useFilters(props.endpoints.index, props.filters);
 
 const statusLabel = (status) => t(`operations.invoiceStatus${status.charAt(0).toUpperCase()}${status.slice(1)}`);
+
+const statusTone = {
+    paid: 'ok',
+    waived: 'neutral',
+    partial: 'info',
+    unpaid: 'warn',
+    overdue: 'danger',
+};
 </script>
 <script>
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -25,106 +35,153 @@ export default {
 };
 </script>
 
-
 <template>
-    <div class="ym-stat-strip">
-        <div class="ym-stat">
-            <p class="ym-stat-label">{{ $t('operations.collectedThisMonth') }}</p>
-            <p class="ym-stat-value">{{ formatVnd(stats.collected) }}</p>
-        </div>
-        <div class="ym-stat">
-            <p class="ym-stat-label">{{ $t('operations.outstanding') }}</p>
-            <p class="ym-stat-value">{{ formatVnd(stats.outstanding) }}</p>
-            <p class="ym-stat-note">{{ $t('operations.openInvoices', { count: stats.openCount }) }}</p>
-        </div>
-        <div class="ym-stat">
-            <p class="ym-stat-label">{{ $t('operations.overdue') }}</p>
-            <p class="ym-stat-value">{{ stats.overdueCount }}</p>
-        </div>
-    </div>
-
-    <section class="ym-surface ym-section">
-        <div class="flex items-center justify-between">
-            <div>
-                <h2 class="ym-title">
-                    {{ $t('operations.tuitionFees') }}
-                    <span class="ym-count-badge">{{ invoices.total }}</span>
-                </h2>
-                <p class="ym-subtitle">{{ $t('operations.tuitionSubtitle') }}</p>
+    <div class="ym-ui">
+        <div class="ym-stats">
+            <div class="ym-stat-card">
+                <p class="ym-stat-card-label">{{ $t('operations.collectedThisMonth') }}</p>
+                <p class="ym-stat-card-value">{{ formatVnd(stats.collected) }}</p>
             </div>
-            <div class="ym-inline-actions">
-                <a :href="endpoints.export" class="ym-btn-outline">{{ $t('common.export') }}</a>
-                <Link v-if="endpoints.plans" :href="endpoints.plans" class="ym-btn-outline">
+            <div class="ym-stat-card ym-stat-card--info">
+                <p class="ym-stat-card-label">{{ $t('operations.outstanding') }}</p>
+                <p class="ym-stat-card-value">{{ formatVnd(stats.outstanding) }}</p>
+                <p class="ym-stat-card-note">{{ $t('operations.openInvoices', { count: stats.openCount }) }}</p>
+            </div>
+            <div class="ym-stat-card ym-stat-card--danger">
+                <p class="ym-stat-card-label">{{ $t('operations.overdue') }}</p>
+                <p class="ym-stat-card-value">{{ stats.overdueCount }}</p>
+            </div>
+        </div>
+
+        <header class="ym-page-head">
+            <div>
+                <h1 class="ym-page-title">
+                    {{ $t('operations.tuitionFees') }}
+                    <span class="ym-count">{{ invoices.total }}</span>
+                </h1>
+                <p class="ym-page-sub">{{ $t('operations.tuitionSubtitle') }}</p>
+            </div>
+            <div class="ym-page-actions">
+                <a :href="endpoints.export" class="ym-btn ym-btn--quiet">
+                    <i class="bi bi-download" /> {{ $t('common.export') }}
+                </a>
+                <Link v-if="endpoints.plans" :href="endpoints.plans" class="ym-btn ym-btn--outline">
                     {{ $t('operations.tuitionPlans') }}
                 </Link>
-                <Link v-if="endpoints.create" :href="endpoints.create" class="ym-btn-sm">
-                    {{ $t('operations.createInvoice') }}
+                <Link v-if="endpoints.create" :href="endpoints.create" class="ym-btn ym-btn--primary">
+                    <i class="bi bi-plus-lg" /> {{ $t('operations.createInvoice') }}
                 </Link>
             </div>
-        </div>
+        </header>
 
-        <FilterBar :active="active" @reset="reset">
-            <input
-                v-model="filters.search"
-                type="search"
-                class="ym-log-search"
-                :placeholder="$t('operations.searchInvoices')"
-            />
-            <select v-model="filters.status" class="ym-log-filter-select">
-                <option value="">{{ $t('operations.allStatuses') }}</option>
-                <option v-for="status in options.statuses" :key="status" :value="status">{{ statusLabel(status) }}</option>
-            </select>
-            <select v-model="filters.overdue" class="ym-log-filter-select">
-                <option value="">{{ $t('operations.allInvoices') }}</option>
-                <option value="1">{{ $t('operations.overdueOnly') }}</option>
-            </select>
-        </FilterBar>
+        <section class="ym-card">
+            <div class="ym-filter-band">
+                <FilterBar
+                    v-model:search="filters.search"
+                    :search-placeholder="$t('operations.searchInvoices')"
+                    :count="filterCount"
+                    :active="active"
+                    @reset="reset"
+                >
+                    <label class="ym-filter-field">
+                        <span>{{ $t('operations.status') }}</span>
+                        <select v-model="filters.status" class="ym-log-filter-select">
+                            <option value="">{{ $t('operations.allStatuses') }}</option>
+                            <option v-for="status in options.statuses" :key="status" :value="status">{{ statusLabel(status) }}</option>
+                        </select>
+                    </label>
+                    <label class="ym-filter-field">
+                        <span>{{ $t('operations.overdue') }}</span>
+                        <select v-model="filters.overdue" class="ym-log-filter-select">
+                            <option value="">{{ $t('operations.allInvoices') }}</option>
+                            <option value="1">{{ $t('operations.overdueOnly') }}</option>
+                        </select>
+                    </label>
+                    <DateRange
+                        v-model:from="filters.from"
+                        v-model:to="filters.to"
+                        :label="$t('operations.dueDate')"
+                    />
+                </FilterBar>
+            </div>
 
-        <div class="ym-table-wrap">
-            <table class="ym-table">
-                <thead>
-                    <tr>
-                        <th class="ym-th">{{ $t('operations.invoiceNumber') }}</th>
-                        <th class="ym-th">{{ $t('operations.student') }}</th>
-                        <th class="ym-th">{{ $t('operations.planBranch') }}</th>
-                        <th class="ym-th">{{ $t('operations.dueDate') }}</th>
-                        <th class="ym-th">{{ $t('operations.amount') }}</th>
-                        <th class="ym-th">{{ $t('operations.invoiceBalance') }}</th>
-                        <th class="ym-th">{{ $t('operations.status') }}</th>
-                        <th class="ym-th">{{ $t('operations.actions') }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="invoice in invoices.data" :key="invoice.id" class="ym-tr">
-                        <td class="ym-td font-medium">{{ invoice.invoice_number }}</td>
-                        <td class="ym-td">{{ invoice.student_name }}</td>
-                        <td class="ym-td text-neutral-500">{{ invoice.branch_name }}</td>
-                        <td class="ym-td text-neutral-500">{{ invoice.due_date }}</td>
-                        <td class="ym-td">{{ formatVnd(invoice.total_amount) }}</td>
-                        <td class="ym-td">{{ formatVnd(invoice.balance) }}</td>
-                        <td class="ym-td">
-                            <span :class="['ym-invoice-status', `ym-invoice-status--${invoice.status}`]">{{ statusLabel(invoice.status) }}</span>
-                        </td>
-                        <td class="ym-td">
-                            <Link class="ym-btn-outline" :href="invoice.showUrl">{{ $t('operations.invoiceDetails') }}</Link>
-                        </td>
-                    </tr>
-                    <tr v-if="!invoices.data.length">
-                        <td class="ym-td text-neutral-500" colspan="8">{{ $t('operations.noInvoices') }}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+            <div class="ym-table-scroll">
+                <table class="ym-grid-table">
+                    <thead>
+                        <tr>
+                            <SortTh
+                                field="invoice_number"
+                                :label="$t('operations.invoiceNumber')"
+                                :state="filters"
+                                @sort="toggleSort"
+                            />
+                            <th>{{ $t('operations.student') }}</th>
+                            <th>{{ $t('operations.planBranch') }}</th>
+                            <SortTh
+                                field="due_date"
+                                :label="$t('operations.dueDate')"
+                                :state="filters"
+                                @sort="toggleSort"
+                            />
+                            <SortTh
+                                field="total_amount"
+                                :label="$t('operations.amount')"
+                                :state="filters"
+                                numeric
+                                @sort="toggleSort"
+                            />
+                            <th class="is-num">{{ $t('operations.invoiceBalance') }}</th>
+                            <SortTh
+                                field="status"
+                                :label="$t('operations.status')"
+                                :state="filters"
+                                @sort="toggleSort"
+                            />
+                            <th class="is-actions">{{ $t('operations.actions') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="invoice in invoices.data" :key="invoice.id">
+                            <td class="is-strong">{{ invoice.invoice_number }}</td>
+                            <td>{{ invoice.student_name }}</td>
+                            <td class="is-muted">{{ invoice.branch_name }}</td>
+                            <td class="is-muted ym-num">{{ invoice.due_date }}</td>
+                            <td class="is-num">{{ formatVnd(invoice.total_amount) }}</td>
+                            <td class="is-num is-strong">{{ formatVnd(invoice.balance) }}</td>
+                            <td>
+                                <span class="ym-tag" :class="`ym-tag--${statusTone[invoice.status] ?? 'neutral'}`">
+                                    {{ statusLabel(invoice.status) }}
+                                </span>
+                            </td>
+                            <td class="is-actions">
+                                <div class="ym-row-actions">
+                                    <Link class="ym-btn ym-btn--outline ym-btn--sm" :href="invoice.showUrl">
+                                        {{ $t('operations.invoiceDetails') }}
+                                    </Link>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-        <div v-if="invoices.links.length > 3" class="ym-pagination">
-            <Link
-                v-for="link in invoices.links"
-                :key="link.label"
-                :href="link.url ?? '#'"
-                v-html="link.label"
-                :class="['ym-page-link', { 'ym-page-link--active': link.active, 'ym-page-link--disabled': !link.url }]"
-                preserve-scroll
-            />
-        </div>
-    </section>
+            <div v-if="!invoices.data.length" class="ym-empty">
+                <i class="bi bi-receipt" />
+                <p>{{ $t('operations.noInvoices') }}</p>
+            </div>
+
+            <div v-if="invoices.links.length > 3" class="ym-card-foot">
+                <div class="ym-pagination">
+                    <Link
+                        v-for="link in invoices.links"
+                        :key="link.label"
+                        :href="link.url ?? '#'"
+                        v-html="link.label"
+                        :class="['ym-page-link', { 'ym-page-link--active': link.active, 'ym-page-link--disabled': !link.url }]"
+                        preserve-scroll
+                    />
+                </div>
+            </div>
+        </section>
+    </div>
 </template>
