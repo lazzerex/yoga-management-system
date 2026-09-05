@@ -8,6 +8,7 @@ use App\Models\Enrollment;
 use App\Modules\Admin\User\Actions\AuditUserAction;
 use App\Modules\Operations\Enrollment\Actions\CancelEnrollmentAction;
 use App\Modules\Operations\Enrollment\Actions\CreateEnrollmentAction;
+use App\Support\Table\SortsQueries;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,6 +16,8 @@ use Inertia\Response;
 
 class EnrollmentController extends Controller
 {
+    use SortsQueries;
+
     public function index(Request $request): Response
     {
         $studentProfile = $request->user()->studentProfile;
@@ -169,17 +172,21 @@ class EnrollmentController extends Controller
         $from = $this->validDate($request->string('from')->toString());
         $to = $this->validDate($request->string('to')->toString());
 
-        $enrollments = Enrollment::query()
+        $query = Enrollment::query()
             ->with(['studentProfile.user:id,name', 'classSession.classType:id,name', 'classSession.coachProfile.user:id,name'])
             ->whereHas('classSession', fn ($q) => $q
                 ->when($branchId, fn ($b) => $b->where('branch_id', $branchId))
                 ->when($from, fn ($b) => $b->where('session_date', '>=', $from))
                 ->when($to, fn ($b) => $b->where('session_date', '<=', $to)))
             ->when(in_array($status, ['booked', 'waitlisted', 'cancelled'], true), fn ($q) => $q->where('status', $status))
-            ->when($search !== '', fn ($q) => $q->whereHas('studentProfile.user', fn ($u) => $u->where('name', 'like', "%{$search}%")))
-            ->orderByDesc('enrolled_at')
-            ->paginate(20)
-            ->withQueryString();
+            ->when($search !== '', fn ($q) => $q->whereHas('studentProfile.user', fn ($u) => $u->where('name', 'like', "%{$search}%")));
+
+        $sort = $this->applySort($query, $request, [
+            'status' => ['booked', 'waitlisted', 'cancelled'],
+            'enrolled_at' => 'enrolled_at',
+        ], 'enrolled_at');
+
+        $enrollments = $query->paginate(20)->withQueryString();
 
         return inertia('Operations/Enrollments/Index', [
             'enrollments' => $enrollments->through(fn (Enrollment $e) => [
@@ -198,7 +205,7 @@ class EnrollmentController extends Controller
                 'search' => $search,
                 'from' => $from ?? '',
                 'to' => $to ?? '',
-            ],
+            ] + $sort,
             'endpoints' => ['index' => route('operations.enrollments.index')],
         ]);
     }
