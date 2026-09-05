@@ -11,6 +11,7 @@ const props = defineProps({
 });
 
 const STATUSES = ['present', 'late', 'absent'];
+const STATUS_TONE = { present: 'ok', late: 'warn', absent: 'danger' };
 
 const entries = reactive(
     Object.fromEntries(props.students.map((student) => [student.enrollment_id, { status: student.status, notes: student.notes ?? '' }])),
@@ -61,91 +62,128 @@ export default {
 </script>
 
 <template>
-    <section class="ym-surface ym-section">
-        <div class="ym-at-roster-head">
+    <div class="ym-ui">
+        <header class="ym-page-head">
             <div>
-                <h2 class="ym-title">
+                <h1 class="ym-page-title">
                     {{ $t('operations.rosterTitle') }}
-                    <span class="ym-count-badge">{{ markedCount }} / {{ students.length }}</span>
-                </h2>
-                <p class="ym-subtitle">
+                    <span class="ym-count">{{ markedCount }} / {{ students.length }}</span>
+                </h1>
+                <p class="ym-page-sub">
                     {{ $t('operations.rosterSubtitle', { class: session.class_type_name, coach: session.coach_name }) }}
                 </p>
-                <p class="ym-subtitle">
-                    {{ longDate }} · {{ session.start_time }} - {{ session.end_time }} · {{ session.branch_name }} / {{ session.room_name }}
+            </div>
+            <div class="ym-page-actions">
+                <Link :href="endpoints.back" class="ym-btn ym-btn--outline">
+                    {{ $t('operations.attendanceBackToBoard') }}
+                </Link>
+            </div>
+        </header>
+
+        <section class="ym-card">
+            <div class="ym-card-meta">
+                <dl class="ym-kv">
+                    <div>
+                        <dt>{{ $t('operations.date') }}</dt>
+                        <dd>{{ longDate }}</dd>
+                    </div>
+                    <div>
+                        <dt>{{ $t('operations.time') }}</dt>
+                        <dd class="ym-num">{{ session.start_time }} – {{ session.end_time }}</dd>
+                    </div>
+                    <div>
+                        <dt>{{ $t('operations.room') }}</dt>
+                        <dd>{{ session.branch_name }} / {{ session.room_name }}</dd>
+                    </div>
+                </dl>
+            </div>
+
+            <div v-if="!canManage" class="ym-card-body">
+                <p class="ym-callout">
+                    <i class="bi bi-info-circle" />
+                    <span>{{ $t('operations.rosterReadOnly') }}</span>
                 </p>
             </div>
-            <Link :href="endpoints.back" class="ym-btn-outline ym-btn-sm">
-                {{ $t('operations.attendanceBackToBoard') }}
-            </Link>
-        </div>
 
-        <p v-if="!canManage" class="ym-info-row">
-            <i class="bi bi-info-circle ym-info-icon" />
-            <span>{{ $t('operations.rosterReadOnly') }}</span>
-        </p>
+            <div v-else-if="students.length" class="ym-filter-band">
+                <div class="ym-log-filters">
+                    <span class="ym-figure-label">{{ $t('operations.status') }}</span>
+                    <button
+                        v-for="status in STATUSES"
+                        :key="status"
+                        type="button"
+                        class="ym-btn ym-btn--outline ym-btn--sm"
+                        @click="setAll(status)"
+                    >
+                        {{ $t(`operations.roster${status.charAt(0).toUpperCase()}${status.slice(1)}`) }}
+                    </button>
+                </div>
+            </div>
 
-        <div v-if="canManage && students.length" class="ym-at-bulk">
-            <button v-for="status in STATUSES" :key="status" type="button" class="ym-btn-ghost ym-btn-sm" @click="setAll(status)">
-                {{ $t(`operations.roster${status.charAt(0).toUpperCase()}${status.slice(1)}`) }}
-            </button>
-        </div>
-
-        <div class="ym-table-wrap">
-            <table class="ym-table">
-                <thead>
-                    <tr>
-                        <th class="ym-th">{{ $t('operations.student') }}</th>
-                        <th class="ym-th">{{ $t('operations.status') }}</th>
-                        <th class="ym-th">{{ $t('operations.rosterNotes') }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="student in students" :key="student.enrollment_id" class="ym-tr">
-                        <td class="ym-td font-medium">{{ student.student_name }}</td>
-                        <td class="ym-td">
-                            <div v-if="canManage" class="ym-at-seg">
-                                <button
-                                    v-for="status in STATUSES"
-                                    :key="status"
-                                    type="button"
-                                    class="ym-at-seg-btn"
-                                    :class="{ 'ym-at-seg-btn--on': entries[student.enrollment_id].status === status }"
-                                    @click="entries[student.enrollment_id].status = status"
+            <div class="ym-table-scroll">
+                <table class="ym-grid-table">
+                    <thead>
+                        <tr>
+                            <th>{{ $t('operations.student') }}</th>
+                            <th>{{ $t('operations.status') }}</th>
+                            <th>{{ $t('operations.rosterNotes') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="student in students" :key="student.enrollment_id">
+                            <td class="is-strong">{{ student.student_name }}</td>
+                            <td>
+                                <div v-if="canManage" class="ym-pick">
+                                    <button
+                                        v-for="status in STATUSES"
+                                        :key="status"
+                                        type="button"
+                                        class="ym-pick-btn"
+                                        :class="{ 'is-on': entries[student.enrollment_id].status === status }"
+                                        :data-tone="STATUS_TONE[status]"
+                                        @click="entries[student.enrollment_id].status = status"
+                                    >
+                                        {{ $t(`operations.roster${status.charAt(0).toUpperCase()}${status.slice(1)}`) }}
+                                    </button>
+                                </div>
+                                <span
+                                    v-else
+                                    class="ym-tag"
+                                    :class="`ym-tag--${student.status ? STATUS_TONE[student.status] : 'neutral'}`"
                                 >
-                                    {{ $t(`operations.roster${status.charAt(0).toUpperCase()}${status.slice(1)}`) }}
-                                </button>
-                            </div>
-                            <span v-else class="ym-status-pill">
-                                {{
-                                    student.status
-                                        ? $t(`operations.roster${student.status.charAt(0).toUpperCase()}${student.status.slice(1)}`)
-                                        : $t('operations.rosterUnmarked')
-                                }}
-                            </span>
-                        </td>
-                        <td class="ym-td">
-                            <input
-                                v-if="canManage"
-                                v-model="entries[student.enrollment_id].notes"
-                                type="text"
-                                maxlength="500"
-                                class="ym-at-note-input"
-                            />
-                            <span v-else class="text-neutral-500">{{ student.notes || '—' }}</span>
-                        </td>
-                    </tr>
-                    <tr v-if="!students.length">
-                        <td class="ym-td text-neutral-500" colspan="3">{{ $t('operations.rosterEmpty') }}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+                                    {{
+                                        student.status
+                                            ? $t(`operations.roster${student.status.charAt(0).toUpperCase()}${student.status.slice(1)}`)
+                                            : $t('operations.rosterUnmarked')
+                                    }}
+                                </span>
+                            </td>
+                            <td>
+                                <input
+                                    v-if="canManage"
+                                    v-model="entries[student.enrollment_id].notes"
+                                    type="text"
+                                    maxlength="500"
+                                    class="ym-input"
+                                />
+                                <span v-else class="is-muted">{{ student.notes || '—' }}</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-        <div v-if="canManage && students.length" class="ym-at-save">
-            <button type="button" class="ym-btn-primary" :disabled="saving" @click="save">
-                {{ $t('operations.rosterSave') }}
-            </button>
-        </div>
-    </section>
+            <div v-if="!students.length" class="ym-empty">
+                <i class="bi bi-people" />
+                <p>{{ $t('operations.rosterEmpty') }}</p>
+            </div>
+
+            <div v-if="canManage && students.length" class="ym-form-foot">
+                <p class="ym-form-foot-lead ym-note">{{ markedCount }} / {{ students.length }}</p>
+                <button type="button" class="ym-btn ym-btn--primary" :disabled="saving" @click="save">
+                    <i class="bi bi-check-lg" /> {{ $t('operations.rosterSave') }}
+                </button>
+            </div>
+        </section>
+    </div>
 </template>
