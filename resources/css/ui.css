@@ -1,0 +1,1469 @@
+/* Shared CMS interface layer.
+   The tokens live on :root so a shared component (FilterBar, buttons, cards) renders
+   correctly wherever it is used, including pages not yet on this layer. .ym-ui adds
+   only the typography and text colour a converted page opts into. */
+
+@layer components {
+    :root {
+        --u-brand: #2f8368;
+        --u-brand-strong: #266b55;
+        --u-brand-deep: #1f5c4a;
+        --u-brand-soft: #eef5f2;
+        --u-brand-line: #d3e5dd;
+
+        --u-ink: #16202b;
+        --u-ink-2: #2b3a4a;
+        --u-ink-3: #55637a;
+        --u-ink-4: #7c8798;
+
+        --u-line: #e4e9f0;
+        --u-line-strong: #d3dbe6;
+        --u-surface: #ffffff;
+        --u-surface-2: #f8fafb;
+
+        --u-danger: #b8404a;
+        --u-danger-soft: #fceef0;
+        --u-warn: #b7791f;
+        --u-warn-soft: #fdf5e6;
+        --u-info: #3a6ea5;
+        --u-info-soft: #edf3fb;
+
+        --u-r: 12px;
+        --u-r-sm: 8px;
+    }
+
+    .ym-ui {
+        color: var(--u-ink-2);
+        font-size: 0.875rem;
+    }
+
+    .ym-ui i { line-height: 0; }
+
+    /* Numbers line up column to column, and never reflow while a value animates. */
+    .ym-num { font-variant-numeric: tabular-nums; }
+
+    /* ---- Page head ---- */
+
+    .ym-page-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+    }
+
+    .ym-page-title {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        margin: 0;
+        font-size: 1.35rem;
+        font-weight: 700;
+        letter-spacing: -0.015em;
+        color: var(--u-ink);
+    }
+
+    .ym-page-sub {
+        margin: 0.3rem 0 0;
+        font-size: 0.85rem;
+        color: var(--u-ink-4);
+    }
+
+    .ym-page-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    /* ---- Buttons ----
+       One base, one variant axis, one size axis. Replaces the four unrelated
+       .ym-btn-* rules, which differ in padding, radius and weight. */
+
+    .ym-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        padding: 0.5rem 0.9rem;
+        border: 1px solid transparent;
+        border-radius: var(--u-r-sm);
+        font-family: inherit;
+        font-size: 0.82rem;
+        font-weight: 650;
+        line-height: 1.2;
+        white-space: nowrap;
+        text-decoration: none;
+        cursor: pointer;
+        transition:
+            background var(--ym-dur) var(--ym-ease),
+            border-color var(--ym-dur) var(--ym-ease),
+            color var(--ym-dur) var(--ym-ease),
+            box-shadow var(--ym-dur) var(--ym-ease);
+    }
+
+    .ym-btn:focus-visible {
+        outline: 2px solid var(--u-brand);
+        outline-offset: 2px;
+    }
+
+    .ym-btn:disabled,
+    .ym-btn[aria-disabled='true'] {
+        opacity: 0.55;
+        cursor: not-allowed;
+    }
+
+    .ym-btn--primary {
+        background: var(--u-brand);
+        border-color: var(--u-brand);
+        color: #ffffff;
+        box-shadow: 0 1px 2px rgba(22, 55, 44, 0.16);
+    }
+
+    .ym-btn--primary:hover:not(:disabled) {
+        background: var(--u-brand-strong);
+        border-color: var(--u-brand-strong);
+    }
+
+    .ym-btn--outline {
+        background: var(--u-surface);
+        border-color: var(--u-line-strong);
+        color: var(--u-ink-2);
+    }
+
+    .ym-btn--outline:hover:not(:disabled) {
+        border-color: var(--u-brand-line);
+        background: var(--u-brand-soft);
+        color: var(--u-brand-deep);
+    }
+
+    /* Quiet: for actions that must be reachable but never compete — void, delete. */
+    .ym-btn--quiet {
+        background: transparent;
+        border-color: transparent;
+        color: var(--u-ink-4);
+    }
+
+    .ym-btn--quiet:hover:not(:disabled) {
+        background: var(--u-surface-2);
+        color: var(--u-ink-2);
+    }
+
+    .ym-btn--danger {
+        background: var(--u-danger);
+        border-color: var(--u-danger);
+        color: #ffffff;
+    }
+
+    .ym-btn--danger:hover:not(:disabled) {
+        background: #a13740;
+        border-color: #a13740;
+    }
+
+    .ym-btn--danger-quiet {
+        background: transparent;
+        border-color: transparent;
+        color: var(--u-danger);
+    }
+
+    .ym-btn--danger-quiet:hover:not(:disabled) { background: var(--u-danger-soft); }
+
+    .ym-btn--sm { padding: 0.34rem 0.62rem; font-size: 0.76rem; }
+    .ym-btn--lg { padding: 0.66rem 1.1rem; font-size: 0.9rem; }
+    .ym-btn--block { width: 100%; }
+
+    .ym-btn--icon {
+        padding: 0;
+        width: 2rem;
+        height: 2rem;
+        border-radius: var(--u-r-sm);
+    }
+
+    /* ---- Cards ---- */
+
+    .ym-card {
+        position: relative;
+        background: var(--u-surface);
+        border: 1px solid var(--u-line);
+        border-radius: var(--u-r);
+        box-shadow: var(--ym-shadow-sm);
+    }
+
+    .ym-card + .ym-card { margin-top: 0.9rem; }
+
+    .ym-card-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        padding: 0.7rem 1rem;
+        border-bottom: 1px solid var(--u-line);
+    }
+
+    .ym-card-title {
+        margin: 0;
+        font-size: 0.74rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--u-ink-3);
+    }
+
+    .ym-card-body { padding: 1rem; }
+    .ym-card-body--flush { padding: 0; }
+
+    .ym-card-foot {
+        padding: 0.7rem 1rem;
+        border-top: 1px solid var(--u-line);
+        background: var(--u-surface-2);
+        border-radius: 0 0 var(--u-r) var(--u-r);
+    }
+
+    /* A second heading part-way down a card, when one card holds two groups. */
+    .ym-card-subhead {
+        padding: 0.7rem 1rem;
+        border-top: 1px solid var(--u-line);
+        border-bottom: 1px solid var(--u-line);
+        background: var(--u-surface-2);
+    }
+
+    /* A metadata band at the top of a card, before the content it describes. */
+    .ym-card-meta {
+        padding: 0.85rem 1rem;
+        border-bottom: 1px solid var(--u-line);
+        background: var(--u-surface-2);
+        border-radius: var(--u-r) var(--u-r) 0 0;
+    }
+
+    .ym-card--accent { border-color: var(--u-brand-line); }
+
+    .ym-card--accent > .ym-card-head {
+        background: var(--u-brand-soft);
+        border-bottom-color: var(--u-brand-line);
+        border-radius: var(--u-r) var(--u-r) 0 0;
+    }
+
+    .ym-card--accent > .ym-card-head .ym-card-title { color: var(--u-brand-deep); }
+
+    /* ---- Two-column work layout: content left, the action of the page right ---- */
+
+    .ym-split {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 21rem;
+        gap: 1rem;
+        align-items: start;
+    }
+
+    /* The shell's .ym-topbar is sticky at top:0, so the rail has to clear it. */
+    .ym-split-rail { position: sticky; top: var(--u-sticky-top, 6.75rem); }
+
+    @media (max-width: 1100px) {
+        .ym-split { grid-template-columns: minmax(0, 1fr); }
+        .ym-split-rail { position: static; order: -1; }
+    }
+
+    /* ---- Figures ---- */
+
+    .ym-figure-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+        gap: 0.9rem;
+    }
+
+    .ym-figure-label {
+        margin: 0;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--u-ink-4);
+    }
+
+    .ym-figure-value {
+        margin: 0.28rem 0 0;
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--u-ink);
+        font-variant-numeric: tabular-nums;
+    }
+
+    .ym-figure-value--muted { color: var(--u-ink-3); font-weight: 650; }
+
+    .ym-hero-label {
+        margin: 0;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--u-ink-4);
+    }
+
+    .ym-hero-value {
+        margin: 0.3rem 0 0;
+        font-size: 1.9rem;
+        font-weight: 750;
+        letter-spacing: -0.02em;
+        color: var(--u-ink);
+        font-variant-numeric: tabular-nums;
+        line-height: 1.1;
+    }
+
+    .ym-hero-value--settled { color: var(--u-brand-strong); }
+
+    /* ---- Progress ---- */
+
+    .ym-progress {
+        height: 6px;
+        border-radius: 999px;
+        background: #eef1f5;
+        overflow: hidden;
+    }
+
+    .ym-progress-fill {
+        display: block;
+        height: 100%;
+        border-radius: 999px;
+        background: var(--u-brand);
+        transition: width 320ms var(--ym-ease);
+    }
+
+    .ym-progress-fill[data-tone='warn']   { background: var(--u-warn); }
+    .ym-progress-fill[data-tone='danger'] { background: var(--u-danger); }
+
+    /* A bar and its number, inline in a table cell. */
+    .ym-rate {
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        min-width: 8rem;
+    }
+
+    .ym-rate .ym-progress { flex: 1; }
+
+    .ym-rate-value {
+        font-size: 0.8rem;
+        font-weight: 650;
+        color: var(--u-ink-2);
+        font-variant-numeric: tabular-nums;
+    }
+
+    .ym-progress-note {
+        margin: 0.45rem 0 0;
+        font-size: 0.76rem;
+        color: var(--u-ink-4);
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* ---- Key/value meta ---- */
+
+    .ym-kv {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+        gap: 0.85rem 1.2rem;
+        margin: 0;
+    }
+
+    .ym-kv dt {
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--u-ink-4);
+    }
+
+    .ym-kv dd {
+        margin: 0.22rem 0 0;
+        font-size: 0.86rem;
+        font-weight: 600;
+        color: var(--u-ink-2);
+    }
+
+    /* ---- Status pills ---- */
+
+    .ym-ui .ym-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.32rem;
+        padding: 0.24rem 0.6rem;
+        border: 1px solid transparent;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        line-height: 1.25;
+        white-space: nowrap;
+    }
+
+    .ym-ui .ym-tag--ok      { background: var(--u-brand-soft); border-color: var(--u-brand-line); color: var(--u-brand-deep); }
+    .ym-ui .ym-tag--warn    { background: var(--u-warn-soft);  border-color: #eedbb2; color: #8d5c11; }
+    .ym-ui .ym-tag--danger  { background: var(--u-danger-soft); border-color: #f0ccd1; color: #96323b; }
+    .ym-ui .ym-tag--info    { background: var(--u-info-soft);  border-color: #cddef2; color: #2c5580; }
+    .ym-ui .ym-tag--neutral { background: var(--u-surface-2);  border-color: var(--u-line-strong); color: var(--u-ink-3); }
+
+    /* ---- Tables ---- */
+
+    .ym-grid-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .ym-grid-table th {
+        padding: 0.55rem 1rem;
+        background: var(--u-surface-2);
+        border-bottom: 1px solid var(--u-line);
+        font-size: 0.71rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--u-ink-4);
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    .ym-grid-table td {
+        padding: 0.66rem 1rem;
+        border-bottom: 1px solid var(--u-line);
+        font-size: 0.85rem;
+        color: var(--u-ink-2);
+        vertical-align: top;
+    }
+
+    .ym-grid-table tbody tr:last-child td { border-bottom: 0; }
+    .ym-grid-table tbody tr:hover td { background: #fafcfd; }
+
+    .ym-grid-table .is-num {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .ym-grid-table .is-muted { color: var(--u-ink-4); }
+    .ym-grid-table .is-strong { font-weight: 650; color: var(--u-ink); }
+
+    .ym-grid-table tfoot td {
+        padding: 0.7rem 1rem;
+        border-top: 1px solid var(--u-line-strong);
+        background: var(--u-surface-2);
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--u-ink);
+    }
+
+    .ym-table-scroll { overflow-x: auto; }
+
+    /* ---- Timeline (payment history, review history, audit trails) ---- */
+
+    .ym-timeline {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .ym-timeline-item {
+        display: flex;
+        gap: 0.85rem;
+        padding: 0.85rem 1rem;
+        border-bottom: 1px solid var(--u-line);
+    }
+
+    .ym-timeline-item:last-child { border-bottom: 0; }
+    .ym-timeline-item.is-void { background: #fdfbfb; }
+
+    .ym-timeline-mark {
+        flex-shrink: 0;
+        width: 2rem;
+        height: 2rem;
+        display: grid;
+        place-items: center;
+        border-radius: 999px;
+        background: var(--u-brand-soft);
+        color: var(--u-brand-deep);
+        font-size: 0.85rem;
+    }
+
+    .ym-timeline-item.is-void .ym-timeline-mark {
+        background: var(--u-danger-soft);
+        color: var(--u-danger);
+    }
+
+    .ym-timeline-body { flex: 1; min-width: 0; }
+
+    .ym-timeline-row {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 0.6rem;
+    }
+
+    .ym-timeline-amount {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--u-ink);
+        font-variant-numeric: tabular-nums;
+    }
+
+    .ym-timeline-item.is-void .ym-timeline-amount {
+        color: var(--u-ink-4);
+        text-decoration: line-through;
+    }
+
+    .ym-timeline-meta {
+        margin: 0.22rem 0 0;
+        font-size: 0.78rem;
+        color: var(--u-ink-4);
+    }
+
+    .ym-timeline-note {
+        margin: 0.35rem 0 0;
+        padding: 0.4rem 0.6rem;
+        border-radius: var(--u-r-sm);
+        background: var(--u-surface-2);
+        font-size: 0.78rem;
+        color: var(--u-ink-3);
+    }
+
+    .ym-timeline-note--void {
+        background: var(--u-danger-soft);
+        color: #96323b;
+    }
+
+    .ym-timeline-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        flex-shrink: 0;
+    }
+
+    /* ---- KPI row ---- */
+
+    .ym-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .ym-stat-card {
+        position: relative;
+        padding: 0.85rem 1rem 0.9rem;
+        background: var(--u-surface);
+        border: 1px solid var(--u-line);
+        border-radius: var(--u-r);
+        box-shadow: var(--ym-shadow-sm);
+        overflow: hidden;
+    }
+
+    .ym-stat-card::before {
+        content: '';
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 3px;
+        background: var(--u-stat-accent, var(--u-brand));
+    }
+
+    .ym-stat-card--warn   { --u-stat-accent: var(--u-warn); }
+    .ym-stat-card--danger { --u-stat-accent: var(--u-danger); }
+    .ym-stat-card--info   { --u-stat-accent: var(--u-info); }
+
+    .ym-stat-card-label {
+        margin: 0;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--u-ink-4);
+    }
+
+    .ym-stat-card-value {
+        margin: 0.3rem 0 0;
+        font-size: 1.3rem;
+        font-weight: 750;
+        letter-spacing: -0.015em;
+        color: var(--u-ink);
+        font-variant-numeric: tabular-nums;
+        line-height: 1.15;
+    }
+
+    .ym-stat-card-note {
+        margin: 0.25rem 0 0;
+        font-size: 0.75rem;
+        color: var(--u-ink-4);
+    }
+
+    .ym-count {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.16rem 0.5rem;
+        border-radius: 999px;
+        background: var(--u-surface-2);
+        border: 1px solid var(--u-line);
+        font-size: 0.76rem;
+        font-weight: 700;
+        color: var(--u-ink-3);
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* ---- Filters: the shared FilterBar keeps its markup, this restyles it ---- */
+
+    .ym-filter-band {
+        padding: 0.7rem 1rem;
+        border-bottom: 1px solid var(--u-line);
+        background: var(--u-surface-2);
+    }
+
+    .ym-ui .ym-log-filters {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0;
+    }
+
+    .ym-ui .ym-log-search,
+    .ym-ui .ym-log-filter-select {
+        height: 2.1rem;
+        padding: 0 0.7rem;
+        border: 1px solid var(--u-line-strong);
+        border-radius: var(--u-r-sm);
+        background: var(--u-surface);
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: var(--u-ink-2);
+        box-shadow: none;
+    }
+
+    .ym-ui .ym-log-search { min-width: 15rem; flex: 1 1 15rem; max-width: 24rem; }
+    .ym-ui .ym-log-filter-select { font-weight: 600; }
+
+    .ym-ui .ym-log-search:focus,
+    .ym-ui .ym-log-filter-select:focus {
+        outline: none;
+        border-color: var(--u-brand);
+        box-shadow: 0 0 0 3px rgba(47, 131, 104, 0.13);
+    }
+
+    .ym-ui .ym-log-clear-btn {
+        height: 2.1rem;
+        padding: 0 0.7rem;
+        border: 1px solid transparent;
+        border-radius: var(--u-r-sm);
+        background: transparent;
+        color: var(--u-ink-4);
+        font-size: 0.78rem;
+        font-weight: 650;
+        cursor: pointer;
+    }
+
+    .ym-ui .ym-log-clear-btn:hover { background: var(--u-surface); color: var(--u-ink-2); }
+
+    /* ---- Toolbar: search, a Filters popover, then actions ---- */
+
+    .ym-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* Named apart from the shell's own .ym-search input in layout.css. */
+    .ym-toolbar-search {
+        position: relative;
+        display: flex;
+        align-items: center;
+        flex: 1 1 16rem;
+        max-width: 24rem;
+    }
+
+    .ym-toolbar-search i {
+        position: absolute;
+        left: 0.65rem;
+        font-size: 0.82rem;
+        color: var(--u-ink-4);
+        pointer-events: none;
+    }
+
+    .ym-toolbar-search input {
+        width: 100%;
+        height: 2.1rem;
+        padding: 0 0.7rem 0 2rem;
+        border: 1px solid var(--u-line-strong);
+        border-radius: var(--u-r-sm);
+        background: var(--u-surface);
+        font-family: inherit;
+        font-size: 0.8rem;
+        color: var(--u-ink-2);
+    }
+
+    .ym-toolbar-search input:focus {
+        outline: none;
+        border-color: var(--u-brand);
+        box-shadow: 0 0 0 3px rgba(47, 131, 104, 0.13);
+    }
+
+    .ym-filter-wrap { position: relative; }
+
+    .ym-filter-wrap .ym-btn.is-open {
+        border-color: var(--u-brand);
+        background: var(--u-brand-soft);
+        color: var(--u-brand-deep);
+    }
+
+    .ym-filter-caret { font-size: 0.66rem; opacity: 0.75; }
+
+    .ym-filter-count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 1.15rem;
+        height: 1.15rem;
+        padding: 0 0.3rem;
+        border-radius: 999px;
+        background: var(--u-brand);
+        color: #ffffff;
+        font-size: 0.68rem;
+        font-weight: 700;
+    }
+
+    .ym-filter-panel {
+        position: absolute;
+        z-index: 30;
+        top: calc(100% + 0.4rem);
+        left: 0;
+        width: min(23rem, calc(100vw - 2rem));
+        border: 1px solid var(--u-line-strong);
+        border-radius: var(--u-r);
+        background: var(--u-surface);
+        box-shadow: var(--ym-shadow-lift);
+    }
+
+    .ym-filter-panel-grid {
+        display: grid;
+        gap: 0.7rem;
+        padding: 0.85rem;
+    }
+
+    .ym-filter-panel-grid > * { width: 100%; }
+
+    .ym-filter-panel-foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        padding: 0.6rem 0.85rem;
+        border-top: 1px solid var(--u-line);
+        background: var(--u-surface-2);
+        border-radius: 0 0 var(--u-r) var(--u-r);
+    }
+
+    .ym-filter-panel-foot > :only-child { margin-left: auto; }
+
+    .ym-toolbar-clear { margin-left: auto; }
+
+    /* Labelled control inside the popover. */
+    .ym-filter-field {
+        display: grid;
+        gap: 0.3rem;
+    }
+
+    .ym-filter-field > span {
+        font-size: 0.72rem;
+        font-weight: 650;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        color: var(--u-ink-4);
+    }
+
+    /* The centre overview's filter row, above its KPI strip. */
+    .ym-overview-filters {
+        padding: 0.7rem 1rem;
+        margin-bottom: 1rem;
+        border: 1px solid var(--u-line);
+        border-radius: var(--u-r);
+        background: var(--u-surface);
+        box-shadow: var(--ym-shadow-sm);
+    }
+
+    /* ---- Date range ---- */
+
+    .ym-daterange { display: grid; gap: 0.3rem; }
+
+    .ym-daterange-label {
+        font-size: 0.72rem;
+        font-weight: 650;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        color: var(--u-ink-4);
+    }
+
+    .ym-daterange-row {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .ym-daterange-row input { flex: 1; min-width: 0; }
+    .ym-daterange-sep { color: var(--u-ink-4); }
+
+    /* ---- Sortable column header ---- */
+
+    .ym-grid-table th:has(.ym-sort) { padding: 0; }
+
+    .ym-sort {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        width: 100%;
+        padding: 0.55rem 1rem;
+        border: none;
+        background: transparent;
+        font-family: inherit;
+        font-size: inherit;
+        font-weight: inherit;
+        letter-spacing: inherit;
+        text-transform: inherit;
+        color: inherit;
+        cursor: pointer;
+    }
+
+    .is-num > .ym-sort { justify-content: flex-end; }
+
+    .ym-sort:hover { color: var(--u-ink-2); }
+    .ym-sort.is-on { color: var(--u-brand-deep); }
+
+    .ym-sort-ico { font-size: 0.7rem; opacity: 0.4; }
+    .ym-sort.is-on .ym-sort-ico { opacity: 1; }
+    .ym-sort:hover .ym-sort-ico { opacity: 0.8; }
+
+    /* ---- File picker ---- */
+
+    .ym-avatar-block {
+        display: grid;
+        justify-items: center;
+        gap: 0.45rem;
+        text-align: center;
+    }
+
+    .ym-avatar-lg {
+        width: 5rem;
+        height: 5rem;
+        border-radius: 999px;
+        object-fit: cover;
+        border: 1px solid var(--u-line);
+    }
+
+    .ym-avatar-lg--initials {
+        display: grid;
+        place-items: center;
+        border: none;
+        background: var(--u-brand-soft);
+        color: var(--u-brand-deep);
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+    }
+
+    .ym-avatar-name {
+        margin: 0.2rem 0 0;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--u-ink);
+    }
+
+    .ym-avatar-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .ym-avatar-row .ym-file-picker { flex: 1; min-width: 0; }
+
+    .ym-file-picker { display: grid; gap: 0.45rem; }
+
+    .ym-file-trigger {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        cursor: pointer;
+    }
+
+    .ym-file-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+
+    .ym-file-hidden:focus-visible + .ym-btn {
+        outline: 2px solid var(--u-brand);
+        outline-offset: 2px;
+    }
+
+    .ym-file-none { font-size: 0.78rem; color: var(--u-ink-4); }
+
+    .ym-file-chips { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.35rem; }
+
+    .ym-file-chip {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.38rem 0.5rem;
+        border: 1px solid var(--u-line);
+        border-radius: var(--u-r-sm);
+        background: var(--u-surface-2);
+        font-size: 0.8rem;
+        color: var(--u-ink-2);
+    }
+
+    .ym-file-chip i { color: var(--u-ink-4); }
+
+    .ym-file-chip-name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .ym-file-chip-size {
+        margin-left: auto;
+        font-size: 0.72rem;
+        color: var(--u-ink-4);
+        font-variant-numeric: tabular-nums;
+    }
+
+    .ym-file-chip-x {
+        display: grid;
+        place-items: center;
+        width: 1.4rem;
+        height: 1.4rem;
+        border: none;
+        border-radius: 999px;
+        background: transparent;
+        color: var(--u-ink-4);
+        font-size: 0.68rem;
+        cursor: pointer;
+    }
+
+    .ym-file-chip-x:hover { background: var(--u-danger-soft); color: var(--u-danger); }
+
+    /* ---- Tabs: the shared TabBar keeps its markup and its sliding indicator ---- */
+
+    .ym-ui .ym-tabbar {
+        gap: 0.15rem;
+        border-bottom-color: var(--u-line);
+    }
+
+    .ym-ui .ym-tabbar-btn {
+        padding: 0.55rem 0.9rem;
+        border-radius: var(--u-r-sm) var(--u-r-sm) 0 0;
+        font-size: 0.82rem;
+        font-weight: 650;
+        color: var(--u-ink-4);
+    }
+
+    .ym-ui .ym-tabbar-btn:hover {
+        background: var(--u-surface-2);
+        color: var(--u-ink-2);
+    }
+
+    .ym-ui .ym-tabbar-btn--active { color: var(--u-brand-deep); }
+
+    .ym-ui .ym-tabbar-indicator {
+        background: var(--u-brand);
+        border-radius: 2px 2px 0 0;
+    }
+
+    /* ---- Sub-tabs: sibling pages, not client-side tabs ---- */
+
+    .ym-subtabs {
+        display: inline-flex;
+        gap: 0.2rem;
+        padding: 0.2rem;
+        margin-bottom: 1rem;
+        border: 1px solid var(--u-line);
+        border-radius: 999px;
+        background: var(--u-surface-2);
+    }
+
+    .ym-subtab {
+        padding: 0.35rem 0.85rem;
+        border-radius: 999px;
+        font-size: 0.79rem;
+        font-weight: 650;
+        color: var(--u-ink-4);
+        text-decoration: none;
+        transition: background var(--ym-dur) var(--ym-ease), color var(--ym-dur) var(--ym-ease);
+    }
+
+    .ym-subtab:hover { color: var(--u-ink-2); }
+
+    .ym-subtab.is-active {
+        background: var(--u-surface);
+        color: var(--u-brand-deep);
+        box-shadow: 0 1px 2px rgba(22, 55, 44, 0.12);
+    }
+
+    /* ---- Pagination ---- */
+
+    .ym-ui .ym-pagination {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.3rem;
+        margin: 0;
+    }
+
+    .ym-ui .ym-page-link {
+        min-width: 2rem;
+        height: 2rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 0.5rem;
+        border: 1px solid var(--u-line-strong);
+        border-radius: var(--u-r-sm);
+        background: var(--u-surface);
+        font-size: 0.78rem;
+        font-weight: 650;
+        color: var(--u-ink-3);
+        text-decoration: none;
+    }
+
+    .ym-ui .ym-page-link:hover { background: var(--u-brand-soft); color: var(--u-brand-deep); }
+
+    .ym-ui .ym-page-link--active {
+        background: var(--u-brand);
+        border-color: var(--u-brand);
+        color: #ffffff;
+    }
+
+    .ym-ui .ym-page-link--disabled { opacity: 0.4; pointer-events: none; }
+
+    /* ---- Row actions inside a table ---- */
+
+    .ym-row-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 0.25rem;
+    }
+
+    .ym-grid-table .is-actions { text-align: right; white-space: nowrap; }
+
+    /* ---- Forms ---- */
+
+    .ym-form-page { max-width: 60rem; }
+
+    .ym-form-grid-2 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+        gap: 0.9rem 1rem;
+    }
+
+    .ym-form-span { grid-column: 1 / -1; }
+
+    .ym-form-foot {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        border-top: 1px solid var(--u-line);
+        background: var(--u-surface-2);
+        border-radius: 0 0 var(--u-r) var(--u-r);
+    }
+
+    .ym-form-foot-lead { margin-right: auto; }
+
+    /* ---- Repeater (invoice lines, and anything else added row by row) ---- */
+
+    .ym-repeater { display: grid; gap: 0.7rem; }
+
+    .ym-repeater-row {
+        display: grid;
+        grid-template-columns: minmax(9rem, 1.3fr) minmax(9rem, 1.5fr) 5.5rem minmax(8rem, 1fr) auto;
+        gap: 0.7rem;
+        align-items: start;
+        padding: 0.8rem;
+        border: 1px solid var(--u-line);
+        border-radius: var(--u-r-sm);
+        background: var(--u-surface-2);
+    }
+
+    @media (max-width: 900px) {
+        .ym-repeater-row { grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); }
+    }
+
+    .ym-repeater-end {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.35rem;
+        padding-top: 1.3rem;
+    }
+
+    .ym-repeater-total {
+        margin: 0;
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--u-ink);
+        font-variant-numeric: tabular-nums;
+    }
+
+    .ym-repeater-fixed {
+        margin: 0;
+        padding: 0.48rem 0;
+        font-size: 0.86rem;
+        font-weight: 650;
+        color: var(--u-ink-3);
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* ---- Long-form content inside a card ---- */
+
+    .ym-body-heading {
+        margin: 0 0 0.4rem;
+        font-size: 0.74rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--u-ink-4);
+    }
+
+    .ym-body-block + .ym-body-block { margin-top: 1.2rem; }
+
+    .ym-body-text {
+        margin: 0;
+        font-size: 0.88rem;
+        line-height: 1.6;
+        color: var(--u-ink-2);
+        white-space: pre-line;
+    }
+
+    .ym-pre {
+        margin: 0;
+        padding: 0.85rem 1rem;
+        border: 1px solid var(--u-line);
+        border-radius: var(--u-r-sm);
+        background: var(--u-surface-2);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.8rem;
+        line-height: 1.65;
+        color: var(--u-ink-2);
+        white-space: pre-wrap;
+        overflow-x: auto;
+    }
+
+    .ym-file-line {
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        padding: 0.5rem 0.65rem;
+        border: 1px solid var(--u-line);
+        border-radius: var(--u-r-sm);
+        background: var(--u-surface-2);
+        font-size: 0.83rem;
+    }
+
+    .ym-file-line + .ym-file-line { margin-top: 0.4rem; }
+    .ym-file-line a { color: var(--u-brand-deep); font-weight: 650; text-decoration: none; }
+    .ym-file-line a:hover { text-decoration: underline; }
+    .ym-file-line-size { margin-left: auto; font-size: 0.75rem; color: var(--u-ink-4); }
+
+    /* ---- Date stepper ---- */
+
+    .ym-daynav {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+
+    .ym-daynav .ym-log-filter-select { min-width: 9.5rem; }
+
+    /* ---- Folder tiles ---- */
+
+    .ym-folders {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+        gap: 0.7rem;
+    }
+
+    .ym-folder-tile {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 0.75rem 0.85rem;
+        border: 1px solid var(--u-line);
+        border-radius: var(--u-r-sm);
+        background: var(--u-surface);
+        text-align: left;
+        cursor: pointer;
+        transition:
+            border-color var(--ym-dur) var(--ym-ease),
+            background var(--ym-dur) var(--ym-ease),
+            box-shadow var(--ym-dur) var(--ym-ease);
+    }
+
+    .ym-folder-tile:hover {
+        border-color: var(--u-brand-line);
+        box-shadow: var(--ym-shadow-sm);
+    }
+
+    .ym-folder-tile.is-active {
+        border-color: var(--u-brand);
+        background: var(--u-brand-soft);
+    }
+
+    .ym-folder-tile i {
+        font-size: 1.1rem;
+        color: var(--u-brand);
+    }
+
+    .ym-folder-tile-name {
+        display: block;
+        font-size: 0.84rem;
+        font-weight: 650;
+        color: var(--u-ink);
+    }
+
+    .ym-folder-tile-meta {
+        display: block;
+        margin-top: 0.1rem;
+        font-size: 0.74rem;
+        color: var(--u-ink-4);
+    }
+
+    /* ---- Segmented picker (one choice out of a few, inline in a row) ---- */
+
+    .ym-pick {
+        display: inline-flex;
+        padding: 0.15rem;
+        border: 1px solid var(--u-line-strong);
+        border-radius: 999px;
+        background: var(--u-surface-2);
+    }
+
+    .ym-pick-btn {
+        padding: 0.26rem 0.65rem;
+        border: none;
+        border-radius: 999px;
+        background: transparent;
+        font-family: inherit;
+        font-size: 0.75rem;
+        font-weight: 650;
+        color: var(--u-ink-4);
+        cursor: pointer;
+        transition: background var(--ym-dur) var(--ym-ease), color var(--ym-dur) var(--ym-ease);
+    }
+
+    .ym-pick-btn:hover { color: var(--u-ink-2); }
+
+    .ym-pick-btn.is-on {
+        background: var(--u-surface);
+        color: var(--u-brand-deep);
+        box-shadow: 0 1px 2px rgba(22, 55, 44, 0.14);
+    }
+
+    .ym-pick-btn.is-on[data-tone='warn']   { color: #8d5c11; }
+    .ym-pick-btn.is-on[data-tone='danger'] { color: #96323b; }
+
+    /* ---- Thumbnails in a table cell ---- */
+
+    .ym-thumb {
+        width: 2.2rem;
+        height: 2.2rem;
+        border-radius: var(--u-r-sm);
+        object-fit: cover;
+        border: 1px solid var(--u-line);
+        background: var(--u-surface-2);
+    }
+
+    .ym-thumb--empty {
+        display: grid;
+        place-items: center;
+        color: var(--u-ink-4);
+    }
+
+    /* ---- Booking pages ----
+       The calendar and session rows keep their markup; only their palette and card
+       chrome are re-pointed at the shared tokens so they stop reading as a separate app. */
+
+    .ym-ui .ym-book {
+        --yb-green: var(--u-brand);
+        --yb-green-deep: var(--u-brand-deep);
+        --yb-green-soft: var(--u-brand-soft);
+        --yb-green-tint: var(--u-surface-2);
+        --yb-ink: var(--u-ink);
+        --yb-muted: var(--u-ink-4);
+        --yb-line: var(--u-line);
+        --yb-r: var(--u-r);
+        --yb-r-sm: var(--u-r-sm);
+    }
+
+    .ym-ui .ym-book-card {
+        box-shadow: var(--ym-shadow-sm);
+        border-color: var(--u-line);
+    }
+
+    .ym-ui .ym-book-card::before { display: none; }
+
+    .ym-ui .ym-book-card-head {
+        background: transparent;
+        border-bottom-color: var(--u-line);
+    }
+
+    .ym-ui .ym-book-card-title {
+        font-size: 0.74rem;
+        letter-spacing: 0.06em;
+        color: var(--u-ink-3);
+    }
+
+    .ym-ui .ym-book-today,
+    .ym-ui .ym-book-clear,
+    .ym-ui .ym-book-daytag {
+        border-radius: var(--u-r-sm);
+        font-size: 0.76rem;
+        letter-spacing: 0;
+        text-transform: none;
+    }
+
+    .ym-ui .ym-book-select { border-radius: var(--u-r-sm); }
+
+    .ym-ui .ym-seg { border-radius: var(--u-r-sm); }
+    .ym-ui .ym-seg-btn { border-radius: calc(var(--u-r-sm) - 2px); }
+
+    .ym-ui .ym-sc-cta {
+        border-radius: var(--u-r-sm);
+        font-size: 0.82rem;
+    }
+
+    /* ---- Settings rows ---- */
+
+    .ym-setting {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+        padding: 0.8rem 0;
+        border-bottom: 1px solid var(--u-line);
+    }
+
+    .ym-setting:first-child { padding-top: 0; }
+    .ym-setting:last-child { padding-bottom: 0; border-bottom: 0; }
+
+    .ym-setting-text { min-width: 0; }
+
+    .ym-setting-label {
+        margin: 0;
+        font-size: 0.86rem;
+        font-weight: 650;
+        color: var(--u-ink);
+    }
+
+    .ym-setting-hint {
+        margin: 0.15rem 0 0;
+        font-size: 0.78rem;
+        line-height: 1.45;
+        color: var(--u-ink-4);
+    }
+
+    .ym-setting-control {
+        flex: 0 0 auto;
+        width: 13rem;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .ym-setting-control > * { width: 100%; }
+    .ym-setting-control > .ym-switch { width: auto; }
+
+    @media (max-width: 720px) {
+        .ym-setting { flex-direction: column; align-items: stretch; gap: 0.55rem; }
+        .ym-setting-control { width: 100%; }
+    }
+
+    .ym-switch {
+        display: inline-flex;
+        align-items: center;
+        width: 2.4rem;
+        height: 1.35rem;
+        padding: 0.15rem;
+        border-radius: 999px;
+        background: #d8dee7;
+        transition: background var(--ym-dur) var(--ym-ease);
+    }
+
+    .ym-switch.is-on { background: var(--u-brand); }
+
+    .ym-switch-dot {
+        width: 1.05rem;
+        height: 1.05rem;
+        border-radius: 999px;
+        background: #ffffff;
+        box-shadow: 0 1px 2px rgba(20, 30, 50, 0.25);
+        transition: transform var(--ym-dur) var(--ym-ease);
+    }
+
+    .ym-switch.is-on .ym-switch-dot { transform: translateX(1.05rem); }
+
+    /* ---- Empty state ---- */
+
+    .ym-empty {
+        display: grid;
+        justify-items: center;
+        gap: 0.5rem;
+        padding: 2rem 1rem;
+        text-align: center;
+        color: var(--u-ink-4);
+    }
+
+    .ym-empty i { font-size: 1.4rem; color: var(--u-line-strong); }
+    .ym-empty p { margin: 0; font-size: 0.84rem; }
+
+    /* ---- Forms inside the rail ---- */
+
+    .ym-stack { display: grid; gap: 0.7rem; }
+
+    .ym-note {
+        margin: 0;
+        font-size: 0.78rem;
+        line-height: 1.5;
+        color: var(--u-ink-4);
+    }
+
+    .ym-callout {
+        display: flex;
+        gap: 0.55rem;
+        padding: 0.7rem 0.8rem;
+        border: 1px solid var(--u-line);
+        border-radius: var(--u-r-sm);
+        background: var(--u-surface-2);
+        font-size: 0.8rem;
+        color: var(--u-ink-3);
+    }
+
+    /* The shared form controls keep their markup; only their accent follows the page. */
+    .ym-ui .ym-label {
+        font-size: 0.76rem;
+        font-weight: 650;
+        color: var(--u-ink-3);
+    }
+
+    .ym-ui .ym-input,
+    .ym-ui .ym-select {
+        border-color: var(--u-line-strong);
+        border-radius: var(--u-r-sm);
+    }
+
+    .ym-ui .ym-input:focus,
+    .ym-ui .ym-select:focus {
+        outline: 2px solid var(--u-brand);
+        outline-offset: 1px;
+    }
+
+    .ym-callout--warn   { background: var(--u-warn-soft);   border-color: #eedbb2; color: #8d5c11; }
+    .ym-callout--danger { background: var(--u-danger-soft); border-color: #f0ccd1; color: #96323b; }
+    .ym-callout--ok     { background: var(--u-brand-soft);  border-color: var(--u-brand-line); color: var(--u-brand-deep); }
+}
