@@ -66,70 +66,94 @@ export default {
 };
 </script>
 
-
 <template>
-    <section class="ym-surface ym-section">
-        <h2 class="ym-title">{{ $t('operations.createInvoice') }}</h2>
-        <p class="ym-subtitle">{{ $t('operations.tuitionSubtitle') }}</p>
+    <div class="ym-ui">
+        <header class="ym-page-head">
+            <div>
+                <h1 class="ym-page-title">{{ $t('operations.createInvoice') }}</h1>
+                <p class="ym-page-sub">{{ $t('operations.tuitionSubtitle') }}</p>
+            </div>
+        </header>
 
         <form @submit.prevent="submit">
-            <div class="ym-form-grid">
-                <Field :label="$t('operations.student')" :error="form.errors.student_profile_id">
-                    <Select v-model="form.student_profile_id" :options="studentOptions" />
-                </Field>
-                <Field :label="$t('operations.planBranch')" :error="form.errors.branch_id">
-                    <Select v-model="form.branch_id" :options="branchOptions" />
-                </Field>
-                <Field :label="$t('operations.invoiceIssuedAt')" :error="form.errors.issued_at">
-                    <DatePicker v-model="form.issued_at" />
-                </Field>
-                <Field :label="$t('operations.dueDate')" :error="form.errors.due_date">
-                    <DatePicker v-model="form.due_date" :min="form.issued_at" />
-                </Field>
-                <Field :label="$t('operations.invoiceNote')" :error="form.errors.note">
-                    <TextInput v-model="form.note" />
-                </Field>
-            </div>
+            <section class="ym-card">
+                <div class="ym-card-head">
+                    <h2 class="ym-card-title">{{ $t('operations.invoiceDetails') }}</h2>
+                </div>
+                <div class="ym-card-body">
+                    <div class="ym-form-grid-2">
+                        <Field :label="$t('operations.student')" :error="form.errors.student_profile_id">
+                            <Select v-model="form.student_profile_id" :options="studentOptions" />
+                        </Field>
+                        <Field :label="$t('operations.planBranch')" :error="form.errors.branch_id">
+                            <Select v-model="form.branch_id" :options="branchOptions" />
+                        </Field>
+                        <Field :label="$t('operations.invoiceIssuedAt')" :error="form.errors.issued_at">
+                            <DatePicker v-model="form.issued_at" />
+                        </Field>
+                        <Field :label="$t('operations.dueDate')" :error="form.errors.due_date">
+                            <DatePicker v-model="form.due_date" :min="form.issued_at" />
+                        </Field>
+                        <Field class="ym-form-span" :label="$t('operations.invoiceNote')" :error="form.errors.note">
+                            <TextInput v-model="form.note" />
+                        </Field>
+                    </div>
+                </div>
+            </section>
 
-            <h3 class="ym-invoice-heading">{{ $t('operations.invoiceItems') }}</h3>
-            <p v-if="form.errors.items" class="ym-field-error">{{ form.errors.items }}</p>
-
-            <div v-for="(item, index) in form.items" :key="index" class="ym-invoice-line">
-                <Field :label="$t('operations.itemPlan')" :error="form.errors[`items.${index}.tuition_plan_id`]">
-                    <Select v-model="item.tuition_plan_id" :options="planOptions" />
-                </Field>
-                <Field :label="$t('operations.itemDescription')" :error="form.errors[`items.${index}.description`]">
-                    <TextInput v-model="item.description" :disabled="!!item.tuition_plan_id" />
-                </Field>
-                <Field :label="$t('operations.itemQuantity')" :error="form.errors[`items.${index}.quantity`]">
-                    <TextInput v-model="item.quantity" type="number" />
-                </Field>
-                <Field :label="$t('operations.itemUnitPrice')" :error="form.errors[`items.${index}.unit_price`]">
-                    <MoneyInput v-if="!item.tuition_plan_id" v-model="item.unit_price" />
-                    <p v-else class="ym-invoice-line-fixed">{{ formatVnd(planPrice(item.tuition_plan_id)) }}</p>
-                </Field>
-                <div class="ym-invoice-line-end">
-                    <p class="ym-invoice-line-total">{{ formatVnd(lineTotal(item)) }}</p>
-                    <button
-                        v-if="form.items.length > 1"
-                        type="button"
-                        class="ym-btn-ghost"
-                        @click="removeItem(index)"
-                    >
-                        {{ $t('operations.removeItem') }}
+            <section class="ym-card">
+                <div class="ym-card-head">
+                    <h2 class="ym-card-title">{{ $t('operations.invoiceItems') }}</h2>
+                    <button type="button" class="ym-btn ym-btn--outline ym-btn--sm" @click="addItem">
+                        <i class="bi bi-plus-lg" /> {{ $t('operations.addItem') }}
                     </button>
                 </div>
-            </div>
 
-            <div class="ym-inline-actions">
-                <button type="button" class="ym-btn-outline" @click="addItem">{{ $t('operations.addItem') }}</button>
-                <p class="ym-invoice-total">{{ $t('operations.invoiceTotal') }}: {{ formatVnd(total) }}</p>
-            </div>
+                <div class="ym-card-body">
+                    <p v-if="form.errors.items" class="ym-field-error">{{ form.errors.items }}</p>
 
-            <div class="ym-actions">
-                <button type="submit" class="ym-btn-sm" :disabled="form.processing">{{ $t('common.create') }}</button>
-                <Link :href="endpoints.index" class="ym-btn-ghost">{{ $t('common.cancel') }}</Link>
-            </div>
+                    <div class="ym-repeater">
+                        <div v-for="(item, index) in form.items" :key="index" class="ym-repeater-row">
+                            <Field :label="$t('operations.itemPlan')" :error="form.errors[`items.${index}.tuition_plan_id`]">
+                                <Select v-model="item.tuition_plan_id" :options="planOptions" />
+                            </Field>
+                            <Field :label="$t('operations.itemDescription')" :error="form.errors[`items.${index}.description`]">
+                                <TextInput v-model="item.description" :disabled="!!item.tuition_plan_id" />
+                            </Field>
+                            <Field :label="$t('operations.itemQuantity')" :error="form.errors[`items.${index}.quantity`]">
+                                <TextInput v-model="item.quantity" type="number" />
+                            </Field>
+                            <Field :label="$t('operations.itemUnitPrice')" :error="form.errors[`items.${index}.unit_price`]">
+                                <MoneyInput v-if="!item.tuition_plan_id" v-model="item.unit_price" />
+                                <p v-else class="ym-repeater-fixed">{{ formatVnd(planPrice(item.tuition_plan_id)) }}</p>
+                            </Field>
+                            <div class="ym-repeater-end">
+                                <p class="ym-repeater-total">{{ formatVnd(lineTotal(item)) }}</p>
+                                <button
+                                    v-if="form.items.length > 1"
+                                    type="button"
+                                    class="ym-btn ym-btn--danger-quiet ym-btn--sm"
+                                    :aria-label="$t('operations.removeItem')"
+                                    @click="removeItem(index)"
+                                >
+                                    <i class="bi bi-trash3" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ym-form-foot">
+                    <div class="ym-form-foot-lead">
+                        <p class="ym-figure-label">{{ $t('operations.invoiceTotal') }}</p>
+                        <p class="ym-figure-value">{{ formatVnd(total) }}</p>
+                    </div>
+                    <Link :href="endpoints.index" class="ym-btn ym-btn--quiet">{{ $t('common.cancel') }}</Link>
+                    <button type="submit" class="ym-btn ym-btn--primary" :disabled="form.processing">
+                        {{ $t('common.create') }}
+                    </button>
+                </div>
+            </section>
         </form>
-    </section>
+    </div>
 </template>
