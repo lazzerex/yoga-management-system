@@ -46,50 +46,62 @@ export default {
 };
 </script>
 
-
 <template>
-    <section class="ym-surface ym-section">
-        <h2 class="ym-title">{{ $t('operations.editTuitionPlan') }}</h2>
-        <p class="ym-subtitle">{{ $t('operations.tuitionPlansSubtitle') }}</p>
-
-        <form class="ym-form-grid" @submit.prevent="submit">
-            <Field :label="$t('operations.tuitionPlanName')" :error="form.errors.name">
-                <TextInput v-model="form.name" />
-            </Field>
-            <Field :label="$t('operations.tuitionPlanType')" :error="form.errors.type">
-                <Select v-model="form.type" :options="typeOptions" />
-            </Field>
-            <Field :label="$t('operations.amountVnd')" :error="form.errors.price_amount">
-                <MoneyInput v-model="form.price_amount" />
-            </Field>
-            <Field :label="$t('operations.planBranch')" :error="form.errors.branch_id">
-                <Select v-model="form.branch_id" :options="branchOptions" />
-            </Field>
-            <Field
-                :label="$t('operations.tuitionPlanSessions')"
-                :error="form.errors.session_count"
-                :hint="$t('operations.tuitionPlanSessionsHint')"
-            >
-                <TextInput v-model="form.session_count" type="number" />
-            </Field>
-            <Field
-                :label="$t('operations.tuitionPlanDuration')"
-                :error="form.errors.duration_days"
-                :hint="$t('operations.tuitionPlanDurationHint')"
-            >
-                <TextInput v-model="form.duration_days" type="number" />
-            </Field>
-            <Field :label="$t('operations.description')" :error="form.errors.description">
-                <TextInput v-model="form.description" />
-            </Field>
-            <Checkbox v-model="form.is_active" :label="$t('operations.active')" />
-
-            <div class="ym-actions">
-                <button type="submit" class="ym-btn-sm" :disabled="form.processing">
-                    {{ $t('common.save') }}
-                </button>
-                <Link :href="endpoints.index" class="ym-btn-ghost">{{ $t('common.cancel') }}</Link>
+    <div class="ym-ui ym-form-page">
+        <header class="ym-page-head">
+            <div>
+                <h1 class="ym-page-title">{{ $t('operations.editTuitionPlan') }}</h1>
+                <p class="ym-page-sub">{{ plan.name }}</p>
             </div>
+        </header>
+
+        <form @submit.prevent="submit">
+            <section class="ym-card">
+                <div class="ym-card-body">
+                    <div class="ym-form-grid-2">
+                        <Field :label="$t('operations.tuitionPlanName')" :error="form.errors.name">
+                            <TextInput v-model="form.name" />
+                        </Field>
+                        <Field :label="$t('operations.tuitionPlanType')" :error="form.errors.type">
+                            <Select v-model="form.type" :options="typeOptions" />
+                        </Field>
+                        <Field :label="$t('operations.amountVnd')" :error="form.errors.price_amount">
+                            <MoneyInput v-model="form.price_amount" />
+                        </Field>
+                        <Field :label="$t('operations.planBranch')" :error="form.errors.branch_id">
+                            <Select v-model="form.branch_id" :options="branchOptions" />
+                        </Field>
+                        <Field
+                            :label="$t('operations.tuitionPlanSessions')"
+                            :error="form.errors.session_count"
+                            :hint="$t('operations.tuitionPlanSessionsHint')"
+                        >
+                            <TextInput v-model="form.session_count" type="number" />
+                        </Field>
+                        <Field
+                            :label="$t('operations.tuitionPlanDuration')"
+                            :error="form.errors.duration_days"
+                            :hint="$t('operations.tuitionPlanDurationHint')"
+                        >
+                            <TextInput v-model="form.duration_days" type="number" />
+                        </Field>
+                        <Field class="ym-form-span" :label="$t('operations.description')" :error="form.errors.description">
+                            <TextInput v-model="form.description" />
+                        </Field>
+                    </div>
+
+                    <div class="mt-4">
+                        <Checkbox v-model="form.is_active" :label="$t('operations.active')" />
+                    </div>
+                </div>
+
+                <div class="ym-form-foot">
+                    <Link :href="endpoints.index" class="ym-btn ym-btn--quiet">{{ $t('common.cancel') }}</Link>
+                    <button type="submit" class="ym-btn ym-btn--primary" :disabled="form.processing">
+                        {{ $t('common.save') }}
+                    </button>
+                </div>
+            </section>
         </form>
-    </section>
+    </div>
 </template>
