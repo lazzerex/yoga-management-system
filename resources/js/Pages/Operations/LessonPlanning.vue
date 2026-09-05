@@ -36,6 +36,24 @@ export default {
 
 <template>
     <div class="ym-ui">
+        <header class="ym-page-head">
+            <div>
+                <h1 class="ym-page-title">
+                    {{ $t('operations.lessonPlans') }}
+                    <span class="ym-count">{{ plans.total }}</span>
+                </h1>
+                <p class="ym-page-sub">{{ $t('operations.lessonPlansSubtitle') }}</p>
+            </div>
+            <div class="ym-page-actions">
+                <Link v-if="endpoints.pending" :href="endpoints.pending" class="ym-btn ym-btn--outline">
+                    {{ $t('operations.approvalQueue') }}
+                </Link>
+                <Link v-if="endpoints.create" :href="endpoints.create" class="ym-btn ym-btn--primary">
+                    <i class="bi bi-plus-lg" /> {{ $t('operations.createLessonPlan') }}
+                </Link>
+            </div>
+        </header>
+
         <div class="ym-stats">
             <div class="ym-stat-card">
                 <p class="ym-stat-card-label">{{ $t('operations.statusDraft') }}</p>
@@ -54,24 +72,6 @@ export default {
                 <p class="ym-stat-card-value">{{ stats.rejected }}</p>
             </div>
         </div>
-
-        <header class="ym-page-head">
-            <div>
-                <h1 class="ym-page-title">
-                    {{ $t('operations.lessonPlans') }}
-                    <span class="ym-count">{{ plans.total }}</span>
-                </h1>
-                <p class="ym-page-sub">{{ $t('operations.lessonPlansSubtitle') }}</p>
-            </div>
-            <div class="ym-page-actions">
-                <Link v-if="endpoints.pending" :href="endpoints.pending" class="ym-btn ym-btn--outline">
-                    {{ $t('operations.approvalQueue') }}
-                </Link>
-                <Link v-if="endpoints.create" :href="endpoints.create" class="ym-btn ym-btn--primary">
-                    <i class="bi bi-plus-lg" /> {{ $t('operations.createLessonPlan') }}
-                </Link>
-            </div>
-        </header>
 
         <section class="ym-card">
             <div class="ym-filter-band">
