@@ -1,5 +1,9 @@
-import { computed, ref, watch } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 import { router } from '@inertiajs/vue3';
+
+const NON_FILTER_KEYS = ['sort', 'dir', 'date', 'months'];
+
+const UNCOUNTED_KEYS = [...NON_FILTER_KEYS, 'search'];
 
 /**
  * Server-side filtering for an index page. Text fields are debounced, selects apply at
@@ -25,7 +29,6 @@ export function useFilters(url, initial = {}, debounced = ['search']) {
     });
 
     let timer = null;
-    // Clearing every field would otherwise fire one request per field.
     let suspended = false;
 
     Object.keys(filters.value).forEach((key) => {
@@ -44,17 +47,48 @@ export function useFilters(url, initial = {}, debounced = ['search']) {
         });
     });
 
-    const active = computed(() => Object.values(filters.value).some((value) => value !== '' && value !== null));
+    const isSet = (value) => value !== '' && value !== null && value !== undefined;
 
-    const reset = () => {
+    const active = computed(() => Object.entries(filters.value)
+        .some(([key, value]) => ! NON_FILTER_KEYS.includes(key) && isSet(value)));
+
+    /** How many narrowing filters are on, for the badge on the Filters button. */
+    const filterCount = computed(() => Object.entries(filters.value)
+        .filter(([key, value]) => ! UNCOUNTED_KEYS.includes(key) && isSet(value))
+        .length);
+
+    /**
+     * Change several fields as one request. Watchers flush after the current tick, so the
+     * guard has to outlive it — releasing it straight away would let each field fire again.
+     */
+    const batch = (mutate) => {
         suspended = true;
         clearTimeout(timer);
+        mutate();
+        apply();
+        nextTick(() => {
+            suspended = false;
+        });
+    };
+
+    const reset = () => batch(() => {
         Object.keys(filters.value).forEach((key) => {
             filters.value[key] = '';
         });
-        suspended = false;
-        apply();
-    };
+    });
 
-    return { filters, active, apply, reset };
+    /** Column headers cycle ascending, descending, then back to the default order. */
+    const toggleSort = (field) => batch(() => {
+        if (filters.value.sort !== field) {
+            filters.value.sort = field;
+            filters.value.dir = 'asc';
+        } else if (filters.value.dir === 'asc') {
+            filters.value.dir = 'desc';
+        } else {
+            filters.value.sort = '';
+            filters.value.dir = '';
+        }
+    });
+
+    return { filters, active, filterCount, apply, reset, toggleSort };
 }
