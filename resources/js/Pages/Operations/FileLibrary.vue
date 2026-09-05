@@ -45,6 +45,16 @@ export default {
 
 <template>
     <div class="ym-ui">
+        <header class="ym-page-head">
+            <div>
+                <h1 class="ym-page-title">
+                    {{ $t('operations.fileLibrary') }}
+                    <span class="ym-count">{{ files.total }}</span>
+                </h1>
+                <p class="ym-page-sub">{{ $t('operations.fileLibrarySubtitle') }}</p>
+            </div>
+        </header>
+
         <div class="ym-stats">
             <div class="ym-stat-card">
                 <p class="ym-stat-card-label">{{ $t('operations.storageUsed') }}</p>
@@ -55,16 +65,6 @@ export default {
                 <p class="ym-stat-card-value">{{ stats.totalFiles }}</p>
             </div>
         </div>
-
-        <header class="ym-page-head">
-            <div>
-                <h1 class="ym-page-title">
-                    {{ $t('operations.fileLibrary') }}
-                    <span class="ym-count">{{ files.total }}</span>
-                </h1>
-                <p class="ym-page-sub">{{ $t('operations.fileLibrarySubtitle') }}</p>
-            </div>
-        </header>
 
         <section v-if="folders.length" class="ym-card">
             <div class="ym-card-head">
