@@ -16,6 +16,12 @@ export default {
 
 <template>
     <div class="ym-ui">
+        <header class="ym-page-head">
+            <div>
+                <h1 class="ym-page-title">{{ $t('coach.classRosterSummary') }}</h1>
+            </div>
+        </header>
+
         <div class="ym-stats">
             <div class="ym-stat-card">
                 <p class="ym-stat-card-label">{{ $t('coach.classesThisWeek') }}</p>
@@ -30,12 +36,6 @@ export default {
                 <p class="ym-stat-card-value">{{ stats.avgFillRate }}%</p>
             </div>
         </div>
-
-        <header class="ym-page-head">
-            <div>
-                <h1 class="ym-page-title">{{ $t('coach.classRosterSummary') }}</h1>
-            </div>
-        </header>
 
         <section class="ym-card">
             <div class="ym-table-scroll">
