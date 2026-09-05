@@ -66,22 +66,6 @@ export default {
 
 <template>
     <div class="ym-ui">
-        <div class="ym-stats">
-            <div class="ym-stat-card">
-                <p class="ym-stat-card-label">{{ $t('operations.attendanceSessionsToday') }}</p>
-                <p class="ym-stat-card-value">{{ stats.sessions }}</p>
-                <p class="ym-stat-card-note">{{ longDate }}</p>
-            </div>
-            <div class="ym-stat-card ym-stat-card--info">
-                <p class="ym-stat-card-label">{{ $t('operations.attendanceCheckedInCount') }}</p>
-                <p class="ym-stat-card-value">{{ stats.checkedIn }}</p>
-            </div>
-            <div class="ym-stat-card">
-                <p class="ym-stat-card-label">{{ $t('operations.attendanceRostersComplete') }}</p>
-                <p class="ym-stat-card-value">{{ stats.rostersComplete }}</p>
-            </div>
-        </div>
-
         <header class="ym-page-head">
             <div>
                 <h1 class="ym-page-title">{{ $t('operations.todayAttendance') }}</h1>
@@ -115,6 +99,22 @@ export default {
                 </Link>
             </div>
         </header>
+
+        <div class="ym-stats">
+            <div class="ym-stat-card">
+                <p class="ym-stat-card-label">{{ $t('operations.attendanceSessionsToday') }}</p>
+                <p class="ym-stat-card-value">{{ stats.sessions }}</p>
+                <p class="ym-stat-card-note">{{ longDate }}</p>
+            </div>
+            <div class="ym-stat-card ym-stat-card--info">
+                <p class="ym-stat-card-label">{{ $t('operations.attendanceCheckedInCount') }}</p>
+                <p class="ym-stat-card-value">{{ stats.checkedIn }}</p>
+            </div>
+            <div class="ym-stat-card">
+                <p class="ym-stat-card-label">{{ $t('operations.attendanceRostersComplete') }}</p>
+                <p class="ym-stat-card-value">{{ stats.rostersComplete }}</p>
+            </div>
+        </div>
 
         <section class="ym-card">
             <div class="ym-filter-band">
