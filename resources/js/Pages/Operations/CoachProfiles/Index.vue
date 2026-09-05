@@ -4,6 +4,7 @@ import { Link, router } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import Modal from '@/Components/UI/Modal.vue';
 import FilterBar from '@/Components/UI/FilterBar.vue';
+import SortTh from '@/Components/UI/SortTh.vue';
 import { useFilters } from '@/composables/useFilters.js';
 
 const props = defineProps({
@@ -15,7 +16,7 @@ const props = defineProps({
     canManage: Boolean,
 });
 
-const { filters, active, reset } = useFilters(props.endpoints.index, props.filters);
+const { filters, active, filterCount, reset, toggleSort } = useFilters(props.endpoints.index, props.filters);
 
 const pendingDelete = ref(null);
 
@@ -34,112 +35,137 @@ export default {
 };
 </script>
 
-
 <template>
-    <div class="ym-stat-strip">
-        <div class="ym-stat">
-            <p class="ym-stat-label">{{ $t('operations.totalCoaches') }}</p>
-            <p class="ym-stat-value">{{ stats.total }}</p>
-        </div>
-        <div class="ym-stat">
-            <p class="ym-stat-label">{{ $t('operations.activeCoaches') }}</p>
-            <p class="ym-stat-value">{{ stats.active }}</p>
-        </div>
-    </div>
-
-    <section class="ym-surface ym-section">
-        <div class="flex items-center justify-between">
-            <div>
-                <h2 class="ym-title">
-                    {{ $t('operations.coaches') }}
-                    <span class="ym-count-badge">{{ profiles.total }}</span>
-                </h2>
-                <p class="ym-subtitle">{{ $t('operations.manageCoaches') }}</p>
+    <div class="ym-ui">
+        <div class="ym-stats">
+            <div class="ym-stat-card">
+                <p class="ym-stat-card-label">{{ $t('operations.totalCoaches') }}</p>
+                <p class="ym-stat-card-value">{{ stats.total }}</p>
             </div>
-            <Link v-if="endpoints.create" :href="endpoints.create" class="ym-btn-sm">
-                {{ $t('operations.createCoach') }}
-            </Link>
+            <div class="ym-stat-card ym-stat-card--info">
+                <p class="ym-stat-card-label">{{ $t('operations.activeCoaches') }}</p>
+                <p class="ym-stat-card-value">{{ stats.active }}</p>
+            </div>
         </div>
 
-        <FilterBar :active="active" @reset="reset">
-            <input
-                v-model="filters.search"
-                type="search"
-                class="ym-log-search"
-                :placeholder="$t('operations.searchByName')"
-            />
-            <select v-model="filters.class_type_id" class="ym-log-filter-select">
-                <option value="">{{ $t('operations.allClassTypes') }}</option>
-                <option v-for="type in options.classTypes" :key="type.id" :value="type.id">{{ type.name }}</option>
-            </select>
-            <select v-model="filters.status" class="ym-log-filter-select">
-                <option value="">{{ $t('operations.allStatuses') }}</option>
-                <option value="active">{{ $t('operations.statusActive') }}</option>
-                <option value="inactive">{{ $t('operations.statusInactive') }}</option>
-            </select>
-        </FilterBar>
+        <header class="ym-page-head">
+            <div>
+                <h1 class="ym-page-title">
+                    {{ $t('operations.coaches') }}
+                    <span class="ym-count">{{ profiles.total }}</span>
+                </h1>
+                <p class="ym-page-sub">{{ $t('operations.manageCoaches') }}</p>
+            </div>
+            <div class="ym-page-actions">
+                <Link v-if="endpoints.create" :href="endpoints.create" class="ym-btn ym-btn--primary">
+                    <i class="bi bi-plus-lg" /> {{ $t('operations.createCoach') }}
+                </Link>
+            </div>
+        </header>
 
-        <div class="ym-table-wrap">
-            <table class="ym-table">
-                <thead>
-                    <tr>
-                        <th class="ym-th">{{ $t('operations.avatar') }}</th>
-                        <th class="ym-th">{{ $t('operations.coachUser') }}</th>
-                        <th class="ym-th">{{ $t('operations.yearsExperience') }}</th>
-                        <th class="ym-th">{{ $t('operations.specializations') }}</th>
-                        <th class="ym-th">{{ $t('operations.status') }}</th>
-                        <th v-if="canManage" class="ym-th">{{ $t('operations.actions') }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="profile in profiles.data" :key="profile.id" class="ym-tr">
-                        <td class="ym-td">
-                            <img v-if="profile.avatar_url" :src="profile.avatar_url" class="ym-avatar-thumb" alt="" />
-                            <span v-else class="ym-avatar-thumb ym-avatar-thumb--empty">{{ profile.user_name.charAt(0) }}</span>
-                        </td>
-                        <td class="ym-td font-medium">{{ profile.user_name }}</td>
-                        <td class="ym-td text-neutral-500">{{ profile.years_experience ?? '-' }}</td>
-                        <td class="ym-td text-neutral-500">{{ profile.class_types.join(', ') || '-' }}</td>
-                        <td class="ym-td">
-                            <span :class="['ym-role-badge', profile.is_active ? 'ym-role-coach' : 'ym-role-member']">
-                                {{ profile.is_active ? $t('operations.active') : $t('operations.inactive') }}
-                            </span>
-                        </td>
-                        <td v-if="canManage" class="ym-td">
-                            <div class="ym-inline-actions">
-                                <Link class="ym-btn-outline" :href="route('operations.coaches.edit', profile.id)">
-                                    {{ $t('operations.edit') }}
-                                </Link>
-                                <button type="button" class="ym-btn-danger" @click="pendingDelete = profile">
-                                    {{ $t('operations.delete') }}
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr v-if="!profiles.data.length">
-                        <td class="ym-td text-neutral-500" :colspan="canManage ? 6 : 5">{{ $t('operations.noCoaches') }}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        <section class="ym-card">
+            <div class="ym-filter-band">
+                <FilterBar
+                    v-model:search="filters.search"
+                    :search-placeholder="$t('operations.searchByName')"
+                    :count="filterCount"
+                    :active="active"
+                    @reset="reset"
+                >
+                    <label class="ym-filter-field">
+                        <span>{{ $t('operations.specializations') }}</span>
+                        <select v-model="filters.class_type_id" class="ym-log-filter-select">
+                            <option value="">{{ $t('operations.allClassTypes') }}</option>
+                            <option v-for="type in options.classTypes" :key="type.id" :value="type.id">{{ type.name }}</option>
+                        </select>
+                    </label>
+                    <label class="ym-filter-field">
+                        <span>{{ $t('operations.status') }}</span>
+                        <select v-model="filters.status" class="ym-log-filter-select">
+                            <option value="">{{ $t('operations.allStatuses') }}</option>
+                            <option value="active">{{ $t('operations.statusActive') }}</option>
+                            <option value="inactive">{{ $t('operations.statusInactive') }}</option>
+                        </select>
+                    </label>
+                </FilterBar>
+            </div>
 
-        <div v-if="profiles.links.length > 3" class="ym-pagination">
-            <Link
-                v-for="link in profiles.links"
-                :key="link.label"
-                :href="link.url ?? '#'"
-                v-html="link.label"
-                :class="['ym-page-link', { 'ym-page-link--active': link.active, 'ym-page-link--disabled': !link.url }]"
-                preserve-scroll
-            />
-        </div>
-    </section>
+            <div class="ym-table-scroll">
+                <table class="ym-grid-table">
+                    <thead>
+                        <tr>
+                            <th>{{ $t('operations.avatar') }}</th>
+                            <th>{{ $t('operations.coachUser') }}</th>
+                            <SortTh
+                                field="years_experience"
+                                :label="$t('operations.yearsExperience')"
+                                :state="filters"
+                                numeric
+                                @sort="toggleSort"
+                            />
+                            <th>{{ $t('operations.specializations') }}</th>
+                            <SortTh field="is_active" :label="$t('operations.status')" :state="filters" @sort="toggleSort" />
+                            <th v-if="canManage" class="is-actions">{{ $t('operations.actions') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="profile in profiles.data" :key="profile.id">
+                            <td>
+                                <img v-if="profile.avatar_url" :src="profile.avatar_url" class="ym-thumb" alt="" />
+                                <span v-else class="ym-thumb ym-thumb--empty">{{ profile.user_name.charAt(0) }}</span>
+                            </td>
+                            <td class="is-strong">{{ profile.user_name }}</td>
+                            <td class="is-num is-muted">{{ profile.years_experience ?? '—' }}</td>
+                            <td class="is-muted">{{ profile.class_types.join(', ') || '—' }}</td>
+                            <td>
+                                <span class="ym-tag" :class="profile.is_active ? 'ym-tag--ok' : 'ym-tag--neutral'">
+                                    {{ profile.is_active ? $t('operations.active') : $t('operations.inactive') }}
+                                </span>
+                            </td>
+                            <td v-if="canManage" class="is-actions">
+                                <div class="ym-row-actions">
+                                    <Link class="ym-btn ym-btn--outline ym-btn--sm" :href="route('operations.coaches.edit', profile.id)">
+                                        {{ $t('operations.edit') }}
+                                    </Link>
+                                    <button
+                                        type="button"
+                                        class="ym-btn ym-btn--danger-quiet ym-btn--sm"
+                                        @click="pendingDelete = profile"
+                                    >
+                                        {{ $t('operations.delete') }}
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-    <Modal :show="!!pendingDelete" :title="$t('operations.deleteCoachTitle')" @close="pendingDelete = null">
-        <p class="ym-card-note">{{ $t('operations.confirmDeleteCoach', { name: pendingDelete?.user_name }) }}</p>
-        <div class="ym-confirm-modal-actions">
-            <button type="button" class="ym-btn-outline" @click="pendingDelete = null">{{ $t('common.cancel') }}</button>
-            <button type="button" class="ym-btn-danger" @click="confirmDelete">{{ $t('operations.delete') }}</button>
-        </div>
-    </Modal>
+            <div v-if="!profiles.data.length" class="ym-empty">
+                <i class="bi bi-person-badge" />
+                <p>{{ $t('operations.noCoaches') }}</p>
+            </div>
+
+            <div v-if="profiles.links.length > 3" class="ym-card-foot">
+                <div class="ym-pagination">
+                    <Link
+                        v-for="link in profiles.links"
+                        :key="link.label"
+                        :href="link.url ?? '#'"
+                        v-html="link.label"
+                        :class="['ym-page-link', { 'ym-page-link--active': link.active, 'ym-page-link--disabled': !link.url }]"
+                        preserve-scroll
+                    />
+                </div>
+            </div>
+        </section>
+
+        <Modal :show="!!pendingDelete" :title="$t('operations.deleteCoachTitle')" @close="pendingDelete = null">
+            <p class="ym-note">{{ $t('operations.confirmDeleteCoach', { name: pendingDelete?.user_name }) }}</p>
+            <div class="ym-confirm-modal-actions">
+                <button type="button" class="ym-btn ym-btn--outline" @click="pendingDelete = null">{{ $t('common.cancel') }}</button>
+                <button type="button" class="ym-btn ym-btn--danger" @click="confirmDelete">{{ $t('operations.delete') }}</button>
+            </div>
+        </Modal>
+    </div>
 </template>
