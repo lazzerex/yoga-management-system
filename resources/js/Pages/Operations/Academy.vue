@@ -79,17 +79,6 @@ export default {
 
 <template>
     <div class="ym-ui">
-        <div class="ym-stats">
-            <div class="ym-stat-card">
-                <p class="ym-stat-card-label">{{ $t('operations.upcomingSessionsCount') }}</p>
-                <p class="ym-stat-card-value">{{ stats.upcomingSessions }}</p>
-            </div>
-            <div class="ym-stat-card ym-stat-card--info">
-                <p class="ym-stat-card-label">{{ $t('operations.activeSchedules') }}</p>
-                <p class="ym-stat-card-value">{{ stats.activeSchedules }}</p>
-            </div>
-        </div>
-
         <TabBar v-model="activeTab" :tabs="tabs" />
 
         <template v-if="activeTab === 'sessions'">
@@ -101,6 +90,17 @@ export default {
                     </h1>
                 </div>
             </header>
+
+            <div class="ym-stats">
+                <div class="ym-stat-card">
+                    <p class="ym-stat-card-label">{{ $t('operations.upcomingSessionsCount') }}</p>
+                    <p class="ym-stat-card-value">{{ stats.upcomingSessions }}</p>
+                </div>
+                <div class="ym-stat-card ym-stat-card--info">
+                    <p class="ym-stat-card-label">{{ $t('operations.activeSchedules') }}</p>
+                    <p class="ym-stat-card-value">{{ stats.activeSchedules }}</p>
+                </div>
+            </div>
 
             <section class="ym-card">
                 <div class="ym-filter-band">
@@ -222,6 +222,17 @@ export default {
                     </Link>
                 </div>
             </header>
+
+            <div class="ym-stats">
+                <div class="ym-stat-card">
+                    <p class="ym-stat-card-label">{{ $t('operations.upcomingSessionsCount') }}</p>
+                    <p class="ym-stat-card-value">{{ stats.upcomingSessions }}</p>
+                </div>
+                <div class="ym-stat-card ym-stat-card--info">
+                    <p class="ym-stat-card-label">{{ $t('operations.activeSchedules') }}</p>
+                    <p class="ym-stat-card-value">{{ stats.activeSchedules }}</p>
+                </div>
+            </div>
 
             <section class="ym-card">
                 <div class="ym-table-scroll">
