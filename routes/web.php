@@ -244,9 +244,6 @@ Route::prefix('cms')->group(function () {
                 Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
                 Route::get('/audit-logs/export', [AuditLogController::class, 'export'])->name('audit-logs.export');
             });
-            Route::middleware('permission:admin.form-demo.view')->group(function () {
-                Route::get('/form-demo', fn () => inertia('Admin/FormDemo'))->name('form-demo');
-            });
             Route::middleware('permission:admin.settings.view')->group(function () {
                 Route::get('/settings/general', fn () => inertia('Admin/Settings/Mock', ['title' => 'General']))->name('settings.general');
             });
