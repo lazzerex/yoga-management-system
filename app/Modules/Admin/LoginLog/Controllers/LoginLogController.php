@@ -4,12 +4,15 @@ namespace App\Modules\Admin\LoginLog\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\LoginLog;
+use App\Support\Table\SortsQueries;
 use Illuminate\Http\Request;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class LoginLogController extends Controller
 {
+    use SortsQueries;
+
     public function index(Request $request): Response
     {
         $query = LoginLog::with('user:id,name,username');
@@ -30,14 +33,28 @@ class LoginLogController extends Controller
             });
         }
 
-        $sortDir = $request->input('sort_dir', 'desc') === 'asc' ? 'asc' : 'desc';
-        $query->orderBy('logged_in_at', $sortDir);
+        $from = $request->date('from')?->toDateString();
+        $to = $request->date('to')?->toDateString();
+
+        $query->when($from, fn ($q) => $q->whereDate('logged_in_at', '>=', $from))
+            ->when($to, fn ($q) => $q->whereDate('logged_in_at', '<=', $to));
+
+        $sort = $this->applySort($query, $request, [
+            'status' => 'status',
+            'logged_in_at' => 'logged_in_at',
+        ], 'logged_in_at');
 
         $logs = $query->paginate(15)->withQueryString();
 
         return inertia('Admin/LoginLogs/Index', [
             'logs' => $logs,
-            'filters' => $request->only(['status', 'device', 'search', 'sort_dir']),
+            'filters' => [
+                'status' => $request->string('status')->toString(),
+                'device' => $request->string('device')->toString(),
+                'search' => $request->string('search')->toString(),
+                'from' => $from ?? '',
+                'to' => $to ?? '',
+            ] + $sort,
             'endpoints' => [
                 'self' => route('admin.login-logs.index'),
                 'export' => route('admin.login-logs.export'),
