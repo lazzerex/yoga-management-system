@@ -37,22 +37,6 @@ export default {
 
 <template>
     <div class="ym-ui">
-        <div class="ym-stats">
-            <div class="ym-stat-card">
-                <p class="ym-stat-card-label">{{ $t('operations.collectedThisMonth') }}</p>
-                <p class="ym-stat-card-value">{{ formatVnd(stats.collected) }}</p>
-            </div>
-            <div class="ym-stat-card ym-stat-card--info">
-                <p class="ym-stat-card-label">{{ $t('operations.outstanding') }}</p>
-                <p class="ym-stat-card-value">{{ formatVnd(stats.outstanding) }}</p>
-                <p class="ym-stat-card-note">{{ $t('operations.openInvoices', { count: stats.openCount }) }}</p>
-            </div>
-            <div class="ym-stat-card ym-stat-card--danger">
-                <p class="ym-stat-card-label">{{ $t('operations.overdue') }}</p>
-                <p class="ym-stat-card-value">{{ stats.overdueCount }}</p>
-            </div>
-        </div>
-
         <header class="ym-page-head">
             <div>
                 <h1 class="ym-page-title">
@@ -73,6 +57,22 @@ export default {
                 </Link>
             </div>
         </header>
+
+        <div class="ym-stats">
+            <div class="ym-stat-card">
+                <p class="ym-stat-card-label">{{ $t('operations.collectedThisMonth') }}</p>
+                <p class="ym-stat-card-value">{{ formatVnd(stats.collected) }}</p>
+            </div>
+            <div class="ym-stat-card ym-stat-card--info">
+                <p class="ym-stat-card-label">{{ $t('operations.outstanding') }}</p>
+                <p class="ym-stat-card-value">{{ formatVnd(stats.outstanding) }}</p>
+                <p class="ym-stat-card-note">{{ $t('operations.openInvoices', { count: stats.openCount }) }}</p>
+            </div>
+            <div class="ym-stat-card ym-stat-card--danger">
+                <p class="ym-stat-card-label">{{ $t('operations.overdue') }}</p>
+                <p class="ym-stat-card-value">{{ stats.overdueCount }}</p>
+            </div>
+        </div>
 
         <section class="ym-card">
             <div class="ym-filter-band">
