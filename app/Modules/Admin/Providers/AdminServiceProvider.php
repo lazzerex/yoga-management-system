@@ -42,9 +42,6 @@ class AdminServiceProvider extends ServiceProvider
                 AppMenuItem::make('nav.auditLogs', '/cms/admin/audit-logs')
                     ->icon('bi-journal-text')->iconColor('#7a6bc4')->group('nav.admin')->order(52)
                     ->permissions('admin.audit-logs.view'),
-                AppMenuItem::make('nav.formDemo', '/cms/admin/form-demo')
-                    ->icon('bi-ui-checks')->iconColor('#3f8f6f')->group('nav.admin')->order(53)
-                    ->permissions('admin.form-demo.view'),
 
                 // Submenu example — mock children, per task allowance.
                 AppMenuItem::make('nav.settings')
