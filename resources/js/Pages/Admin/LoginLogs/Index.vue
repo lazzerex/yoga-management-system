@@ -1,8 +1,9 @@
 <script setup>
-import { computed } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import { trans as t } from 'laravel-vue-i18n';
 import FilterBar from '@/Components/UI/FilterBar.vue';
+import DateRange from '@/Components/UI/DateRange.vue';
+import SortTh from '@/Components/UI/SortTh.vue';
 import { useFilters } from '@/composables/useFilters.js';
 
 const props = defineProps({
@@ -11,19 +12,9 @@ const props = defineProps({
     endpoints: Object,
 });
 
-const { filters, active, reset } = useFilters(props.endpoints.self, {
-    search: props.filters?.search,
-    status: props.filters?.status,
-    device: props.filters?.device,
-    sort_dir: props.filters?.sort_dir,
-});
+const { filters, active, filterCount, reset, toggleSort } = useFilters(props.endpoints.self, props.filters);
 
-// Newest first is the default, so it travels as an absent value rather than a filter.
-const sortDir = computed(() => (filters.value.sort_dir === 'asc' ? 'asc' : 'desc'));
 
-const toggleSort = () => {
-    filters.value.sort_dir = filters.value.sort_dir === 'asc' ? '' : 'asc';
-};
 
 const statusBadgeClass = (status) =>
     status === 'failed' ? 'ym-action-badge--login-failed' : 'ym-action-badge--login-success';
@@ -61,90 +52,105 @@ export default {
 
 
 <template>
-    <section class="ym-surface ym-section">
-        <div class="ym-log-page-head">
+    <div class="ym-ui">
+        <header class="ym-page-head">
             <div>
-                <h2 class="ym-title">{{ $t('admin.loginActivity') }}</h2>
-                <p class="ym-subtitle">{{ $t('admin.recentSignIns') }}</p>
+                <h1 class="ym-page-title">{{ $t('admin.loginActivity') }}</h1>
+                <p class="ym-page-sub">{{ $t('admin.recentSignIns') }}</p>
             </div>
-            <div class="ym-log-head-actions">
-                <a :href="endpoints.export" class="ym-btn-outline">{{ $t('admin.exportCsv') }}</a>
-                <Link :href="endpoints.users" class="ym-btn-ghost">{{ $t('admin.users') }}</Link>
+            <div class="ym-page-actions">
+                <Link :href="endpoints.users" class="ym-btn ym-btn--quiet">{{ $t('admin.users') }}</Link>
+                <a :href="endpoints.export" class="ym-btn ym-btn--outline">
+                    <i class="bi bi-download" /> {{ $t('admin.exportCsv') }}
+                </a>
             </div>
+        </header>
+
+        <div class="ym-subtabs">
+            <Link :href="endpoints.self" class="ym-subtab is-active">{{ $t('admin.loginLogs') }}</Link>
+            <Link :href="endpoints.audit_logs" class="ym-subtab">{{ $t('admin.auditLogs') }}</Link>
         </div>
 
-        <div class="ym-log-tabs">
-            <Link :href="endpoints.self" class="ym-log-tab ym-log-tab--active">{{ $t('admin.loginLogs') }}</Link>
-            <Link :href="endpoints.audit_logs" class="ym-log-tab">{{ $t('admin.auditLogs') }}</Link>
-        </div>
+        <section class="ym-card">
+            <div class="ym-filter-band">
+                <FilterBar
+                    v-model:search="filters.search"
+                    :search-placeholder="$t('admin.searchIp')"
+                    :count="filterCount"
+                    :active="active"
+                    @reset="reset"
+                >
+                    <label class="ym-filter-field">
+                        <span>{{ $t('admin.status') }}</span>
+                        <select v-model="filters.status" class="ym-log-filter-select">
+                            <option value="">{{ $t('admin.allStatus') }}</option>
+                            <option value="success">{{ $t('admin.success') }}</option>
+                            <option value="failed">{{ $t('admin.failed') }}</option>
+                        </select>
+                    </label>
+                    <label class="ym-filter-field">
+                        <span>{{ $t('admin.device') }}</span>
+                        <select v-model="filters.device" class="ym-log-filter-select">
+                            <option value="">{{ $t('admin.allDevices') }}</option>
+                            <option value="desktop">{{ $t('profile.desktop') }}</option>
+                            <option value="mobile">{{ $t('profile.mobile') }}</option>
+                        </select>
+                    </label>
+                    <DateRange v-model:from="filters.from" v-model:to="filters.to" :label="$t('admin.time')" />
+                </FilterBar>
+            </div>
 
-        <FilterBar :active="active" @reset="reset">
-            <input
-                v-model="filters.search"
-                type="search"
-                :placeholder="$t('admin.searchIp')"
-                class="ym-log-search"
-            />
-            <select v-model="filters.status" class="ym-log-filter-select">
-                <option value="">{{ $t('admin.allStatus') }}</option>
-                <option value="success">{{ $t('admin.success') }}</option>
-                <option value="failed">{{ $t('admin.failed') }}</option>
-            </select>
-            <select v-model="filters.device" class="ym-log-filter-select">
-                <option value="">{{ $t('admin.allDevices') }}</option>
-                <option value="desktop">{{ $t('profile.desktop') }}</option>
-                <option value="mobile">{{ $t('profile.mobile') }}</option>
-            </select>
-        </FilterBar>
+            <div class="ym-table-scroll">
+                <table class="ym-grid-table">
+                    <thead>
+                        <tr>
+                            <SortTh field="status" :label="$t('admin.status')" :state="filters" @sort="toggleSort" />
+                            <th>{{ $t('admin.user') }}</th>
+                            <th>{{ $t('admin.identifier') }}</th>
+                            <th>{{ $t('admin.ipAddress') }}</th>
+                            <th>{{ $t('admin.device') }}</th>
+                            <SortTh field="logged_in_at" :label="$t('admin.time')" :state="filters" @sort="toggleSort" />
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="log in logs.data" :key="log.id">
+                            <td>
+                                <span :class="['ym-action-badge', statusBadgeClass(log.status)]">
+                                    {{ statusLabel(log) }}
+                                </span>
+                            </td>
+                            <td class="is-strong">{{ log.user?.name ?? '—' }}</td>
+                            <td class="is-muted">{{ log.attempted_identifier ? `@${log.attempted_identifier}` : '—' }}</td>
+                            <td class="ym-num">{{ log.ip_address }}</td>
+                            <td>
+                                <span class="ym-tag ym-tag--neutral">
+                                    <i :class="log.device_type === 'mobile' ? 'bi bi-phone' : 'bi bi-laptop'" />
+                                    {{ log.device_type }}
+                                </span>
+                            </td>
+                            <td class="is-muted ym-num">{{ formatDate(log.logged_in_at) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-        <div class="ym-table-wrap">
-            <table class="ym-table">
-                <thead>
-                    <tr>
-                        <th class="ym-th">{{ $t('admin.status') }}</th>
-                        <th class="ym-th">{{ $t('admin.user') }}</th>
-                        <th class="ym-th">{{ $t('admin.identifier') }}</th>
-                        <th class="ym-th">{{ $t('admin.ipAddress') }}</th>
-                        <th class="ym-th">{{ $t('admin.device') }}</th>
-                        <th class="ym-th ym-th--sortable" @click="toggleSort">
-                            {{ $t('admin.time') }}
-                            <span class="ym-sort-icon">{{ sortDir === 'asc' ? '↑' : '↓' }}</span>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-if="logs.data.length === 0">
-                        <td colspan="6" class="ym-td ym-td--empty">{{ $t('admin.noLogs') }}</td>
-                    </tr>
-                    <tr v-for="log in logs.data" :key="log.id" class="ym-tr">
-                        <td class="ym-td">
-                            <span :class="['ym-action-badge', statusBadgeClass(log.status)]">
-                                {{ statusLabel(log) }}
-                            </span>
-                        </td>
-                        <td class="ym-td font-medium">{{ log.user?.name ?? '—' }}</td>
-                        <td class="ym-td text-neutral-500">{{ log.attempted_identifier ? `@${log.attempted_identifier}` : '—' }}</td>
-                        <td class="ym-td font-mono text-sm">{{ log.ip_address }}</td>
-                        <td class="ym-td">
-                            <span :class="['ym-device-badge', log.device_type === 'mobile' ? 'ym-device-mobile' : 'ym-device-desktop']">
-                                {{ log.device_type }}
-                            </span>
-                        </td>
-                        <td class="ym-td text-neutral-500">{{ formatDate(log.logged_in_at) }}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+            <div v-if="!logs.data.length" class="ym-empty">
+                <i class="bi bi-box-arrow-in-right" />
+                <p>{{ $t('admin.noLogs') }}</p>
+            </div>
 
-        <div v-if="logs.links.length > 3" class="ym-pagination">
-            <Link
-                v-for="link in logs.links"
-                :key="link.label"
-                :href="link.url ?? '#'"
-                v-html="link.label"
-                :class="['ym-page-link', { 'ym-page-link--active': link.active, 'ym-page-link--disabled': !link.url }]"
-                preserve-scroll
-            />
-        </div>
-    </section>
+            <div v-if="logs.links.length > 3" class="ym-card-foot">
+                <div class="ym-pagination">
+                    <Link
+                        v-for="link in logs.links"
+                        :key="link.label"
+                        :href="link.url ?? '#'"
+                        v-html="link.label"
+                        :class="['ym-page-link', { 'ym-page-link--active': link.active, 'ym-page-link--disabled': !link.url }]"
+                        preserve-scroll
+                    />
+                </div>
+            </div>
+        </section>
+    </div>
 </template>
