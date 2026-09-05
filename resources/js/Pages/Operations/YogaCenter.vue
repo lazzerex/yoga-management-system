@@ -21,7 +21,7 @@ const props = defineProps({
 });
 
 // One box narrows all three tabs; they are three views of the same centre.
-const { filters, active, reset } = useFilters(props.endpoints.index, props.filters);
+const { filters, active, filterCount, reset } = useFilters(props.endpoints.index, props.filters);
 
 const tabs = computed(() => {
     currentLocale.value;
@@ -65,277 +65,354 @@ export default {
 };
 </script>
 
-
 <template>
-    <TabBar v-model="activeTab" :tabs="tabs" />
+    <div class="ym-ui">
+        <TabBar v-model="activeTab" :tabs="tabs" />
 
-    <FilterBar :active="active" @reset="reset">
-        <input
-            v-model="filters.search"
-            type="search"
-            class="ym-log-search"
-            :placeholder="$t('operations.searchByName')"
-        />
-        <select v-model="filters.status" class="ym-log-filter-select">
-            <option value="">{{ $t('operations.allStatuses') }}</option>
-            <option value="active">{{ $t('operations.statusActive') }}</option>
-            <option value="inactive">{{ $t('operations.statusInactive') }}</option>
-        </select>
-    </FilterBar>
-
-    <template v-if="activeTab === 'branches'">
-        <div class="ym-stat-strip">
-            <div class="ym-stat">
-                <p class="ym-stat-label">{{ $t('operations.totalBranches') }}</p>
-                <p class="ym-stat-value">{{ branchStats.total }}</p>
+        <template v-if="activeTab === 'branches'">
+            <div class="ym-stats">
+                <div class="ym-stat-card">
+                    <p class="ym-stat-card-label">{{ $t('operations.totalBranches') }}</p>
+                    <p class="ym-stat-card-value">{{ branchStats.total }}</p>
+                </div>
+                <div class="ym-stat-card ym-stat-card--info">
+                    <p class="ym-stat-card-label">{{ $t('operations.activeBranches') }}</p>
+                    <p class="ym-stat-card-value">{{ branchStats.active }}</p>
+                </div>
             </div>
-            <div class="ym-stat">
-                <p class="ym-stat-label">{{ $t('operations.activeBranches') }}</p>
-                <p class="ym-stat-value">{{ branchStats.active }}</p>
-            </div>
-        </div>
 
-        <section class="ym-surface ym-section">
-            <div class="flex items-center justify-between">
+            <header class="ym-page-head">
                 <div>
-                    <h2 class="ym-title">
+                    <h1 class="ym-page-title">
                         {{ $t('operations.branches') }}
-                        <span class="ym-count-badge">{{ branches.total }}</span>
-                    </h2>
-                    <p class="ym-subtitle">{{ $t('operations.manageBranches') }}</p>
+                        <span class="ym-count">{{ branches.total }}</span>
+                    </h1>
+                    <p class="ym-page-sub">{{ $t('operations.manageBranches') }}</p>
                 </div>
-                <Link v-if="endpoints.createBranch" :href="endpoints.createBranch" class="ym-btn-sm">
-                    {{ $t('operations.createBranch') }}
-                </Link>
+                <div class="ym-page-actions">
+                    <Link v-if="endpoints.createBranch" :href="endpoints.createBranch" class="ym-btn ym-btn--primary">
+                        <i class="bi bi-plus-lg" /> {{ $t('operations.createBranch') }}
+                    </Link>
+                </div>
+            </header>
+
+            <section class="ym-card">
+                <div class="ym-filter-band">
+                    <FilterBar
+                        v-model:search="filters.search"
+                        :search-placeholder="$t('operations.searchByName')"
+                        :count="filterCount"
+                        :active="active"
+                        @reset="reset"
+                    >
+                        <label class="ym-filter-field">
+                            <span>{{ $t('operations.status') }}</span>
+                            <select v-model="filters.status" class="ym-log-filter-select">
+                                <option value="">{{ $t('operations.allStatuses') }}</option>
+                                <option value="active">{{ $t('operations.statusActive') }}</option>
+                                <option value="inactive">{{ $t('operations.statusInactive') }}</option>
+                            </select>
+                        </label>
+                    </FilterBar>
+                </div>
+
+                <div class="ym-table-scroll">
+                    <table class="ym-grid-table">
+                        <thead>
+                            <tr>
+                                <th>{{ $t('operations.branchName') }}</th>
+                                <th>{{ $t('operations.address') }}</th>
+                                <th>{{ $t('operations.phone') }}</th>
+                                <th>{{ $t('operations.status') }}</th>
+                                <th v-if="canManage" class="is-actions">{{ $t('operations.actions') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="branch in branches.data" :key="branch.id">
+                                <td class="is-strong">{{ branch.name }}</td>
+                                <td class="is-muted">{{ branch.address }}</td>
+                                <td class="is-muted ym-num">{{ branch.phone ?? '—' }}</td>
+                                <td>
+                                    <span class="ym-tag" :class="branch.is_active ? 'ym-tag--ok' : 'ym-tag--neutral'">
+                                        {{ branch.is_active ? $t('operations.active') : $t('operations.inactive') }}
+                                    </span>
+                                </td>
+                                <td v-if="canManage" class="is-actions">
+                                    <div class="ym-row-actions">
+                                        <Link class="ym-btn ym-btn--outline ym-btn--sm" :href="route('operations.branches.edit', branch.id)">
+                                            {{ $t('operations.edit') }}
+                                        </Link>
+                                        <button
+                                            type="button"
+                                            class="ym-btn ym-btn--danger-quiet ym-btn--sm"
+                                            @click="pendingDeleteBranch = branch"
+                                        >
+                                            {{ $t('operations.delete') }}
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div v-if="!branches.data.length" class="ym-empty">
+                    <i class="bi bi-building" />
+                    <p>{{ $t('operations.noBranches') }}</p>
+                </div>
+
+                <div v-if="branches.links.length > 3" class="ym-card-foot">
+                    <div class="ym-pagination">
+                        <Link
+                            v-for="link in branches.links"
+                            :key="link.label"
+                            :href="link.url ?? '#'"
+                            v-html="link.label"
+                            :class="['ym-page-link', { 'ym-page-link--active': link.active, 'ym-page-link--disabled': !link.url }]"
+                            preserve-scroll
+                        />
+                    </div>
+                </div>
+            </section>
+        </template>
+
+        <template v-else-if="activeTab === 'rooms'">
+            <div class="ym-stats">
+                <div class="ym-stat-card">
+                    <p class="ym-stat-card-label">{{ $t('operations.totalRooms') }}</p>
+                    <p class="ym-stat-card-value">{{ roomStats.total }}</p>
+                </div>
+                <div class="ym-stat-card ym-stat-card--info">
+                    <p class="ym-stat-card-label">{{ $t('operations.activeRooms') }}</p>
+                    <p class="ym-stat-card-value">{{ roomStats.active }}</p>
+                </div>
             </div>
 
-            <div class="ym-table-wrap">
-                <table class="ym-table">
-                    <thead>
-                        <tr>
-                            <th class="ym-th">{{ $t('operations.branchName') }}</th>
-                            <th class="ym-th">{{ $t('operations.address') }}</th>
-                            <th class="ym-th">{{ $t('operations.phone') }}</th>
-                            <th class="ym-th">{{ $t('operations.status') }}</th>
-                            <th v-if="canManage" class="ym-th">{{ $t('operations.actions') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="branch in branches.data" :key="branch.id" class="ym-tr">
-                            <td class="ym-td font-medium">{{ branch.name }}</td>
-                            <td class="ym-td text-neutral-500">{{ branch.address }}</td>
-                            <td class="ym-td text-neutral-500">{{ branch.phone ?? '-' }}</td>
-                            <td class="ym-td">
-                                <span :class="['ym-role-badge', branch.is_active ? 'ym-role-coach' : 'ym-role-member']">
-                                    {{ branch.is_active ? $t('operations.active') : $t('operations.inactive') }}
-                                </span>
-                            </td>
-                            <td v-if="canManage" class="ym-td">
-                                <div class="ym-inline-actions">
-                                    <Link class="ym-btn-outline" :href="route('operations.branches.edit', branch.id)">
-                                        {{ $t('operations.edit') }}
-                                    </Link>
-                                    <button type="button" class="ym-btn-danger" @click="pendingDeleteBranch = branch">
-                                        {{ $t('operations.delete') }}
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr v-if="!branches.data.length">
-                            <td class="ym-td text-neutral-500" :colspan="canManage ? 5 : 4">{{ $t('operations.noBranches') }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div v-if="branches.links.length > 3" class="ym-pagination">
-                <Link
-                    v-for="link in branches.links"
-                    :key="link.label"
-                    :href="link.url ?? '#'"
-                    v-html="link.label"
-                    :class="['ym-page-link', { 'ym-page-link--active': link.active, 'ym-page-link--disabled': !link.url }]"
-                    preserve-scroll
-                />
-            </div>
-        </section>
-    </template>
-
-    <template v-else-if="activeTab === 'rooms'">
-        <div class="ym-stat-strip">
-            <div class="ym-stat">
-                <p class="ym-stat-label">{{ $t('operations.totalRooms') }}</p>
-                <p class="ym-stat-value">{{ roomStats.total }}</p>
-            </div>
-            <div class="ym-stat">
-                <p class="ym-stat-label">{{ $t('operations.activeRooms') }}</p>
-                <p class="ym-stat-value">{{ roomStats.active }}</p>
-            </div>
-        </div>
-
-        <section class="ym-surface ym-section">
-            <div class="flex items-center justify-between">
+            <header class="ym-page-head">
                 <div>
-                    <h2 class="ym-title">
+                    <h1 class="ym-page-title">
                         {{ $t('operations.rooms') }}
-                        <span class="ym-count-badge">{{ rooms.total }}</span>
-                    </h2>
-                    <p class="ym-subtitle">{{ $t('operations.manageRooms') }}</p>
+                        <span class="ym-count">{{ rooms.total }}</span>
+                    </h1>
+                    <p class="ym-page-sub">{{ $t('operations.manageRooms') }}</p>
                 </div>
-                <Link v-if="endpoints.createRoom" :href="endpoints.createRoom" class="ym-btn-sm">
-                    {{ $t('operations.createRoom') }}
-                </Link>
+                <div class="ym-page-actions">
+                    <Link v-if="endpoints.createRoom" :href="endpoints.createRoom" class="ym-btn ym-btn--primary">
+                        <i class="bi bi-plus-lg" /> {{ $t('operations.createRoom') }}
+                    </Link>
+                </div>
+            </header>
+
+            <section class="ym-card">
+                <div class="ym-filter-band">
+                    <FilterBar
+                        v-model:search="filters.search"
+                        :search-placeholder="$t('operations.searchByName')"
+                        :count="filterCount"
+                        :active="active"
+                        @reset="reset"
+                    >
+                        <label class="ym-filter-field">
+                            <span>{{ $t('operations.status') }}</span>
+                            <select v-model="filters.status" class="ym-log-filter-select">
+                                <option value="">{{ $t('operations.allStatuses') }}</option>
+                                <option value="active">{{ $t('operations.statusActive') }}</option>
+                                <option value="inactive">{{ $t('operations.statusInactive') }}</option>
+                            </select>
+                        </label>
+                    </FilterBar>
+                </div>
+
+                <div class="ym-table-scroll">
+                    <table class="ym-grid-table">
+                        <thead>
+                            <tr>
+                                <th>{{ $t('operations.roomName') }}</th>
+                                <th>{{ $t('operations.branch') }}</th>
+                                <th class="is-num">{{ $t('operations.capacity') }}</th>
+                                <th>{{ $t('operations.status') }}</th>
+                                <th v-if="canManage" class="is-actions">{{ $t('operations.actions') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="room in rooms.data" :key="room.id">
+                                <td class="is-strong">{{ room.name }}</td>
+                                <td class="is-muted">{{ room.branch_name }}</td>
+                                <td class="is-num is-muted">{{ room.capacity }}</td>
+                                <td>
+                                    <span class="ym-tag" :class="room.is_active ? 'ym-tag--ok' : 'ym-tag--neutral'">
+                                        {{ room.is_active ? $t('operations.active') : $t('operations.inactive') }}
+                                    </span>
+                                </td>
+                                <td v-if="canManage" class="is-actions">
+                                    <div class="ym-row-actions">
+                                        <Link class="ym-btn ym-btn--outline ym-btn--sm" :href="route('operations.rooms.edit', room.id)">
+                                            {{ $t('operations.edit') }}
+                                        </Link>
+                                        <button
+                                            type="button"
+                                            class="ym-btn ym-btn--danger-quiet ym-btn--sm"
+                                            @click="pendingDeleteRoom = room"
+                                        >
+                                            {{ $t('operations.delete') }}
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div v-if="!rooms.data.length" class="ym-empty">
+                    <i class="bi bi-door-open" />
+                    <p>{{ $t('operations.noRooms') }}</p>
+                </div>
+
+                <div v-if="rooms.links.length > 3" class="ym-card-foot">
+                    <div class="ym-pagination">
+                        <Link
+                            v-for="link in rooms.links"
+                            :key="link.label"
+                            :href="link.url ?? '#'"
+                            v-html="link.label"
+                            :class="['ym-page-link', { 'ym-page-link--active': link.active, 'ym-page-link--disabled': !link.url }]"
+                            preserve-scroll
+                        />
+                    </div>
+                </div>
+            </section>
+        </template>
+
+        <template v-else>
+            <div class="ym-stats">
+                <div class="ym-stat-card">
+                    <p class="ym-stat-card-label">{{ $t('operations.totalClassTypes') }}</p>
+                    <p class="ym-stat-card-value">{{ classTypeStats.total }}</p>
+                </div>
+                <div class="ym-stat-card ym-stat-card--info">
+                    <p class="ym-stat-card-label">{{ $t('operations.activeClassTypes') }}</p>
+                    <p class="ym-stat-card-value">{{ classTypeStats.active }}</p>
+                </div>
             </div>
 
-            <div class="ym-table-wrap">
-                <table class="ym-table">
-                    <thead>
-                        <tr>
-                            <th class="ym-th">{{ $t('operations.roomName') }}</th>
-                            <th class="ym-th">{{ $t('operations.branch') }}</th>
-                            <th class="ym-th">{{ $t('operations.capacity') }}</th>
-                            <th class="ym-th">{{ $t('operations.status') }}</th>
-                            <th v-if="canManage" class="ym-th">{{ $t('operations.actions') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="room in rooms.data" :key="room.id" class="ym-tr">
-                            <td class="ym-td font-medium">{{ room.name }}</td>
-                            <td class="ym-td text-neutral-500">{{ room.branch_name }}</td>
-                            <td class="ym-td text-neutral-500">{{ room.capacity }}</td>
-                            <td class="ym-td">
-                                <span :class="['ym-role-badge', room.is_active ? 'ym-role-coach' : 'ym-role-member']">
-                                    {{ room.is_active ? $t('operations.active') : $t('operations.inactive') }}
-                                </span>
-                            </td>
-                            <td v-if="canManage" class="ym-td">
-                                <div class="ym-inline-actions">
-                                    <Link class="ym-btn-outline" :href="route('operations.rooms.edit', room.id)">
-                                        {{ $t('operations.edit') }}
-                                    </Link>
-                                    <button type="button" class="ym-btn-danger" @click="pendingDeleteRoom = room">
-                                        {{ $t('operations.delete') }}
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr v-if="!rooms.data.length">
-                            <td class="ym-td text-neutral-500" :colspan="canManage ? 5 : 4">{{ $t('operations.noRooms') }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div v-if="rooms.links.length > 3" class="ym-pagination">
-                <Link
-                    v-for="link in rooms.links"
-                    :key="link.label"
-                    :href="link.url ?? '#'"
-                    v-html="link.label"
-                    :class="['ym-page-link', { 'ym-page-link--active': link.active, 'ym-page-link--disabled': !link.url }]"
-                    preserve-scroll
-                />
-            </div>
-        </section>
-    </template>
-
-    <template v-else>
-        <div class="ym-stat-strip">
-            <div class="ym-stat">
-                <p class="ym-stat-label">{{ $t('operations.totalClassTypes') }}</p>
-                <p class="ym-stat-value">{{ classTypeStats.total }}</p>
-            </div>
-            <div class="ym-stat">
-                <p class="ym-stat-label">{{ $t('operations.activeClassTypes') }}</p>
-                <p class="ym-stat-value">{{ classTypeStats.active }}</p>
-            </div>
-        </div>
-
-        <section class="ym-surface ym-section">
-            <div class="flex items-center justify-between">
+            <header class="ym-page-head">
                 <div>
-                    <h2 class="ym-title">
+                    <h1 class="ym-page-title">
                         {{ $t('operations.classTypes') }}
-                        <span class="ym-count-badge">{{ classTypes.total }}</span>
-                    </h2>
-                    <p class="ym-subtitle">{{ $t('operations.manageClassTypes') }}</p>
+                        <span class="ym-count">{{ classTypes.total }}</span>
+                    </h1>
+                    <p class="ym-page-sub">{{ $t('operations.manageClassTypes') }}</p>
                 </div>
-                <Link v-if="endpoints.createClassType" :href="endpoints.createClassType" class="ym-btn-sm">
-                    {{ $t('operations.createClassType') }}
-                </Link>
+                <div class="ym-page-actions">
+                    <Link v-if="endpoints.createClassType" :href="endpoints.createClassType" class="ym-btn ym-btn--primary">
+                        <i class="bi bi-plus-lg" /> {{ $t('operations.createClassType') }}
+                    </Link>
+                </div>
+            </header>
+
+            <section class="ym-card">
+                <div class="ym-filter-band">
+                    <FilterBar
+                        v-model:search="filters.search"
+                        :search-placeholder="$t('operations.searchByName')"
+                        :count="filterCount"
+                        :active="active"
+                        @reset="reset"
+                    >
+                        <label class="ym-filter-field">
+                            <span>{{ $t('operations.status') }}</span>
+                            <select v-model="filters.status" class="ym-log-filter-select">
+                                <option value="">{{ $t('operations.allStatuses') }}</option>
+                                <option value="active">{{ $t('operations.statusActive') }}</option>
+                                <option value="inactive">{{ $t('operations.statusInactive') }}</option>
+                            </select>
+                        </label>
+                    </FilterBar>
+                </div>
+
+                <div class="ym-table-scroll">
+                    <table class="ym-grid-table">
+                        <thead>
+                            <tr>
+                                <th>{{ $t('operations.classTypeName') }}</th>
+                                <th>{{ $t('operations.description') }}</th>
+                                <th>{{ $t('operations.status') }}</th>
+                                <th v-if="canManage" class="is-actions">{{ $t('operations.actions') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="classType in classTypes.data" :key="classType.id">
+                                <td class="is-strong">{{ classType.name }}</td>
+                                <td class="is-muted">{{ classType.description ?? '—' }}</td>
+                                <td>
+                                    <span class="ym-tag" :class="classType.is_active ? 'ym-tag--ok' : 'ym-tag--neutral'">
+                                        {{ classType.is_active ? $t('operations.active') : $t('operations.inactive') }}
+                                    </span>
+                                </td>
+                                <td v-if="canManage" class="is-actions">
+                                    <div class="ym-row-actions">
+                                        <Link
+                                            class="ym-btn ym-btn--outline ym-btn--sm"
+                                            :href="route('operations.class-types.edit', classType.id)"
+                                        >
+                                            {{ $t('operations.edit') }}
+                                        </Link>
+                                        <button
+                                            type="button"
+                                            class="ym-btn ym-btn--danger-quiet ym-btn--sm"
+                                            @click="pendingDeleteClassType = classType"
+                                        >
+                                            {{ $t('operations.delete') }}
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div v-if="!classTypes.data.length" class="ym-empty">
+                    <i class="bi bi-collection" />
+                    <p>{{ $t('operations.noClassTypes') }}</p>
+                </div>
+
+                <div v-if="classTypes.links.length > 3" class="ym-card-foot">
+                    <div class="ym-pagination">
+                        <Link
+                            v-for="link in classTypes.links"
+                            :key="link.label"
+                            :href="link.url ?? '#'"
+                            v-html="link.label"
+                            :class="['ym-page-link', { 'ym-page-link--active': link.active, 'ym-page-link--disabled': !link.url }]"
+                            preserve-scroll
+                        />
+                    </div>
+                </div>
+            </section>
+        </template>
+
+        <Modal :show="!!pendingDeleteBranch" :title="$t('operations.deleteBranchTitle')" @close="pendingDeleteBranch = null">
+            <p class="ym-note">{{ $t('operations.confirmDeleteBranch', { name: pendingDeleteBranch?.name }) }}</p>
+            <div class="ym-confirm-modal-actions">
+                <button type="button" class="ym-btn ym-btn--outline" @click="pendingDeleteBranch = null">{{ $t('common.cancel') }}</button>
+                <button type="button" class="ym-btn ym-btn--danger" @click="confirmDeleteBranch">{{ $t('operations.delete') }}</button>
             </div>
+        </Modal>
 
-            <div class="ym-table-wrap">
-                <table class="ym-table">
-                    <thead>
-                        <tr>
-                            <th class="ym-th">{{ $t('operations.classTypeName') }}</th>
-                            <th class="ym-th">{{ $t('operations.description') }}</th>
-                            <th class="ym-th">{{ $t('operations.status') }}</th>
-                            <th v-if="canManage" class="ym-th">{{ $t('operations.actions') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="classType in classTypes.data" :key="classType.id" class="ym-tr">
-                            <td class="ym-td font-medium">{{ classType.name }}</td>
-                            <td class="ym-td text-neutral-500">{{ classType.description ?? '-' }}</td>
-                            <td class="ym-td">
-                                <span :class="['ym-role-badge', classType.is_active ? 'ym-role-coach' : 'ym-role-member']">
-                                    {{ classType.is_active ? $t('operations.active') : $t('operations.inactive') }}
-                                </span>
-                            </td>
-                            <td v-if="canManage" class="ym-td">
-                                <div class="ym-inline-actions">
-                                    <Link class="ym-btn-outline" :href="route('operations.class-types.edit', classType.id)">
-                                        {{ $t('operations.edit') }}
-                                    </Link>
-                                    <button type="button" class="ym-btn-danger" @click="pendingDeleteClassType = classType">
-                                        {{ $t('operations.delete') }}
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr v-if="!classTypes.data.length">
-                            <td class="ym-td text-neutral-500" :colspan="canManage ? 4 : 3">{{ $t('operations.noClassTypes') }}</td>
-                        </tr>
-                    </tbody>
-                </table>
+        <Modal :show="!!pendingDeleteRoom" :title="$t('operations.deleteRoomTitle')" @close="pendingDeleteRoom = null">
+            <p class="ym-note">{{ $t('operations.confirmDeleteRoom', { name: pendingDeleteRoom?.name }) }}</p>
+            <div class="ym-confirm-modal-actions">
+                <button type="button" class="ym-btn ym-btn--outline" @click="pendingDeleteRoom = null">{{ $t('common.cancel') }}</button>
+                <button type="button" class="ym-btn ym-btn--danger" @click="confirmDeleteRoom">{{ $t('operations.delete') }}</button>
             </div>
+        </Modal>
 
-            <div v-if="classTypes.links.length > 3" class="ym-pagination">
-                <Link
-                    v-for="link in classTypes.links"
-                    :key="link.label"
-                    :href="link.url ?? '#'"
-                    v-html="link.label"
-                    :class="['ym-page-link', { 'ym-page-link--active': link.active, 'ym-page-link--disabled': !link.url }]"
-                    preserve-scroll
-                />
+        <Modal :show="!!pendingDeleteClassType" :title="$t('operations.deleteClassTypeTitle')" @close="pendingDeleteClassType = null">
+            <p class="ym-note">{{ $t('operations.confirmDeleteClassType', { name: pendingDeleteClassType?.name }) }}</p>
+            <div class="ym-confirm-modal-actions">
+                <button type="button" class="ym-btn ym-btn--outline" @click="pendingDeleteClassType = null">{{ $t('common.cancel') }}</button>
+                <button type="button" class="ym-btn ym-btn--danger" @click="confirmDeleteClassType">{{ $t('operations.delete') }}</button>
             </div>
-        </section>
-    </template>
-
-    <Modal :show="!!pendingDeleteBranch" :title="$t('operations.deleteBranchTitle')" @close="pendingDeleteBranch = null">
-        <p class="ym-card-note">{{ $t('operations.confirmDeleteBranch', { name: pendingDeleteBranch?.name }) }}</p>
-        <div class="ym-confirm-modal-actions">
-            <button type="button" class="ym-btn-outline" @click="pendingDeleteBranch = null">{{ $t('common.cancel') }}</button>
-            <button type="button" class="ym-btn-danger" @click="confirmDeleteBranch">{{ $t('operations.delete') }}</button>
-        </div>
-    </Modal>
-
-    <Modal :show="!!pendingDeleteRoom" :title="$t('operations.deleteRoomTitle')" @close="pendingDeleteRoom = null">
-        <p class="ym-card-note">{{ $t('operations.confirmDeleteRoom', { name: pendingDeleteRoom?.name }) }}</p>
-        <div class="ym-confirm-modal-actions">
-            <button type="button" class="ym-btn-outline" @click="pendingDeleteRoom = null">{{ $t('common.cancel') }}</button>
-            <button type="button" class="ym-btn-danger" @click="confirmDeleteRoom">{{ $t('operations.delete') }}</button>
-        </div>
-    </Modal>
-
-    <Modal :show="!!pendingDeleteClassType" :title="$t('operations.deleteClassTypeTitle')" @close="pendingDeleteClassType = null">
-        <p class="ym-card-note">{{ $t('operations.confirmDeleteClassType', { name: pendingDeleteClassType?.name }) }}</p>
-        <div class="ym-confirm-modal-actions">
-            <button type="button" class="ym-btn-outline" @click="pendingDeleteClassType = null">{{ $t('common.cancel') }}</button>
-            <button type="button" class="ym-btn-danger" @click="confirmDeleteClassType">{{ $t('operations.delete') }}</button>
-        </div>
-    </Modal>
+        </Modal>
+    </div>
 </template>
