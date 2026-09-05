@@ -30,6 +30,13 @@ export default {
 
 <template>
     <div class="ym-ui">
+        <header class="ym-page-head">
+            <div>
+                <h1 class="ym-page-title">{{ $t('member.activeEntitlements') }}</h1>
+                <p class="ym-page-sub">{{ $t('member.activeEntitlementsSubtitle') }}</p>
+            </div>
+        </header>
+
         <div class="ym-stats">
             <div class="ym-stat-card">
                 <p class="ym-stat-card-label">{{ $t('member.currentPlan') }}</p>
@@ -45,13 +52,6 @@ export default {
                 <p class="ym-stat-card-value">{{ formatVnd(outstanding) }}</p>
             </div>
         </div>
-
-        <header class="ym-page-head">
-            <div>
-                <h1 class="ym-page-title">{{ $t('member.activeEntitlements') }}</h1>
-                <p class="ym-page-sub">{{ $t('member.activeEntitlementsSubtitle') }}</p>
-            </div>
-        </header>
 
         <section class="ym-card">
             <ul v-if="entitlements.length" class="ym-timeline">

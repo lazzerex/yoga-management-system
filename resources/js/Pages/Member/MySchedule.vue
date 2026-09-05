@@ -54,6 +54,12 @@ export default {
 
 <template>
     <div class="ym-ui">
+        <header class="ym-page-head">
+            <div>
+                <h1 class="ym-page-title">{{ $t('member.personalWeeklyCalendar') }}</h1>
+            </div>
+        </header>
+
         <div class="ym-stats">
             <div class="ym-stat-card">
                 <p class="ym-stat-card-label">{{ $t('member.totalSessionsPlanned') }}</p>
@@ -66,12 +72,6 @@ export default {
                 <p v-if="nextSession" class="ym-stat-card-note">{{ nextSession.class_type_name }}</p>
             </div>
         </div>
-
-        <header class="ym-page-head">
-            <div>
-                <h1 class="ym-page-title">{{ $t('member.personalWeeklyCalendar') }}</h1>
-            </div>
-        </header>
 
         <section class="ym-card">
             <div v-if="sessions.length" class="ym-card-body ym-timetable-scroll">
