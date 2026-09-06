@@ -8,10 +8,12 @@ use App\Models\Enrollment;
 use App\Modules\Admin\User\Actions\AuditUserAction;
 use App\Modules\Operations\Enrollment\Actions\CancelEnrollmentAction;
 use App\Modules\Operations\Enrollment\Actions\CreateEnrollmentAction;
+use App\Notifications\EnrollmentCancelledByStaffNotification;
 use App\Support\Table\SortsQueries;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 use Inertia\Response;
 
 class EnrollmentController extends Controller
@@ -245,6 +247,12 @@ class EnrollmentController extends Controller
             'class' => $enrollment->classSession->classType->name,
             'session_date' => $enrollment->classSession->session_date,
         ]);
+
+        // Not in the Action: it also serves the member cancelling their own booking.
+        Notification::send(
+            $enrollment->studentProfile->user,
+            new EnrollmentCancelledByStaffNotification($enrollment)
+        );
 
         return back()->with('success', ['key' => 'flash.enrollmentCancelled']);
     }
