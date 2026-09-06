@@ -414,3 +414,87 @@
         .ym-pane-head { flex-wrap: wrap; }
     }
 }
+
+@layer components {
+    /* ---- Notification centre ---- */
+
+    .ym-note-count { color: var(--u-brand); font-weight: 650; }
+
+    .ym-note-feed {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .ym-note-row {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+        padding: 0.85rem 1rem;
+        border-bottom: 1px solid var(--u-line);
+        cursor: pointer;
+        transition: background 0.12s ease;
+    }
+
+    .ym-note-row:last-child { border-bottom: 0; }
+    .ym-note-row:hover { background: var(--u-surface-2); }
+    .ym-note-row:focus-visible { outline: 2px solid var(--u-brand); outline-offset: -2px; }
+
+    .ym-note-row.is-unread { background: var(--u-brand-soft); }
+    .ym-note-row.is-unread:hover { background: #e7f1ed; }
+
+    .ym-note-icon {
+        flex: 0 0 auto;
+        display: grid;
+        place-items: center;
+        width: 2.25rem;
+        height: 2.25rem;
+        border-radius: 50%;
+        font-size: 0.95rem;
+    }
+
+    .ym-note-icon.is-info { background: var(--u-info-soft); color: var(--u-info); }
+    .ym-note-icon.is-brand { background: var(--u-brand-soft); color: var(--u-brand); }
+    .ym-note-icon.is-warn { background: var(--u-warn-soft); color: var(--u-warn); }
+    .ym-note-icon.is-danger { background: var(--u-danger-soft); color: var(--u-danger); }
+
+    .ym-note-body {
+        flex: 1 1 auto;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+    }
+
+    .ym-note-text {
+        color: var(--u-ink-2);
+        font-size: 0.86rem;
+        line-height: 1.35;
+    }
+
+    .ym-note-row.is-unread .ym-note-text { color: var(--u-ink); font-weight: 600; }
+
+    .ym-note-time {
+        color: var(--u-ink-4);
+        font-size: 0.75rem;
+    }
+
+    .ym-note-dot {
+        flex: 0 0 auto;
+        width: 0.45rem;
+        height: 0.45rem;
+        border-radius: 50%;
+        background: var(--u-brand);
+    }
+
+    .ym-note-chevron {
+        flex: 0 0 auto;
+        color: var(--u-ink-4);
+        font-size: 0.8rem;
+    }
+
+    @media (max-width: 640px) {
+        .ym-note-row { padding: 0.75rem 0.8rem; gap: 0.65rem; }
+        .ym-note-chevron { display: none; }
+    }
+}
