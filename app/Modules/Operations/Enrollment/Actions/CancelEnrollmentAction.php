@@ -3,7 +3,10 @@
 namespace App\Modules\Operations\Enrollment\Actions;
 
 use App\Models\Enrollment;
+use App\Notifications\EnrollmentPromotedNotification;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
 
 class CancelEnrollmentAction
@@ -22,17 +25,29 @@ class CancelEnrollmentAction
 
         $wasBooked = $enrollment->status === 'booked';
 
-        $enrollment->update([
-            'status' => 'cancelled',
-            'cancelled_at' => now(),
-        ]);
+        $promoted = DB::transaction(function () use ($enrollment, $wasBooked) {
+            $enrollment->update([
+                'status' => 'cancelled',
+                'cancelled_at' => now(),
+            ]);
 
-        if ($wasBooked) {
-            Enrollment::where('class_session_id', $enrollment->class_session_id)
+            if (! $wasBooked) {
+                return null;
+            }
+
+            $next = Enrollment::where('class_session_id', $enrollment->class_session_id)
                 ->where('status', 'waitlisted')
                 ->orderBy('enrolled_at')
-                ->first()
-                ?->update(['status' => 'booked']);
+                ->first();
+
+            $next?->update(['status' => 'booked']);
+
+            return $next;
+        });
+
+        // After the transaction, never inside it: a rolled back job is the double-send bug.
+        if ($promoted && $user = $promoted->studentProfile->user) {
+            Notification::send($user, new EnrollmentPromotedNotification($promoted));
         }
 
         return $enrollment;
