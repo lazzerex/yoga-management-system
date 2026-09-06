@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 import { useForm } from '@inertiajs/vue3';
 import { trans as t } from 'laravel-vue-i18n';
+import Checkbox from '@/Components/Form/Checkbox.vue';
 import Field from '@/Components/Form/Field.vue';
 import FileInput from '@/Components/Form/FileInput.vue';
 import TextInput from '@/Components/Form/TextInput.vue';
@@ -23,6 +24,14 @@ const props = defineProps({
         type: Array,
         required: true,
     },
+    notificationEvents: {
+        type: Array,
+        required: true,
+    },
+    notificationChannels: {
+        type: Array,
+        required: true,
+    },
     endpoints: {
         type: Object,
         required: true,
@@ -32,6 +41,15 @@ const props = defineProps({
 const editingAccount = ref(false);
 
 const avatarForm = useForm({ avatar: null, remove_avatar: false });
+const notificationForm = useForm({
+    preferences: Object.fromEntries(props.notificationEvents.map((event) => [event.key, { ...event.channels }])),
+});
+
+const saveNotificationPreferences = () => notificationForm.post(props.endpoints.notificationPreferences, {
+    preserveScroll: true,
+});
+
+const channelLabel = (channel) => t(`profile.channel${channel.charAt(0).toUpperCase()}${channel.slice(1)}`);
 const accountForm = useForm({
     name: props.profile.name,
     username: props.profile.username,
@@ -224,6 +242,50 @@ export default {
                     <div v-else class="ym-empty">
                         <i class="bi bi-box-arrow-in-right" />
                         <p>{{ $t('profile.noLoginActivity') }}</p>
+                    </div>
+                </section>
+
+                <section class="ym-card">
+                    <div class="ym-card-head">
+                        <h2 class="ym-card-title">{{ $t('profile.notificationSettings') }}</h2>
+                        <p class="ym-card-sub">{{ $t('profile.notificationSettingsHint') }}</p>
+                    </div>
+
+                    <form v-if="props.notificationEvents.length" @submit.prevent="saveNotificationPreferences">
+                        <div class="ym-table-scroll">
+                            <table class="ym-grid-table">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th v-for="channel in props.notificationChannels" :key="channel">
+                                            {{ channelLabel(channel) }}
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="event in props.notificationEvents" :key="event.key">
+                                        <td>{{ event.label }}</td>
+                                        <td v-for="channel in props.notificationChannels" :key="channel">
+                                            <Checkbox
+                                                v-model="notificationForm.preferences[event.key][channel]"
+                                                :aria-label="`${event.label} - ${channelLabel(channel)}`"
+                                            />
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="ym-form-foot">
+                            <button type="submit" class="ym-btn ym-btn--primary" :disabled="notificationForm.processing">
+                                {{ $t('common.save') }}
+                            </button>
+                        </div>
+                    </form>
+
+                    <div v-else class="ym-empty">
+                        <i class="bi bi-bell-slash" />
+                        <p>{{ $t('profile.noNotificationEvents') }}</p>
                     </div>
                 </section>
             </div>
