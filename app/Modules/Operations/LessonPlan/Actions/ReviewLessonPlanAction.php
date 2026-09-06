@@ -4,7 +4,9 @@ namespace App\Modules\Operations\LessonPlan\Actions;
 
 use App\Models\LessonPlan;
 use App\Models\User;
+use App\Notifications\LessonPlanReviewedNotification;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
 
 class ReviewLessonPlanAction
@@ -23,7 +25,7 @@ class ReviewLessonPlanAction
             ]);
         }
 
-        return DB::transaction(function () use ($lessonPlan, $validated, $reviewer) {
+        $reviewed = DB::transaction(function () use ($lessonPlan, $validated, $reviewer) {
             $lessonPlan->reviews()->create([
                 'reviewer_user_id' => $reviewer->id,
                 'action' => $validated['action'],
@@ -35,5 +37,11 @@ class ReviewLessonPlanAction
 
             return $lessonPlan;
         });
+
+        if ($owner = $reviewed->coachProfile->user) {
+            Notification::send($owner, new LessonPlanReviewedNotification($reviewed, $reviewer));
+        }
+
+        return $reviewed;
     }
 }
