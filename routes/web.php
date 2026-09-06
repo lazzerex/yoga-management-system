@@ -19,6 +19,8 @@ use App\Modules\Operations\StudentProfile\Controllers\StudentProfileController;
 use App\Modules\Operations\Tuition\Controllers\InvoiceController;
 use App\Modules\Operations\Tuition\Controllers\MembershipController;
 use App\Modules\Operations\Tuition\Controllers\TuitionPlanController;
+use App\Modules\Profile\Controllers\LocaleController;
+use App\Modules\Profile\Controllers\NotificationController;
 use App\Modules\Profile\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -35,6 +37,13 @@ Route::prefix('cms')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('cms.dashboard');
         Route::get('/profile', [ProfileController::class, 'show'])->name('cms.profile.show');
         Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('cms.profile.avatar');
+        Route::post('/profile/notification-preferences', [ProfileController::class, 'updateNotificationPreferences'])->name('cms.profile.notification-preferences');
+        Route::post('/locale', [LocaleController::class, 'update'])->name('cms.locale.update');
+
+        Route::get('/notifications', [NotificationController::class, 'index'])->name('cms.notifications.index');
+        Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('cms.notifications.read-all');
+        Route::delete('/notifications', [NotificationController::class, 'clear'])->name('cms.notifications.clear');
+        Route::post('/notifications/{notification}/read', [NotificationController::class, 'markRead'])->name('cms.notifications.read');
 
         Route::prefix('operations')->name('operations.')->group(function () {
             Route::middleware('permission:operations.center.view')->group(function () {
