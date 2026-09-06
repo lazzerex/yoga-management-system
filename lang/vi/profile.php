@@ -32,4 +32,9 @@ return [
     'pictureHint' => 'JPG, PNG hoặc WebP, tối đa 2 MB.',
     'accountDetails' => 'Thông tin tài khoản',
     'editAccount' => 'Sửa thông tin',
+    'notificationSettings' => 'Thông báo',
+    'notificationSettingsHint' => 'Chọn cách nhận từng loại thông báo.',
+    'channelMail' => 'Email',
+    'channelDatabase' => 'Trong ứng dụng',
+    'noNotificationEvents' => 'Tài khoản của bạn không nhận thông báo nào.',
 ];

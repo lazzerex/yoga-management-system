@@ -4,11 +4,6 @@ return [
     'brand' => [
         'title' => 'Yoga CRM',
     ],
-    'notifications' => [
-        'leads' => 'Có 3 yêu cầu học thử mới từ khách truy cập website',
-        'attendance' => 'Điểm danh giáo viên hôm nay đã được gửi',
-        'tuition' => 'Đối soát học phí tháng 4 sắp đến hạn',
-    ],
     'sidebar' => [
         'main' => 'Chính',
         'home' => 'Trang chủ',

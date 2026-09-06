@@ -84,4 +84,6 @@ return [
     'paymentAlreadyVoided' => 'Khoản thanh toán này đã bị huỷ hiệu lực.',
     'avatarUpdated' => 'Đã cập nhật ảnh đại diện.',
     'accountUpdated' => 'Đã cập nhật thông tin tài khoản.',
+    'notificationPreferencesUpdated' => 'Đã lưu tùy chọn thông báo.',
+    'notificationsCleared' => 'Đã xóa tất cả thông báo.',
 ];
