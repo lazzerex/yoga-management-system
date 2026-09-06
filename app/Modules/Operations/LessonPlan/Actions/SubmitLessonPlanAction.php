@@ -3,6 +3,9 @@
 namespace App\Modules\Operations\LessonPlan\Actions;
 
 use App\Models\LessonPlan;
+use App\Models\User;
+use App\Notifications\LessonPlanSubmittedNotification;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
 
 class SubmitLessonPlanAction
@@ -19,6 +22,11 @@ class SubmitLessonPlanAction
             'status' => 'pending',
             'submitted_at' => now(),
         ]);
+
+        Notification::send(
+            User::permission('operations.plans.review')->get(),
+            new LessonPlanSubmittedNotification($lessonPlan)
+        );
 
         return $lessonPlan;
     }
