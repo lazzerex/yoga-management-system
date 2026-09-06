@@ -482,6 +482,15 @@
 
     .ym-popover-link:hover { color: #2f5f9d; }
 
+    .ym-popover-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
+    .ym-popover-link--danger { color: #b8404a; }
+    .ym-popover-link--danger:hover { color: #97323b; }
+
     .ym-notification-list {
         margin: 0;
         padding: 0;
@@ -495,6 +504,28 @@
         border-radius: 0.5rem;
         padding: 0.52rem 0.58rem;
         background: #f9fbff;
+        cursor: pointer;
+    }
+
+    .ym-notification-item:hover { border-color: #c9d8ec; }
+
+    .ym-notification-item--unread {
+        border-left: 3px solid #2f8368;
+        background: #ffffff;
+    }
+
+    .ym-notification-empty {
+        margin: 0;
+        padding: 0.6rem 0.2rem;
+        font-size: 0.78rem;
+        color: #7a8aa0;
+    }
+
+    .ym-notification-all {
+        display: block;
+        margin-top: 0.5rem;
+        text-align: center;
+        text-decoration: none;
     }
 
     .ym-notification-title {
