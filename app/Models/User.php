@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,9 +18,9 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'username', 'email', 'password', 'role'])]
+#[Fillable(['name', 'username', 'email', 'password', 'role', 'locale', 'notification_preferences'])]
 #[Hidden(['password', 'remember_token'])]
-class User extends Authenticatable implements HasMedia
+class User extends Authenticatable implements HasLocalePreference, HasMedia
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, HasRoles, Notifiable;
@@ -67,11 +68,29 @@ class User extends Authenticatable implements HasMedia
         return $this->can('admin.dashboard.manage');
     }
 
+    public function preferredLocale(): ?string
+    {
+        return $this->locale;
+    }
+
+    public function wantsNotification(string $eventKey, string $channel): bool
+    {
+        // Indexed, not a config() dot path: event keys contain dots of their own.
+        $default = config('notifications.events')[$eventKey]['channels'][$channel] ?? null;
+
+        if ($default === null) {
+            return false;
+        }
+
+        return (bool) ($this->notification_preferences[$eventKey][$channel] ?? $default);
+    }
+
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'notification_preferences' => 'array',
         ];
     }
 }
