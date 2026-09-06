@@ -3,7 +3,9 @@
 namespace App\Actions\Fortify;
 
 use App\Models\User;
+use App\Notifications\MemberRegisteredNotification;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -35,11 +37,22 @@ class CreateNewUser implements CreatesNewUsers
             'password' => $this->passwordRules(),
         ])->validate();
 
-        return User::create([
+        // Explicit, not the column default: User::booted() reads the attribute to sync roles.
+        $user = User::create([
             'name' => $input['name'],
             'username' => $input['username'],
             'email' => $input['email'],
             'password' => Hash::make($input['password']),
+            'role' => 'member',
         ]);
+
+        $user->studentProfile()->create();
+
+        Notification::send(
+            User::permission('admin.users.view')->get(),
+            new MemberRegisteredNotification($user)
+        );
+
+        return $user;
     }
 }
