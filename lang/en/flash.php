@@ -84,4 +84,6 @@ return [
     'paymentAlreadyVoided' => 'This payment is already voided.',
     'avatarUpdated' => 'Profile picture updated.',
     'accountUpdated' => 'Account details updated.',
+    'notificationPreferencesUpdated' => 'Notification preferences saved.',
+    'notificationsCleared' => 'All notifications cleared.',
 ];

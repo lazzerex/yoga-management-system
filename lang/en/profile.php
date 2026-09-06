@@ -32,4 +32,9 @@ return [
     'pictureHint' => 'JPG, PNG or WebP, up to 2 MB.',
     'accountDetails' => 'Account details',
     'editAccount' => 'Edit details',
+    'notificationSettings' => 'Notifications',
+    'notificationSettingsHint' => 'Choose how each message reaches you.',
+    'channelMail' => 'Email',
+    'channelDatabase' => 'In app',
+    'noNotificationEvents' => 'No notifications are sent to your account.',
 ];

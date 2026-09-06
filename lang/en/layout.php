@@ -4,11 +4,6 @@ return [
     'brand' => [
         'title' => 'Yoga CRM',
     ],
-    'notifications' => [
-        'leads' => '3 new trial requests from website leads',
-        'attendance' => 'Teacher attendance for today was submitted',
-        'tuition' => 'April tuition reconciliation is almost due',
-    ],
     'sidebar' => [
         'main' => 'Main',
         'home' => 'Home',
