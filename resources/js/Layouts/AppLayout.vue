@@ -22,6 +22,13 @@ const toggleLocale = async () => {
     const newLocale = currentLocale.value === 'en' ? 'vi' : 'en';
     await loadLanguageAsync(newLocale);
     document.cookie = `locale=${newLocale}; path=/; SameSite=Lax`;
+
+    if (page.props.auth?.user) {
+        router.post(route('cms.locale.update'), { locale: newLocale }, {
+            preserveScroll: true,
+            preserveState: true,
+        });
+    }
 };
 
 const resolveFlashMessage = (message) => {
@@ -384,17 +391,19 @@ const topMenuItems = computed(() => {
         }));
 });
 
-const notifications = [
-    { titleKey: 'layout.notifications.leads', time: '2m ago' },
-    { titleKey: 'layout.notifications.attendance', time: '14m ago' },
-    { titleKey: 'layout.notifications.tuition', time: '1h ago' },
-];
+const unreadCount = computed(() => page.props.bell?.unread ?? 0);
+
+const recentNotifications = ref([]);
+const notificationsLoading = ref(false);
+
+const confirmingClearAll = ref(false);
+
+const NOTIFICATION_POLL_MS = 30000;
+let notificationsPoll = null;
+let notificationsRefreshing = false;
 
 const quickActions = computed(() => [
     { label: t('common.profile'), hint: t('common.viewAccountSummary'), href: route('cms.profile.show') },
-    { label: t('common.preferences'), hint: t('common.adjustWorkspaceSettings') },
-    { label: t('common.lastViewed'), hint: t('common.jumpBackToRecentPages') },
-    { label: t('common.about'), hint: t('common.seeReleaseNotes') },
 ]);
 
 const userInitials = computed(() => {
@@ -482,7 +491,84 @@ const toggleNotifications = () => {
     notificationsOpen.value = !notificationsOpen.value;
     if (notificationsOpen.value) {
         profileMenuOpen.value = false;
+        fetchNotifications();
     }
+};
+
+watch(notificationsOpen, (open) => {
+    if (!open) {
+        confirmingClearAll.value = false;
+    }
+});
+
+// flash and errors ride along: a partial reload merges, so a spent alert would survive
+// on the client and announce() would raise it again.
+const fetchNotifications = ({ background = false } = {}) => {
+    if (notificationsRefreshing) {
+        return;
+    }
+
+    notificationsRefreshing = true;
+    notificationsLoading.value = !background;
+
+    router.reload({
+        only: ['bell', 'flash', 'errors'],
+        onSuccess: () => {
+            recentNotifications.value = page.props.bell?.recent ?? [];
+        },
+        onFinish: () => {
+            notificationsRefreshing = false;
+            notificationsLoading.value = false;
+        },
+    });
+};
+
+// Refreshing sends the spent flash, so skip the tick rather than cut a toast short.
+const alertOnScreen = () => Boolean(
+    (flash.value.success && visible('success'))
+    || (flash.value.error && visible('error'))
+    || (actionError.value && visible('action'))
+);
+
+onMounted(() => {
+    notificationsPoll = setInterval(() => {
+        if (document.hidden || alertOnScreen()) {
+            return;
+        }
+
+        fetchNotifications({ background: true });
+    }, NOTIFICATION_POLL_MS);
+});
+
+onBeforeUnmount(() => clearInterval(notificationsPoll));
+
+const openNotification = (item) => {
+    closeMenus();
+    router.post(item.readUrl, {}, {
+        preserveScroll: true,
+        onFinish: () => item.url && router.get(item.url),
+    });
+};
+
+const markAllNotificationsRead = () => {
+    router.post(route('cms.notifications.read-all'), {}, {
+        preserveScroll: true,
+        onSuccess: () => {
+            recentNotifications.value = recentNotifications.value.map((item) => ({ ...item, read: true }));
+        },
+    });
+};
+
+const clearAllNotifications = () => {
+    router.delete(route('cms.notifications.clear'), {
+        preserveScroll: true,
+        onSuccess: () => {
+            recentNotifications.value = [];
+        },
+        onFinish: () => {
+            confirmingClearAll.value = false;
+        },
+    });
 };
 
 const toggleProfileMenu = () => {
@@ -697,26 +783,70 @@ const logout = () => {
                                 @click.stop="toggleNotifications"
                             >
                                 <i class="bi bi-bell" />
-                                <span class="ym-icon-dot" aria-hidden="true" />
+                                <span v-if="unreadCount > 0" class="ym-icon-dot" aria-hidden="true" />
                             </button>
 
                             <div v-if="notificationsOpen" class="ym-popover ym-popover-notifications" role="menu">
-                                <div class="ym-popover-head">
-                                    <p class="ym-popover-title">{{ $t('common.notifications') }}</p>
-                                    <button type="button" class="ym-popover-link" @click="notificationsOpen = false">
-                                        {{ $t('common.markAllRead') }}
-                                    </button>
+                                <div v-if="confirmingClearAll" class="ym-popover-head">
+                                    <p class="ym-popover-title">{{ $t('common.clearNotificationsTitle') }}</p>
+                                    <div class="ym-popover-actions">
+                                        <button type="button" class="ym-popover-link" @click="confirmingClearAll = false">
+                                            {{ $t('common.cancel') }}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="ym-popover-link ym-popover-link--danger"
+                                            @click="clearAllNotifications"
+                                        >
+                                            {{ $t('common.clearAll') }}
+                                        </button>
+                                    </div>
                                 </div>
-                                <ul class="ym-notification-list">
+
+                                <div v-else class="ym-popover-head">
+                                    <p class="ym-popover-title">{{ $t('common.notifications') }}</p>
+                                    <div class="ym-popover-actions">
+                                        <button
+                                            v-if="unreadCount > 0"
+                                            type="button"
+                                            class="ym-popover-link"
+                                            @click="markAllNotificationsRead"
+                                        >
+                                            {{ $t('common.markAllRead') }}
+                                        </button>
+                                        <button
+                                            v-if="recentNotifications.length"
+                                            type="button"
+                                            class="ym-popover-link ym-popover-link--danger"
+                                            @click="confirmingClearAll = true"
+                                        >
+                                            {{ $t('common.clearAll') }}
+                                        </button>
+                                    </div>
+                                </div>
+                                <p v-if="notificationsLoading && !recentNotifications.length" class="ym-notification-empty">
+                                    {{ $t('common.loading') }}
+                                </p>
+                                <ul v-else-if="recentNotifications.length" class="ym-notification-list">
                                     <li
-                                        v-for="item in notifications"
-                                        :key="item.titleKey"
+                                        v-for="item in recentNotifications"
+                                        :key="item.id"
                                         class="ym-notification-item"
+                                        :class="{ 'ym-notification-item--unread': !item.read }"
+                                        @click="openNotification(item)"
                                     >
-                                        <p class="ym-notification-title">{{ $t(item.titleKey) }}</p>
+                                        <p class="ym-notification-title">{{ $t(item.message, item.params) }}</p>
                                         <p class="ym-notification-time">{{ item.time }}</p>
                                     </li>
                                 </ul>
+                                <p v-else class="ym-notification-empty">{{ $t('common.noNotifications') }}</p>
+                                <Link
+                                    class="ym-popover-link ym-notification-all"
+                                    :href="route('cms.notifications.index')"
+                                    @click="closeMenus"
+                                >
+                                    {{ $t('common.viewAllNotifications') }}
+                                </Link>
                             </div>
                         </div>
 
