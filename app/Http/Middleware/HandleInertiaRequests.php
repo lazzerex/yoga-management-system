@@ -3,8 +3,10 @@
 namespace App\Http\Middleware;
 
 use App\Models\Branch;
+use App\Modules\Profile\Controllers\NotificationController;
 use App\Support\Menu\Facades\Menu;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -57,6 +59,11 @@ class HandleInertiaRequests extends Middleware
             'flash' => [
                 'success' => $request->session()->get('success'),
                 'error' => $request->session()->get('error'),
+            ],
+            // Not 'notifications': page props merge over shared ones and would swallow it.
+            'bell' => [
+                'unread' => fn () => $user ? $user->unreadNotifications()->count() : 0,
+                'recent' => Inertia::optional(fn () => $user ? NotificationController::recentFor($user) : []),
             ],
             'menu' => fn () => Menu::forUser($user),
         ]);
