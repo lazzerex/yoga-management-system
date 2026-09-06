@@ -54,11 +54,66 @@ class ProfileController extends Controller
                     : null,
             ],
             'recentLogins' => $recentLogins,
+            'notificationEvents' => $this->notificationCatalogue($user),
+            'notificationChannels' => config('notifications.channels'),
             'endpoints' => [
                 'avatar' => route('cms.profile.avatar'),
                 'account' => route('user-profile-information.update'),
+                'notificationPreferences' => route('cms.profile.notification-preferences'),
             ],
         ]);
+    }
+
+    public function updateNotificationPreferences(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+        $catalogue = config('notifications.events');
+        $deviations = [];
+
+        foreach ($request->input('preferences', []) as $eventKey => $channels) {
+            $event = $catalogue[$eventKey] ?? null;
+
+            if (! $event || ! $this->canReceive($user, $event)) {
+                continue;
+            }
+
+            foreach ($this->activeChannels($event) as $channel => $default) {
+                $wanted = (bool) ($channels[$channel] ?? $default);
+
+                if ($wanted !== $default) {
+                    $deviations[$eventKey][$channel] = $wanted;
+                }
+            }
+        }
+
+        $user->update(['notification_preferences' => $deviations]);
+
+        return back()->with('success', ['key' => 'flash.notificationPreferencesUpdated']);
+    }
+
+    private function notificationCatalogue(User $user): array
+    {
+        return collect(config('notifications.events'))
+            ->filter(fn (array $event) => $this->canReceive($user, $event))
+            ->map(fn (array $event, string $key) => [
+                'key' => $key,
+                'label' => __($event['label']),
+                'channels' => collect($this->activeChannels($event))
+                    ->map(fn ($default, string $channel) => $user->wantsNotification($key, $channel))
+                    ->all(),
+            ])
+            ->values()
+            ->all();
+    }
+
+    private function canReceive(User $user, array $event): bool
+    {
+        return collect($event['audience'])->contains(fn (string $permission) => $user->can($permission));
+    }
+
+    private function activeChannels(array $event): array
+    {
+        return array_intersect_key($event['channels'], array_flip(config('notifications.channels')));
     }
 
     public function updateAvatar(UpdateAvatarRequest $request): RedirectResponse
