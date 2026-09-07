@@ -125,6 +125,10 @@ export default {
 
                     <span class="ym-note-body">
                         <span class="ym-note-text">{{ $t(item.message, item.params) }}</span>
+                        <span v-if="item.emailed" class="ym-note-emailed">
+                            <i class="bi bi-envelope" />
+                            {{ $t('common.notificationEmailed') }}
+                        </span>
                         <span class="ym-note-time">{{ item.time }}</span>
                     </span>
 
