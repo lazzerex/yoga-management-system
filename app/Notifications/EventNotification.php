@@ -22,7 +22,15 @@ abstract class EventNotification extends Notification implements ShouldQueue
         ));
     }
 
-    // Inline for the bell; mail keeps the default queue connection when it is turned on.
+    // The database channel prefers this over toArray(), so the flag costs no subclass changes.
+    public function toDatabase(object $notifiable): array
+    {
+        return $this->toArray($notifiable) + [
+            'emailed' => in_array('mail', $this->via($notifiable), true),
+        ];
+    }
+
+    // Inline for the bell; mail keeps the default queue connection.
     public function viaConnections(): array
     {
         return ['database' => 'sync'];
