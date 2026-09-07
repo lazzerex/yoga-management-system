@@ -22,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
     {
         // Seeded accounts sit on @yoga.local, so a live mailer without this
         // sends a burst of hard bounces at the provider.
-        if (! $this->app->isProduction() && config('mail.always_to')) {
+        if (! $this->app->environment('production') && config('mail.always_to')) {
             Mail::alwaysTo(config('mail.always_to'));
         }
 
