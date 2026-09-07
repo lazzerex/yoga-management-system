@@ -78,14 +78,17 @@ return [
         'delete_user' => 'Xóa Người dùng',
         'view_student_medical_notes' => 'Xem Ghi chú Y tế',
         'cancel_enrollment' => 'Huỷ đăng ký lớp',
+        'update_setting' => 'Cập nhật thiết lập',
     ],
     'searchUsers' => 'Tên, tên đăng nhập hoặc email',
     'allRoles' => 'Tất cả vai trò',
     'noUsers' => 'Không có người dùng nào khớp bộ lọc.',
     'settings' => [
         'subtitle' => 'Cấu hình chung của trung tâm',
-        'designNotice' => 'Các thiết lập này mới có giao diện, chưa được lưu. Các điều khiển bị khoá cho tới khi module được xây dựng.',
+        'designNotice' => 'Các dòng gắn nhãn "Đang chạy" được lưu và có hiệu lực ngay. Các dòng còn lại mới có giao diện và vẫn bị khoá cho tới khi được xây dựng.',
         'notWired' => 'Chức năng lưu chưa được kết nối.',
+        'liveFoot' => 'Lưu toàn bộ thiết lập đang chạy trên trang này.',
+        'liveBadge' => 'Đang chạy',
 
         'centre' => 'Trung tâm',
         'booking' => 'Quy tắc đặt lớp',

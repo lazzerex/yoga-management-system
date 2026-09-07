@@ -86,4 +86,5 @@ return [
     'accountUpdated' => 'Đã cập nhật thông tin tài khoản.',
     'notificationPreferencesUpdated' => 'Đã lưu tùy chọn thông báo.',
     'notificationsCleared' => 'Đã xóa tất cả thông báo.',
+    'settingsUpdated' => 'Đã lưu thiết lập.',
 ];

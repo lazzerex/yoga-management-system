@@ -41,4 +41,13 @@ return [
     'notificationsUnread' => ':count chưa đọc',
     'notificationsTotal' => 'tổng cộng :count',
     'notificationEmailed' => 'Chúng tôi đã gửi email kèm chi tiết cho bạn.',
+    'searchHint' => 'Nhập ít nhất hai ký tự.',
+    'searchEmpty' => 'Không có kết quả phù hợp.',
+    'searchGroups' => [
+        'students' => 'Học viên',
+        'coaches' => 'Giáo viên',
+        'invoices' => 'Hoá đơn',
+        'lessonPlans' => 'Giáo án',
+        'users' => 'Người dùng',
+    ],
 ];
