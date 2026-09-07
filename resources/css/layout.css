@@ -536,6 +536,15 @@
         line-height: 1.3;
     }
 
+    .ym-notification-emailed {
+        margin: 0.22rem 0 0;
+        font-size: 0.71rem;
+        color: #2f8368;
+        display: flex;
+        align-items: center;
+        gap: 0.28rem;
+    }
+
     .ym-notification-time {
         margin: 0.22rem 0 0;
         font-size: 0.72rem;
