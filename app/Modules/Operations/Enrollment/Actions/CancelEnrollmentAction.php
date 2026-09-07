@@ -4,6 +4,7 @@ namespace App\Modules\Operations\Enrollment\Actions;
 
 use App\Models\Enrollment;
 use App\Notifications\EnrollmentPromotedNotification;
+use App\Support\Settings;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
@@ -15,7 +16,7 @@ class CancelEnrollmentAction
     {
         $classSession = $enrollment->classSession;
         $sessionStart = Carbon::parse($classSession->session_date.' '.$classSession->start_time);
-        $cutoffHours = (int) config('enrollment.cancel_cutoff_hours');
+        $cutoffHours = (int) Settings::get('booking.cancel_cutoff_hours', config('enrollment.cancel_cutoff_hours'));
 
         if ($enforceCutoff && now()->addHours($cutoffHours)->greaterThan($sessionStart)) {
             throw ValidationException::withMessages([
