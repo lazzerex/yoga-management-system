@@ -33,7 +33,7 @@ class LessonPlanController extends Controller
     public function index(Request $request): Response
     {
         $user = $request->user();
-        $scope = $this->visibleScope($request);
+        $scope = self::visibleScope($request);
 
         $search = $request->string('search')->toString();
         $status = $request->string('status')->toString();
@@ -315,7 +315,7 @@ class LessonPlanController extends Controller
         return $user->can('operations.plans.manage') ? $user->coachProfile : null;
     }
 
-    private function visibleScope(Request $request): callable
+    public static function visibleScope(Request $request): callable
     {
         $user = $request->user();
         $branchId = $request->attributes->get('currentBranch')?->id;
