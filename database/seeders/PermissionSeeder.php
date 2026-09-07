@@ -43,6 +43,7 @@ class PermissionSeeder extends Seeder
             'admin.audit-logs.view',
             'admin.settings.view',
             'admin.settings.system.view',
+            'admin.settings.manage',
             'admin.dashboard.manage',
         ];
 
@@ -82,6 +83,7 @@ class PermissionSeeder extends Seeder
             'admin.audit-logs.view',
             'admin.settings.view',
             'admin.settings.system.view',
+            'admin.settings.manage',
             'admin.dashboard.manage',
         ]);
 
