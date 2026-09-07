@@ -372,6 +372,62 @@
         outline-offset: 1px;
     }
 
+    .ym-search-shell { position: relative; min-width: 0; }
+
+    .ym-search-panel {
+        position: absolute;
+        top: calc(100% + 0.42rem);
+        left: 0;
+        width: min(360px, calc(100vw - 2rem));
+        max-height: 60vh;
+        overflow-y: auto;
+        background: #ffffff;
+        border: 1px solid #d5deea;
+        border-radius: 0.62rem;
+        box-shadow: 0 12px 30px rgba(22, 34, 52, 0.16);
+        z-index: 40;
+        padding: 0.55rem;
+    }
+
+    .ym-search-note {
+        margin: 0;
+        padding: 0.4rem 0.35rem;
+        font-size: 0.78rem;
+        color: #7b8798;
+    }
+
+    .ym-search-group + .ym-search-group { margin-top: 0.45rem; }
+
+    .ym-search-group-title {
+        margin: 0 0 0.22rem;
+        padding: 0 0.35rem;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #8b97a8;
+    }
+
+    .ym-search-row {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 0.6rem;
+        width: 100%;
+        border: none;
+        border-radius: 0.42rem;
+        background: transparent;
+        padding: 0.36rem 0.35rem;
+        text-align: left;
+        cursor: pointer;
+    }
+
+    .ym-search-row:hover,
+    .ym-search-row.is-active { background: #eef3fa; }
+
+    .ym-search-row-title { font-size: 0.82rem; font-weight: 600; color: #33465e; }
+    .ym-search-row-meta { font-size: 0.74rem; color: #8b97a8; white-space: nowrap; }
+
     .ym-header-menu-wrap { position: relative; flex-shrink: 0; }
 
     .ym-branch-switch-btn {
@@ -846,6 +902,7 @@
         }
 
         .ym-topbar-actions { width: 100%; flex-wrap: wrap; }
+        .ym-search-shell { width: 100%; flex: 1 1 100%; }
         .ym-search-wrap { width: 100%; flex: 1 1 100%; }
         .ym-search { width: 100%; }
 
