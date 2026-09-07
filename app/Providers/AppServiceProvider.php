@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Support\Menu\AppMenuItem;
 use App\Support\Menu\MenuRegistry;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\ServiceProvider;
 use TorMorten\Eventy\Facades\Events as Eventy;
 
@@ -19,6 +20,12 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Seeded accounts sit on @yoga.local, so a live mailer without this
+        // sends a burst of hard bounces at the provider.
+        if (! $this->app->isProduction() && config('mail.always_to')) {
+            Mail::alwaysTo(config('mail.always_to'));
+        }
+
         // The core items register through the same hook the modules use, so the menu
         // is whatever register_backend_menu produces and never depends on who built
         // the registry. Priority 5 keeps them ahead of the modules.
