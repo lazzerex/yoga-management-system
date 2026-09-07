@@ -25,14 +25,7 @@ class StudentProfileController extends Controller
     public function index(Request $request): Response
     {
         $user = $request->user();
-        $seesEveryone = $user->can('operations.students.view.any');
-        $coachProfileId = $user->coachProfile?->id;
-
-        // Without the .any permission the directory narrows to students booked into the viewer's own sessions.
-        $scope = fn ($query) => $query->when(! $seesEveryone, fn ($q) => $q
-            ->whereHas('enrollments', fn ($e) => $e
-                ->where('status', 'booked')
-                ->whereHas('classSession', fn ($s) => $s->where('coach_profile_id', $coachProfileId))));
+        $scope = self::visibleScope($request);
 
         // medical_notes intentionally excluded from the list query, not just the response shape.
         $search = $request->string('search')->toString();
@@ -142,6 +135,19 @@ class StudentProfileController extends Controller
         return redirect()
             ->route('operations.students.index')
             ->with('success', ['key' => 'flash.studentProfileUpdated', 'params' => ['name' => $studentProfile->user->name]]);
+    }
+
+    // Without the .any permission the directory narrows to students booked into the viewer's own sessions.
+    public static function visibleScope(Request $request): callable
+    {
+        $user = $request->user();
+        $seesEveryone = $user->can('operations.students.view.any');
+        $coachProfileId = $user->coachProfile?->id;
+
+        return fn ($query) => $query->when(! $seesEveryone, fn ($q) => $q
+            ->whereHas('enrollments', fn ($e) => $e
+                ->where('status', 'booked')
+                ->whereHas('classSession', fn ($s) => $s->where('coach_profile_id', $coachProfileId))));
     }
 
     private function avatarUrl(StudentProfile $profile): ?string
