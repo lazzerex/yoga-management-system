@@ -9,6 +9,7 @@ use App\Modules\Admin\User\Actions\AuditUserAction;
 use App\Modules\Operations\Enrollment\Actions\CancelEnrollmentAction;
 use App\Modules\Operations\Enrollment\Actions\CreateEnrollmentAction;
 use App\Notifications\EnrollmentCancelledByStaffNotification;
+use App\Support\Settings;
 use App\Support\Table\SortsQueries;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
@@ -23,7 +24,7 @@ class EnrollmentController extends Controller
     public function index(Request $request): Response
     {
         $studentProfile = $request->user()->studentProfile;
-        $cutoffHours = (int) config('enrollment.cancel_cutoff_hours');
+        $cutoffHours = (int) Settings::get('booking.cancel_cutoff_hours', config('enrollment.cancel_cutoff_hours'));
 
         $myEnrollments = $studentProfile
             ? Enrollment::with([
