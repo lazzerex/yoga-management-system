@@ -6,7 +6,7 @@
 
 return [
 
-    'channels' => ['database'],
+    'channels' => ['database', 'mail'],
 
     'events' => [
 
