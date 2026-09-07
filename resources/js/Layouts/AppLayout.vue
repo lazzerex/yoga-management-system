@@ -81,6 +81,7 @@ announce();
 watch(() => page.props, announce);
 
 onBeforeUnmount(() => clearTimeout(successTimer));
+const centreName = computed(() => page.props.centreName ?? t('dashboard.systemName'));
 const userName = computed(() => page.props.auth?.user?.name ?? 'Guest');
 const userRole = computed(() => page.props.auth?.user?.role ?? 'member');
 const canAccessAdmin = computed(() => page.props.auth?.user?.canAccessAdmin ?? false);
@@ -309,6 +310,8 @@ const dashboardActionsOpen = ref(false);
 const dashboardActionsRef = ref(null);
 const branchSwitcherOpen = ref(false);
 const branchSwitcherRef = ref(null);
+const searchOpen = ref(false);
+const searchRef = ref(null);
 
 const currentBranch = computed(() => page.props.currentBranch);
 const allBranches = computed(() => page.props.allBranches ?? []);
@@ -480,11 +483,68 @@ const isTopNavActive = (item) => {
     return dashboardView.value === item.viewKey;
 };
 
+const canSearch = computed(() => page.props.auth?.user?.canSearch ?? false);
+const searchTerm = ref('');
+const searchGroups = ref([]);
+const searchLoading = ref(false);
+const searchIndex = ref(-1);
+let searchTimer = null;
+
+const searchRows = computed(() => searchGroups.value.flatMap((group) => group.rows));
+
+const runSearch = async (term) => {
+    searchLoading.value = true;
+
+    try {
+        const { data } = await window.axios.get(route('cms.search'), { params: { q: term } });
+        searchGroups.value = data.groups ?? [];
+    } catch {
+        searchGroups.value = [];
+    } finally {
+        searchLoading.value = false;
+        searchIndex.value = -1;
+    }
+};
+
+watch(searchTerm, (term) => {
+    clearTimeout(searchTimer);
+    const trimmed = term.trim();
+
+    if (trimmed.length < 2) {
+        searchGroups.value = [];
+        searchOpen.value = trimmed.length > 0;
+        return;
+    }
+
+    searchOpen.value = true;
+    searchTimer = setTimeout(() => runSearch(trimmed), 250);
+});
+
+const openSearchRow = (row) => {
+    if (!row) {
+        return;
+    }
+
+    searchOpen.value = false;
+    searchTerm.value = '';
+    router.visit(row.url);
+};
+
+const moveSearchIndex = (step) => {
+    if (!searchRows.value.length) {
+        return;
+    }
+
+    const next = searchIndex.value + step;
+    searchIndex.value = (next + searchRows.value.length) % searchRows.value.length;
+};
+
 const closeMenus = () => {
     notificationsOpen.value = false;
     profileMenuOpen.value = false;
     dashboardActionsOpen.value = false;
     branchSwitcherOpen.value = false;
+    searchOpen.value = false;
 };
 
 const toggleNotifications = () => {
@@ -644,6 +704,10 @@ const handleGlobalClick = (event) => {
     if (branchSwitcherOpen.value && branchSwitcherRef.value && !branchSwitcherRef.value.contains(target)) {
         branchSwitcherOpen.value = false;
     }
+
+    if (searchOpen.value && searchRef.value && !searchRef.value.contains(target)) {
+        searchOpen.value = false;
+    }
 };
 
 onMounted(() => {
@@ -654,6 +718,7 @@ onMounted(() => {
 watch(() => page.url, closeSidebar);
 
 onBeforeUnmount(() => {
+    clearTimeout(searchTimer);
     document.removeEventListener('click', handleGlobalClick);
     window.removeEventListener('ym-dashboard-tabs-updated', handleDashboardTabsUpdated);
 });
@@ -723,7 +788,7 @@ const logout = () => {
                             <i class="bi bi-list" />
                         </button>
                         <div>
-                            <p class="ym-overline">{{ $t('dashboard.systemName') }}</p>
+                            <p class="ym-overline">{{ centreName }}</p>
                             <h1 class="ym-header-title">{{ title }}</h1>
                         </div>
                     </div>
@@ -758,15 +823,48 @@ const logout = () => {
                             </div>
                         </div>
 
-                        <label class="ym-search-wrap" :aria-label="$t('common.search')">
-                            <i class="bi bi-search ym-search-icon" />
-                            <input
-                                type="search"
-                                class="ym-search"
-                                :placeholder="$t('common.search')"
-                                :aria-label="$t('common.search')"
-                            />
-                        </label>
+                        <div v-if="canSearch" ref="searchRef" class="ym-search-shell">
+                            <label class="ym-search-wrap" :aria-label="$t('common.search')">
+                                <i class="bi bi-search ym-search-icon" />
+                                <input
+                                    v-model="searchTerm"
+                                    type="search"
+                                    class="ym-search"
+                                    :placeholder="$t('common.search')"
+                                    :aria-label="$t('common.search')"
+                                    @focus="searchOpen = searchTerm.trim().length > 0"
+                                    @keydown.down.prevent="moveSearchIndex(1)"
+                                    @keydown.up.prevent="moveSearchIndex(-1)"
+                                    @keydown.enter.prevent="openSearchRow(searchRows[searchIndex] ?? searchRows[0])"
+                                    @keydown.esc="searchOpen = false"
+                                />
+                            </label>
+
+                            <div v-if="searchOpen" class="ym-search-panel">
+                                <p v-if="searchTerm.trim().length < 2" class="ym-search-note">
+                                    {{ $t('common.searchHint') }}
+                                </p>
+                                <p v-else-if="searchLoading" class="ym-search-note">{{ $t('common.loading') }}</p>
+                                <p v-else-if="!searchGroups.length" class="ym-search-note">
+                                    {{ $t('common.searchEmpty') }}
+                                </p>
+
+                                <div v-for="group in searchGroups" :key="group.key" class="ym-search-group">
+                                    <p class="ym-search-group-title">{{ $t(`common.searchGroups.${group.key}`) }}</p>
+                                    <button
+                                        v-for="row in group.rows"
+                                        :key="`${group.key}-${row.id}`"
+                                        type="button"
+                                        class="ym-search-row"
+                                        :class="{ 'is-active': searchRows[searchIndex] === row }"
+                                        @click="openSearchRow(row)"
+                                    >
+                                        <span class="ym-search-row-title">{{ row.title }}</span>
+                                        <span v-if="row.meta" class="ym-search-row-meta">{{ row.meta }}</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
 
                         <button
                             type="button"
