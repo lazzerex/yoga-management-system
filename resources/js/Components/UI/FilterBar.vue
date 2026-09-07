@@ -17,6 +17,11 @@ const wrap = ref(null);
 const close = () => (open.value = false);
 
 const onDocumentClick = (event) => {
+    // A control that conditioned itself away is detached by now, not outside.
+    if (! event.target.isConnected) {
+        return;
+    }
+
     if (open.value && wrap.value && ! wrap.value.contains(event.target)) {
         close();
     }
