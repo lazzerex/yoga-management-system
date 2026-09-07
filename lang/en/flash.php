@@ -86,4 +86,5 @@ return [
     'accountUpdated' => 'Account details updated.',
     'notificationPreferencesUpdated' => 'Notification preferences saved.',
     'notificationsCleared' => 'All notifications cleared.',
+    'settingsUpdated' => 'Settings saved.',
 ];

@@ -41,4 +41,13 @@ return [
     'notificationsUnread' => ':count unread',
     'notificationsTotal' => ':count in total',
     'notificationEmailed' => 'We have sent you an email with the details.',
+    'searchHint' => 'Type at least two characters.',
+    'searchEmpty' => 'Nothing matches that.',
+    'searchGroups' => [
+        'students' => 'Students',
+        'coaches' => 'Coaches',
+        'invoices' => 'Invoices',
+        'lessonPlans' => 'Lesson plans',
+        'users' => 'Users',
+    ],
 ];

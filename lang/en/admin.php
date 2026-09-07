@@ -78,14 +78,17 @@ return [
         'delete_user' => 'Delete User',
         'view_student_medical_notes' => 'View Medical Notes',
         'cancel_enrollment' => 'Cancel Enrollment',
+        'update_setting' => 'Update Setting',
     ],
     'searchUsers' => 'Name, username or email',
     'allRoles' => 'All roles',
     'noUsers' => 'No users match these filters.',
     'settings' => [
         'subtitle' => 'Centre-wide configuration',
-        'designNotice' => 'These settings are designed but not stored yet. The controls are disabled until the module is built.',
+        'designNotice' => 'Rows marked live are stored and take effect immediately. The rest are designed and stay disabled until they are built.',
         'notWired' => 'Saving is not connected yet.',
+        'liveFoot' => 'Saves every live setting on this page.',
+        'liveBadge' => 'Live',
 
         'centre' => 'Centre',
         'booking' => 'Booking rules',
