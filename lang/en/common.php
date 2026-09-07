@@ -40,4 +40,5 @@ return [
     'clearNotificationsBody' => 'This removes every notification from your list. It cannot be undone.',
     'notificationsUnread' => ':count unread',
     'notificationsTotal' => ':count in total',
+    'notificationEmailed' => 'We have sent you an email with the details.',
 ];

@@ -40,4 +40,5 @@ return [
     'clearNotificationsBody' => 'Thao tác này xóa toàn bộ thông báo khỏi danh sách và không thể hoàn tác.',
     'notificationsUnread' => ':count chưa đọc',
     'notificationsTotal' => 'tổng cộng :count',
+    'notificationEmailed' => 'Chúng tôi đã gửi email kèm chi tiết cho bạn.',
 ];
