@@ -115,4 +115,17 @@ return [
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Redirect Every Recipient
+    |--------------------------------------------------------------------------
+    |
+    | Outside production, every message is redirected to this address. The
+    | seeded demo accounts sit on an unroutable domain, so a live run without
+    | this would burst hard bounces at the provider.
+    |
+    */
+
+    'always_to' => env('MAIL_ALWAYS_TO'),
+
 ];
