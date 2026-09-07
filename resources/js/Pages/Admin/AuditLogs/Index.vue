@@ -23,6 +23,7 @@ const ACTION_BADGE_CLASSES = {
     delete_user: 'ym-action-badge--delete',
     view_student_medical_notes: 'ym-action-badge--update',
     cancel_enrollment: 'ym-action-badge--delete',
+    update_setting: 'ym-action-badge--update',
 };
 
 const actionBadgeClass = (action) => ACTION_BADGE_CLASSES[action] ?? '';
@@ -57,6 +58,8 @@ const formatMeta = (action, meta) => {
             return '—';
         case 'cancel_enrollment':
             return `${meta.class} · ${meta.session_date}`;
+        case 'update_setting':
+            return `${meta.key}: ${meta.from || '—'} → ${meta.to}`;
         default:
             return '—';
     }
@@ -121,6 +124,7 @@ export default {
                             <option value="delete_user">{{ $t('admin.auditActions.delete_user') }}</option>
                             <option value="view_student_medical_notes">{{ $t('admin.auditActions.view_student_medical_notes') }}</option>
                             <option value="cancel_enrollment">{{ $t('admin.auditActions.cancel_enrollment') }}</option>
+                            <option value="update_setting">{{ $t('admin.auditActions.update_setting') }}</option>
                         </select>
                     </label>
                     <DateRange v-model:from="filters.from" v-model:to="filters.to" :label="$t('admin.time')" />
