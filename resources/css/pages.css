@@ -474,6 +474,14 @@
 
     .ym-note-row.is-unread .ym-note-text { color: var(--u-ink); font-weight: 600; }
 
+    .ym-note-emailed {
+        color: var(--u-brand);
+        font-size: 0.75rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
     .ym-note-time {
         color: var(--u-ink-4);
         font-size: 0.75rem;
