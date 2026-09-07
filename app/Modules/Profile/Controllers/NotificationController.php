@@ -63,6 +63,7 @@ class NotificationController extends Controller
             'message' => $notification->data['message'] ?? '',
             'params' => $notification->data['params'] ?? [],
             'url' => $notification->data['url'] ?? null,
+            'emailed' => (bool) ($notification->data['emailed'] ?? false),
             'read' => $notification->read_at !== null,
             'time' => $notification->created_at->diffForHumans(),
             'readUrl' => route('cms.notifications.read', $notification->id),
