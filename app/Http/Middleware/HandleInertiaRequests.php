@@ -4,7 +4,9 @@ namespace App\Http\Middleware;
 
 use App\Models\Branch;
 use App\Modules\Profile\Controllers\NotificationController;
+use App\Modules\Search\Controllers\SearchController;
 use App\Support\Menu\Facades\Menu;
+use App\Support\Settings;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Middleware;
@@ -43,6 +45,8 @@ class HandleInertiaRequests extends Middleware
         $currentBranch = $request->attributes->get('currentBranch');
 
         return array_merge(parent::share($request), [
+            // Lazy: share() runs before SetLocale, so a plain value would resolve its fallback under 'en'.
+            'centreName' => fn () => Settings::get('centre.name') ?: __('dashboard.systemName'),
             'currentBranch' => $currentBranch ? ['id' => $currentBranch->id, 'name' => $currentBranch->name] : null,
             'allBranches' => fn () => Branch::active()->orderBy('name')->get(['id', 'name']),
             'auth' => [
@@ -54,6 +58,7 @@ class HandleInertiaRequests extends Middleware
                     'role' => $user->role,
                     'canAccessAdmin' => $user->canAccessAdmin(),
                     'canViewCoachDashboard' => $user->can('coach.dashboard.view'),
+                    'canSearch' => SearchController::isAvailableTo($user),
                 ] : null,
             ],
             'flash' => [
