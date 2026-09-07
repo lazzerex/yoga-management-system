@@ -624,6 +624,11 @@ const handleDashboardTabsUpdated = (event) => {
 const handleGlobalClick = (event) => {
     const target = event.target;
 
+    // A control that conditioned itself away is detached by now, not outside.
+    if (!target.isConnected) {
+        return;
+    }
+
     if (notificationsOpen.value && notificationsRef.value && !notificationsRef.value.contains(target)) {
         notificationsOpen.value = false;
     }
@@ -836,6 +841,10 @@ const logout = () => {
                                         @click="openNotification(item)"
                                     >
                                         <p class="ym-notification-title">{{ $t(item.message, item.params) }}</p>
+                                        <p v-if="item.emailed" class="ym-notification-emailed">
+                                            <i class="bi bi-envelope" />
+                                            {{ $t('common.notificationEmailed') }}
+                                        </p>
                                         <p class="ym-notification-time">{{ item.time }}</p>
                                     </li>
                                 </ul>
