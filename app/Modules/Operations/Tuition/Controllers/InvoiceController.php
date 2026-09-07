@@ -29,7 +29,7 @@ class InvoiceController extends Controller
 
     public function index(Request $request, TuitionStatsAction $stats): Response
     {
-        $scope = $this->branchScope($request);
+        $scope = self::branchScope($request);
         $canManage = $request->user()->can('operations.tuition.manage');
 
         $search = $request->string('search')->toString();
@@ -193,7 +193,7 @@ class InvoiceController extends Controller
 
     public function export(Request $request): StreamedResponse
     {
-        $scope = $this->branchScope($request);
+        $scope = self::branchScope($request);
         $filename = 'invoices-'.now()->format('Y-m-d').'.csv';
 
         return response()->streamDownload(function () use ($scope) {
@@ -224,7 +224,7 @@ class InvoiceController extends Controller
         }, $filename, ['Content-Type' => 'text/csv']);
     }
 
-    private function branchScope(Request $request): callable
+    public static function branchScope(Request $request): callable
     {
         $branchId = $request->attributes->get('currentBranch')?->id;
 
