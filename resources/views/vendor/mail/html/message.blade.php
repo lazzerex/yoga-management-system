@@ -1,8 +1,9 @@
+@php($centreName = \App\Support\Settings::get('centre.name', config('app.name')))
 <x-mail::layout>
 {{-- Header --}}
 <x-slot:header>
 <x-mail::header :url="config('app.url')">
-{{ config('app.name') }}
+{{ $centreName }}
 </x-mail::header>
 </x-slot:header>
 
@@ -21,7 +22,7 @@
 {{-- Footer --}}
 <x-slot:footer>
 <x-mail::footer>
-© {{ date('Y') }} {{ config('app.name') }}. {{ __('All rights reserved.') }}
+© {{ date('Y') }} {{ $centreName }}. {{ __('All rights reserved.') }}
 </x-mail::footer>
 </x-slot:footer>
 </x-mail::layout>
