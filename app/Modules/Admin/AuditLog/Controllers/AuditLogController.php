@@ -13,7 +13,7 @@ class AuditLogController extends Controller
 {
     use SortsQueries;
 
-    private const VALID_ACTIONS = ['create_user', 'update_user_info', 'change_password', 'assign_role', 'remove_role', 'delete_user', 'view_student_medical_notes', 'cancel_enrollment'];
+    private const VALID_ACTIONS = ['create_user', 'update_user_info', 'change_password', 'assign_role', 'remove_role', 'delete_user', 'view_student_medical_notes', 'cancel_enrollment', 'update_setting'];
 
     public function index(Request $request): Response
     {
