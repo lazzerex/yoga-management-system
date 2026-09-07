@@ -2,6 +2,7 @@
 
 use App\Modules\Admin\AuditLog\Controllers\AuditLogController;
 use App\Modules\Admin\LoginLog\Controllers\LoginLogController;
+use App\Modules\Admin\Settings\Controllers\SettingsController;
 use App\Modules\Admin\User\Controllers\UserController;
 use App\Modules\Dashboard\Controllers\DashboardController;
 use App\Modules\Operations\Attendance\Controllers\AttendanceController;
@@ -22,6 +23,7 @@ use App\Modules\Operations\Tuition\Controllers\TuitionPlanController;
 use App\Modules\Profile\Controllers\LocaleController;
 use App\Modules\Profile\Controllers\NotificationController;
 use App\Modules\Profile\Controllers\ProfileController;
+use App\Modules\Search\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -39,6 +41,8 @@ Route::prefix('cms')->group(function () {
         Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('cms.profile.avatar');
         Route::post('/profile/notification-preferences', [ProfileController::class, 'updateNotificationPreferences'])->name('cms.profile.notification-preferences');
         Route::post('/locale', [LocaleController::class, 'update'])->name('cms.locale.update');
+
+        Route::get('/search', SearchController::class)->middleware('throttle:30,1')->name('cms.search');
 
         Route::get('/notifications', [NotificationController::class, 'index'])->name('cms.notifications.index');
         Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('cms.notifications.read-all');
@@ -254,11 +258,14 @@ Route::prefix('cms')->group(function () {
                 Route::get('/audit-logs/export', [AuditLogController::class, 'export'])->name('audit-logs.export');
             });
             Route::middleware('permission:admin.settings.view')->group(function () {
-                Route::get('/settings/general', fn () => inertia('Admin/Settings/Mock', ['title' => 'General']))->name('settings.general');
+                Route::get('/settings/general', [SettingsController::class, 'general'])->name('settings.general');
+            });
+            Route::middleware('permission:admin.settings.manage')->group(function () {
+                Route::post('/settings', [SettingsController::class, 'update'])->name('settings.update');
             });
             Route::middleware('permission:admin.settings.system.view')->group(function () {
-                Route::get('/settings/system/general', fn () => inertia('Admin/Settings/Mock', ['title' => 'System / General']))->name('settings.system.general');
-                Route::get('/settings/system/advanced', fn () => inertia('Admin/Settings/Mock', ['title' => 'System / Advanced']))->name('settings.system.advanced');
+                Route::get('/settings/system/general', [SettingsController::class, 'systemGeneral'])->name('settings.system.general');
+                Route::get('/settings/system/advanced', [SettingsController::class, 'systemAdvanced'])->name('settings.system.advanced');
             });
         });
     });
