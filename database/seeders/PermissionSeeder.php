@@ -28,6 +28,7 @@ class PermissionSeeder extends Seeder
             'operations.plans.view.any',
             'operations.plans.manage',
             'operations.plans.review',
+            'operations.plans.ai.suggest',
             'operations.files.view',
             'operations.files.manage',
             'operations.tuition.view',
@@ -96,6 +97,7 @@ class PermissionSeeder extends Seeder
             'operations.attendance.manage',
             'operations.plans.view',
             'operations.plans.manage',
+            'operations.plans.ai.suggest',
             'operations.files.view',
             'coach.dashboard.view',
         ]);
