@@ -9,16 +9,22 @@ use App\Models\ClassType;
 use App\Models\CoachProfile;
 use App\Models\LessonPlan;
 use App\Models\User;
+use App\Modules\Admin\User\Actions\AuditUserAction;
 use App\Modules\Operations\LessonPlan\Actions\CreateLessonPlanAction;
 use App\Modules\Operations\LessonPlan\Actions\DeleteLessonPlanAction;
 use App\Modules\Operations\LessonPlan\Actions\ReviewLessonPlanAction;
+use App\Modules\Operations\LessonPlan\Actions\ReviewPlanAction;
 use App\Modules\Operations\LessonPlan\Actions\SubmitLessonPlanAction;
+use App\Modules\Operations\LessonPlan\Actions\SuggestSequenceAction;
 use App\Modules\Operations\LessonPlan\Actions\UpdateLessonPlanAction;
 use App\Modules\Operations\LessonPlan\Requests\ReviewLessonPlanRequest;
 use App\Modules\Operations\LessonPlan\Requests\StoreLessonPlanRequest;
+use App\Modules\Operations\LessonPlan\Requests\SuggestSequenceRequest;
 use App\Modules\Operations\LessonPlan\Requests\UpdateLessonPlanRequest;
 use App\Modules\Operations\Media\Actions\AuthorizeMediaAccessAction;
+use App\Support\Ai\GeminiClient;
 use App\Support\Table\SortsQueries;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -27,6 +33,9 @@ use Inertia\Response;
 class LessonPlanController extends Controller
 {
     use SortsQueries;
+
+    // Gemini reads PDFs too, but only images may be sent: see D48 in the Week 11 plan.
+    private const AI_IMAGE_TYPES = ['image/jpeg', 'image/png'];
 
     public function __construct(private AuthorizeMediaAccessAction $access) {}
 
@@ -118,6 +127,7 @@ class LessonPlanController extends Controller
             'selectedBranchId' => $request->attributes->get('currentBranch')?->id,
             'endpoints' => [
                 'store' => route('operations.lesson-plans.store'),
+                'suggest' => $this->suggestEndpoint($request->user()),
                 'index' => route('operations.lesson-planning'),
             ],
         ]);
@@ -150,9 +160,7 @@ class LessonPlanController extends Controller
         ]);
 
         $owns = $this->owns($user, $lessonPlan);
-        $canReview = $user->can('operations.plans.review')
-            && $lessonPlan->status === 'pending'
-            && $lessonPlan->coachProfile->user_id !== $user->id;
+        $canReview = $this->canReview($user, $lessonPlan);
 
         return inertia('Operations/LessonPlans/Show', [
             'plan' => $this->row($lessonPlan) + [
@@ -173,6 +181,7 @@ class LessonPlanController extends Controller
                 'submit' => $owns && $lessonPlan->isEditable() ? route('operations.lesson-plans.submit', $lessonPlan) : null,
                 'destroy' => $owns && $lessonPlan->status === 'draft' ? route('operations.lesson-plans.destroy', $lessonPlan) : null,
                 'review' => $canReview ? route('operations.lesson-plans.review', $lessonPlan) : null,
+                'check' => $canReview && GeminiClient::isConfigured() ? route('operations.lesson-plans.check', $lessonPlan) : null,
                 'index' => route('operations.lesson-planning'),
             ],
         ]);
@@ -202,6 +211,7 @@ class LessonPlanController extends Controller
             'options' => $this->formOptions($request),
             'endpoints' => [
                 'update' => route('operations.lesson-plans.update', $lessonPlan),
+                'suggest' => $this->suggestEndpoint($request->user()),
                 'show' => route('operations.lesson-plans.show', $lessonPlan),
             ],
         ]);
@@ -249,6 +259,66 @@ class LessonPlanController extends Controller
         ]);
     }
 
+    public function suggest(SuggestSequenceRequest $request, SuggestSequenceAction $action): JsonResponse
+    {
+        abort_unless(GeminiClient::isConfigured(), 403);
+
+        $validated = $request->validated();
+        $classType = ClassType::findOrFail($validated['class_type_id']);
+
+        $steps = $action->execute($request->user(), [
+            'class_type' => $classType->name,
+            'level' => $validated['level'],
+            'duration_minutes' => (int) $validated['duration_minutes'],
+            'objective' => trim($validated['objective'] ?? ''),
+        ]);
+
+        return $steps === null
+            ? response()->json(['error' => 'operations.aiUnavailable'])
+            : response()->json(['steps' => $steps]);
+    }
+
+    /**
+     * Advisory only. This never writes to the plan and is never wired to the decision.
+     */
+    public function check(Request $request, LessonPlan $lessonPlan, ReviewPlanAction $action, AuditUserAction $audit): JsonResponse
+    {
+        $user = $request->user();
+        abort_unless($this->canReview($user, $lessonPlan) && GeminiClient::isConfigured(), 403);
+
+        $request->validate(['media_id' => ['nullable', 'integer']]);
+        $image = null;
+
+        if ($mediaId = $request->integer('media_id')) {
+            $image = $lessonPlan->getMedia('attachments')->firstWhere('id', $mediaId);
+
+            // Own-plan and image-only, checked here and not trusted from the form.
+            if ($image === null || ! in_array($image->mime_type, self::AI_IMAGE_TYPES, true)) {
+                return response()->json(['error' => 'operations.aiImageInvalid'], 422);
+            }
+
+            $audit->execute($user, 'ai_attachment_sent', $lessonPlan->coachProfile->user, [
+                'plan_id' => $lessonPlan->id,
+                'plan_title' => $lessonPlan->title,
+                'media_id' => $image->id,
+                'file_name' => $image->file_name,
+            ]);
+        }
+
+        $sections = $action->execute($user, $lessonPlan, $image);
+
+        return $sections === null
+            ? response()->json(['error' => 'operations.aiUnavailable'])
+            : response()->json(['sections' => $sections]);
+    }
+
+    private function suggestEndpoint(User $user): ?string
+    {
+        return $user->can('operations.plans.ai.suggest') && GeminiClient::isConfigured()
+            ? route('operations.lesson-plans.suggest')
+            : null;
+    }
+
     private function attachments(User $user, LessonPlan $plan): array
     {
         return $plan->getMedia('attachments')->map(fn ($media) => [
@@ -256,6 +326,7 @@ class LessonPlanController extends Controller
             'name' => $media->name,
             'file_name' => $media->file_name,
             'size' => (int) $media->size,
+            'is_image' => in_array($media->mime_type, self::AI_IMAGE_TYPES, true),
             'showUrl' => route('operations.files.show', $media),
             'deleteUrl' => $this->access->canDelete($user, $media) ? route('operations.files.destroy', $media) : null,
         ])->all();
@@ -324,6 +395,14 @@ class LessonPlanController extends Controller
         return fn ($query) => $query
             ->when($branchId, fn ($q) => $q->where('branch_id', $branchId))
             ->when(! $seesEveryone, fn ($q) => $q->where('coach_profile_id', $user->coachProfile?->id));
+    }
+
+    // The AI critique sits beside the decision, so it lives and dies with the same test.
+    private function canReview(User $user, LessonPlan $lessonPlan): bool
+    {
+        return $user->can('operations.plans.review')
+            && $lessonPlan->status === 'pending'
+            && $lessonPlan->coachProfile->user_id !== $user->id;
     }
 
     private function canView(User $user, LessonPlan $lessonPlan): bool
