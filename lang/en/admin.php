@@ -79,6 +79,7 @@ return [
         'view_student_medical_notes' => 'View Medical Notes',
         'cancel_enrollment' => 'Cancel Enrollment',
         'update_setting' => 'Update Setting',
+        'ai_attachment_sent' => 'Sent Attachment to AI',
     ],
     'searchUsers' => 'Name, username or email',
     'allRoles' => 'All roles',
