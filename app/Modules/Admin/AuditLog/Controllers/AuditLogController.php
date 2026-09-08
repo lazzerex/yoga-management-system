@@ -13,7 +13,7 @@ class AuditLogController extends Controller
 {
     use SortsQueries;
 
-    private const VALID_ACTIONS = ['create_user', 'update_user_info', 'change_password', 'assign_role', 'remove_role', 'delete_user', 'view_student_medical_notes', 'cancel_enrollment', 'update_setting'];
+    private const VALID_ACTIONS = ['create_user', 'update_user_info', 'change_password', 'assign_role', 'remove_role', 'delete_user', 'view_student_medical_notes', 'cancel_enrollment', 'update_setting', 'ai_attachment_sent'];
 
     public function index(Request $request): Response
     {
@@ -27,7 +27,7 @@ class AuditLogController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('subject_name', 'like', "%{$search}%")
-                  ->orWhereHas('causer', fn ($q2) => $q2->where('name', 'like', "%{$search}%"));
+                    ->orWhereHas('causer', fn ($q2) => $q2->where('name', 'like', "%{$search}%"));
             });
         }
 
@@ -62,7 +62,7 @@ class AuditLogController extends Controller
 
     public function export(): StreamedResponse
     {
-        $filename = 'audit-logs-' . now()->format('Y-m-d') . '.csv';
+        $filename = 'audit-logs-'.now()->format('Y-m-d').'.csv';
 
         return response()->streamDownload(function () {
             $handle = fopen('php://output', 'w');
