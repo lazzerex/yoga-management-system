@@ -147,9 +147,14 @@ Route::prefix('cms')->group(function () {
                     Route::post('/', [LessonPlanController::class, 'store'])->name('store');
                 });
 
+                Route::middleware(['permission:operations.plans.ai.suggest', 'throttle:10,60'])->group(function () {
+                    Route::post('/suggest', [LessonPlanController::class, 'suggest'])->name('suggest');
+                });
+
                 Route::middleware('permission:operations.plans.review')->group(function () {
                     Route::get('/pending', [LessonPlanController::class, 'pending'])->name('pending');
                     Route::post('/{lessonPlan}/review', [LessonPlanController::class, 'review'])->name('review');
+                    Route::post('/{lessonPlan}/check', [LessonPlanController::class, 'check'])->middleware('throttle:10,60')->name('check');
                 });
 
                 Route::middleware('permission:operations.plans.view')->group(function () {
