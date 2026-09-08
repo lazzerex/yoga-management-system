@@ -7,6 +7,7 @@ import TextInput from '@/Components/Form/TextInput.vue';
 import Select from '@/Components/Form/Select.vue';
 import Textarea from '@/Components/Form/TextArea.vue';
 import FileInput from '@/Components/Form/FileInput.vue';
+import AiSuggestPanel from '@/Components/LessonPlan/AiSuggestPanel.vue';
 
 const props = defineProps({
     options: Object,
@@ -44,6 +45,13 @@ watch(() => props.selectedBranchId, (branchId) => {
     }
 });
 
+const aiPayload = computed(() => ({
+    class_type_id: form.class_type_id,
+    level: form.level,
+    duration_minutes: form.duration_minutes,
+    objective: form.objective,
+}));
+
 const submit = () => {
     form.post(props.endpoints.store);
 };
@@ -67,6 +75,9 @@ export default {
 
         <form @submit.prevent="submit">
             <section class="ym-card">
+                <div class="ym-card-head">
+                    <h2 class="ym-card-title">{{ $t('operations.planDetails') }}</h2>
+                </div>
                 <div class="ym-card-body">
                     <div class="ym-form-grid-2">
                         <Field class="ym-form-span" :label="$t('operations.planTitle')" :error="form.errors.title">
@@ -87,20 +98,27 @@ export default {
                         <Field class="ym-form-span" :label="$t('operations.planSession')" :error="form.errors.class_session_id">
                             <Select v-model="form.class_session_id" :options="sessionOptions" />
                         </Field>
+                        <Field class="ym-form-span" :label="$t('operations.planObjective')" :error="form.errors.objective">
+                            <Textarea v-model="form.objective" />
+                        </Field>
                     </div>
                 </div>
             </section>
+
+            <AiSuggestPanel
+                v-if="endpoints.suggest"
+                :endpoint="endpoints.suggest"
+                :payload="aiPayload"
+                @apply="(text) => (form.asana_sequence = text)"
+            />
 
             <section class="ym-card">
                 <div class="ym-card-head">
                     <h2 class="ym-card-title">{{ $t('operations.planAsanaSequence') }}</h2>
                 </div>
                 <div class="ym-card-body ym-stack">
-                    <Field :label="$t('operations.planObjective')" :error="form.errors.objective">
-                        <Textarea v-model="form.objective" />
-                    </Field>
                     <Field :label="$t('operations.planAsanaSequence')" :error="form.errors.asana_sequence">
-                        <Textarea v-model="form.asana_sequence" />
+                        <Textarea v-model="form.asana_sequence" :rows="10" auto-resize />
                     </Field>
                     <Field
                         :label="$t('operations.planAttachments')"
