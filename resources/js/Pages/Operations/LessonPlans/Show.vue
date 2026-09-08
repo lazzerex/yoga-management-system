@@ -5,6 +5,7 @@ import { trans as t } from 'laravel-vue-i18n';
 import Field from '@/Components/Form/Field.vue';
 import Textarea from '@/Components/Form/TextArea.vue';
 import Modal from '@/Components/UI/Modal.vue';
+import AiCheckPanel from '@/Components/LessonPlan/AiCheckPanel.vue';
 import { formatBytes } from '@/composables/useBytes.js';
 
 const props = defineProps({
@@ -124,6 +125,8 @@ export default {
                         </div>
                     </div>
                 </section>
+
+                <AiCheckPanel v-if="endpoints.check" :endpoint="endpoints.check" :attachments="plan.attachments" />
 
                 <section class="ym-card">
                     <div class="ym-card-head">
