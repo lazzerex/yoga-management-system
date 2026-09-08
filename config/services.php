@@ -35,4 +35,13 @@ return [
         ],
     ],
 
+    // AI lesson-plan assistance. 'fake' is the shipped default because a fresh clone
+    // holds no key and the free tier is quota-capped: the demo must not need a live call.
+    'gemini' => [
+        'driver' => env('AI_DRIVER', 'fake'),
+        'key' => env('GEMINI_API_KEY'),
+        'model' => env('GEMINI_MODEL', 'gemini-3.5-flash'),
+        'timeout' => (int) env('GEMINI_TIMEOUT', 20),
+    ],
+
 ];
