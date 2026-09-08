@@ -79,6 +79,7 @@ return [
         'view_student_medical_notes' => 'Xem Ghi chú Y tế',
         'cancel_enrollment' => 'Huỷ đăng ký lớp',
         'update_setting' => 'Cập nhật thiết lập',
+        'ai_attachment_sent' => 'Gửi tệp đính kèm cho AI',
     ],
     'searchUsers' => 'Tên, tên đăng nhập hoặc email',
     'allRoles' => 'Tất cả vai trò',
