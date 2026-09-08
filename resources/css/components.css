@@ -607,6 +607,9 @@
     }
     .ym-textarea:focus { outline: 2px solid #8fadd8; outline-offset: 1px; }
 
+    /* Grown from its own content in JS, so the manual drag handle would fight it. */
+    .ym-textarea.is-autoresize { resize: none; overflow-y: auto; }
+
     /* Checkbox */
     .ym-checkbox-wrap {
         display: inline-flex;
