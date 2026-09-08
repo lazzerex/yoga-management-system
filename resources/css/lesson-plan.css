@@ -102,3 +102,282 @@
     flex-direction: column;
     gap: 0.25rem;
 }
+
+/* AI panels: the suggestion panel on the plan form and the check card on the plan page. */
+
+.ym-ai-card { border-color: var(--u-brand-line); }
+
+.ym-ai-card > .ym-card-head {
+    background: linear-gradient(90deg, var(--u-brand-soft), transparent 65%);
+    border-bottom-color: var(--u-brand-line);
+}
+
+.ym-ai-card > .ym-card-head .ym-card-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--u-brand-deep);
+}
+
+.ym-ai-state {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+}
+
+.ym-ai-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.35rem;
+    height: 1.35rem;
+    flex: none;
+    border-radius: 0.35rem;
+    background: var(--u-brand-soft);
+    color: var(--u-brand);
+    font-size: 0.72rem;
+}
+
+.ym-ai-sub {
+    margin: 0.15rem 0 0;
+    font-size: 0.76rem;
+    line-height: 1.5;
+    color: var(--u-ink-4);
+}
+
+.ym-ai-status {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin: 0;
+    font-size: 0.78rem;
+    color: var(--u-ink-4);
+}
+
+.ym-ai-pulse {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+    background: var(--u-brand);
+    animation: ymAiPulse 1.1s ease-in-out infinite;
+}
+
+@keyframes ymAiPulse {
+    0%, 100% { opacity: 0.25; transform: scale(0.8); }
+    50%      { opacity: 1;    transform: scale(1.15); }
+}
+
+.ym-ai-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.ym-ai-skeleton-row {
+    height: 0.85rem;
+    border-radius: 0.3rem;
+    background: linear-gradient(90deg, #eef1f0 25%, #f7faf9 50%, #eef1f0 75%);
+    background-size: 200% 100%;
+    animation: ymAiShimmer 1.4s ease-in-out infinite;
+    animation-delay: var(--ym-stagger, 0ms);
+}
+
+.ym-ai-skeleton-row:nth-child(2) { width: 88%; }
+.ym-ai-skeleton-row:nth-child(3) { width: 74%; }
+.ym-ai-skeleton-row:nth-child(4) { width: 60%; }
+
+@keyframes ymAiShimmer {
+    from { background-position: 200% 0; }
+    to   { background-position: -200% 0; }
+}
+
+.ym-ai-note,
+.ym-ai-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.45rem;
+    margin: 0;
+    padding: 0.5rem 0.65rem;
+    border-radius: 0.45rem;
+    font-size: 0.76rem;
+    line-height: 1.5;
+}
+
+.ym-ai-note {
+    background: var(--u-warn-soft);
+    border: 1px solid #eedbb2;
+    color: #8d5c11;
+}
+
+.ym-ai-error {
+    background: var(--u-danger-soft);
+    border: 1px solid #f0ccd1;
+    color: #96323b;
+}
+
+.ym-ai-steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.ym-ai-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 0.55rem 0.6rem;
+    border: 1px solid var(--u-line);
+    border-radius: 0.45rem;
+    background: var(--u-surface);
+}
+
+.ym-ai-step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.35rem;
+    height: 1.35rem;
+    flex: none;
+    border-radius: 999px;
+    background: var(--u-brand-soft);
+    color: var(--u-brand-deep);
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.ym-ai-step-body { flex: 1; min-width: 0; }
+
+.ym-ai-step-name {
+    margin: 0;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--u-ink);
+}
+
+.ym-ai-step-sanskrit {
+    margin-left: 0.35rem;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--u-ink-4);
+}
+
+.ym-ai-step-cue {
+    margin: 0.15rem 0 0;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--u-ink-4);
+}
+
+.ym-ai-step-dur {
+    flex: none;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--u-brand-deep);
+    white-space: nowrap;
+}
+
+.ym-ai-foot {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.ym-ai-count {
+    margin-left: auto;
+    font-size: 0.72rem;
+    color: var(--u-ink-4);
+}
+
+.ym-ai-applied {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: var(--u-brand-deep);
+}
+
+.ym-ai-optin {
+    padding: 0.6rem 0.65rem;
+    border: 1px dashed #e0d3bb;
+    border-radius: 0.45rem;
+    background: #fffdf8;
+}
+
+.ym-ai-optin-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.ym-ai-optin-pick { max-width: 18rem; }
+
+/* Two across once the card has the content column's width, so four findings read as
+   a block rather than a long scroll. Falls back to one column in a narrow rail. */
+.ym-ai-findings {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
+    gap: 0.5rem;
+    align-items: start;
+}
+
+.ym-ai-finding {
+    padding: 0.6rem 0.65rem;
+    border: 1px solid var(--u-line);
+    border-left-width: 3px;
+    border-radius: 0.45rem;
+    background: var(--u-surface);
+}
+
+.ym-ai-finding.is-ok   { border-left-color: var(--u-brand); }
+.ym-ai-finding.is-note { border-left-color: #7aa7d1; }
+.ym-ai-finding.is-warn { border-left-color: #d9a441; }
+
+.ym-ai-finding-head {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0 0 0.35rem;
+    font-size: 0.79rem;
+    font-weight: 650;
+    color: var(--u-ink);
+}
+
+.ym-ai-finding.is-ok   .ym-ai-finding-head i { color: var(--u-brand); }
+.ym-ai-finding.is-note .ym-ai-finding-head i { color: #4a7fb5; }
+.ym-ai-finding.is-warn .ym-ai-finding-head i { color: #b07d1c; }
+
+.ym-ai-finding-line {
+    display: flex;
+    gap: 0.45rem;
+    margin: 0.2rem 0 0;
+    font-size: 0.75rem;
+    line-height: 1.55;
+    color: var(--u-ink-4);
+}
+
+.ym-ai-finding-tag {
+    flex: none;
+    width: 2.1rem;
+    font-size: 0.66rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #9aa3ad;
+    padding-top: 0.1rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ym-ai-pulse,
+    .ym-ai-skeleton-row {
+        animation: none;
+    }
+}
