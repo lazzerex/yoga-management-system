@@ -47,11 +47,10 @@ export default {
     <div class="ym-ui">
         <header class="ym-page-head">
             <div>
-                <h1 class="ym-page-title">
-                    {{ $t('operations.fileLibrary') }}
+                <p class="ym-page-sub">
+                    {{ $t('operations.fileLibrarySubtitle') }}
                     <span class="ym-count">{{ files.total }}</span>
-                </h1>
-                <p class="ym-page-sub">{{ $t('operations.fileLibrarySubtitle') }}</p>
+                </p>
             </div>
         </header>
 
