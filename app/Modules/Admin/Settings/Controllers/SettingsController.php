@@ -68,8 +68,7 @@ class SettingsController extends Controller
             $changes[] = ['key' => $key, 'from' => $before, 'to' => $after];
         }
 
-        // One row per save, not per field: a form with thirty fields would otherwise
-        // bury the log under thirty entries describing a single administrative act.
+        // One row per save, not per field.
         if ($changes !== []) {
             $this->audit->execute($user, 'update_setting', $user, ['changes' => $changes]);
         }
