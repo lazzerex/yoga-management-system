@@ -296,11 +296,18 @@ const toggleSidebarCollapsed = () => {
     }
 };
 
-// Collapsing hides the group labels (display:none, instant) which shifts every
-// item below it upward immediately — no need to wait for the width transition,
-// vertical stacking doesn't depend on it. Measuring right away avoids a stale
-// position followed by a jump.
+// Labels vanish instantly, then width and link text animate: one measurement catches
+// only the first, so the observer re-measures while the rail is still moving.
 watch(sidebarCollapsed, () => nextTick(updateSideIndicator));
+
+let sideNavObserver;
+onMounted(() => {
+    if (sideNavRef.value && 'ResizeObserver' in window) {
+        sideNavObserver = new ResizeObserver(() => updateSideIndicator());
+        sideNavObserver.observe(sideNavRef.value);
+    }
+});
+onBeforeUnmount(() => sideNavObserver?.disconnect());
 
 const notificationsOpen = ref(false);
 const profileMenuOpen = ref(false);
@@ -766,6 +773,7 @@ const logout = () => {
                         :open-items="openMenuItems"
                         :is-active="isMenuLinkActive"
                         :toggle="toggleMenuItem"
+                        :collapsed="sidebarCollapsed"
                     />
                 </section>
             </nav>
