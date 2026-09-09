@@ -59,8 +59,11 @@ const formatMeta = (action, meta) => {
             return '—';
         case 'cancel_enrollment':
             return `${meta.class} · ${meta.session_date}`;
-        case 'update_setting':
-            return `${meta.key}: ${meta.from || '—'} → ${meta.to}`;
+        case 'update_setting': {
+            // Rows written before batching carry one key/from/to instead of a list.
+            const changes = meta.changes ?? [meta];
+            return changes.map((change) => `${change.key}: ${change.from || '—'} → ${change.to}`).join(', ');
+        }
         case 'ai_attachment_sent':
             return `${meta.plan_title} · ${meta.file_name}`;
         default:
