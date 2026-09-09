@@ -1,13 +1,15 @@
-import { computed, nextTick, ref, watch } from 'vue';
+import { computed, nextTick, provide, ref, watch } from 'vue';
 import { router } from '@inertiajs/vue3';
 
 const NON_FILTER_KEYS = ['sort', 'dir', 'date', 'months'];
 
 const UNCOUNTED_KEYS = [...NON_FILTER_KEYS, 'search'];
 
+export const FilterDraftKey = Symbol('filter-draft');
+
 /**
- * Server-side filtering for an index page. Text fields are debounced, selects apply at
- * once, and an empty value drops out of the query string instead of being sent blank.
+ * Server-side filtering for an index page. Search, sorting and anything else outside the
+ * filter panel applies on change, text debounced; panel fields are staged until Apply.
  *
  * @param {string} url        endpoint the page filters against
  * @param {object} initial    current filter values from the controller
@@ -71,11 +73,43 @@ export function useFilters(url, initial = {}, debounced = ['search']) {
         });
     };
 
-    const reset = () => batch(() => {
+    // The panel edits `filters` directly; the snapshot is what Cancel puts back.
+    let draft = null;
+
+    const beginDraft = () => {
+        draft = { ...filters.value };
+        suspended = true;
+        clearTimeout(timer);
+    };
+
+    const commitDraft = () => {
+        draft = null;
+        suspended = false;
+        apply();
+    };
+
+    const discardDraft = () => {
+        if (draft !== null) {
+            Object.assign(filters.value, draft);
+            draft = null;
+        }
+
+        // Restoring re-triggers the watchers, so the guard has to outlive this tick.
+        nextTick(() => {
+            suspended = false;
+        });
+    };
+
+    provide(FilterDraftKey, { beginDraft, commitDraft, discardDraft });
+
+    const clearAll = () => {
         Object.keys(filters.value).forEach((key) => {
             filters.value[key] = '';
         });
-    });
+    };
+
+    // Inside an open panel the clear is staged like any other panel edit.
+    const reset = () => (draft === null ? batch(clearAll) : clearAll());
 
     /** Column headers cycle ascending, descending, then back to the default order. */
     const toggleSort = (field) => batch(() => {
