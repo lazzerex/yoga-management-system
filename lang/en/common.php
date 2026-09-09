@@ -4,6 +4,7 @@ return [
     'search' => 'Search',
     'filters' => 'Filters',
     'done' => 'Done',
+    'applyFilters' => 'Apply',
     'from' => 'From',
     'to' => 'To',
     'chooseFile' => 'Choose file',
