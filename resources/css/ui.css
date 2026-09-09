@@ -615,6 +615,8 @@
         font-variant-numeric: tabular-nums;
     }
 
+    .ym-page-sub .ym-count { margin-left: 0.45rem; }
+
     /* ---- Filters: the shared FilterBar keeps its markup, this restyles it ---- */
 
     .ym-filter-band {

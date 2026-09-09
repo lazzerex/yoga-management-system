@@ -20,11 +20,10 @@
 
     .ym-sidebar--collapsed { width: 76px; }
 
+    /* Stays a row: the mark is the tallest thing in it, so the header height never changes. */
     .ym-sidebar--collapsed .ym-brand {
-        flex-direction: column;
         justify-content: center;
         padding-inline: 0.5rem;
-        gap: 0.4rem;
     }
 
     .ym-brand-text {
@@ -51,6 +50,40 @@
     .ym-sidebar--collapsed .ym-side-link { justify-content: center; }
     .ym-sidebar--collapsed .ym-sidebar-footer { display: flex; justify-content: center; }
 
+    /* Flush against the rail on purpose: a gap would drop the hover on the way across. */
+    .ym-sidebar--collapsed .ym-side-children.ym-side-flyout {
+        display: grid;
+        position: fixed;
+        z-index: 60;
+        min-width: 12rem;
+        margin: 0;
+        padding: 0.3rem;
+        gap: 0.12rem;
+        background: var(--ym-sidebar);
+        border: 1px solid var(--ym-sidebar-border);
+        border-radius: 0.6rem;
+        box-shadow: var(--ym-shadow-lift);
+    }
+
+    .ym-side-flyout-title {
+        margin: 0 0 0.1rem;
+        padding: 0.3rem 0.5rem;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #7b8798;
+    }
+
+    .ym-sidebar--collapsed .ym-side-flyout .ym-nav-item-text { opacity: 1; max-width: 12rem; }
+    .ym-sidebar--collapsed .ym-side-flyout .ym-side-link { justify-content: flex-start; }
+
+    .ym-sidebar--collapsed .ym-side-flyout .ym-nav-item-content {
+        justify-content: flex-start;
+        width: auto;
+        gap: 0.7rem;
+    }
+
     .ym-sidebar-collapse-toggle {
         display: none;
         position: absolute;
@@ -68,17 +101,31 @@
         justify-content: center;
         cursor: pointer;
         z-index: 30;
-        transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+        transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease,
+            opacity 160ms ease;
     }
 
     .ym-sidebar-collapse-toggle:hover { background: #f2f6fb; color: #35495f; border-color: #c9d3e0; }
 
     .ym-sidebar-collapse-toggle:focus-visible { outline: 2px solid var(--ym-primary); outline-offset: 2px; }
 
-    /* 76px rail: stack under the mark instead of overlapping it. */
+    /* Toggle and mark share one centre and cross-fade; the hidden chevron keeps its hit
+       area, so the mark itself is what expands the rail. */
     .ym-sidebar--collapsed .ym-sidebar-collapse-toggle {
-        position: static;
-        transform: none;
+        right: auto;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        opacity: 0;
+    }
+
+    .ym-sidebar--collapsed .ym-brand:hover .ym-sidebar-collapse-toggle,
+    .ym-sidebar--collapsed .ym-brand:focus-within .ym-sidebar-collapse-toggle {
+        opacity: 1;
+    }
+
+    .ym-sidebar--collapsed .ym-brand:hover .ym-brand-mark,
+    .ym-sidebar--collapsed .ym-brand:focus-within .ym-brand-mark {
+        opacity: 0;
     }
 
     @media (min-width: 1024px) {
@@ -107,6 +154,8 @@
         font-size: 0.82rem;
         font-weight: 800;
         letter-spacing: 0.03em;
+        flex-shrink: 0;
+        transition: opacity 160ms ease;
     }
 
     .ym-brand-title {
