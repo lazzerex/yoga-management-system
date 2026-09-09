@@ -39,11 +39,10 @@ export default {
     <div class="ym-ui">
         <header class="ym-page-head">
             <div>
-                <h1 class="ym-page-title">
-                    {{ $t('operations.tuitionFees') }}
+                <p class="ym-page-sub">
+                    {{ $t('operations.tuitionSubtitle') }}
                     <span class="ym-count">{{ invoices.total }}</span>
-                </h1>
-                <p class="ym-page-sub">{{ $t('operations.tuitionSubtitle') }}</p>
+                </p>
             </div>
             <div class="ym-page-actions">
                 <a :href="endpoints.export" class="ym-btn ym-btn--quiet">
