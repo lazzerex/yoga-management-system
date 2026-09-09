@@ -38,11 +38,10 @@ export default {
     <div class="ym-ui">
         <header class="ym-page-head">
             <div>
-                <h1 class="ym-page-title">
-                    {{ $t('operations.lessonPlans') }}
+                <p class="ym-page-sub">
+                    {{ $t('operations.lessonPlansSubtitle') }}
                     <span class="ym-count">{{ plans.total }}</span>
-                </h1>
-                <p class="ym-page-sub">{{ $t('operations.lessonPlansSubtitle') }}</p>
+                </p>
             </div>
             <div class="ym-page-actions">
                 <Link v-if="endpoints.pending" :href="endpoints.pending" class="ym-btn ym-btn--outline">
