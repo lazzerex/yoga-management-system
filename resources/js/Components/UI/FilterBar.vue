@@ -1,5 +1,6 @@
 <script setup>
-import { onBeforeUnmount, onMounted, ref, useSlots } from 'vue';
+import { inject, onBeforeUnmount, onMounted, ref, useSlots } from 'vue';
+import { FilterDraftKey } from '@/composables/useFilters.js';
 
 defineProps({
     search: { type: String, default: null },
@@ -14,7 +15,27 @@ const slots = useSlots();
 const open = ref(false);
 const wrap = ref(null);
 
-const close = () => (open.value = false);
+const draft = inject(FilterDraftKey, null);
+
+const openPanel = () => {
+    open.value = true;
+    draft?.beginDraft();
+};
+
+// Leaving the panel any way other than Apply abandons the staged values.
+const cancel = () => {
+    if (! open.value) {
+        return;
+    }
+
+    open.value = false;
+    draft?.discardDraft();
+};
+
+const applyAndClose = () => {
+    open.value = false;
+    draft?.commitDraft();
+};
 
 const onDocumentClick = (event) => {
     // A control that conditioned itself away is detached by now, not outside.
@@ -23,13 +44,13 @@ const onDocumentClick = (event) => {
     }
 
     if (open.value && wrap.value && ! wrap.value.contains(event.target)) {
-        close();
+        cancel();
     }
 };
 
 const onEscape = (event) => {
     if (event.key === 'Escape') {
-        close();
+        cancel();
     }
 };
 
@@ -62,7 +83,7 @@ onBeforeUnmount(() => {
                 class="ym-btn ym-btn--outline"
                 :class="{ 'is-open': open }"
                 :aria-expanded="open"
-                @click="open = !open"
+                @click="open ? cancel() : openPanel()"
             >
                 <i class="bi bi-funnel" />
                 {{ $t('common.filters') }}
@@ -78,8 +99,8 @@ onBeforeUnmount(() => {
                     <button v-if="active" type="button" class="ym-btn ym-btn--quiet ym-btn--sm" @click="emit('reset')">
                         {{ $t('common.clearFilters') }}
                     </button>
-                    <button type="button" class="ym-btn ym-btn--primary ym-btn--sm" @click="close">
-                        {{ $t('common.done') }}
+                    <button type="button" class="ym-btn ym-btn--primary ym-btn--sm" @click="applyAndClose">
+                        {{ $t('common.applyFilters') }}
                     </button>
                 </div>
             </div>
