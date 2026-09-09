@@ -53,6 +53,8 @@ class SettingsController extends Controller
         $validated = $request->validated();
         $user = $request->user();
 
+        $changes = [];
+
         foreach (self::KEYS as $field => $key) {
             $before = (string) Settings::get($key, '');
             $after = (string) $validated[$field];
@@ -63,11 +65,13 @@ class SettingsController extends Controller
 
             Settings::set($key, $after);
 
-            $this->audit->execute($user, 'update_setting', $user, [
-                'key' => $key,
-                'from' => $before,
-                'to' => $after,
-            ]);
+            $changes[] = ['key' => $key, 'from' => $before, 'to' => $after];
+        }
+
+        // One row per save, not per field: a form with thirty fields would otherwise
+        // bury the log under thirty entries describing a single administrative act.
+        if ($changes !== []) {
+            $this->audit->execute($user, 'update_setting', $user, ['changes' => $changes]);
         }
 
         return back()->with('success', __('flash.settingsUpdated'));
