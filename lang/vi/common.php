@@ -4,6 +4,7 @@ return [
     'search' => 'Tìm kiếm',
     'filters' => 'Bộ lọc',
     'done' => 'Xong',
+    'applyFilters' => 'Áp dụng',
     'from' => 'Từ ngày',
     'to' => 'Đến ngày',
     'chooseFile' => 'Chọn tệp',
