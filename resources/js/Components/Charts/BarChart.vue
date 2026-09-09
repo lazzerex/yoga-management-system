@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue';
 import VueApexCharts from 'vue3-apexcharts';
+import { chartPalette } from '@/composables/useChartPalette.js';
 
 const props = defineProps({
     categories: { type: Array, default: () => [] },
@@ -21,7 +22,7 @@ const options = computed(() => ({
         fontFamily: 'inherit',
         animations: { speed: 320 },
     },
-    colors: [props.color, '#5f83c2', '#c28a3a'],
+    colors: [props.color, ...chartPalette.slice(1)],
     plotOptions: { bar: { horizontal: props.horizontal, borderRadius: 3, columnWidth: '55%' } },
     dataLabels: { enabled: false },
     grid: { borderColor: '#e6ebf2', strokeDashArray: 3 },

@@ -1,12 +1,13 @@
 <script setup>
 import { computed } from 'vue';
 import VueApexCharts from 'vue3-apexcharts';
+import { chartPalette } from '@/composables/useChartPalette.js';
 
 const props = defineProps({
     categories: { type: Array, default: () => [] },
     series: { type: Array, default: () => [] },
     height: { type: Number, default: 260 },
-    colors: { type: Array, default: () => ['#4f9f5f', '#5f83c2', '#c28a3a'] },
+    colors: { type: Array, default: () => chartPalette },
     formatter: { type: Function, default: null },
 });
 
