@@ -23,6 +23,7 @@ use App\Modules\Operations\LessonPlan\Requests\SuggestSequenceRequest;
 use App\Modules\Operations\LessonPlan\Requests\UpdateLessonPlanRequest;
 use App\Modules\Operations\Media\Actions\AuthorizeMediaAccessAction;
 use App\Support\Ai\GeminiClient;
+use App\Support\Pdf\DocumentPdf;
 use App\Support\Table\SortsQueries;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -182,9 +183,30 @@ class LessonPlanController extends Controller
                 'destroy' => $owns && $lessonPlan->status === 'draft' ? route('operations.lesson-plans.destroy', $lessonPlan) : null,
                 'review' => $canReview ? route('operations.lesson-plans.review', $lessonPlan) : null,
                 'check' => $canReview && GeminiClient::isConfigured() ? route('operations.lesson-plans.check', $lessonPlan) : null,
+                'pdf' => route('operations.lesson-plans.pdf', $lessonPlan),
                 'index' => route('operations.lesson-planning'),
             ],
         ]);
+    }
+
+    public function pdf(Request $request, LessonPlan $lessonPlan): \Illuminate\Http\Response
+    {
+        abort_unless($this->canView($request->user(), $lessonPlan), 403);
+
+        $lessonPlan->load([
+            'classType:id,name',
+            'branch:id,name',
+            'coachProfile.user:id,name',
+            'reviews.reviewer:id,name',
+        ]);
+
+        return DocumentPdf::download(
+            'pdf.lesson-plan',
+            ['plan' => $lessonPlan],
+            $lessonPlan->title,
+            'lesson-plan-'.$lessonPlan->id.'.pdf',
+            __('pdf.planSubtitle', ['coach' => $lessonPlan->coachProfile->user->name]),
+        );
     }
 
     public function edit(Request $request, LessonPlan $lessonPlan): Response
