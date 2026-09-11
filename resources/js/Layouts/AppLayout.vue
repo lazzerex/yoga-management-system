@@ -83,6 +83,7 @@ watch(() => page.props, announce);
 onBeforeUnmount(() => clearTimeout(successTimer));
 const centreName = computed(() => page.props.centreName ?? t('dashboard.systemName'));
 const userName = computed(() => page.props.auth?.user?.name ?? 'Guest');
+const userAvatarUrl = computed(() => page.props.auth?.user?.avatarUrl ?? null);
 const userRole = computed(() => page.props.auth?.user?.role ?? 'member');
 const canAccessAdmin = computed(() => page.props.auth?.user?.canAccessAdmin ?? false);
 const canViewCoachDashboard = computed(() => page.props.auth?.user?.canViewCoachDashboard ?? false);
@@ -428,6 +429,7 @@ const userInitials = computed(() => {
         .map((part) => part.charAt(0).toUpperCase())
         .join('');
 });
+
 
 // Same trick as the sidebar rail: measure the active link and slide to it, rather
 // than animating a border that belongs to the link itself.
@@ -958,7 +960,8 @@ const logout = () => {
 
                             <div v-if="profileMenuOpen" class="ym-popover ym-popover-menu" role="menu">
                                 <div class="ym-profile-chip">
-                                    <span class="ym-profile-avatar">{{ userInitials }}</span>
+                                    <img v-if="userAvatarUrl" :src="userAvatarUrl" :alt="userName" class="ym-profile-avatar ym-profile-avatar--photo" />
+                                    <span v-else class="ym-profile-avatar">{{ userInitials }}</span>
                                     <div>
                                         <p class="ym-profile-name">{{ userName }}</p>
                                         <p class="ym-profile-role">{{ roleLabel }}</p>
