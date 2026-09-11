@@ -26,6 +26,7 @@ return [
     'confirm' => 'Xác nhận',
     'back' => 'Quay lại',
     'export' => 'Xuất CSV',
+    'exportPdf' => 'Xuất PDF',
     'loading' => 'Đang tải...',
     'noData' => 'Không có dữ liệu',
     'clearFilters' => 'Xóa bộ lọc',
