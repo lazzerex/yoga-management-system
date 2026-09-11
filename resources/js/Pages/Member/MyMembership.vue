@@ -45,7 +45,7 @@ export default {
             </div>
             <div class="ym-stat-card ym-stat-card--info">
                 <p class="ym-stat-card-label">{{ $t('member.sessionsIncluded') }}</p>
-                <p class="ym-stat-card-value">{{ current ? (current.sessions_granted ?? $t('member.unlimited')) : '—' }}</p>
+                <p class="ym-stat-card-value">{{ current ? (current.sessions_granted ?? $t('member.unlimited')) : '-' }}</p>
             </div>
             <div class="ym-stat-card" :class="{ 'ym-stat-card--danger': outstanding > 0 }">
                 <p class="ym-stat-card-label">{{ $t('member.outstandingBalance') }}</p>
@@ -63,7 +63,7 @@ export default {
                             <span class="ym-tag ym-tag--ok">{{ $t('operations.invoiceStatusPaid') }}</span>
                         </div>
                         <p class="ym-timeline-meta">
-                            {{ entitlement.valid_from ?? '—' }} – {{ entitlement.valid_until }}
+                            {{ entitlement.valid_from ? `${entitlement.valid_from} - ${entitlement.valid_until}` : entitlement.valid_until }}
                             <template v-if="entitlement.sessions_granted">
                                 · {{ $t('member.sessionsGranted', { count: entitlement.sessions_granted }) }}
                             </template>

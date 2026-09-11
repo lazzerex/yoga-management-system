@@ -107,7 +107,7 @@ export default {
                     <div class="ym-card-body">
                         <div class="ym-body-block">
                             <h2 class="ym-body-heading">{{ $t('operations.planObjective') }}</h2>
-                            <p class="ym-body-text">{{ plan.objective || '—' }}</p>
+                            <p class="ym-body-text">{{ plan.objective || '-' }}</p>
                         </div>
 
                         <div class="ym-body-block">
@@ -148,7 +148,7 @@ export default {
                                         {{ statusLabel(review.action) }}
                                     </span>
                                 </div>
-                                <p class="ym-timeline-meta">{{ review.reviewer_name ?? '—' }} · {{ formatDate(review.reviewed_at) }}</p>
+                                <p class="ym-timeline-meta">{{ review.reviewer_name ?? '-' }} · {{ formatDate(review.reviewed_at) }}</p>
                                 <p v-if="review.comment" class="ym-timeline-note">{{ review.comment }}</p>
                             </div>
                         </li>

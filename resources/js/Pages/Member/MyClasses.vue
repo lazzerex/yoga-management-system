@@ -42,7 +42,7 @@ const formatLongDate = (iso) =>
     new Intl.DateTimeFormat(locale.value, { weekday: 'long', month: 'long', day: 'numeric' }).format(new Date(`${iso}T00:00:00`));
 
 const formatDateTime = (iso) =>
-    iso ? new Intl.DateTimeFormat(locale.value, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(iso)) : '—';
+    iso ? new Intl.DateTimeFormat(locale.value, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(iso)) : '-';
 
 const durationMin = (item) => {
     const [sh, sm] = item.start_time.split(':').map(Number);
@@ -172,7 +172,7 @@ export default {
                             <div class="ym-bk-when">
                                 <span class="ym-bk-rel">{{ relLabel(item.session_date) }}</span>
                                 <span class="ym-bk-date">{{ formatDate(item.session_date) }}</span>
-                                <span class="ym-bk-time">{{ item.start_time }}–{{ item.end_time }}</span>
+                                <span class="ym-bk-time">{{ item.start_time }}-{{ item.end_time }}</span>
                             </div>
                             <div class="ym-bk-info">
                                 <p class="ym-bk-name"><span class="ym-bk-swatch" /> {{ item.class_type_name }}</p>
@@ -225,7 +225,7 @@ export default {
                             </p>
                             <ul class="ym-book-next-facts">
                                 <li><i class="bi bi-calendar3" /> {{ formatDate(nextBooked.session_date) }}</li>
-                                <li><i class="bi bi-clock" /> {{ nextBooked.start_time }}–{{ nextBooked.end_time }}</li>
+                                <li><i class="bi bi-clock" /> {{ nextBooked.start_time }}-{{ nextBooked.end_time }}</li>
                                 <li><i class="bi bi-person" /> {{ nextBooked.coach_name }}</li>
                                 <li><i class="bi bi-geo-alt" /> {{ nextBooked.branch_name }} · {{ nextBooked.room_name }}</li>
                             </ul>
@@ -289,7 +289,7 @@ export default {
                     <p class="ym-detail-label">{{ $t('member.scheduleSection') }}</p>
                     <p class="ym-detail-strong">{{ formatLongDate(detail.session_date) }}</p>
                     <p class="ym-detail-text">
-                        {{ detail.start_time }}–{{ detail.end_time }} · {{ $t('member.durationValue', { count: durationMin(detail) }) }}
+                        {{ detail.start_time }}-{{ detail.end_time }} · {{ $t('member.durationValue', { count: durationMin(detail) }) }}
                     </p>
                 </div>
                 <div class="ym-detail-block">

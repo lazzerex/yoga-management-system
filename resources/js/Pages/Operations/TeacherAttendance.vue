@@ -153,7 +153,7 @@ export default {
                     </thead>
                     <tbody>
                         <tr v-for="row in sessions" :key="row.id">
-                            <td class="is-strong ym-num">{{ row.start_time }} – {{ row.end_time }}</td>
+                            <td class="is-strong ym-num">{{ row.start_time }} - {{ row.end_time }}</td>
                             <td>{{ row.class_type_name }}</td>
                             <td>{{ row.coach_name }}</td>
                             <td class="is-muted">{{ row.branch_name }} / {{ row.room_name }}</td>
@@ -168,7 +168,7 @@ export default {
                                     }}
                                 </span>
                                 <span v-if="row.checked_in_at" class="ym-timeline-meta ym-num">
-                                    {{ clockTime(row.checked_in_at) }}<template v-if="row.checked_out_at"> – {{ clockTime(row.checked_out_at) }}</template>
+                                    {{ clockTime(row.checked_in_at) }}<template v-if="row.checked_out_at"> - {{ clockTime(row.checked_out_at) }}</template>
                                 </span>
                             </td>
                             <td class="is-muted ym-num">

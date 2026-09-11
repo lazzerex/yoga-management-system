@@ -149,7 +149,7 @@ export default {
                         <tbody>
                             <tr v-for="session in sessions.data" :key="session.id">
                                 <td class="ym-num">{{ session.session_date }}</td>
-                                <td class="ym-num">{{ session.start_time }}–{{ session.end_time }}</td>
+                                <td class="ym-num">{{ session.start_time }}-{{ session.end_time }}</td>
                                 <td class="is-strong">{{ session.class_type_name }}</td>
                                 <td class="is-muted">{{ session.coach_name }}</td>
                                 <td class="is-muted">{{ session.branch_name }}</td>

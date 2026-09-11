@@ -131,7 +131,7 @@ export default {
                             <tr v-for="branch in branches.data" :key="branch.id">
                                 <td class="is-strong">{{ branch.name }}</td>
                                 <td class="is-muted">{{ branch.address }}</td>
-                                <td class="is-muted ym-num">{{ branch.phone ?? '—' }}</td>
+                                <td class="is-muted ym-num">{{ branch.phone ?? '-' }}</td>
                                 <td>
                                     <span class="ym-tag" :class="branch.is_active ? 'ym-tag--ok' : 'ym-tag--neutral'">
                                         {{ branch.is_active ? $t('operations.active') : $t('operations.inactive') }}
@@ -343,7 +343,7 @@ export default {
                         <tbody>
                             <tr v-for="classType in classTypes.data" :key="classType.id">
                                 <td class="is-strong">{{ classType.name }}</td>
-                                <td class="is-muted">{{ classType.description ?? '—' }}</td>
+                                <td class="is-muted">{{ classType.description ?? '-' }}</td>
                                 <td>
                                     <span class="ym-tag" :class="classType.is_active ? 'ym-tag--ok' : 'ym-tag--neutral'">
                                         {{ classType.is_active ? $t('operations.active') : $t('operations.inactive') }}

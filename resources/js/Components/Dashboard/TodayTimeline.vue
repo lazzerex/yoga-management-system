@@ -8,7 +8,7 @@ defineProps({ data: { type: Array, required: true } });
     <div v-else class="ym-row-list">
         <div v-for="session in data" :key="session.id" class="ym-row">
             <div class="ym-row-main">
-                <p class="ym-row-title">{{ session.start_time }}–{{ session.end_time }} {{ session.class_type_name }}</p>
+                <p class="ym-row-title">{{ session.start_time }}-{{ session.end_time }} {{ session.class_type_name }}</p>
                 <p class="ym-row-meta">{{ session.coach_name }} · {{ session.room_name }}</p>
             </div>
             <div class="ym-row-aside">

@@ -100,8 +100,8 @@ export default {
                             <td class="is-strong">{{ plan.name }}</td>
                             <td class="is-muted">{{ typeLabel(plan.type) }}</td>
                             <td class="is-num is-strong">{{ formatVnd(plan.price_amount) }}</td>
-                            <td class="is-num is-muted">{{ plan.session_count ?? '—' }}</td>
-                            <td class="is-num is-muted">{{ plan.duration_days ?? '—' }}</td>
+                            <td class="is-num is-muted">{{ plan.session_count ?? '-' }}</td>
+                            <td class="is-num is-muted">{{ plan.duration_days ?? '-' }}</td>
                             <td class="is-muted">{{ plan.branch_name ?? $t('operations.allBranches') }}</td>
                             <td>
                                 <span class="ym-tag" :class="plan.is_active ? 'ym-tag--ok' : 'ym-tag--neutral'">

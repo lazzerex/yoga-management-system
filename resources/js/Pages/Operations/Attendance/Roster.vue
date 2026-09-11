@@ -89,7 +89,7 @@ export default {
                     </div>
                     <div>
                         <dt>{{ $t('operations.time') }}</dt>
-                        <dd class="ym-num">{{ session.start_time }} – {{ session.end_time }}</dd>
+                        <dd class="ym-num">{{ session.start_time }} - {{ session.end_time }}</dd>
                     </div>
                     <div>
                         <dt>{{ $t('operations.room') }}</dt>
@@ -166,7 +166,7 @@ export default {
                                     maxlength="500"
                                     class="ym-input"
                                 />
-                                <span v-else class="is-muted">{{ student.notes || '—' }}</span>
+                                <span v-else class="is-muted">{{ student.notes || '-' }}</span>
                             </td>
                         </tr>
                     </tbody>

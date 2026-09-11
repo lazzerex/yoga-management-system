@@ -22,7 +22,7 @@ const pendingDelete = ref(null);
 const { filters, active, filterCount, reset, toggleSort } = useFilters(props.endpoints.index, props.filters);
 
 const kindLabel = (value) => t(`operations.fileKind${value.charAt(0).toUpperCase()}${value.slice(1)}`);
-const formatDate = (value) => (value ? new Date(value).toLocaleDateString() : '—');
+const formatDate = (value) => (value ? new Date(value).toLocaleDateString() : '-');
 
 const toggleFolder = (folderKind) => {
     filters.value.kind = filters.value.kind === folderKind ? '' : folderKind;

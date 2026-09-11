@@ -226,8 +226,8 @@ export default {
                                     <td class="is-num">{{ item.quantity }}</td>
                                     <td class="is-num">{{ formatVnd(item.unit_price) }}</td>
                                     <td class="is-num is-strong">{{ formatVnd(item.line_total) }}</td>
-                                    <td class="is-muted">{{ item.valid_until ?? '—' }}</td>
-                                    <td class="is-num is-muted">{{ item.sessions_granted ?? '—' }}</td>
+                                    <td class="is-muted">{{ item.valid_until ?? '-' }}</td>
+                                    <td class="is-num is-muted">{{ item.sessions_granted ?? '-' }}</td>
                                 </tr>
                             </tbody>
                             <tfoot>
@@ -283,12 +283,12 @@ export default {
                                 <p class="ym-timeline-meta">
                                     {{ methodLabel(payment.method) }}
                                     · {{ formatDate(payment.paid_at) }}
-                                    · {{ payment.recorded_by ?? '—' }}
+                                    · {{ payment.recorded_by ?? '-' }}
                                     <template v-if="payment.reference"> · {{ payment.reference }}</template>
                                 </p>
                                 <p v-if="payment.status === 'voided'" class="ym-timeline-note ym-timeline-note--void">
-                                    {{ $t('operations.paymentVoidedOn', { date: formatDate(payment.voided_at), name: payment.voided_by ?? '—' }) }}
-                                    — {{ payment.void_reason }}
+                                    {{ $t('operations.paymentVoidedOn', { date: formatDate(payment.voided_at), name: payment.voided_by ?? '-' }) }}
+                                    · {{ payment.void_reason }}
                                 </p>
                             </div>
                         </li>

@@ -34,7 +34,7 @@ const statusLabel = (log) => {
 };
 
 const formatDate = (dateStr) => {
-    if (!dateStr) return '—';
+    if (!dateStr) return '-';
     return new Date(dateStr).toLocaleString('en-US', {
         year: 'numeric',
         month: 'short',
@@ -123,8 +123,8 @@ export default {
                                     {{ statusLabel(log) }}
                                 </span>
                             </td>
-                            <td class="is-strong">{{ log.user?.name ?? '—' }}</td>
-                            <td class="is-muted">{{ log.attempted_identifier ? `@${log.attempted_identifier}` : '—' }}</td>
+                            <td class="is-strong">{{ log.user?.name ?? '-' }}</td>
+                            <td class="is-muted">{{ log.attempted_identifier ? `@${log.attempted_identifier}` : '-' }}</td>
                             <td class="ym-num">{{ log.ip_address }}</td>
                             <td>
                                 <span class="ym-tag ym-tag--neutral">

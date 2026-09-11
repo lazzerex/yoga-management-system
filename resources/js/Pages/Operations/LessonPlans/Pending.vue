@@ -9,7 +9,7 @@ defineProps({
 
 const levelLabel = (level) => t(`operations.level${level.charAt(0).toUpperCase()}${level.slice(1)}`);
 
-const waitingSince = (value) => (value ? new Date(value).toLocaleDateString() : '—');
+const waitingSince = (value) => (value ? new Date(value).toLocaleDateString() : '-');
 </script>
 <script>
 import AppLayout from '@/Layouts/AppLayout.vue';

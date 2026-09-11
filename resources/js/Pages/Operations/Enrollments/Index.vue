@@ -27,7 +27,7 @@ const statusTone = {
 };
 
 const formatDateTime = (value) =>
-    value ? new Intl.DateTimeFormat(locale(), { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : '—';
+    value ? new Intl.DateTimeFormat(locale(), { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : '-';
 
 const pendingCancel = ref(null);
 

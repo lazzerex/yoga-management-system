@@ -115,8 +115,8 @@ export default {
                                 <span v-else class="ym-thumb ym-thumb--empty">{{ profile.user_name.charAt(0) }}</span>
                             </td>
                             <td class="is-strong">{{ profile.user_name }}</td>
-                            <td class="is-num is-muted">{{ profile.years_experience ?? '—' }}</td>
-                            <td class="is-muted">{{ profile.class_types.join(', ') || '—' }}</td>
+                            <td class="is-num is-muted">{{ profile.years_experience ?? '-' }}</td>
+                            <td class="is-muted">{{ profile.class_types.join(', ') || '-' }}</td>
                             <td>
                                 <span class="ym-tag" :class="profile.is_active ? 'ym-tag--ok' : 'ym-tag--neutral'">
                                     {{ profile.is_active ? $t('operations.active') : $t('operations.inactive') }}

@@ -20,7 +20,7 @@ const emit = defineEmits(['update:from', 'update:to']);
                 :aria-label="$t('common.from')"
                 @input="emit('update:from', $event.target.value)"
             />
-            <span class="ym-daterange-sep">–</span>
+            <span class="ym-daterange-sep">-</span>
             <input
                 :value="to"
                 type="date"

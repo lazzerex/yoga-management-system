@@ -33,7 +33,7 @@ const weeklySchedule = computed(() => {
             sessions: props.sessions
                 .filter((session) => session.session_date === isoDate)
                 .map((session) => ({
-                    time: `${session.start_time}–${session.end_time}`,
+                    time: `${session.start_time}-${session.end_time}`,
                     title: session.class_type_name,
                     meta: `${session.branch_name} · ${session.room_name}`,
                 })),
@@ -68,7 +68,7 @@ export default {
             </div>
             <div class="ym-stat-card ym-stat-card--info">
                 <p class="ym-stat-card-label">{{ $t('member.nextSession') }}</p>
-                <p class="ym-stat-card-value">{{ nextSession ? `${nextSession.start_time}` : '—' }}</p>
+                <p class="ym-stat-card-value">{{ nextSession ? `${nextSession.start_time}` : '-' }}</p>
                 <p v-if="nextSession" class="ym-stat-card-note">{{ nextSession.class_type_name }}</p>
             </div>
         </div>

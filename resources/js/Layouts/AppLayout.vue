@@ -117,7 +117,7 @@ const isMenuItemActive = (href) => {
 // Single indicator that measures the currently active sidebar link and
 // slides to it. If the active link isn't visible (e.g. inside a collapsed
 // group), there's nothing to slide from, so it fades in at the new spot
-// instead — `top`/`height` and `opacity` transition independently in CSS.
+// instead. `top`/`height` and `opacity` transition independently in CSS.
 const sideNavRef = ref(null);
 const sideIndicatorStyle = ref({ top: '0px', left: '0px', height: '0px', opacity: 0 });
 
@@ -220,7 +220,7 @@ const flattenMenuItems = (groups) => {
 
 // A parent and its first child often share one href (Lesson Plans / All Plans), and
 // isMenuItemActive matches on prefix, so several items can match at once. Only the
-// longest match is the page you are on — anything shorter is an ancestor.
+// longest match is the page you are on; anything shorter is an ancestor.
 const activeHref = computed(() => flattenMenuItems(sidebarMenu.value)
     .map((item) => item.href)
     .filter((href) => isMenuItemActive(href))
@@ -292,7 +292,7 @@ const toggleSidebarCollapsed = () => {
     try {
         localStorage.setItem('ym-sidebar-collapsed', sidebarCollapsed.value ? '1' : '0');
     } catch {
-        // ignore — collapse still works for this session, just won't persist
+        // ignore: collapse still works for this session, it just won't persist
     }
 };
 
@@ -344,18 +344,18 @@ const switchBranch = (branchId) => {
     document.cookie = `branch_id=${branchId}; path=/; SameSite=Lax`;
 
     // Sidebar links prefetch on hover, so a page you hovered before switching is already
-    // cached with the old branch's data — and a visit to that URL would be served from
+    // cached with the old branch's data, and a visit to that URL would be served from
     // that cache without ever reaching the server. Every cached page is branch-stale now.
     router.flushAll();
 
     // Page 3 of the old branch usually doesn't exist in the new one, which reads as
-    // an empty page. Non-paging filters (date, month, status) stay — they aren't branch-bound.
+    // an empty page. Non-paging filters (date, month, status) stay; they aren't branch-bound.
     const url = new URL(window.location.href);
     [...url.searchParams.keys()]
         .filter((key) => key.toLowerCase().endsWith('page'))
         .forEach((key) => url.searchParams.delete(key));
 
-    // Cleared on every terminal outcome, not just success — a server error must not
+    // Cleared on every terminal outcome, not just success: a server error must not
     // leave the switcher spinning with no way back to another branch.
     const done = () => { branchSwitching.value = false; };
 

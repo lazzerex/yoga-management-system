@@ -31,7 +31,7 @@ const ACTION_BADGE_CLASSES = {
 const actionBadgeClass = (action) => ACTION_BADGE_CLASSES[action] ?? '';
 
 const formatMeta = (action, meta) => {
-    if (!meta) return '—';
+    if (!meta) return '-';
 
     switch (action) {
         case 'create_user':
@@ -47,7 +47,7 @@ const formatMeta = (action, meta) => {
             if (meta.from?.username !== meta.to?.username) {
                 parts.push(`${t('admin.metaUsername')}: ${meta.from.username} → ${meta.to.username}`);
             }
-            return parts.join(', ') || '—';
+            return parts.join(', ') || '-';
         }
         case 'change_password':
             return t('admin.passwordChanged');
@@ -57,23 +57,23 @@ const formatMeta = (action, meta) => {
         case 'delete_user':
             return t('admin.wasRole', { role: t(`admin.roles.${meta.role}`) });
         case 'view_student_medical_notes':
-            return '—';
+            return '-';
         case 'cancel_enrollment':
             return `${meta.class} · ${meta.session_date}`;
         case 'update_setting': {
             // Rows written before batching carry one key/from/to instead of a list.
             const changes = meta.changes ?? [meta];
-            return changes.map((change) => `${change.key}: ${change.from || '—'} → ${change.to}`).join(', ');
+            return changes.map((change) => `${change.key}: ${change.from || '-'} → ${change.to}`).join(', ');
         }
         case 'ai_attachment_sent':
             return `${meta.plan_title} · ${meta.file_name}`;
         default:
-            return '—';
+            return '-';
     }
 };
 
 const formatDate = (dateStr) => {
-    if (!dateStr) return '—';
+    if (!dateStr) return '-';
     return new Date(dateStr).toLocaleString('en-US', {
         year: 'numeric',
         month: 'short',
@@ -161,7 +161,7 @@ export default {
                                     {{ $t(`admin.auditActions.${log.action}`) }}
                                 </span>
                             </td>
-                            <td>{{ log.subject_name ?? '—' }}</td>
+                            <td>{{ log.subject_name ?? '-' }}</td>
                             <td class="is-muted">{{ formatMeta(log.action, log.meta) }}</td>
                             <td class="is-muted ym-num">{{ formatDate(log.created_at) }}</td>
                         </tr>
