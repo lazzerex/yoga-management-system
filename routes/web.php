@@ -127,6 +127,7 @@ Route::prefix('cms')->group(function () {
             Route::middleware('permission:operations.attendance.view')->group(function () {
                 Route::get('/teacher-attendance', [AttendanceController::class, 'index'])->name('teacher-attendance');
                 Route::get('/attendance/reports', [AttendanceController::class, 'reports'])->name('attendance.reports');
+                Route::get('/attendance/reports/pdf', [AttendanceController::class, 'reportPdf'])->name('attendance.reports.pdf');
                 Route::get('/attendance/{classSession}', [AttendanceController::class, 'roster'])->name('attendance.roster');
             });
 
@@ -159,6 +160,7 @@ Route::prefix('cms')->group(function () {
 
                 Route::middleware('permission:operations.plans.view')->group(function () {
                     Route::get('/{lessonPlan}', [LessonPlanController::class, 'show'])->name('show');
+                    Route::get('/{lessonPlan}/pdf', [LessonPlanController::class, 'pdf'])->name('pdf');
                 });
 
                 Route::middleware('permission:operations.plans.manage')->group(function () {
@@ -206,6 +208,10 @@ Route::prefix('cms')->group(function () {
                     Route::middleware('permission:operations.tuition.view')->group(function () {
                         Route::get('/{invoice}', [InvoiceController::class, 'show'])->whereNumber('invoice')->name('show');
                     });
+
+                    // No permission middleware: a member holds no tuition permission and
+                    // still needs the receipt for their own invoice, so ownership decides.
+                    Route::get('/{invoice}/pdf', [InvoiceController::class, 'pdf'])->whereNumber('invoice')->name('pdf');
 
                     Route::middleware('permission:operations.tuition.manage')->whereNumber('invoice')->group(function () {
                         Route::post('/{invoice}/payments', [InvoiceController::class, 'recordPayment'])->name('payments.store');
