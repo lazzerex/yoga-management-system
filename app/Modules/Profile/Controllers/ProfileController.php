@@ -37,7 +37,7 @@ class ProfileController extends Controller
         return inertia('Profile/Show', [
             'profile' => [
                 'name' => $user->name,
-                'avatar_url' => $this->avatarUrl($user),
+                'avatar_url' => $user->avatarThumbUrl(),
                 'username' => $user->username,
                 'email' => $user->email,
                 'role' => $user->role,
@@ -131,12 +131,5 @@ class ProfileController extends Controller
         }
 
         return back()->with('success', ['key' => 'flash.avatarUpdated']);
-    }
-
-    private function avatarUrl(User $user): ?string
-    {
-        $avatar = $user->getFirstMedia('avatar');
-
-        return $avatar ? route('operations.files.show', [$avatar, 'conversion' => 'thumb']) : null;
     }
 }
