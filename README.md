@@ -19,10 +19,10 @@
 
 <p align="center">
 <strong>Serenity is a management system for a multi-branch yoga centre.</strong><br/>
-It runs the whole operation: branches and rooms, class schedules and sessions, member booking with a
+It covers the full operation: branches and rooms, class schedules and sessions, member booking with a
 waitlist, teacher and student attendance, lesson plans with an approval workflow, tuition invoicing
-and payments, a central file library, notifications by email and in-app, and an AI assistant that
-drafts asana sequences.
+and payments, a central file library, PDF documents, notifications by email and in-app, and an AI
+assistant that drafts asana sequences.
 </p>
 
 ---
@@ -69,60 +69,65 @@ drafts asana sequences.
 
 ## What it does
 
-**Centre setup** — branches, rooms and class types, with a branch switcher in the top bar that scopes
-every list a staff member sees.
+**Centre setup.** Branches, rooms and class types. A branch switcher in the top bar scopes every list
+a staff member sees.
 
-**Scheduling** — recurring class schedules generate concrete class sessions. Sessions carry a coach, a
-room, a capacity and a status (scheduled, done, cancelled).
+**Scheduling.** Recurring class schedules generate concrete class sessions. Each session carries a
+coach, a room, a capacity and a status (scheduled, done or cancelled).
 
-**Booking** — members book and cancel their own places. A full session waitlists, and a cancellation
-promotes the first person waiting and notifies them. The cancellation cutoff is a setting, not a
-constant.
+**Booking.** Members book and cancel their own places. A full session waitlists, and a cancellation
+promotes the first person waiting and notifies them. The cancellation cutoff is a setting rather than
+a constant.
 
-**Attendance** — coaches check in and out of their own sessions, and mark the student roster. Admins
-see every branch; a coach sees only their own sessions. Monthly reports summarise both.
+**Attendance.** Coaches check in and out of their own sessions and mark the student roster. Admins see
+every branch; a coach sees only their own sessions. Monthly reports summarise both.
 
-**Lesson plans** — a coach drafts a plan (objective, asana sequence, level, duration, up to five
-attachments), submits it, and an admin approves or rejects it with a comment. Every decision is kept
-as review history.
+**Lesson plans.** A coach drafts a plan (objective, asana sequence, level, duration, up to five
+attachments) and submits it; an admin approves or rejects it with a comment. Every decision is kept as
+review history.
 
-**Tuition** — tuition plans, invoices with line items, partial payments, payment proofs, voiding
-rather than deleting, and a CSV export. Membership entitlements appear once an invoice is paid.
+**Tuition.** Tuition plans, invoices with line items, partial payments, payment proofs, voiding rather
+than deleting, and a CSV export. Membership entitlements appear once an invoice is paid.
 
-**Files** — one library over every uploaded file. A file is authorised by the record it hangs off, not
-by a flat permission, so a coach cannot read a payment proof by knowing its id.
+**Files.** One library over every uploaded file. A file is authorised by the record it hangs off
+rather than by a flat permission, so a coach cannot read a payment proof by knowing its id.
 
-**Notifications** — nine events across in-app and email, each with per-user channel preferences. Two
+**Documents.** Invoices, monthly attendance reports and lesson plans export to PDF. The templates are
+Blade views rendered by dompdf and pin a font that carries Vietnamese diacritics.
+
+**Notifications.** Nine events across in-app and email, each with per-user channel preferences. Two
 scheduled commands send tuition reminders and class reminders.
 
-**Admin** — user management, role assignment, login logs, an audit trail of sensitive actions
-(including every view of a student's medical notes), and a settings page that actually persists.
+**Admin.** User management, role assignment, login logs, an audit trail of sensitive actions
+(including every view of a student's medical notes), and a settings page that persists to the
+database.
 
-**Search** — one throttled, permission-gated search box across students, coaches, invoices, lesson
-plans and users. Results are row-scoped, so a coach searching a name only finds students booked into
+**Search.** One throttled, permission-gated search box across students, coaches, invoices, lesson
+plans and users. Results are row-scoped, so a coach searching a name finds only students booked into
 their own sessions.
 
-**Dashboard** — real figures, not mock data: revenue by month, sessions taught, attendance rate, new
-members, plans awaiting review, class fill rate.
+**Dashboard.** Live figures rather than mock data: revenue by month, sessions taught, attendance rate,
+new members, plans awaiting review and class fill rate.
 
 ## Roles and authorization
 
-Three roles, and **each user holds exactly one**: `admin`, `coach`, `member`.
+Three roles, and each user holds exactly one: `admin`, `coach`, `member`.
 
-**Every access decision reads a permission, never the role column.** There are 35 permissions —
-admin holds 30, coach 10, member 4 — seeded by `database/seeders/PermissionSeeder.php` and enforced
-three ways:
+Every access decision reads a permission, never the role column. There are 35 permissions (admin holds
+30, coach 10, member 4), seeded by `database/seeders/PermissionSeeder.php` and enforced in three
+places:
 
 - Routes: `Route::middleware('permission:operations.plans.review')`
 - Menu items: `AppMenuItem::make(...)->permissions('operations.plans.view')`
 - Vue: named ability flags shared from `HandleInertiaRequests`, never the full permission list
 
 Two roles can share some permissions and differ in others, so a permission check survives a change of
-role where a role check does not. `users.role` is used only to assign permissions, to show a label,
+role where a role check does not. `users.role` is used only to assign permissions, to render a label,
 and in audit metadata.
 
-Permissions also come in `.any` variants — `operations.plans.view` versus `operations.plans.view.any`
-— which is what narrows a coach to their own records while an admin sees the centre.
+Permissions also come in `.any` variants, such as `operations.plans.view` against
+`operations.plans.view.any`. That distinction is what narrows a coach to their own records while an
+admin sees the whole centre.
 
 ## Tech stack
 
@@ -132,9 +137,10 @@ Permissions also come in `.any` variants — `operations.plans.view` versus `ope
 | Auth | Laravel Fortify |
 | Permissions | spatie/laravel-permission 8 |
 | Files | spatie/laravel-medialibrary 11 |
+| PDF | barryvdh/laravel-dompdf 3 |
 | Hooks | tormjens/eventy (menu registry) |
 | Routes in JS | Ziggy |
-| Frontend | Inertia.js 3 + Vue 3 (Blade renders only the shell, the landing page and the mail templates) |
+| Frontend | Inertia.js 3 and Vue 3 (Blade renders the shell, the landing page, the mail templates and the PDF documents) |
 | Styling | Tailwind v4 and a hand-written design system in `resources/css/ui.css` |
 | Charts | ApexCharts |
 | i18n | laravel-vue-i18n (English and Vietnamese) |
@@ -175,7 +181,7 @@ pnpm dev          # Vite dev server
 php artisan serve # http://127.0.0.1:8000
 ```
 
-For a production-style build, `pnpm build` instead of `pnpm dev`.
+For a production-style build, use `pnpm build` instead of `pnpm dev`.
 
 Sign in at `http://127.0.0.1:8000/cms/login`. The whole app lives under `/cms`.
 
@@ -186,6 +192,10 @@ Sign in at `http://127.0.0.1:8000/cms/login`. The whole app lives under `/cms`.
 > php artisan db:seed --class=PermissionSeeder
 > php artisan permission:cache-reset
 > ```
+
+> **Do not leave a cached config in place while running the test suite.** A cached config overrides
+> every `<env>` pin in `phpunit.xml`, which points the suite at your development database. Run
+> `php artisan config:clear` first. See `AGENTS.md` section 6.
 
 ## Demo accounts
 
@@ -211,30 +221,30 @@ notify:tuition-due        daily at 08:00   overdue and due-soon invoices
 notify:upcoming-classes   daily at 18:00   tomorrow's classes, to members and coaches
 ```
 
-Both are idempotent for the day, so running twice sends once. To see them end to end:
+Both are idempotent for the day, so running twice sends once. To exercise them end to end:
 
 ```sh
 php artisan queue:work      # terminal 1
 php artisan schedule:work   # terminal 2
 ```
 
-`MAIL_ALWAYS_TO` in `.env` redirects every outgoing message to one inbox, which is how the mail path
-is rehearsed without writing to real members.
+`MAIL_ALWAYS_TO` in `.env` redirects every outgoing message to a single inbox, which allows the mail
+path to be rehearsed without writing to real members.
 
 ## AI lesson-plan assistant
 
-Two entry points, both advisory, neither of which ever writes to a lesson plan:
+Two entry points. Both are advisory, and neither writes to a lesson plan:
 
-- **Coach** — "Suggest a sequence" on the plan form. Returns a structured asana sequence the coach
+- **Coach.** "Suggest a sequence" on the plan form returns a structured asana sequence that the coach
   edits and saves themselves.
-- **Admin** — "Check this plan" on a pending plan. Returns a critique under four headings. **It is
-  never wired to approve or reject.** A human always decides.
+- **Admin.** "Check this plan" on a pending plan returns a critique under four headings. It is not
+  wired to approve or reject; a human always decides.
 
-The prompt for the coach's request is built from exactly four whitelisted fields — class type, level,
-duration, objective. No student record, name, medical note or attendance figure is ever sent.
+The prompt for the coach's request is built from exactly four whitelisted fields: class type, level,
+duration and objective. No student record, name, medical note or attendance figure is sent.
 
-An admin may optionally attach **one image** from the plan under review, behind a checkbox that is
-unticked on every visit; PDFs cannot be sent, the image must belong to that plan, and each send writes
+An admin may optionally attach one image from the plan under review, behind a checkbox that starts
+unticked on every visit. PDFs cannot be sent, the image must belong to that plan, and each send writes
 an `ai_attachment_sent` audit row naming who sent what. Prompts and responses are stored in
 `ai_suggestions` as evidence.
 
@@ -247,27 +257,31 @@ GEMINI_MODEL=gemini-3.5-flash
 GEMINI_TIMEOUT=20
 ```
 
-`AI_DRIVER=fake` returns a canned sequence and critique, so **a fresh clone has a working demo with no
-key and no network**. Set `AI_DRIVER=gemini` plus a free key from
+`AI_DRIVER=fake` returns a canned sequence and critique, so a fresh clone has a working demo with no
+key and no network. Set `AI_DRIVER=gemini` with a free key from
 [Google AI Studio](https://aistudio.google.com/apikey), run `php artisan config:clear`, and the same
-buttons call the real API. With `gemini` set and no key, the buttons are not rendered and the
-endpoints return 403 — there is no half-state.
+buttons call the real API. With `gemini` set and no key present, the buttons are not rendered and the
+endpoints return 403, so there is no partially enabled state.
 
 ## Testing
 
 ```sh
-php artisan test        # 328 tests, 1063 assertions
+php artisan test        # 336 tests, 1085 assertions
 vendor/bin/pint         # code style
 ```
 
-Tests run against sqlite in memory and **never open a socket**: mail uses the array transport, the AI
+Tests run against sqlite in memory and never open a socket: mail uses the array transport, the AI
 driver is pinned to `fake`, HTTP calls are faked, and Inertia SSR is disabled for the suite. Feature
 tests that create users need `$seed = true` with `$seeder = PermissionSeeder::class`.
 
+Two manual scripts sit alongside the suite: `tasks/smoke-test-core-flow.md` is a twenty-step happy
+path for use before a demo, and `tasks/e2e-test-flow.md` walks all three roles with the negative
+checks inline.
+
 ## Architecture
 
-**Modular, not a flat `app/Http/Controllers`.** Each feature owns its controllers, actions and form
-requests under `app/Modules/<Area>/<Feature>/`:
+Features are organised as modules rather than a flat `app/Http/Controllers`. Each feature owns its
+controllers, actions and form requests under `app/Modules/<Area>/<Feature>/`:
 
 ```
 app/Modules/
@@ -281,28 +295,29 @@ app/Modules/
 ```
 
 **Actions hold the work.** A controller validates, authorises and delegates; an action such as
-`CancelEnrollmentAction` or `ReviewLessonPlanAction` owns the transaction and the notification.
+`CancelEnrollmentAction` or `ReviewLessonPlanAction` owns the transaction and the notification that
+follows it.
 
-**Shared support** in `app/Support/`:
+**Shared support** lives in `app/Support/`:
 
 | Class | Purpose |
 |---|---|
-| `Menu/MenuRegistry` | The sidebar, registered by each module's provider through Eventy and filtered per viewer's permissions |
+| `Menu/MenuRegistry` | The sidebar, registered by each module's provider through Eventy and filtered against the viewer's permissions |
 | `Settings` | Key-value settings with one cached read per request, forgotten on write |
-| `Table/SortsQueries` | Server-side sorting from a **whitelist map**, so no request value ever reaches `orderBy` |
-| `Ai/GeminiClient` | The one HTTP call, schema-constrained JSON, `null` on any failure |
+| `Table/SortsQueries` | Server-side sorting from a whitelist map, so no request value reaches `orderBy` |
+| `Ai/GeminiClient` | The single HTTP call, schema-constrained JSON, `null` on any failure |
+| `Pdf/DocumentPdf` | One helper behind the three PDF endpoints |
 | `LoginAttemptLogger` | Login log entries |
 
-**Middleware** in `app/Http/Middleware/`: `SetCurrentBranch` (the branch switcher),
-`SetLocale` (cookie, then the user's stored locale, then the centre default),
-`HandleInertiaRequests` (shared props and ability flags), and `PreventPageCaching`, which marks
-authenticated responses `no-store` so pressing Back after a logout cannot redisplay the previous
-user's screen.
+**Middleware** lives in `app/Http/Middleware/`: `SetCurrentBranch` for the branch switcher, `SetLocale`
+(cookie, then the user's stored locale, then the centre default), `HandleInertiaRequests` for shared
+props and ability flags, and `PreventPageCaching`, which marks authenticated responses `no-store` so
+that pressing Back after a logout cannot redisplay the previous user's screen.
 
-**Design system.** `resources/css/ui.css` holds the tokens, the single button system, cards, tables,
-tags, the split layout and the empty states. Pages follow one of three patterns — index (head,
-metric strip, filter band, table), form (cards by concern, actions in the foot), or detail (content
-left, the page's actual job in a sticky right rail).
+**Design system.** `resources/css/ui.css` holds the tokens, the button system, cards, tables, tags,
+the split layout and the empty states. Pages follow one of three patterns: index (head, metric strip,
+filter band, table), form (cards grouped by concern, actions in the foot), or detail (content on the
+left, the page's primary action in a sticky right rail).
 
 ## Project structure
 
@@ -313,7 +328,7 @@ app/
   Models/               20 Eloquent models
   Modules/              feature modules (see above)
   Notifications/        nine events on one abstract base
-  Support/              menu, settings, sorting, AI client
+  Support/              menu, settings, sorting, AI client, PDF
 database/
   migrations/           35 migrations
   seeders/              permissions, demo data
@@ -323,31 +338,34 @@ resources/
   js/Pages/             50 Inertia pages
   js/Components/        form controls, UI primitives, charts
   js/Layouts/           the CMS shell
-  views/                the Inertia root template and mail views
-lang/en, lang/vi/       13 namespaces each
-routes/web.php          141 routes
-tests/Feature/          34 test files
+  views/                the Inertia root template, mail views and PDF templates
+lang/en, lang/vi/       14 namespaces each
+routes/web.php          144 routes
+tests/Feature/          35 test files
 ```
 
 ## Internationalisation
 
-English and Vietnamese, in 13 namespaces per locale. PHP translation files are compiled into the
-bundle by `laravel-vue-i18n`, so `$t('operations.planTitle')` works identically in Blade, in Vue and
-in a queued email.
+English and Vietnamese, in 14 namespaces per locale. PHP translation files are compiled into the
+bundle by `laravel-vue-i18n`, so `$t('operations.planTitle')` resolves identically in Blade, in Vue
+and in a queued email.
 
-The locale resolves as **valid cookie → the user's stored locale → the centre default setting →
-English**, which means a coach whose account is set to Vietnamese gets a Vietnamese interface and a
-Vietnamese email on any browser. Notifications render in the recipient's language, not the sender's.
+The locale resolves in this order: a valid cookie, then the user's stored locale, then the centre
+default setting, then English. A coach whose account is set to Vietnamese therefore gets a Vietnamese
+interface and a Vietnamese email on any browser. Notifications render in the recipient's language
+rather than the sender's.
 
 ## Project status
 
-A graduation project on a twelve-week plan (`PLAN.md`), currently in **Week 11 of 12**. Weeks 1–10
-are delivered: the technical debt clean-up, the schema, profiles, sessions and recurring schedules,
-booking, attendance, lesson plans, tuition, the file library and a dashboard on real data.
+A graduation project built to a twelve-week plan (`PLAN.md`). Weeks 1 to 11 are delivered: the
+technical debt clean-up, the schema, coach and student profiles, sessions and recurring schedules,
+booking and the waitlist, both kinds of attendance, lesson plans with review, tuition, the file
+library, a dashboard on real data, notifications with email delivery, persisted settings, global
+search and the AI assistant. PDF export was added on top of that set.
 
-Week 11 has shipped notifications, email delivery, real settings, global search and the AI assistant.
-Week 12 is testing, optimisation, deployment and documentation. Continuous integration is not yet
-set up and is part of that final week.
+Week 12 is the remaining work: test coverage of the main flows, query and index optimisation, a
+security pass, deployment with a queue worker, cron and database backups, and the written
+documentation. Continuous integration is not yet configured and belongs to that week.
 
 ## Contributing
 
@@ -358,9 +376,9 @@ set up and is part of that final week.
 5. Push to the branch (`git push origin feature/YourFeature`)
 6. Open a pull request
 
-For major changes, open an issue first to discuss what you would like to change. `AGENTS.md` records
-the conventions this codebase is held to — in particular, that every access decision is a permission
-check and never a role check.
+For a substantial change, open an issue first to discuss it. `AGENTS.md` records the conventions this
+codebase is held to, in particular that every access decision is a permission check and never a role
+check.
 
 ## License
 
