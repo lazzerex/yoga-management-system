@@ -39,6 +39,16 @@ class User extends Authenticatable implements HasLocalePreference, HasMedia
         $this->addMediaConversion('thumb')->fit(Fit::Contain, 320, 320)->nonQueued();
     }
 
+    // Queries the relation rather than getFirstMedia(): this is shared before the
+    // controller runs, and a loaded media relation would make a later addMedia or
+    // clearMediaCollection act on a stale snapshot.
+    public function avatarThumbUrl(): ?string
+    {
+        $avatar = $this->media()->where('collection_name', 'avatar')->first();
+
+        return $avatar ? route('operations.files.show', [$avatar, 'conversion' => 'thumb']) : null;
+    }
+
     protected static function booted(): void
     {
         static::saved(function (User $user) {
