@@ -52,8 +52,8 @@
                     <tr>
                         <td>{{ $review->reviewed_at->format('d/m/Y H:i') }}</td>
                         <td>{{ __('pdf.planStatuses.'.$review->action) }}</td>
-                        <td>{{ $review->reviewer?->name ?? '—' }}</td>
-                        <td class="muted">{{ $review->comment ?: '—' }}</td>
+                        <td>{{ $review->reviewer?->name ?? '-' }}</td>
+                        <td class="muted">{{ $review->comment ?: '-' }}</td>
                     </tr>
                 @endforeach
             </tbody>

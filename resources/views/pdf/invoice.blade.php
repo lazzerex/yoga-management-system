@@ -76,7 +76,7 @@
                     <tr>
                         <td>{{ $payment->paid_at->format('d/m/Y') }}</td>
                         <td>{{ __('pdf.method.'.$payment->method) }}</td>
-                        <td class="muted">{{ $payment->reference ?: '—' }}</td>
+                        <td class="muted">{{ $payment->reference ?: '-' }}</td>
                         <td class="num">
                             {{ $money($payment->amount) }}
                             @if ($payment->isVoided())

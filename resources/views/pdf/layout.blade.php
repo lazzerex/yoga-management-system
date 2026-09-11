@@ -57,7 +57,7 @@
     @yield('content')
 
     <div class="foot">
-        {{ $centreName }} — {{ __('pdf.generatedOn', ['date' => $generatedAt]) }}
+        {{ $centreName }} · {{ __('pdf.generatedOn', ['date' => $generatedAt]) }}
     </div>
 </body>
 </html>
