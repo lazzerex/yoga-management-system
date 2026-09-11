@@ -94,6 +94,7 @@ export default {
                             <th class="is-num">{{ $t('operations.amount') }}</th>
                             <th class="is-num">{{ $t('operations.invoiceBalance') }}</th>
                             <th>{{ $t('operations.status') }}</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -108,6 +109,11 @@ export default {
                                 <span class="ym-tag" :class="`ym-tag--${statusTone[invoice.status] ?? 'neutral'}`">
                                     {{ statusLabel(invoice.status) }}
                                 </span>
+                            </td>
+                            <td>
+                                <a :href="invoice.pdfUrl" class="ym-btn ym-btn--outline ym-btn--pdf ym-btn--sm">
+                                    <i class="bi bi-filetype-pdf" /> {{ $t('common.exportPdf') }}
+                                </a>
                             </td>
                         </tr>
                     </tbody>
