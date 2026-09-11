@@ -32,6 +32,7 @@ class MembershipController extends Controller
                 'status' => $invoice->displayStatus(),
                 'total_amount' => $invoice->total_amount,
                 'balance' => $invoice->balance(),
+                'pdfUrl' => route('operations.invoices.pdf', $invoice),
             ]),
             'outstanding' => (int) $invoices->filter(fn (Invoice $invoice) => in_array($invoice->status, Invoice::OPEN_STATUSES, true))
                 ->sum(fn (Invoice $invoice) => $invoice->balance()),
