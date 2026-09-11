@@ -26,6 +26,7 @@ return [
     'confirm' => 'Confirm',
     'back' => 'Back',
     'export' => 'Export CSV',
+    'exportPdf' => 'Export PDF',
     'loading' => 'Loading...',
     'noData' => 'No data',
     'clearFilters' => 'Clear',
