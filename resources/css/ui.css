@@ -138,7 +138,7 @@
         color: var(--u-brand-deep);
     }
 
-    /* Quiet: for actions that must be reachable but never compete — void, delete. */
+    /* Quiet: for actions that must be reachable but never compete, such as void and delete. */
     .ym-btn--quiet {
         background: transparent;
         border-color: transparent;

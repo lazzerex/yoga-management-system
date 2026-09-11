@@ -115,7 +115,7 @@
         .ym-sidebar-collapse-toggle { display: inline-flex; }
     }
 
-    /* Width is the expanded rail's, and it never changes — that is the whole point of
+    /* Width is the expanded rail's, and it never changes. That is the whole point of
        lifting the brand out of the rail. */
     .ym-brand {
         position: relative;

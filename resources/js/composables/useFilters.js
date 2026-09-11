@@ -61,7 +61,7 @@ export function useFilters(url, initial = {}, debounced = ['search']) {
 
     /**
      * Change several fields as one request. Watchers flush after the current tick, so the
-     * guard has to outlive it — releasing it straight away would let each field fire again.
+     * guard has to outlive it: releasing it straight away would let each field fire again.
      */
     const batch = (mutate) => {
         suspended = true;
