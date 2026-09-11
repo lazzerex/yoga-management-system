@@ -8,6 +8,7 @@ use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\StudentProfile;
 use App\Models\TuitionPlan;
+use App\Models\User;
 use App\Modules\Operations\Tuition\Actions\CreateInvoiceAction;
 use App\Modules\Operations\Tuition\Actions\DeleteInvoiceAction;
 use App\Modules\Operations\Tuition\Actions\RecordPaymentAction;
@@ -17,6 +18,7 @@ use App\Modules\Operations\Tuition\Actions\WaiveInvoiceAction;
 use App\Modules\Operations\Tuition\Requests\StoreInvoiceRequest;
 use App\Modules\Operations\Tuition\Requests\StorePaymentRequest;
 use App\Modules\Operations\Tuition\Requests\VoidPaymentRequest;
+use App\Support\Pdf\DocumentPdf;
 use App\Support\Table\SortsQueries;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -155,9 +157,32 @@ class InvoiceController extends Controller
                 'payment' => $canManage && ! $settled ? route('operations.invoices.payments.store', $invoice) : null,
                 'waive' => $canManage && $invoice->status === 'unpaid' ? route('operations.invoices.waive', $invoice) : null,
                 'destroy' => $canManage && $invoice->payments->isEmpty() ? route('operations.invoices.destroy', $invoice) : null,
+                'pdf' => route('operations.invoices.pdf', $invoice),
                 'index' => route('operations.tuition-fees'),
             ],
         ]);
+    }
+
+    public function pdf(Request $request, Invoice $invoice): \Illuminate\Http\Response
+    {
+        abort_unless($this->canSee($request->user(), $invoice), 403);
+
+        $invoice->load(['studentProfile.user:id,name', 'branch:id,name', 'items', 'payments']);
+
+        return DocumentPdf::download(
+            'pdf.invoice',
+            ['invoice' => $invoice],
+            __('pdf.invoiceTitle', ['number' => $invoice->invoice_number]),
+            'invoice-'.$invoice->invoice_number.'.pdf',
+        );
+    }
+
+    // Staff read every invoice through the tuition permission. A member holds none of
+    // those, and reaches only the invoices raised against their own profile.
+    private function canSee(User $user, Invoice $invoice): bool
+    {
+        return $user->can('operations.tuition.view')
+            || ($user->studentProfile && $invoice->student_profile_id === $user->studentProfile->id);
     }
 
     public function recordPayment(StorePaymentRequest $request, Invoice $invoice, RecordPaymentAction $action): RedirectResponse
