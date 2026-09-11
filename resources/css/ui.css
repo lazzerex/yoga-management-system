@@ -169,6 +169,22 @@
 
     .ym-btn--danger-quiet:hover:not(:disabled) { background: var(--u-danger-soft); }
 
+    /* A document export is easy to miss beside the page's own actions, so it carries a
+       fill rather than sitting flat on the background. */
+    .ym-btn--pdf {
+        background: var(--u-brand-soft);
+        border-color: var(--u-brand-line);
+        color: var(--u-brand-deep);
+    }
+
+    .ym-btn--pdf:hover:not(:disabled) {
+        background: var(--u-surface);
+        border-color: var(--u-brand);
+        color: var(--u-brand-deep);
+    }
+
+    .ym-btn--pdf .bi { color: var(--u-danger); }
+
     .ym-btn--sm { padding: 0.34rem 0.62rem; font-size: 0.76rem; }
     .ym-btn--lg { padding: 0.66rem 1.1rem; font-size: 0.9rem; }
     .ym-btn--block { width: 100%; }
@@ -255,7 +271,7 @@
         align-items: start;
     }
 
-    /* The shell's .ym-topbar is sticky at top:0, so the rail has to clear it. */
+    /* The shell's .ym-appbar is sticky at top:0, so the rail has to clear it. */
     .ym-split-rail { position: sticky; top: var(--u-sticky-top, 6.75rem); }
 
     @media (max-width: 1100px) {
@@ -993,6 +1009,7 @@
     /* ---- Sub-tabs: sibling pages, not client-side tabs ---- */
 
     .ym-subtabs {
+        position: relative;
         display: inline-flex;
         gap: 0.2rem;
         padding: 0.2rem;
@@ -1002,23 +1019,33 @@
         background: var(--u-surface-2);
     }
 
+    /* The pill is one element that slides, rather than a background on each tab. */
+    .ym-subtab-indicator {
+        position: absolute;
+        top: 0.2rem;
+        bottom: 0.2rem;
+        border-radius: 999px;
+        background: var(--u-surface);
+        box-shadow: 0 1px 2px rgba(22, 55, 44, 0.12);
+        transition: left 260ms cubic-bezier(0.4, 0, 0.2, 1),
+            width 260ms cubic-bezier(0.4, 0, 0.2, 1), opacity 160ms ease;
+    }
+
     .ym-subtab {
+        position: relative;
+        z-index: 1;
         padding: 0.35rem 0.85rem;
         border-radius: 999px;
         font-size: 0.79rem;
         font-weight: 650;
         color: var(--u-ink-4);
         text-decoration: none;
-        transition: background var(--ym-dur) var(--ym-ease), color var(--ym-dur) var(--ym-ease);
+        transition: color var(--ym-dur) var(--ym-ease);
     }
 
     .ym-subtab:hover { color: var(--u-ink-2); }
 
-    .ym-subtab.is-active {
-        background: var(--u-surface);
-        color: var(--u-brand-deep);
-        box-shadow: 0 1px 2px rgba(22, 55, 44, 0.12);
-    }
+    .ym-subtab.is-active { color: var(--u-brand-deep); }
 
     /* ---- Pagination ---- */
 
