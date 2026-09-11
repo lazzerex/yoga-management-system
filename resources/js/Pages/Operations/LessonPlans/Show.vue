@@ -68,7 +68,7 @@ export default {
                 <p class="ym-page-sub">{{ plan.class_type_name }} · {{ plan.branch_name }} · {{ plan.coach_name }}</p>
             </div>
             <div class="ym-page-actions">
-                <a :href="endpoints.pdf" class="ym-btn ym-btn--outline ym-btn--pdf">
+                <a :href="endpoints.pdf" class="ym-btn ym-btn--export">
                     <i class="bi bi-filetype-pdf" /> {{ $t('common.exportPdf') }}
                 </a>
                 <Link v-if="endpoints.edit" :href="endpoints.edit" class="ym-btn ym-btn--outline">

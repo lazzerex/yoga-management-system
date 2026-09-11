@@ -45,7 +45,7 @@ export default {
                 </p>
             </div>
             <div class="ym-page-actions">
-                <a :href="endpoints.export" class="ym-btn ym-btn--quiet">
+                <a :href="endpoints.export" class="ym-btn ym-btn--export">
                     <i class="bi bi-download" /> {{ $t('common.export') }}
                 </a>
                 <Link v-if="endpoints.plans" :href="endpoints.plans" class="ym-btn ym-btn--outline">

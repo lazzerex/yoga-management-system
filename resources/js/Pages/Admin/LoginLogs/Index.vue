@@ -61,7 +61,7 @@ export default {
             </div>
             <div class="ym-page-actions">
                 <Link :href="endpoints.users" class="ym-btn ym-btn--quiet">{{ $t('admin.users') }}</Link>
-                <a :href="endpoints.export" class="ym-btn ym-btn--outline">
+                <a :href="endpoints.export" class="ym-btn ym-btn--export">
                     <i class="bi bi-download" /> {{ $t('admin.exportCsv') }}
                 </a>
             </div>

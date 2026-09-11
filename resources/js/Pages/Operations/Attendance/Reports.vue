@@ -79,7 +79,7 @@ export default {
             </div>
             <div class="ym-page-actions">
                 <input v-model="month" type="month" class="ym-log-filter-select" />
-                <a :href="`${endpoints.pdf}?month=${month}`" class="ym-btn ym-btn--outline ym-btn--pdf">
+                <a :href="`${endpoints.pdf}?month=${month}`" class="ym-btn ym-btn--export">
                     <i class="bi bi-filetype-pdf" /> {{ $t('common.exportPdf') }}
                 </a>
                 <Link :href="endpoints.board" class="ym-btn ym-btn--outline">

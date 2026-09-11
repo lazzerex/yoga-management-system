@@ -111,7 +111,7 @@ export default {
                                 </span>
                             </td>
                             <td>
-                                <a :href="invoice.pdfUrl" class="ym-btn ym-btn--outline ym-btn--pdf ym-btn--sm">
+                                <a :href="invoice.pdfUrl" class="ym-btn ym-btn--export ym-btn--sm">
                                     <i class="bi bi-filetype-pdf" /> {{ $t('common.exportPdf') }}
                                 </a>
                             </td>
