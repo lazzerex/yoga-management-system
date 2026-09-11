@@ -136,6 +136,9 @@ export default {
                 <p class="ym-page-sub">{{ invoice.student_name }} · {{ invoice.branch_name }}</p>
             </div>
             <div class="ym-page-actions">
+                <a :href="endpoints.pdf" class="ym-btn ym-btn--outline ym-btn--pdf">
+                    <i class="bi bi-filetype-pdf" /> {{ $t('common.exportPdf') }}
+                </a>
                 <button v-if="endpoints.waive" type="button" class="ym-btn ym-btn--outline" @click="confirmingWaive = true">
                     <i class="bi bi-slash-circle" /> {{ $t('operations.waiveInvoice') }}
                 </button>
