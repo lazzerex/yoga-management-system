@@ -56,6 +56,7 @@ class HandleInertiaRequests extends Middleware
                     'username' => $user->username,
                     'email' => $user->email,
                     'role' => $user->role,
+                    'avatarUrl' => $user->avatarThumbUrl(),
                     'canAccessAdmin' => $user->canAccessAdmin(),
                     'canViewCoachDashboard' => $user->can('coach.dashboard.view'),
                     'canSearch' => SearchController::isAvailableTo($user),
