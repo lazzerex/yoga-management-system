@@ -13,9 +13,11 @@ use App\Modules\Operations\Attendance\Actions\CheckOutCoachAction;
 use App\Modules\Operations\Attendance\Actions\MarkStudentAttendanceAction;
 use App\Modules\Operations\Attendance\Actions\SessionBoardStatsAction;
 use App\Modules\Operations\Attendance\Requests\MarkAttendanceRequest;
+use App\Support\Pdf\DocumentPdf;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Inertia\Response;
 
 class AttendanceController extends Controller
@@ -163,6 +165,32 @@ class AttendanceController extends Controller
 
     public function reports(Request $request): Response
     {
+        return inertia('Operations/Attendance/Reports', $this->reportData($request) + [
+            'endpoints' => [
+                'board' => route('operations.teacher-attendance'),
+                'pdf' => route('operations.attendance.reports.pdf'),
+            ],
+        ]);
+    }
+
+    public function reportPdf(Request $request): \Illuminate\Http\Response
+    {
+        $data = $this->reportData($request);
+
+        return DocumentPdf::download(
+            'pdf.attendance-report',
+            $data,
+            __('pdf.reportTitle'),
+            'attendance-'.$data['month'].'.pdf',
+            __('pdf.reportPeriod', ['month' => $data['month']]),
+        );
+    }
+
+    /**
+     * @return array{month: string, taughtHours: Collection, attendanceRates: Collection}
+     */
+    private function reportData(Request $request): array
+    {
         $user = $request->user();
         $branchId = $request->attributes->get('currentBranch')?->id;
         $month = $this->resolveMonth($request->string('month')->toString());
@@ -211,14 +239,11 @@ class AttendanceController extends Controller
             ->sortBy('student_name')
             ->values();
 
-        return inertia('Operations/Attendance/Reports', [
+        return [
             'month' => $month,
             'taughtHours' => $taughtHours,
             'attendanceRates' => $attendanceRates,
-            'endpoints' => [
-                'board' => route('operations.teacher-attendance'),
-            ],
-        ]);
+        ];
     }
 
     private function canView(User $user, ClassSession $classSession): bool
