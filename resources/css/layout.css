@@ -1,6 +1,23 @@
 @layer components {
+    /* The header spans both columns, so the brand keeps its width while only the nav
+       column animates. Nothing above the nav moves when the rail collapses. */
     .ym-shell {
         min-height: 100vh;
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        grid-template-rows: auto minmax(0, 1fr);
+    }
+
+    .ym-appbar {
+        grid-column: 1 / -1;
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        align-items: stretch;
+        background: color-mix(in oklab, #f6f8fb 82%, #ffffff 18%);
+        border-bottom: 1px solid var(--ym-sidebar-border);
+        backdrop-filter: blur(8px);
     }
 
     .ym-sidebar {
@@ -9,34 +26,20 @@
         border-right: 1px solid var(--ym-sidebar-border);
         display: flex;
         flex-direction: column;
-        /* Fixed, not sticky: whole rail stays put. Scrolling lives on .ym-side-nav. */
-        position: fixed;
-        top: 0;
-        left: 0;
-        height: 100vh;
+        position: sticky;
+        top: var(--ym-topbar-h, 118px);
+        align-self: start;
+        height: calc(100vh - var(--ym-topbar-h, 118px));
         z-index: 49;
         transition: width var(--ym-collapse-dur) var(--ym-ease);
     }
 
     .ym-sidebar--collapsed { width: 76px; }
 
-    /* Stays a row: the mark is the tallest thing in it, so the header height never changes. */
-    .ym-sidebar--collapsed .ym-brand {
-        justify-content: center;
-        padding-inline: 0.5rem;
-    }
-
     .ym-brand-text {
         overflow: hidden;
         white-space: nowrap;
-        max-width: 200px;
-        max-height: 3rem;
-        opacity: 1;
-        transition: opacity 200ms ease, max-width var(--ym-collapse-dur) var(--ym-ease),
-            max-height var(--ym-collapse-dur) var(--ym-ease);
     }
-
-    .ym-sidebar--collapsed .ym-brand-text { opacity: 0; max-width: 0; max-height: 0; }
 
     .ym-sidebar--collapsed .ym-side-group,
     .ym-sidebar--collapsed .ym-side-link-badge,
@@ -90,9 +93,9 @@
         top: 50%;
         right: 0.55rem;
         transform: translateY(-50%);
-        width: 1.75rem;
-        height: 1.75rem;
-        font-size: 0.85rem;
+        width: 2.1rem;
+        height: 2.1rem;
+        font-size: 1rem;
         border-radius: var(--ym-radius-sm);
         border: 1px solid #d4dce7;
         background: #ffffff;
@@ -101,68 +104,51 @@
         justify-content: center;
         cursor: pointer;
         z-index: 30;
-        transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease,
-            opacity 160ms ease;
+        transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
     }
 
     .ym-sidebar-collapse-toggle:hover { background: #f2f6fb; color: #35495f; border-color: #c9d3e0; }
 
     .ym-sidebar-collapse-toggle:focus-visible { outline: 2px solid var(--ym-primary); outline-offset: 2px; }
 
-    /* Toggle and mark share one centre and cross-fade; the hidden chevron keeps its hit
-       area, so the mark itself is what expands the rail. */
-    .ym-sidebar--collapsed .ym-sidebar-collapse-toggle {
-        right: auto;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        opacity: 0;
-    }
-
-    .ym-sidebar--collapsed .ym-brand:hover .ym-sidebar-collapse-toggle,
-    .ym-sidebar--collapsed .ym-brand:focus-within .ym-sidebar-collapse-toggle {
-        opacity: 1;
-    }
-
-    .ym-sidebar--collapsed .ym-brand:hover .ym-brand-mark,
-    .ym-sidebar--collapsed .ym-brand:focus-within .ym-brand-mark {
-        opacity: 0;
-    }
-
     @media (min-width: 1024px) {
         .ym-sidebar-collapse-toggle { display: inline-flex; }
     }
 
+    /* Width is the expanded rail's, and it never changes — that is the whole point of
+       lifting the brand out of the rail. */
     .ym-brand {
         position: relative;
+        flex: 0 0 268px;
         display: flex;
         align-items: center;
-        gap: 0.75rem;
-        transition: gap var(--ym-collapse-dur) var(--ym-ease), padding-inline var(--ym-collapse-dur) var(--ym-ease);
-        padding: 1rem 0.9rem 0.85rem;
-        border-bottom: 1px solid var(--ym-sidebar-border);
+        gap: 0.65rem;
+        padding: 0.5rem 0.9rem;
+        border-right: 1px solid var(--ym-sidebar-border);
+        background: var(--ym-sidebar);
     }
 
     .ym-brand-mark {
-        width: 2rem;
-        height: 2rem;
-        border-radius: 0.5rem;
+        width: 2.25rem;
+        height: 2.25rem;
+        border-radius: 0.55rem;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(145deg, #e5eefc 0%, #d5e5fb 100%);
-        color: #5a7db5;
-        font-size: 0.82rem;
+        background: var(--u-brand-soft);
+        border: 1px solid var(--u-brand-line);
+        color: var(--u-brand-deep);
+        font-size: 0.9rem;
         font-weight: 800;
         letter-spacing: 0.03em;
         flex-shrink: 0;
-        transition: opacity 160ms ease;
     }
 
     .ym-brand-title {
-        font-size: 1.03rem;
-        font-weight: 800;
+        font-size: 1.15rem;
+        font-weight: 750;
         letter-spacing: -0.01em;
-        color: #5b7cae;
+        color: var(--u-brand-deep);
     }
 
     .ym-side-nav {
@@ -335,23 +321,10 @@
         flex-direction: column;
     }
 
-    /* Rail is out of flow, so the workspace reserves its width. */
-    @media (min-width: 1024px) {
-        .ym-workspace {
-            margin-left: 268px;
-            transition: margin-left var(--ym-collapse-dur) var(--ym-ease);
-        }
-
-        .ym-shell--collapsed .ym-workspace { margin-left: 76px; }
-    }
 
     .ym-topbar {
-        position: sticky;
-        top: 0;
-        z-index: 20;
-        background: color-mix(in oklab, #f6f8fb 82%, #ffffff 18%);
-        border-bottom: 1px solid var(--ym-sidebar-border);
-        backdrop-filter: blur(8px);
+        flex: 1;
+        min-width: 0;
     }
 
     .ym-topbar-head {
@@ -365,7 +338,7 @@
         align-items: center;
         justify-content: space-between;
         gap: 1rem;
-        padding: 1rem 1.6rem 0.62rem;
+        padding: 0.55rem 1.6rem 0.45rem;
     }
 
     .ym-overline {
@@ -926,9 +899,17 @@
     }
 
     @media (max-width: 1023px) {
+        /* The rail is a drawer here, so it leaves the grid and the header is one row. */
+        .ym-shell { grid-template-columns: minmax(0, 1fr); }
+        .ym-appbar { grid-column: 1; }
+        .ym-brand { flex: 0 0 auto; border-right: 0; background: transparent; }
+
         .ym-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
             height: 100dvh;
-            z-index: 50;
+            z-index: 51;
             transform: translateX(-100%);
             transition: transform 220ms ease;
             border-right: 1px solid var(--ym-sidebar-border);
