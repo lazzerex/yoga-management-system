@@ -52,8 +52,8 @@ class PermissionSeeder extends Seeder
             Permission::firstOrCreate(['name' => $name]);
         }
 
-        // Mirrors the current role:x,y route groups in routes/web.php exactly —
-        // see menu.md Step 10.7 for the route side of this same mapping.
+        // Mirrors the current role:x,y route groups in routes/web.php exactly.
+        // See menu.md Step 10.7 for the route side of this same mapping.
         $admin = Role::firstOrCreate(['name' => 'admin']);
         $admin->syncPermissions([
             'operations.center.view',

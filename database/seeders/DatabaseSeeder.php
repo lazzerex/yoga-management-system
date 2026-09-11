@@ -43,7 +43,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // WithoutModelEvents suppresses the User::booted() saved hook during
-        // seeding, so backfill spatie roles explicitly here — see menu.md 10.4.
+        // seeding, so backfill spatie roles explicitly here. See menu.md 10.4.
         User::query()->get()->each(fn (User $user) => $user->syncRoles([$user->role]));
     }
 }

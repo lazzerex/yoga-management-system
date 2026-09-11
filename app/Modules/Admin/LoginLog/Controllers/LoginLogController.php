@@ -78,11 +78,11 @@ class LoginLogController extends Controller
                     foreach ($logs as $log) {
                         fputcsv($handle, [
                             $log->status,
-                            $log->user?->name ?? '—',
-                            $log->attempted_identifier ?? '—',
+                            $log->user?->name ?? '-',
+                            $log->attempted_identifier ?? '-',
                             $log->ip_address,
                             $log->device_type,
-                            $log->failure_reason ?? '—',
+                            $log->failure_reason ?? '-',
                             $log->logged_in_at?->format('Y-m-d H:i:s'),
                         ]);
                     }

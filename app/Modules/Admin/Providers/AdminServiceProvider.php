@@ -43,7 +43,7 @@ class AdminServiceProvider extends ServiceProvider
                     ->icon('bi-journal-text')->iconColor('#7a6bc4')->group('nav.admin')->order(52)
                     ->permissions('admin.audit-logs.view'),
 
-                // Submenu example — mock children, per task allowance.
+                // Submenu example with mock children, per task allowance.
                 AppMenuItem::make('nav.settings')
                     ->nolink()
                     ->icon('bi-gear')->iconColor('#6e7891')->group('nav.admin')->order(60)

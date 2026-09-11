@@ -97,7 +97,7 @@ class InvoiceSeeder extends Seeder
                 ]);
 
                 // A few are written off instead of chased. Waiving takes a payment-free
-                // invoice, so it happens before settlement — but never on the invoice
+                // invoice, so it happens before settlement, but never on the invoice
                 // that is guaranteeing this branch some revenue this month.
                 $guaranteed = $monthsAgo === 0 && ! in_array($branch->id, $this->paidThisMonth, true);
 

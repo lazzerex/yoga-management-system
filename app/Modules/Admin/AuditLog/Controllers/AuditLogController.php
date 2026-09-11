@@ -75,8 +75,8 @@ class AuditLogController extends Controller
                         fputcsv($handle, [
                             $log->causer?->name ?? 'System',
                             $log->action,
-                            $log->subject_name ?? '—',
-                            $log->meta ? json_encode($log->meta) : '—',
+                            $log->subject_name ?? '-',
+                            $log->meta ? json_encode($log->meta) : '-',
                             $log->created_at?->format('Y-m-d H:i:s'),
                         ]);
                     }
