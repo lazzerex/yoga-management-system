@@ -169,21 +169,23 @@
 
     .ym-btn--danger-quiet:hover:not(:disabled) { background: var(--u-danger-soft); }
 
-    /* A document export is easy to miss beside the page's own actions, so it carries a
-       fill rather than sitting flat on the background. */
-    .ym-btn--pdf {
-        background: var(--u-brand-soft);
-        border-color: var(--u-brand-line);
-        color: var(--u-brand-deep);
-    }
-
-    .ym-btn--pdf:hover:not(:disabled) {
+    /* CSV and PDF exports sit beside the page's own actions on a tinted background, where a
+       hairline border reads as decoration rather than as a control. A saturated border and a
+       lift make the boundary unmistakable while staying subordinate to the filled primary. */
+    .ym-btn--export {
         background: var(--u-surface);
         border-color: var(--u-brand);
         color: var(--u-brand-deep);
+        box-shadow: 0 1px 2px rgba(22, 55, 44, 0.16);
     }
 
-    .ym-btn--pdf .bi { color: var(--u-danger); }
+    .ym-btn--export:hover:not(:disabled) {
+        background: var(--u-brand-soft);
+        border-color: var(--u-brand-strong);
+        color: var(--u-brand-strong);
+    }
+
+    .ym-btn--export .bi-filetype-pdf { color: var(--u-danger); }
 
     .ym-btn--sm { padding: 0.34rem 0.62rem; font-size: 0.76rem; }
     .ym-btn--lg { padding: 0.66rem 1.1rem; font-size: 0.9rem; }
