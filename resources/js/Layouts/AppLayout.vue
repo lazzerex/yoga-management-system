@@ -745,7 +745,7 @@ const logout = () => {
     <div class="ym-shell" :class="{ 'ym-shell--collapsed': sidebarCollapsed }">
         <div v-if="sidebarOpen" class="ym-sidebar-backdrop" @click="closeSidebar" />
 
-        <aside class="ym-sidebar" :class="{ 'ym-sidebar--open': sidebarOpen, 'ym-sidebar--collapsed': sidebarCollapsed }">
+        <div ref="topbarRef" class="ym-appbar">
             <div class="ym-brand">
                 <p class="ym-brand-mark">YM</p>
                 <div class="ym-brand-text">
@@ -762,29 +762,7 @@ const logout = () => {
                 </button>
             </div>
 
-            <nav ref="sideNavRef" class="ym-side-nav">
-                <span class="ym-side-active-indicator" :style="sideIndicatorStyle" />
-                <section v-for="group in sidebarMenu" :key="group.key" class="ym-side-group-wrap">
-                    <p class="ym-side-group">{{ group.label }}</p>
-                    <SidebarMenuItem
-                        v-for="item in group.items"
-                        :key="item.href ?? item.labelKey"
-                        :item="item"
-                        :open-items="openMenuItems"
-                        :is-active="isMenuLinkActive"
-                        :toggle="toggleMenuItem"
-                        :collapsed="sidebarCollapsed"
-                    />
-                </section>
-            </nav>
-
-            <div class="ym-sidebar-footer">
-                <span class="ym-badge">{{ roleLabel }}</span>
-            </div>
-        </aside>
-
-        <div class="ym-workspace">
-            <header ref="topbarRef" class="ym-topbar">
+            <header class="ym-topbar">
                 <div class="ym-topbar-row">
                     <div class="ym-topbar-head">
                         <button
@@ -1079,7 +1057,31 @@ const logout = () => {
                     </div>
                 </nav>
             </header>
+        </div>
 
+        <aside class="ym-sidebar" :class="{ 'ym-sidebar--open': sidebarOpen, 'ym-sidebar--collapsed': sidebarCollapsed }">
+            <nav ref="sideNavRef" class="ym-side-nav">
+                <span class="ym-side-active-indicator" :style="sideIndicatorStyle" />
+                <section v-for="group in sidebarMenu" :key="group.key" class="ym-side-group-wrap">
+                    <p class="ym-side-group">{{ group.label }}</p>
+                    <SidebarMenuItem
+                        v-for="item in group.items"
+                        :key="item.href ?? item.labelKey"
+                        :item="item"
+                        :open-items="openMenuItems"
+                        :is-active="isMenuLinkActive"
+                        :toggle="toggleMenuItem"
+                        :collapsed="sidebarCollapsed"
+                    />
+                </section>
+            </nav>
+
+            <div class="ym-sidebar-footer">
+                <span class="ym-badge">{{ roleLabel }}</span>
+            </div>
+        </aside>
+
+        <div class="ym-workspace">
             <main class="ym-main">
                 <div class="ym-alert-stack">
                 <Transition name="ym-alert-fade">
