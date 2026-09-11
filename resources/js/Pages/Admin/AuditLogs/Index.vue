@@ -99,7 +99,7 @@ export default {
                 <p class="ym-page-sub">{{ $t('admin.auditSubtitle') }}</p>
             </div>
             <div class="ym-page-actions">
-                <a :href="endpoints.export" class="ym-btn ym-btn--outline">
+                <a :href="endpoints.export" class="ym-btn ym-btn--export">
                     <i class="bi bi-download" /> {{ $t('admin.exportCsv') }}
                 </a>
             </div>
