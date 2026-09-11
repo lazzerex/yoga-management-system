@@ -4,6 +4,7 @@ import { trans as t } from 'laravel-vue-i18n';
 import FilterBar from '@/Components/UI/FilterBar.vue';
 import DateRange from '@/Components/UI/DateRange.vue';
 import SortTh from '@/Components/UI/SortTh.vue';
+import SubTabs from '@/Components/UI/SubTabs.vue';
 import { useFilters } from '@/composables/useFilters.js';
 
 const props = defineProps({
@@ -104,10 +105,13 @@ export default {
             </div>
         </header>
 
-        <div class="ym-subtabs">
-            <Link :href="endpoints.login_logs" class="ym-subtab">{{ $t('admin.loginLogs') }}</Link>
-            <Link :href="endpoints.self" class="ym-subtab is-active">{{ $t('admin.auditLogs') }}</Link>
-        </div>
+        <SubTabs
+            group="admin-logs"
+            :tabs="[
+                { label: $t('admin.loginLogs'), href: endpoints.login_logs, active: false },
+                { label: $t('admin.auditLogs'), href: endpoints.self, active: true },
+            ]"
+        />
 
         <section class="ym-card">
             <div class="ym-filter-band">
