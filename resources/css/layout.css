@@ -640,6 +640,7 @@
         margin-bottom: 0.28rem;
     }
 
+    /* Initials fallback matches .ym-avatar-lg--initials on the profile page. */
     .ym-profile-avatar {
         width: 1.86rem;
         height: 1.86rem;
@@ -649,9 +650,15 @@
         justify-content: center;
         font-size: 0.72rem;
         font-weight: 700;
-        color: #ffffff;
-        background: linear-gradient(140deg, #5a89bf, #4f70b7);
+        letter-spacing: 0.02em;
+        color: var(--u-brand-deep);
+        background: var(--u-brand-soft);
         flex-shrink: 0;
+    }
+
+    .ym-profile-avatar--photo {
+        object-fit: cover;
+        background: var(--u-brand-soft);
     }
 
     .ym-profile-name {
