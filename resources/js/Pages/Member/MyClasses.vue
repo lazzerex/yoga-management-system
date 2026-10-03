@@ -99,9 +99,9 @@ const downloadIcs = (item) => {
     const lines = [
         'BEGIN:VCALENDAR',
         'VERSION:2.0',
-        'PRODID:-//Serenity Yoga//Booking//EN',
+        'PRODID:-//Yoga Management System//Booking//EN',
         'BEGIN:VEVENT',
-        `UID:enrollment-${item.id}@serenity-yoga`,
+        `UID:enrollment-${item.id}@yoga-management-system`,
         `DTSTAMP:${now}`,
         `DTSTART:${stamp(item.session_date, item.start_time)}`,
         `DTEND:${stamp(item.session_date, item.end_time)}`,

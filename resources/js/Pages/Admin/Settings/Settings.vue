@@ -65,7 +65,7 @@ const GROUPS = {
             rows: [
                 { key: 'emailReminders', type: 'toggle', value: true },
                 { key: 'reminderLeadTime', type: 'number', value: '3' },
-                { key: 'fromAddress', type: 'text', value: 'no-reply@serenity.test' },
+                { key: 'fromAddress', type: 'text', value: 'no-reply@example.test' },
             ],
         },
         {
