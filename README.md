@@ -1,4 +1,4 @@
-# Serenity
+# Yoga Management System
 
 <p align="center">
 
@@ -18,7 +18,7 @@
 </p>
 
 <p align="center">
-<strong>Serenity is a management system for a multi-branch yoga centre.</strong><br/>
+<strong>A management system for a multi-branch yoga centre.</strong><br/>
 It covers the full operation: branches and rooms, class schedules and sessions, member booking with a
 waitlist, teacher and student attendance, lesson plans with an approval workflow, tuition invoicing
 and payments, a central file library, PDF documents, notifications by email and in-app, and an AI
