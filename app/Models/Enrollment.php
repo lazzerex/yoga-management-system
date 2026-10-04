@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable(['student_profile_id', 'class_session_id', 'status', 'enrolled_at', 'cancelled_at'])]
+#[Fillable(['student_profile_id', 'class_session_id', 'invoice_item_id', 'status', 'enrolled_at', 'cancelled_at'])]
 class Enrollment extends Model
 {
     /** @use HasFactory<EnrollmentFactory> */
@@ -31,6 +31,11 @@ class Enrollment extends Model
     public function classSession(): BelongsTo
     {
         return $this->belongsTo(ClassSession::class);
+    }
+
+    public function invoiceItem(): BelongsTo
+    {
+        return $this->belongsTo(InvoiceItem::class);
     }
 
     public function attendance(): HasOne
