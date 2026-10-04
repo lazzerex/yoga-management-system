@@ -32,13 +32,14 @@ class DatabaseSeeder extends Seeder
         // seeding a year of enrolments nobody reads.
         app(GenerateClassSessionsAction::class)->execute(weeksBack: 20);
 
+        // Billing before bookings: the lines must exist before EnrollmentSeeder points at them.
         $this->call([
+            TuitionPlanSeeder::class,
+            InvoiceSeeder::class,
             EnrollmentSeeder::class,
             SessionVarietySeeder::class,
             AttendanceSeeder::class,
             LessonPlanSeeder::class,
-            TuitionPlanSeeder::class,
-            InvoiceSeeder::class,
             MediaSeeder::class,
         ]);
 

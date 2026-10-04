@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Branch;
 use App\Models\ClassSession;
 use App\Models\Enrollment;
+use App\Models\InvoiceItem;
 use App\Models\StudentProfile;
 use Illuminate\Database\Seeder;
 
@@ -30,6 +31,8 @@ class EnrollmentSeeder extends Seeder
             ->orderBy('start_time')
             ->get();
 
+        $today = now()->toDateString();
+        $passes = $this->currentPasses();
         $rows = [];
 
         foreach ($sessions as $index => $session) {
@@ -76,6 +79,9 @@ class EnrollmentSeeder extends Seeder
                 $rows[] = [
                     'student_profile_id' => $studentId,
                     'class_session_id' => $session->id,
+                    'invoice_item_id' => $cancelled || $session->session_date < $today
+                        ? null
+                        : $this->spend($passes, $studentId),
                     'status' => $cancelled ? 'cancelled' : $status,
                     'enrolled_at' => $enrolledAt,
                     'cancelled_at' => $cancelled ? $enrolledAt->copy()->addDays(1) : null,
@@ -89,6 +95,58 @@ class EnrollmentSeeder extends Seeder
             }
         }
 
+        // Bulk insert, not CreateEnrollmentAction: ~10k rows, and the lines are already decided above.
         collect($rows)->chunk(500)->each(fn ($chunk) => Enrollment::insert($chunk->all()));
+    }
+
+    /**
+     * Lines each student can book a forward session against. A pack keeps two sessions
+     * back so the counter never demos as empty.
+     *
+     * @return array<int, array{unlimited: int|null, pack: int|null, packLeft: int}>
+     */
+    private function currentPasses(): array
+    {
+        $passes = [];
+
+        $lines = InvoiceItem::granting()
+            ->with('invoice:id,student_profile_id')
+            ->where(fn ($q) => $q->whereNull('valid_until')->orWhereDate('valid_until', '>=', today()))
+            ->orderByRaw('valid_until is null desc, valid_until desc')
+            ->get();
+
+        foreach ($lines as $line) {
+            $studentId = $line->invoice->student_profile_id;
+            $passes[$studentId] ??= ['unlimited' => null, 'pack' => null, 'packLeft' => 0];
+
+            if ($line->isUnlimited()) {
+                $passes[$studentId]['unlimited'] ??= $line->id;
+
+                continue;
+            }
+
+            if ($passes[$studentId]['pack'] === null) {
+                $passes[$studentId]['pack'] = $line->id;
+                $passes[$studentId]['packLeft'] = max(0, $line->sessions_granted - 2);
+            }
+        }
+
+        return $passes;
+    }
+
+    /** Spends a pack session while one is held, then falls back to the unlimited pass. */
+    private function spend(array &$passes, int $studentId): ?int
+    {
+        if (! isset($passes[$studentId])) {
+            return null;
+        }
+
+        if ($passes[$studentId]['packLeft'] > 0) {
+            $passes[$studentId]['packLeft']--;
+
+            return $passes[$studentId]['pack'];
+        }
+
+        return $passes[$studentId]['unlimited'];
     }
 }

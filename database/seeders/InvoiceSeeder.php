@@ -13,6 +13,7 @@ use App\Modules\Operations\Tuition\Actions\VoidPaymentAction;
 use App\Modules\Operations\Tuition\Actions\WaiveInvoiceAction;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 
 class InvoiceSeeder extends Seeder
 {
@@ -109,6 +110,50 @@ class InvoiceSeeder extends Seeder
 
                 $this->settle($record, $void, $invoice, $sequence, $monthsAgo, $admin, $issuedAt);
             }
+        }
+
+        $this->guaranteeCurrentPasses($create, $record, $plans, $branches, $admin);
+    }
+
+    /** Every active student needs a current line or the gate locks the demo out. Annual, because sessions run a month ahead. */
+    private function guaranteeCurrentPasses(
+        CreateInvoiceAction $create,
+        RecordPaymentAction $record,
+        Collection $plans,
+        Collection $branches,
+        User $admin,
+    ): void {
+        $unlimited = $plans->firstWhere('name', 'Annual Unlimited');
+        $pack = $plans->firstWhere('name', '10-Class Pack');
+
+        if (! $unlimited || ! $pack) {
+            return;
+        }
+
+        foreach (StudentProfile::active()->orderBy('id')->get()->values() as $index => $student) {
+            $items = [['tuition_plan_id' => $unlimited->id, 'description' => null, 'quantity' => 1, 'unit_price' => null]];
+
+            // A pack on every seventh member, so the sessions-left counter shows somewhere.
+            if ($index % 7 === 0) {
+                $items[] = ['tuition_plan_id' => $pack->id, 'description' => null, 'quantity' => 1, 'unit_price' => null];
+            }
+
+            $invoice = $create->execute([
+                'student_profile_id' => $student->id,
+                'branch_id' => $branches[$index % $branches->count()]->id,
+                'issued_at' => today()->toDateString(),
+                'due_date' => today()->addDays(14)->toDateString(),
+                'note' => null,
+                'items' => $items,
+            ]);
+
+            $record->execute($invoice, [
+                'amount' => $invoice->total_amount,
+                'method' => 'transfer',
+                'paid_at' => now()->toDateTimeString(),
+                'reference' => 'PASS-'.str_pad((string) $student->id, 5, '0', STR_PAD_LEFT),
+                'note' => null,
+            ], $admin);
         }
     }
 
