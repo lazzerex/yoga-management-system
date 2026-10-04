@@ -8,6 +8,8 @@ use App\Models\Enrollment;
 use App\Modules\Admin\User\Actions\AuditUserAction;
 use App\Modules\Operations\Enrollment\Actions\CancelEnrollmentAction;
 use App\Modules\Operations\Enrollment\Actions\CreateEnrollmentAction;
+use App\Modules\Operations\Enrollment\Actions\ResolveEntitlementAction;
+use App\Modules\Operations\Tuition\Actions\StudentEntitlementsAction;
 use App\Notifications\EnrollmentCancelledByStaffNotification;
 use App\Support\Settings;
 use App\Support\Table\SortsQueries;
@@ -92,8 +94,14 @@ class EnrollmentController extends Controller
         ]);
     }
 
-    public function browse(Request $request): Response
-    {
+    public function browse(
+        Request $request,
+        ResolveEntitlementAction $resolve,
+        StudentEntitlementsAction $entitlements,
+    ): Response {
+        // Resolved once, then asked about each session in memory.
+        $set = $resolve->forStudent($request->user()->studentProfile);
+
         $availableSessions = $this->availableSessionsQuery($request)
             ->with(['branch:id,name', 'room:id,name', 'classType:id,name', 'coachProfile.user:id,name'])
             ->withCount([
@@ -120,8 +128,10 @@ class EnrollmentController extends Controller
                 'booked_count' => $s->booked_count,
                 'spots_left' => max(0, $s->capacity - $s->booked_count),
                 'waitlist_count' => $s->waitlist_count,
+                'block_reason' => $set->check($s->session_date),
                 'bookUrl' => route('member.enrollments.store', $s->id),
             ])->values(),
+            'entitlements' => $entitlements->execute($request->user()->studentProfile?->id),
         ]);
     }
 
