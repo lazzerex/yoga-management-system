@@ -15,6 +15,14 @@ class DeleteInvoiceAction
             ]);
         }
 
+        // A waived invoice has no payments but can still have been booked on, and a
+        // cancelled booking keeps its line reference, so any reference at all counts.
+        if ($invoice->items()->has('enrollments')->exists()) {
+            throw ValidationException::withMessages([
+                'action' => __('flash.invoiceHasBookings'),
+            ]);
+        }
+
         $invoice->delete();
     }
 }

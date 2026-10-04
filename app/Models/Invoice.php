@@ -20,6 +20,9 @@ class Invoice extends Model
 
     public const OPEN_STATUSES = ['unpaid', 'partial'];
 
+    /** A waived invoice is a comped membership, so it grants exactly what a paid one does. */
+    public const GRANTING_STATUSES = ['paid', 'waived'];
+
     protected function casts(): array
     {
         return [
