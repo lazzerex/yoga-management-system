@@ -46,12 +46,12 @@ class AccessControlTest extends TestCase
         $this->assertContains('nav.users', $this->menuLabelKeys($member));
     }
 
-    public function test_dashboard_flags_are_shared_for_each_role(): void
+    public function test_ability_flags_are_shared_for_each_role(): void
     {
         $expected = [
-            'admin' => ['canAccessAdmin' => true, 'canViewCoachDashboard' => false],
-            'coach' => ['canAccessAdmin' => false, 'canViewCoachDashboard' => true],
-            'member' => ['canAccessAdmin' => false, 'canViewCoachDashboard' => false],
+            'admin' => ['canAccessAdmin' => true, 'canViewCoachDashboard' => false, 'canViewSettings' => true, 'canViewMembership' => false],
+            'coach' => ['canAccessAdmin' => false, 'canViewCoachDashboard' => true, 'canViewSettings' => false, 'canViewMembership' => false],
+            'member' => ['canAccessAdmin' => false, 'canViewCoachDashboard' => false, 'canViewSettings' => false, 'canViewMembership' => true],
         ];
 
         foreach ($expected as $role => $flags) {
@@ -61,8 +61,25 @@ class AccessControlTest extends TestCase
             $this->assertSame($flags, [
                 'canAccessAdmin' => $page['props']['auth']['user']['canAccessAdmin'],
                 'canViewCoachDashboard' => $page['props']['auth']['user']['canViewCoachDashboard'],
+                'canViewSettings' => $page['props']['auth']['user']['canViewSettings'],
+                'canViewMembership' => $page['props']['auth']['user']['canViewMembership'],
             ], "flags wrong for {$role}");
         }
+    }
+
+    /** The quick menu reads these flags, so a changed permission has to move them. */
+    public function test_the_settings_flag_follows_the_permission_not_the_role(): void
+    {
+        $coach = User::factory()->create(['role' => 'coach']);
+
+        $page = $this->actingAs($coach)->get('/cms/dashboard')->viewData('page');
+        $this->assertFalse($page['props']['auth']['user']['canViewSettings']);
+
+        $coach->givePermissionTo('admin.settings.view');
+        $this->forgetPermissionCache();
+
+        $page = $this->actingAs($coach)->get('/cms/dashboard')->viewData('page');
+        $this->assertTrue($page['props']['auth']['user']['canViewSettings']);
     }
 
     private function forgetPermissionCache(): void

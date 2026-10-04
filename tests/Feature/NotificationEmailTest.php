@@ -11,8 +11,10 @@ use App\Notifications\TuitionOverdueNotification;
 use App\Providers\AppServiceProvider;
 use Database\Seeders\PermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Mail\Transport\ArrayTransport;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
+use Symfony\Component\Mime\Email;
 use Tests\TestCase;
 
 class NotificationEmailTest extends TestCase
@@ -60,6 +62,41 @@ class NotificationEmailTest extends TestCase
         ], 'vi'), $subject);
     }
 
+    /** The shell is string keys from lang/vi.json, not lang/vi/notifications.php. */
+    public function test_the_mail_shell_is_translated_and_not_left_in_english(): void
+    {
+        $user = $this->member();
+        $user->update(['locale' => 'vi']);
+
+        Notification::send($user, new TuitionOverdueNotification($this->invoice($user)));
+
+        $body = $this->sent()->getHtmlBody();
+
+        $this->assertStringContainsString('Xin chào!', $body);
+        $this->assertStringContainsString('Trân trọng,', $body);
+        $this->assertStringContainsString('Mọi quyền được bảo lưu.', $body);
+        $this->assertStringContainsString('vào trình duyệt của bạn', $body);
+
+        $this->assertStringNotContainsString('Hello!', $body);
+        $this->assertStringNotContainsString('Regards,', $body);
+        $this->assertStringNotContainsString('All rights reserved.', $body);
+        $this->assertStringNotContainsString('having trouble clicking', $body);
+    }
+
+    public function test_an_english_recipient_still_gets_the_english_shell(): void
+    {
+        $user = $this->member();
+        $user->update(['locale' => 'en']);
+
+        Notification::send($user, new TuitionOverdueNotification($this->invoice($user)));
+
+        $body = $this->sent()->getHtmlBody();
+
+        $this->assertStringContainsString('Hello!', $body);
+        $this->assertStringContainsString('Regards,', $body);
+        $this->assertStringNotContainsString('Xin chào!', $body);
+    }
+
     public function test_always_to_redirects_every_recipient_away_from_the_seeded_addresses(): void
     {
         config(['mail.always_to' => 'demo-inbox@example.test']);
@@ -94,14 +131,19 @@ class NotificationEmailTest extends TestCase
         $this->assertTrue($rows[0]['emailed']);
     }
 
-    private function sent()
+    // MAIL_MAILER=array in phpunit.xml, so the transport is the one that keeps messages.
+    private function sent(): ?Email
     {
-        $message = Mail::getSymfonyTransport()->messages()->last();
+        /** @var ArrayTransport $transport */
+        $transport = Mail::getSymfonyTransport();
 
-        return $message?->getOriginalMessage();
+        $message = $transport->messages()->last()?->getOriginalMessage();
+
+        return $message instanceof Email ? $message : null;
     }
 
-    private function addresses($message): array
+    /** @return array<string, string|null> */
+    private function addresses(Email $message): array
     {
         $out = [];
 

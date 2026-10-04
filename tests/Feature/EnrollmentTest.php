@@ -9,8 +9,10 @@ use App\Models\ClassSession;
 use App\Models\ClassType;
 use App\Models\CoachProfile;
 use App\Models\Enrollment;
+use App\Models\Invoice;
 use App\Models\Room;
 use App\Models\StudentProfile;
+use App\Models\TuitionPlan;
 use App\Models\User;
 use Database\Seeders\PermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -495,10 +497,25 @@ class EnrollmentTest extends TestCase
         $this->assertSame(1, $page['props']['sessions'][0]['students']);
     }
 
+    /** A member in good standing, so these tests stay about capacity, waitlist and cutoff. */
     private function member(): array
     {
         $user = User::factory()->create(['role' => 'member']);
         $studentProfile = StudentProfile::factory()->create(['user_id' => $user->id]);
+
+        Invoice::factory()
+            ->create(['student_profile_id' => $studentProfile->id, 'status' => 'paid'])
+            ->items()
+            ->create([
+                'tuition_plan_id' => TuitionPlan::factory()->create(['session_count' => null])->id,
+                'description' => 'Unlimited Monthly',
+                'quantity' => 1,
+                'unit_price' => 0,
+                'line_total' => 0,
+                'valid_from' => today()->subDay()->toDateString(),
+                'valid_until' => today()->addYear()->toDateString(),
+                'sessions_granted' => null,
+            ]);
 
         return [$user, $studentProfile];
     }

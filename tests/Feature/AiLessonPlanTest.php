@@ -196,6 +196,40 @@ class AiLessonPlanTest extends TestCase
         $this->assertSame(0, $plan->reviews()->count());
     }
 
+    public function test_a_check_carries_a_sequence_grade_clamped_to_the_scale(): void
+    {
+        config(['services.gemini.driver' => 'live', 'services.gemini.key' => 'test-key']);
+        $this->fakeGemini([
+            'grade' => ['score' => 140, 'verdict' => 'Strong opening, thin cool-down.'],
+            'sections' => [['heading' => 'Safety', 'issue' => 'None.', 'fix' => 'None.', 'severity' => 'ok']],
+        ]);
+
+        [$coachUser] = $this->coach();
+        $plan = $this->planFor($coachUser, 'pending');
+
+        $response = $this->actingAs($this->admin())->postJson("/cms/operations/lesson-planning/{$plan->id}/check");
+
+        $response->assertOk();
+        $this->assertSame(100, $response->json('grade.score'));
+        $this->assertSame('Strong opening, thin cool-down.', $response->json('grade.verdict'));
+    }
+
+    /** The findings are the review. A reply without a grade still has to produce one. */
+    public function test_a_check_without_a_grade_still_returns_the_findings(): void
+    {
+        config(['services.gemini.driver' => 'live', 'services.gemini.key' => 'test-key']);
+        $this->fakeGemini(['sections' => [['heading' => 'Safety', 'issue' => 'None.', 'fix' => 'None.', 'severity' => 'ok']]]);
+
+        [$coachUser] = $this->coach();
+        $plan = $this->planFor($coachUser, 'pending');
+
+        $response = $this->actingAs($this->admin())->postJson("/cms/operations/lesson-planning/{$plan->id}/check");
+
+        $response->assertOk();
+        $this->assertCount(1, $response->json('sections'));
+        $this->assertNull($response->json('grade'));
+    }
+
     public function test_a_coach_cannot_reach_the_check_endpoint(): void
     {
         [$coachUser] = $this->coach();

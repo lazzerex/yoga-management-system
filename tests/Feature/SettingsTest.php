@@ -33,7 +33,7 @@ class SettingsTest extends TestCase
         $this->assertSame(4, Role::findByName('member')->permissions()->count());
     }
 
-    public function test_an_admin_saves_the_three_live_settings(): void
+    public function test_an_admin_saves_the_live_settings(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);
 
@@ -41,22 +41,44 @@ class SettingsTest extends TestCase
             ->post('/cms/admin/settings', [
                 'centre_name' => 'Lotus Yoga',
                 'cancel_cutoff_hours' => 6,
+                'require_entitlement' => '1',
                 'default_locale' => 'vi',
             ])
             ->assertRedirect();
 
         $this->assertSame('Lotus Yoga', Settings::get('centre.name'));
         $this->assertSame('6', Settings::get('booking.cancel_cutoff_hours'));
+        $this->assertSame('1', Settings::get('booking.require_entitlement'));
         $this->assertSame('vi', Settings::get('centre.default_locale'));
 
-        // Three settings changed, one row.
+        // Every setting changed, one row.
         $this->assertSame(1, AuditLog::where('action', 'update_setting')->count());
 
         $this->assertSame([
             ['key' => 'centre.name', 'from' => '', 'to' => 'Lotus Yoga'],
             ['key' => 'booking.cancel_cutoff_hours', 'from' => '', 'to' => '6'],
+            ['key' => 'booking.require_entitlement', 'from' => '', 'to' => '1'],
             ['key' => 'centre.default_locale', 'from' => '', 'to' => 'vi'],
         ], AuditLog::where('action', 'update_setting')->sole()->meta['changes']);
+    }
+
+    /**
+     * The save loop stringifies each value, so a boolean false would be stored as ''
+     * and read back as the config default. Off has to persist as a literal '0'.
+     */
+    public function test_switching_the_entitlement_requirement_off_stores_a_zero(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $this->actingAs($admin)->post('/cms/admin/settings', [
+            'centre_name' => 'Lotus Yoga',
+            'cancel_cutoff_hours' => 6,
+            'require_entitlement' => '0',
+            'default_locale' => 'en',
+        ]);
+
+        $this->assertSame('0', Settings::get('booking.require_entitlement'));
+        $this->assertFalse((bool) Settings::get('booking.require_entitlement', config('enrollment.require_entitlement')));
     }
 
     public function test_a_saved_cutoff_moves_the_cancellation_window(): void
@@ -76,6 +98,7 @@ class SettingsTest extends TestCase
         $this->actingAs($admin)->post('/cms/admin/settings', [
             'centre_name' => 'Lotus Yoga',
             'cancel_cutoff_hours' => 8,
+            'require_entitlement' => '1',
             'default_locale' => 'en',
         ]);
 
@@ -102,6 +125,7 @@ class SettingsTest extends TestCase
             ->post('/cms/admin/settings', [
                 'centre_name' => 'Lotus Yoga',
                 'cancel_cutoff_hours' => 6,
+                'require_entitlement' => '1',
                 'default_locale' => 'en',
             ])
             ->assertForbidden();
@@ -116,6 +140,7 @@ class SettingsTest extends TestCase
         $this->actingAs($admin)->post('/cms/admin/settings', [
             'centre_name' => 'Lotus Yoga',
             'cancel_cutoff_hours' => 6,
+            'require_entitlement' => '1',
             'default_locale' => 'en',
             'maintenance_mode' => '1',
         ]);
