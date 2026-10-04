@@ -59,6 +59,8 @@ class HandleInertiaRequests extends Middleware
                     'avatarUrl' => $user->avatarThumbUrl(),
                     'canAccessAdmin' => $user->canAccessAdmin(),
                     'canViewCoachDashboard' => $user->can('coach.dashboard.view'),
+                    'canViewSettings' => $user->can('admin.settings.view'),
+                    'canViewMembership' => $user->can('member.dashboard.view'),
                     'canSearch' => SearchController::isAvailableTo($user),
                 ] : null,
             ],
