@@ -9,6 +9,12 @@ const props = defineProps({
 });
 
 const statusLabel = (status) => t(`operations.invoiceStatus${status.charAt(0).toUpperCase()}${status.slice(1)}`);
+
+// A plan sold without a duration has no end date to print.
+const windowLabel = (entitlement) => {
+    if (!entitlement.valid_until) return t('member.noExpiry');
+    return entitlement.valid_from ? `${entitlement.valid_from} - ${entitlement.valid_until}` : entitlement.valid_until;
+};
 const current = props.entitlements[0] ?? null;
 
 const statusTone = {
@@ -41,11 +47,15 @@ export default {
             <div class="ym-stat-card">
                 <p class="ym-stat-card-label">{{ $t('member.currentPlan') }}</p>
                 <p class="ym-stat-card-value">{{ current?.description ?? $t('member.noActivePlan') }}</p>
-                <p v-if="current" class="ym-stat-card-note">{{ $t('member.validUntil', { date: current.valid_until }) }}</p>
+                <p v-if="current?.valid_until" class="ym-stat-card-note">{{ $t('member.validUntil', { date: current.valid_until }) }}</p>
+                <p v-else-if="current" class="ym-stat-card-note">{{ $t('member.noExpiry') }}</p>
             </div>
             <div class="ym-stat-card ym-stat-card--info">
-                <p class="ym-stat-card-label">{{ $t('member.sessionsIncluded') }}</p>
-                <p class="ym-stat-card-value">{{ current ? (current.sessions_granted ?? $t('member.unlimited')) : '-' }}</p>
+                <p class="ym-stat-card-label">{{ $t('member.sessionsLeft') }}</p>
+                <p class="ym-stat-card-value">{{ current ? (current.sessions_remaining ?? $t('member.unlimited')) : '-' }}</p>
+                <p v-if="current?.sessions_granted" class="ym-stat-card-note">
+                    {{ $t('member.sessionsGranted', { count: current.sessions_granted }) }}
+                </p>
             </div>
             <div class="ym-stat-card" :class="{ 'ym-stat-card--danger': outstanding > 0 }">
                 <p class="ym-stat-card-label">{{ $t('member.outstandingBalance') }}</p>
@@ -63,9 +73,9 @@ export default {
                             <span class="ym-tag ym-tag--ok">{{ $t('operations.invoiceStatusPaid') }}</span>
                         </div>
                         <p class="ym-timeline-meta">
-                            {{ entitlement.valid_from ? `${entitlement.valid_from} - ${entitlement.valid_until}` : entitlement.valid_until }}
+                            {{ windowLabel(entitlement) }}
                             <template v-if="entitlement.sessions_granted">
-                                · {{ $t('member.sessionsGranted', { count: entitlement.sessions_granted }) }}
+                                · {{ $t('member.sessionsLeftOf', { remaining: entitlement.sessions_remaining, granted: entitlement.sessions_granted }) }}
                             </template>
                         </p>
                     </div>

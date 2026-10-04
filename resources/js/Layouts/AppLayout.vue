@@ -87,6 +87,8 @@ const userAvatarUrl = computed(() => page.props.auth?.user?.avatarUrl ?? null);
 const userRole = computed(() => page.props.auth?.user?.role ?? 'member');
 const canAccessAdmin = computed(() => page.props.auth?.user?.canAccessAdmin ?? false);
 const canViewCoachDashboard = computed(() => page.props.auth?.user?.canViewCoachDashboard ?? false);
+const canViewSettings = computed(() => page.props.auth?.user?.canViewSettings ?? false);
+const canViewMembership = computed(() => page.props.auth?.user?.canViewMembership ?? false);
 
 const sidebarMenu = computed(() => {
     currentLocale.value;
@@ -413,8 +415,15 @@ const NOTIFICATION_POLL_MS = 30000;
 let notificationsPoll = null;
 let notificationsRefreshing = false;
 
+// Account-shaped destinations only. The bell and the language toggle have their own buttons.
 const quickActions = computed(() => [
     { label: t('common.profile'), hint: t('common.viewAccountSummary'), href: route('cms.profile.show') },
+    ...(canViewMembership.value
+        ? [{ label: t('member.myMembership'), hint: t('common.viewPlanAndInvoices'), href: route('member.my-membership') }]
+        : []),
+    ...(canViewSettings.value
+        ? [{ label: t('nav.settings'), hint: t('common.viewCentreSettings'), href: route('admin.settings.general') }]
+        : []),
 ]);
 
 const userInitials = computed(() => {

@@ -5,6 +5,7 @@ import { trans as t, getActiveLanguage } from 'laravel-vue-i18n';
 
 const props = defineProps({
     availableSessions: Array,
+    entitlements: Array,
 });
 
 const locale = computed(() => (getActiveLanguage() === 'vi' ? 'vi-VN' : 'en-US'));
@@ -189,7 +190,27 @@ const resultLabel = computed(() =>
 
 const bookingId = ref(null);
 
+// The server decides whether a session can be booked and says why not. Nothing here
+// recomputes that from the entitlements below, which are shown for information only.
+const planSummary = computed(() =>
+    props.entitlements
+        .map((plan) =>
+            plan.sessions_remaining === null
+                ? plan.description
+                : t('member.planWithSessionsLeft', { description: plan.description, count: plan.sessions_remaining }),
+        )
+        .join(' · '),
+);
+
+const firstBlockReason = computed(() => props.availableSessions.find((s) => s.block_reason)?.block_reason ?? null);
+
+const allBlocked = computed(
+    () => props.availableSessions.length > 0 && props.availableSessions.every((s) => s.block_reason),
+);
+
 const book = (session) => {
+    if (session.block_reason) return;
+
     bookingId.value = session.id;
     router.post(session.bookUrl, {}, {
         preserveScroll: true,
@@ -217,6 +238,15 @@ export default {
                 <p class="ym-page-sub">{{ $t('member.availableSessions') }}</p>
             </div>
         </header>
+
+        <p v-if="allBlocked" class="ym-callout ym-callout--warn mb-3">
+            <i class="bi bi-exclamation-triangle" />
+            <span>{{ $t(firstBlockReason) }}</span>
+        </p>
+        <p v-else-if="planSummary" class="ym-callout ym-callout--ok mb-3">
+            <i class="bi bi-patch-check" />
+            <span>{{ $t('member.planInForce', { plans: planSummary }) }}</span>
+        </p>
 
         <div class="ym-book">
             <div class="ym-book-layout">
@@ -367,10 +397,12 @@ export default {
                                         type="button"
                                         class="ym-sc-cta"
                                         :class="{ 'is-wait': entry.session.spots_left === 0 }"
-                                        :disabled="bookingId === entry.session.id"
+                                        :disabled="bookingId === entry.session.id || !!entry.session.block_reason"
+                                        :title="entry.session.block_reason ? $t(entry.session.block_reason) : null"
                                         @click="book(entry.session)"
                                     >
                                         <i v-if="bookingId === entry.session.id" class="bi bi-arrow-repeat ym-spin" />
+                                        <i v-else-if="entry.session.block_reason" class="bi bi-lock" />
                                         <template v-else>{{ entry.session.spots_left === 0 ? $t('member.joinWaitlist') : $t('member.book') }}</template>
                                     </button>
                                 </div>
