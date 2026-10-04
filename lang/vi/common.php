@@ -15,6 +15,8 @@ return [
     'notifications' => 'Thông báo',
     'profile' => 'Hồ sơ',
     'viewAccountSummary' => 'Xem tóm tắt tài khoản',
+    'viewPlanAndInvoices' => 'Gói tập, số buổi còn lại và hoá đơn',
+    'viewCentreSettings' => 'Tên trung tâm, đăng ký lớp và ngôn ngữ',
     'noNotifications' => 'Hiện chưa có thông báo nào.',
     'viewAllNotifications' => 'Xem tất cả thông báo',
     'save' => 'Lưu',

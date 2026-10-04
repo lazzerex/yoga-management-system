@@ -110,6 +110,10 @@ return [
 
         'cancelCutoff' => 'Hạn huỷ đăng ký (giờ)',
         'cancelCutoffHint' => 'Học viên được huỷ trước giờ học bao lâu.',
+        'requireEntitlement' => 'Bắt buộc có gói tập đã thanh toán',
+        'requireEntitlementHint' => 'Khi bật, học viên chỉ đăng ký được lớp nằm trong gói tập đã thanh toán.',
+        'settingEnabled' => 'Bật',
+        'settingDisabled' => 'Tắt',
         'waitlistPromote' => 'Tự động chuyển từ danh sách chờ',
         'waitlistPromoteHint' => 'Khi có người huỷ, người chờ đầu tiên được nhận chỗ.',
         'dailyBookingLimit' => 'Số buổi mỗi học viên mỗi ngày',

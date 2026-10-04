@@ -15,6 +15,8 @@ return [
     'notifications' => 'Notifications',
     'profile' => 'Profile',
     'viewAccountSummary' => 'View account summary',
+    'viewPlanAndInvoices' => 'Plan, sessions left and invoices',
+    'viewCentreSettings' => 'Centre name, booking and language',
     'noNotifications' => 'Nothing to read right now.',
     'viewAllNotifications' => 'View all notifications',
     'save' => 'Save',

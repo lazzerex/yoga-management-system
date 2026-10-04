@@ -110,6 +110,10 @@ return [
 
         'cancelCutoff' => 'Cancellation cutoff (hours)',
         'cancelCutoffHint' => 'How long before a class a member may still cancel.',
+        'requireEntitlement' => 'Require a paid plan to book',
+        'requireEntitlementHint' => 'When on, a member can only book a class covered by a paid tuition plan.',
+        'settingEnabled' => 'On',
+        'settingDisabled' => 'Off',
         'waitlistPromote' => 'Promote from waitlist automatically',
         'waitlistPromoteHint' => 'When a booking is cancelled, the first person waiting takes the place.',
         'dailyBookingLimit' => 'Bookings per member per day',
