@@ -319,14 +319,95 @@
 
 /* Two across once the card has the content column's width, so four findings read as
    a block rather than a long scroll. Falls back to one column in a narrow rail. */
+.ym-ai-head-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.ym-ai-grade {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid var(--u-line);
+    border-radius: 0.5rem;
+    background: var(--u-surface);
+}
+
+.ym-ai-grade.is-ok   { border-color: var(--u-brand-line); background: var(--u-brand-soft); }
+.ym-ai-grade.is-note { border-color: #cddceb; background: #f2f7fc; }
+.ym-ai-grade.is-warn { border-color: #eedbb2; background: var(--u-warn-soft); }
+
+.ym-ai-grade-score {
+    flex: none;
+    display: flex;
+    align-items: baseline;
+    gap: 0.15rem;
+    margin: 0;
+    min-width: 5.25rem;
+}
+
+.ym-ai-grade-num {
+    font-size: 1.85rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.ym-ai-grade.is-ok   .ym-ai-grade-num { color: var(--u-brand-deep); }
+.ym-ai-grade.is-note .ym-ai-grade-num { color: #4a7fb5; }
+.ym-ai-grade.is-warn .ym-ai-grade-num { color: #b07d1c; }
+
+.ym-ai-grade-den {
+    font-size: 0.72rem;
+    color: var(--u-ink-4);
+}
+
+.ym-ai-grade-body {
+    min-width: 0;
+}
+
+.ym-ai-grade-label {
+    margin: 0;
+    font-size: 0.66rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--u-ink-4);
+}
+
+.ym-ai-grade-verdict {
+    margin: 0.15rem 0 0;
+    font-size: 0.79rem;
+    line-height: 1.5;
+    color: var(--u-ink);
+}
+
+.ym-ai-grade-tag {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin: 0.3rem 0 0;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--u-ink-4);
+}
+
+@media (max-width: 30rem) {
+    .ym-ai-grade {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.45rem;
+    }
+}
+
+/* One column at every width: an auto-fit grid left a hole whenever the count did not divide. */
 .ym-ai-findings {
     list-style: none;
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
-    gap: 0.5rem;
-    align-items: start;
+    gap: 0.4rem;
 }
 
 .ym-ai-finding {
@@ -350,6 +431,25 @@
     font-weight: 650;
     color: var(--u-ink);
 }
+
+.ym-ai-finding-name {
+    flex: 1 1 auto;
+}
+
+.ym-ai-finding-sev {
+    flex: none;
+    font-size: 0.64rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.1rem 0.4rem;
+    border-radius: 999px;
+    border: 1px solid currentcolor;
+}
+
+.ym-ai-finding.is-ok   .ym-ai-finding-sev { color: var(--u-brand-deep); }
+.ym-ai-finding.is-note .ym-ai-finding-sev { color: #4a7fb5; }
+.ym-ai-finding.is-warn .ym-ai-finding-sev { color: #b07d1c; }
 
 .ym-ai-finding.is-ok   .ym-ai-finding-head i { color: var(--u-brand); }
 .ym-ai-finding.is-note .ym-ai-finding-head i { color: #4a7fb5; }
