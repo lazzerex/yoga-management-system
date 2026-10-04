@@ -327,11 +327,11 @@ class LessonPlanController extends Controller
             ]);
         }
 
-        $sections = $action->execute($user, $lessonPlan, $image);
+        $review = $action->execute($user, $lessonPlan, $image);
 
-        return $sections === null
+        return $review === null
             ? response()->json(['error' => 'operations.aiUnavailable'])
-            : response()->json(['sections' => $sections]);
+            : response()->json($review);
     }
 
     private function suggestEndpoint(User $user): ?string

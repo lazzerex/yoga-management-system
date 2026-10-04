@@ -14,6 +14,8 @@ class ReviewPlanAction
         .'Return exactly four sections, headed Warm-up and cool-down, Sequencing, Level and duration, and Safety. '
         .'For each, state what is missing or risky and how to fix it, and rate it: ok when nothing needs changing, '
         .'note for a minor improvement, warn for something that should be fixed before the class runs. '
+        .'Also grade the asana sequence as written: an integer from 0 to 100, and one sentence of at most '
+        .'twenty words saying what that score reflects. The grade is advisory for the manager only. '
         .'Never approve or reject the plan, never give medical advice, and never address the teacher directly.';
 
     private const SCHEMA = [
@@ -32,11 +34,22 @@ class ReviewPlanAction
                     'required' => ['heading', 'issue', 'fix', 'severity'],
                 ],
             ],
+            'grade' => [
+                'type' => 'object',
+                'properties' => [
+                    'score' => ['type' => 'integer'],
+                    'verdict' => ['type' => 'string'],
+                ],
+                'required' => ['score', 'verdict'],
+            ],
         ],
-        'required' => ['sections'],
+        'required' => ['sections', 'grade'],
     ];
 
-    private const FAKE = ['sections' => [
+    private const FAKE = ['grade' => [
+        'score' => 72,
+        'verdict' => 'Sound structure, but the opening needs work before this class runs.',
+    ], 'sections' => [
         [
             'heading' => 'Warm-up and cool-down',
             'severity' => 'warn',
@@ -66,7 +79,7 @@ class ReviewPlanAction
     public function __construct(private GeminiClient $client) {}
 
     /**
-     * @return array<int, array<string, string>>|null
+     * @return array{sections: array<int, array<string, string>>, grade: array{score: int, verdict: string}|null}|null
      */
     public function execute(User $user, LessonPlan $plan, ?Media $image = null): ?array
     {
@@ -107,6 +120,23 @@ class ReviewPlanAction
             'model' => GeminiClient::model(),
         ]);
 
-        return $sections;
+        return ['sections' => $sections, 'grade' => $this->grade($response['grade'] ?? null)];
+    }
+
+    /**
+     * The findings are the review; a missing or out-of-scale grade must not lose them.
+     *
+     * @return array{score: int, verdict: string}|null
+     */
+    private function grade(mixed $grade): ?array
+    {
+        if (! is_array($grade) || ! isset($grade['score']) || ! is_numeric($grade['score'])) {
+            return null;
+        }
+
+        return [
+            'score' => max(0, min(100, (int) $grade['score'])),
+            'verdict' => (string) ($grade['verdict'] ?? ''),
+        ];
     }
 }
