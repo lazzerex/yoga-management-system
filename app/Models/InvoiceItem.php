@@ -44,6 +44,12 @@ class InvoiceItem extends Model
             ->whereHas('invoice', fn (Builder $q) => $q->whereIn('status', Invoice::GRANTING_STATUSES));
     }
 
+    /** A plan line reads in the viewer's language; a one-off charge keeps the text it was billed with. */
+    public function label(): string
+    {
+        return $this->tuitionPlan?->localizedName() ?? $this->description;
+    }
+
     public function isUnlimited(): bool
     {
         return $this->sessions_granted === null;
@@ -66,11 +72,7 @@ class InvoiceItem extends Model
             return (int) $this->consumed_count;
         }
 
-        if ($this->relationLoaded('enrollments')) {
-            return $this->enrollments->where('status', '!=', 'cancelled')->count();
-        }
-
-        return $this->enrollments()->where('status', '!=', 'cancelled')->count();
+        return $this->enrollments()->consuming()->count();
     }
 
     public function sessionsRemaining(): ?int

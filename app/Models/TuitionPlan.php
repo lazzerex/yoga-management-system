@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['branch_id', 'name', 'type', 'price_amount', 'session_count', 'duration_days', 'description', 'is_active'])]
+#[Fillable(['branch_id', 'name', 'name_vi', 'type', 'price_amount', 'session_count', 'duration_days', 'description', 'is_active'])]
 class TuitionPlan extends Model
 {
     /** @use HasFactory<TuitionPlanFactory> */
@@ -34,6 +34,11 @@ class TuitionPlan extends Model
     public function invoiceItems(): HasMany
     {
         return $this->hasMany(InvoiceItem::class);
+    }
+
+    public function localizedName(): string
+    {
+        return app()->getLocale() === 'vi' && $this->name_vi ? $this->name_vi : $this->name;
     }
 
     public function scopeActive(Builder $query): Builder
