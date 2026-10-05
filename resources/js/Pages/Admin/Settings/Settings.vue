@@ -37,15 +37,6 @@ const GROUPS = {
             icon: 'bi-calendar-check',
             rows: [
                 { key: 'cancelCutoff', type: 'number', setting: 'cancel_cutoff_hours' },
-                {
-                    key: 'requireEntitlement',
-                    type: 'select',
-                    setting: 'require_entitlement',
-                    choices: [
-                        { value: '1', label: 'settingEnabled' },
-                        { value: '0', label: 'settingDisabled' },
-                    ],
-                },
                 { key: 'waitlistPromote', type: 'toggle', value: true },
                 { key: 'dailyBookingLimit', type: 'number', value: '2' },
             ],
