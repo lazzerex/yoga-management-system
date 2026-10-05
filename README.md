@@ -19,8 +19,8 @@
 
 <p align="center">
 <strong>A management system for a multi-branch yoga centre.</strong><br/>
-It covers the full operation: branches and rooms, class schedules and sessions, member booking with a
-waitlist, teacher and student attendance, lesson plans with an approval workflow, tuition invoicing
+It covers the full operation: branches and rooms, class schedules and sessions with week calendars,
+member booking gated by paid tuition plans and backed by a waitlist, teacher and student attendance, lesson plans with an approval workflow, tuition invoicing
 and payments, a central file library, PDF documents, notifications by email and in-app, and an AI
 assistant that drafts asana sequences.
 </p>
@@ -73,11 +73,17 @@ assistant that drafts asana sequences.
 a staff member sees.
 
 **Scheduling.** Recurring class schedules generate concrete class sessions. Each session carries a
-coach, a room, a capacity and a status (scheduled, done or cancelled).
+coach, a room, a capacity and a status (scheduled, done or cancelled), plus a short code such as
+`CS-000123` that staff can read out and search by. Members, coaches and admins each get an interactive
+week calendar; the admin version covers the whole branch and opens a session detail with the roster,
+fill and actions to edit or cancel the session.
 
-**Booking.** Members book and cancel their own places. A full session waitlists, and a cancellation
-promotes the first person waiting and notifies them. The cancellation cutoff is a setting rather than
-a constant.
+**Booking.** Members book and cancel their own places, and only on a date that a paid (or waived)
+tuition plan covers. Each booking spends one session of that plan, preferring an unlimited pass and
+otherwise the plan that expires soonest; cancelling returns it. A full session waitlists, and a
+cancellation promotes the first person waiting and notifies them. When the centre cancels a whole
+session, every member's plan session comes back and the booking shows as cancelled. Each booking has
+a code such as `BK-000123`. The cancellation cutoff is a setting rather than a constant.
 
 **Attendance.** Coaches check in and out of their own sessions and mark the student roster. Admins see
 every branch; a coach sees only their own sessions. Monthly reports summarise both.
@@ -87,7 +93,9 @@ attachments) and submits it; an admin approves or rejects it with a comment. Eve
 review history.
 
 **Tuition.** Tuition plans, invoices with line items, partial payments, payment proofs, voiding rather
-than deleting, and a CSV export. Membership entitlements appear once an invoice is paid.
+than deleting, and a CSV export. A paid invoice line for a plan becomes the member's entitlement:
+its validity window and, for packs, a session count that bookings draw down. Plans carry an English
+and an optional Vietnamese name.
 
 **Files.** One library over every uploaded file. A file is authorised by the record it hangs off
 rather than by a flat permission, so a coach cannot read a payment proof by knowing its id.
@@ -199,8 +207,10 @@ Sign in at `http://127.0.0.1:8000/cms/login`. The whole app lives under `/cms`.
 
 ## Demo accounts
 
-`php artisan migrate --seed` creates three accounts along with branches, rooms, class types, coaches,
-students, twenty weeks of sessions, enrolments, attendance, lesson plans and invoices.
+`php artisan migrate --seed` creates the accounts below along with branches, rooms, class types,
+coaches, students, twenty weeks of sessions, enrolments, attendance, lesson plans, invoices and a
+current paid plan for every active member. `coach2` to `coach6` and `member2` to `member43` exist
+too, with the same passwords as their role.
 
 | Role | Username | Password |
 |---|---|---|
@@ -237,8 +247,11 @@ Two entry points. Both are advisory, and neither writes to a lesson plan:
 
 - **Coach.** "Suggest a sequence" on the plan form returns a structured asana sequence that the coach
   edits and saves themselves.
-- **Admin.** "Check this plan" on a pending plan returns a critique under four headings. It is not
-  wired to approve or reject; a human always decides.
+- **Admin.** "Check this plan" on a pending plan returns a critique under four headings, each rated
+  and paired with a concrete fix, plus an advisory score. It is not wired to approve or reject; a
+  human always decides.
+
+Both replies come back in the viewer's language, English or Vietnamese.
 
 The prompt for the coach's request is built from exactly four whitelisted fields: class type, level,
 duration and objective. No student record, name, medical note or attendance figure is sent.
@@ -254,7 +267,7 @@ Configuration is four keys in `.env`:
 AI_DRIVER=fake                    # the shipped default
 GEMINI_API_KEY=
 GEMINI_MODEL=gemini-3.5-flash
-GEMINI_TIMEOUT=20
+GEMINI_TIMEOUT=30
 ```
 
 `AI_DRIVER=fake` returns a canned sequence and critique, so a fresh clone has a working demo with no
@@ -266,7 +279,7 @@ endpoints return 403, so there is no partially enabled state.
 ## Testing
 
 ```sh
-php artisan test        # 336 tests, 1085 assertions
+php artisan test        # 375 tests, 1228 assertions
 vendor/bin/pint         # code style
 ```
 
@@ -304,6 +317,7 @@ follows it.
 |---|---|
 | `Menu/MenuRegistry` | The sidebar, registered by each module's provider through Eventy and filtered against the viewer's permissions |
 | `Settings` | Key-value settings with one cached read per request, forgotten on write |
+| `Week` | Resolves a `?week=` query to its Monday for the week calendars |
 | `Table/SortsQueries` | Server-side sorting from a whitelist map, so no request value reaches `orderBy` |
 | `Ai/GeminiClient` | The single HTTP call, schema-constrained JSON, `null` on any failure |
 | `Pdf/DocumentPdf` | One helper behind the three PDF endpoints |
@@ -313,6 +327,10 @@ follows it.
 (cookie, then the user's stored locale, then the centre default), `HandleInertiaRequests` for shared
 props and ability flags, and `PreventPageCaching`, which marks authenticated responses `no-store` so
 that pressing Back after a logout cannot redisplay the previous user's screen.
+
+**Derived, never stored.** A plan's remaining sessions are counted from the bookings that point at it,
+so a cancellation returns the session with no refund code. Booking and session codes are formatted
+from the primary key by the `HasReference` model trait, and searching matches any part of the code.
 
 **Design system.** `resources/css/ui.css` holds the tokens, the button system, cards, tables, tags,
 the split layout and the empty states. Pages follow one of three patterns: index (head, metric strip,
@@ -330,7 +348,7 @@ app/
   Notifications/        nine events on one abstract base
   Support/              menu, settings, sorting, AI client, PDF
 database/
-  migrations/           35 migrations
+  migrations/           37 migrations
   seeders/              permissions, demo data
   factories/
 resources/
@@ -340,8 +358,8 @@ resources/
   js/Layouts/           the CMS shell
   views/                the Inertia root template, mail views and PDF templates
 lang/en, lang/vi/       14 namespaces each
-routes/web.php          144 routes
-tests/Feature/          35 test files
+routes/web.php          146 routes
+tests/Feature/          36 test files
 ```
 
 ## Internationalisation
@@ -353,7 +371,9 @@ and in a queued email.
 The locale resolves in this order: a valid cookie, then the user's stored locale, then the centre
 default setting, then English. A coach whose account is set to Vietnamese therefore gets a Vietnamese
 interface and a Vietnamese email on any browser. Notifications render in the recipient's language
-rather than the sender's.
+rather than the sender's, and a stored in-app notification keeps a message key rather than words
+translated at send time, so it reads correctly in whichever language the recipient uses later.
+Laravel's own mail strings (greeting, sign-off, footer) are translated in `lang/vi.json`.
 
 ## Project status
 
@@ -361,11 +381,14 @@ A graduation project built to a twelve-week plan (`PLAN.md`). Weeks 1 to 11 are 
 technical debt clean-up, the schema, coach and student profiles, sessions and recurring schedules,
 booking and the waitlist, both kinds of attendance, lesson plans with review, tuition, the file
 library, a dashboard on real data, notifications with email delivery, persisted settings, global
-search and the AI assistant. PDF export was added on top of that set.
+search and the AI assistant. PDF export was added on top of that set. Week 11 connected tuition to
+booking, so a member books only on a paid plan, and closed with three rounds of manual acceptance
+testing whose fixes added the week calendars, booking and session codes and bilingual plan names.
 
-Week 12 is the remaining work: test coverage of the main flows, query and index optimisation, a
-security pass, deployment with a queue worker, cron and database backups, and the written
-documentation. Continuous integration is not yet configured and belongs to that week.
+Week 12 is the remaining work: query and index optimisation, a security pass, deployment with a
+queue worker, cron and database backups, and the written report. Continuous integration is not yet
+configured. Two-factor sign-in is enabled in Fortify's config but has no setup screen yet, so no
+account can turn it on and sign-in never asks for a code.
 
 ## Contributing
 
