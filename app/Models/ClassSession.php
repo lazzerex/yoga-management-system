@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasReference;
 use Database\Factories\ClassSessionFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
@@ -14,7 +15,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class ClassSession extends Model
 {
     /** @use HasFactory<ClassSessionFactory> */
-    use HasFactory;
+    use HasFactory, HasReference;
+
+    public const REFERENCE_PREFIX = 'CS';
 
     protected function casts(): array
     {
