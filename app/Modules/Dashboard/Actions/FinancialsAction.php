@@ -94,13 +94,13 @@ class FinancialsAction
 
     private function topPlans(callable $scope): array
     {
-        return InvoiceItem::with('tuitionPlan:id,name')
+        return InvoiceItem::with('tuitionPlan:id,name,name_vi')
             ->whereNotNull('tuition_plan_id')
             ->whereHas('invoice', fn ($q) => $q->tap($scope))
             ->get(['id', 'invoice_id', 'tuition_plan_id', 'line_total'])
             ->groupBy('tuition_plan_id')
             ->map(fn (Collection $items) => [
-                'name' => $items->first()->tuitionPlan->name,
+                'name' => $items->first()->tuitionPlan->localizedName(),
                 'amount' => (int) $items->sum('line_total'),
                 'count' => $items->count(),
             ])
