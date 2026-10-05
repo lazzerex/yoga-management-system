@@ -190,26 +190,28 @@ const resultLabel = computed(() =>
 
 const bookingId = ref(null);
 
-// The server decides whether a session can be booked and says why not. Nothing here
-// recomputes that from the entitlements below, which are shown for information only.
-const planSummary = computed(() =>
-    props.entitlements
-        .map((plan) =>
-            plan.sessions_remaining === null
-                ? plan.description
-                : t('member.planWithSessionsLeft', { description: plan.description, count: plan.sessions_remaining }),
-        )
-        .join(' · '),
+// The server decides whether a session can be booked and says why not. The plans below
+// are shown for information only.
+const planChips = computed(() =>
+    props.entitlements.map((plan) => ({
+        id: plan.id,
+        spent: plan.sessions_remaining === 0,
+        label: plan.sessions_remaining === null
+            ? plan.description
+            : t('member.planWithSessionsLeft', { description: plan.description, count: plan.sessions_remaining }),
+    })),
 );
 
-const firstBlockReason = computed(() => props.availableSessions.find((s) => s.block_reason)?.block_reason ?? null);
+const openSessions = computed(() => props.availableSessions.filter((s) => !s.my_status));
+
+const firstBlockReason = computed(() => openSessions.value.find((s) => s.block_reason)?.block_reason ?? null);
 
 const allBlocked = computed(
-    () => props.availableSessions.length > 0 && props.availableSessions.every((s) => s.block_reason),
+    () => openSessions.value.length > 0 && openSessions.value.every((s) => s.block_reason),
 );
 
 const book = (session) => {
-    if (session.block_reason) return;
+    if (session.block_reason || session.my_status) return;
 
     bookingId.value = session.id;
     router.post(session.bookUrl, {}, {
@@ -239,14 +241,22 @@ export default {
             </div>
         </header>
 
-        <p v-if="allBlocked" class="ym-callout ym-callout--warn mb-3">
-            <i class="bi bi-exclamation-triangle" />
+        <p v-if="allBlocked" class="ym-callout ym-callout--warn ym-book-alert mb-3">
+            <i class="bi bi-exclamation-triangle-fill" />
             <span>{{ $t(firstBlockReason) }}</span>
         </p>
-        <p v-else-if="planSummary" class="ym-callout ym-callout--ok mb-3">
+        <div v-else-if="planChips.length" class="ym-callout ym-callout--ok mb-3">
             <i class="bi bi-patch-check" />
-            <span>{{ $t('member.planInForce', { plans: planSummary }) }}</span>
-        </p>
+            <span class="ym-book-plans">
+                {{ $t('member.planInForce') }}
+                <span
+                    v-for="plan in planChips"
+                    :key="plan.id"
+                    class="ym-book-plan"
+                    :class="{ 'is-spent': plan.spent }"
+                >{{ plan.label }}</span>
+            </span>
+        </div>
 
         <div class="ym-book">
             <div class="ym-book-layout">
@@ -391,18 +401,32 @@ export default {
                                             <template v-if="entry.session.waitlist_count">· {{ $t('member.onWaitlist', { count: entry.session.waitlist_count }) }}</template>
                                         </span>
                                     </div>
+                                    <p v-if="entry.session.block_reason" class="ym-sc-block">
+                                        <i class="bi bi-exclamation-triangle-fill" />
+                                        <span>{{ $t(entry.session.block_reason) }}</span>
+                                    </p>
                                 </div>
                                 <div class="ym-sc-side">
+                                    <span
+                                        v-if="entry.session.my_status"
+                                        class="ym-sc-cta is-mine"
+                                        :title="entry.session.my_status === 'waitlisted' ? $t('member.alreadyWaitlistedHint') : $t('member.alreadyBookedHint')"
+                                    >
+                                        <i class="bi bi-check2" />
+                                        {{ entry.session.my_status === 'waitlisted' ? $t('member.waitlisted') : $t('member.statusBooked') }}
+                                    </span>
+                                    <span v-else-if="entry.session.block_reason" class="ym-sc-cta is-locked">
+                                        <i class="bi bi-lock-fill" /> {{ $t('member.locked') }}
+                                    </span>
                                     <button
+                                        v-else
                                         type="button"
                                         class="ym-sc-cta"
                                         :class="{ 'is-wait': entry.session.spots_left === 0 }"
-                                        :disabled="bookingId === entry.session.id || !!entry.session.block_reason"
-                                        :title="entry.session.block_reason ? $t(entry.session.block_reason) : null"
+                                        :disabled="bookingId === entry.session.id"
                                         @click="book(entry.session)"
                                     >
                                         <i v-if="bookingId === entry.session.id" class="bi bi-arrow-repeat ym-spin" />
-                                        <i v-else-if="entry.session.block_reason" class="bi bi-lock" />
                                         <template v-else>{{ entry.session.spots_left === 0 ? $t('member.joinWaitlist') : $t('member.book') }}</template>
                                     </button>
                                 </div>

@@ -53,6 +53,13 @@ const durationMin = (item) => {
 const sortedEnrollments = computed(() =>
     [...props.myEnrollments].sort((a, b) => (a.session_date + a.start_time).localeCompare(b.session_date + b.start_time)),
 );
+const statusClass = (item) => ({ booked: 'is-booked', waitlisted: 'is-wait', cancelled: 'is-cancelled' })[item.status];
+const statusText = (item) => {
+    if (item.status === 'booked') return t('member.statusBooked');
+    if (item.status === 'cancelled') return t('member.classCancelled');
+    return t('member.waitlistPosition', { position: item.waitlist_position });
+};
+
 const nextBooked = computed(() => sortedEnrollments.value.find((e) => e.status === 'booked') ?? null);
 const bookedCount = computed(() => props.myEnrollments.filter((e) => e.status === 'booked').length);
 const waitCount = computed(() => props.myEnrollments.filter((e) => e.status === 'waitlisted').length);
@@ -162,6 +169,7 @@ export default {
                             v-for="item in pagedEnrollments"
                             :key="item.id"
                             class="ym-bk-row ym-bk-row--btn"
+                            :class="{ 'is-class-cancelled': item.status === 'cancelled' }"
                             role="button"
                             tabindex="0"
                             :style="{ '--accent': typeColor(item.class_type_id ?? 0) }"
@@ -176,14 +184,10 @@ export default {
                             </div>
                             <div class="ym-bk-info">
                                 <p class="ym-bk-name"><span class="ym-bk-swatch" /> {{ item.class_type_name }}</p>
-                                <p class="ym-bk-sub">{{ item.coach_name }} · {{ item.branch_name }} · {{ item.room_name }}</p>
+                                <p class="ym-bk-sub">{{ item.reference }} · {{ item.coach_name }} · {{ item.branch_name }} · {{ item.room_name }}</p>
                             </div>
                             <div class="ym-bk-act">
-                                <span class="ym-bk-status" :class="item.status === 'booked' ? 'is-booked' : 'is-wait'">
-                                    {{ item.status === 'booked'
-                                        ? $t('member.statusBooked')
-                                        : $t('member.waitlistPosition', { position: item.waitlist_position }) }}
-                                </span>
+                                <span class="ym-bk-status" :class="statusClass(item)">{{ statusText(item) }}</span>
                                 <i class="bi bi-chevron-right ym-bk-chevron" />
                             </div>
                         </div>
@@ -264,14 +268,12 @@ export default {
         <div v-if="detail" class="ym-detail">
             <div class="ym-detail-hero" :style="{ '--accent': typeColor(detail.class_type_id ?? 0) }">
                 <span class="ym-detail-tag">{{ detail.class_type_name }}</span>
-                <span
-                    class="ym-bk-status"
-                    :class="detail.status === 'booked' ? 'is-booked' : 'is-wait'"
-                >
-                    {{ detail.status === 'booked'
-                        ? $t('member.statusBooked')
-                        : $t('member.waitlistPosition', { position: detail.waitlist_position }) }}
-                </span>
+                <span class="ym-bk-status" :class="statusClass(detail)">{{ statusText(detail) }}</span>
+            </div>
+
+            <div v-if="detail.status === 'cancelled'" class="ym-detail-note is-cancelled">
+                <i class="bi bi-x-circle" />
+                <span>{{ $t('member.classCancelledNote') }}</span>
             </div>
 
             <div v-if="detail.status === 'waitlisted'" class="ym-detail-note">
@@ -328,8 +330,10 @@ export default {
 
             <div class="ym-detail-block">
                 <p class="ym-detail-label">{{ $t('member.yourBookingSection') }}</p>
+                <p class="ym-detail-strong">{{ $t('member.bookingReference', { reference: detail.reference }) }}</p>
+                <p class="ym-detail-text">{{ $t('member.sessionReference', { reference: detail.session_reference }) }}</p>
                 <p class="ym-detail-text">{{ $t('member.enrolledOn', { date: formatDateTime(detail.enrolled_at) }) }}</p>
-                <p class="ym-detail-text" :class="{ 'ym-detail-warn': !detail.can_cancel }">
+                <p v-if="detail.status !== 'cancelled'" class="ym-detail-text" :class="{ 'ym-detail-warn': !detail.can_cancel }">
                     <i class="bi" :class="detail.can_cancel ? 'bi-unlock' : 'bi-lock'" />
                     {{ detail.can_cancel
                         ? $t('member.cancelBy', { date: formatDateTime(detail.cancel_deadline) })
@@ -337,26 +341,27 @@ export default {
                 </p>
             </div>
 
-            <div class="ym-detail-actions">
-                <button type="button" class="ym-btn-outline" @click="downloadIcs(detail)">
-                    <i class="bi bi-calendar-plus" /> {{ $t('member.addToCalendar') }}
-                </button>
-
-                <template v-if="detail.can_cancel && !confirmingCancel">
-                    <button type="button" class="ym-btn-danger" @click="confirmingCancel = true">
-                        {{ $t('member.cancelBooking') }}
-                    </button>
-                </template>
-                <template v-else-if="confirmingCancel">
-                    <span class="ym-detail-confirm-q">{{ $t('member.confirmCancelBooking') }}</span>
-                    <button type="button" class="ym-btn-outline" @click="confirmingCancel = false">
+            <div v-if="confirmingCancel" class="ym-detail-confirm">
+                <p class="ym-detail-confirm-q">{{ $t('member.confirmCancelBooking') }}</p>
+                <p class="ym-detail-confirm-note">{{ $t('member.confirmCancelNote') }}</p>
+                <div class="ym-detail-actions">
+                    <button type="button" class="ym-btn-outline" :disabled="cancelling" @click="confirmingCancel = false">
                         {{ $t('member.keepBooking') }}
                     </button>
                     <button type="button" class="ym-btn-danger" :disabled="cancelling" @click="confirmCancel">
                         <i v-if="cancelling" class="bi bi-arrow-repeat ym-spin" />
-                        <template v-else>{{ $t('member.cancelBooking') }}</template>
+                        {{ $t('member.yesCancelBooking') }}
                     </button>
-                </template>
+                </div>
+            </div>
+
+            <div v-else class="ym-detail-actions">
+                <button type="button" class="ym-btn-outline" @click="downloadIcs(detail)">
+                    <i class="bi bi-calendar-plus" /> {{ $t('member.addToCalendar') }}
+                </button>
+                <button v-if="detail.can_cancel" type="button" class="ym-btn-danger ym-btn-cancel" @click="confirmingCancel = true">
+                    <i class="bi bi-x-circle" /> {{ $t('member.cancelBooking') }}
+                </button>
             </div>
         </div>
     </Modal>
