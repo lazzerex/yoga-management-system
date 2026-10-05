@@ -8,10 +8,13 @@ import TabBar from '@/Components/UI/TabBar.vue';
 import FilterBar from '@/Components/UI/FilterBar.vue';
 import DateRange from '@/Components/UI/DateRange.vue';
 import SortTh from '@/Components/UI/SortTh.vue';
+import WeekCalendar from '@/Components/UI/WeekCalendar.vue';
 import { useFilters } from '@/composables/useFilters.js';
 
 const props = defineProps({
     sessions: Object,
+    calendar: Array,
+    week: String,
     schedules: Object,
     stats: Object,
     filters: Object,
@@ -20,16 +23,61 @@ const props = defineProps({
     canManage: Boolean,
 });
 
-const { filters, active, filterCount, reset, toggleSort } = useFilters(props.endpoints.index, props.filters, []);
+const { filters, active, filterCount, reset, toggleSort } = useFilters(props.endpoints.index, props.filters);
 
 const tabs = computed(() => {
     currentLocale.value;
     return [
+        { key: 'calendar', label: t('operations.calendar') },
         { key: 'sessions', label: t('operations.sessions') },
         { key: 'schedules', label: t('operations.schedules') },
     ];
 });
-const activeTab = ref('sessions');
+const activeTab = ref('calendar');
+
+const fillPercent = (row) => (row.capacity ? Math.min(100, Math.round((row.booked_count / row.capacity) * 100)) : 0);
+const fillTone = (row) => (row.booked_count >= row.capacity ? 'is-full' : fillPercent(row) >= 80 ? 'is-high' : '');
+
+const detail = ref(null);
+const detailLoading = ref(false);
+const detailError = ref(false);
+const confirmingCancel = ref(false);
+const cancelling = ref(false);
+
+const openSession = async (id) => {
+    detail.value = { id };
+    detailLoading.value = true;
+    detailError.value = false;
+    confirmingCancel.value = false;
+
+    try {
+        const { data } = await window.axios.get(props.endpoints.showSession.replace('__ID__', id));
+        if (detail.value?.id === id) detail.value = data;
+    } catch {
+        detailError.value = true;
+    } finally {
+        detailLoading.value = false;
+    }
+};
+
+const closeSession = () => {
+    detail.value = null;
+    confirmingCancel.value = false;
+};
+
+const cancelSession = () => {
+    cancelling.value = true;
+    router.post(detail.value.endpoints.cancel, {}, {
+        preserveScroll: true,
+        preserveState: true,
+        onSuccess: () => closeSession(),
+        onFinish: () => (cancelling.value = false),
+    });
+};
+
+const enrollmentLabel = (status) => t(`operations.enrollmentStatus${status.charAt(0).toUpperCase()}${status.slice(1)}`);
+const enrollmentTone = { booked: 'ok', waitlisted: 'warn', cancelled: 'neutral' };
+const attendanceLabel = (status) => t(`operations.roster${status.charAt(0).toUpperCase()}${status.slice(1)}`);
 
 const dayNames = [
     'operations.daySunday',
@@ -81,7 +129,30 @@ export default {
     <div class="ym-ui">
         <TabBar v-model="activeTab" :tabs="tabs" />
 
-        <template v-if="activeTab === 'sessions'">
+        <template v-if="activeTab === 'calendar'">
+            <header class="ym-page-head">
+                <div>
+                    <h1 class="ym-page-title">{{ $t('operations.centreCalendar') }}</h1>
+                    <p class="ym-page-sub">{{ $t('operations.centreCalendarSub') }}</p>
+                </div>
+            </header>
+
+            <WeekCalendar
+                :sessions="calendar"
+                :week="week"
+                :reload-only="['calendar', 'week']"
+                :empty-text="$t('operations.noSessionsThisWeek')"
+                @select="openSession($event.id)"
+            >
+                <template #event="{ session }">
+                    <span class="ym-wcal-title">{{ session.class_type_name }}</span>
+                    <span class="ym-wcal-meta">{{ session.coach_name }}</span>
+                    <span class="ym-wcal-meta">{{ session.room_name }} · {{ session.booked_count }}/{{ session.capacity }}</span>
+                </template>
+            </WeekCalendar>
+        </template>
+
+        <template v-else-if="activeTab === 'sessions'">
             <header class="ym-page-head">
                 <div>
                     <h1 class="ym-page-title">
@@ -104,7 +175,13 @@ export default {
 
             <section class="ym-card">
                 <div class="ym-filter-band">
-                    <FilterBar :count="filterCount" :active="active" @reset="reset">
+                    <FilterBar
+                        v-model:search="filters.search"
+                        :search-placeholder="$t('operations.searchSessions')"
+                        :count="filterCount"
+                        :active="active"
+                        @reset="reset"
+                    >
                         <label class="ym-filter-field">
                             <span>{{ $t('operations.class') }}</span>
                             <select v-model="filters.class_type_id" class="ym-log-filter-select">
@@ -136,24 +213,36 @@ export default {
                     <table class="ym-grid-table">
                         <thead>
                             <tr>
+                                <th>{{ $t('operations.sessionCode') }}</th>
                                 <SortTh field="session_date" :label="$t('operations.date')" :state="filters" @sort="toggleSort" />
                                 <th>{{ $t('operations.time') }}</th>
                                 <th>{{ $t('operations.class') }}</th>
                                 <th>{{ $t('operations.coach') }}</th>
                                 <th>{{ $t('operations.branch') }}</th>
                                 <th>{{ $t('operations.room') }}</th>
+                                <th>{{ $t('operations.booked') }}</th>
                                 <SortTh field="status" :label="$t('operations.status')" :state="filters" @sort="toggleSort" />
-                                <th v-if="canManage" class="is-actions">{{ $t('operations.actions') }}</th>
+                                <th class="is-actions">{{ $t('operations.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="session in sessions.data" :key="session.id">
+                            <tr v-for="session in sessions.data" :key="session.id" class="ym-clickable-row" @click="openSession(session.id)">
+                                <td class="ym-num is-muted">{{ session.reference }}</td>
                                 <td class="ym-num">{{ session.session_date }}</td>
                                 <td class="ym-num">{{ session.start_time }}-{{ session.end_time }}</td>
                                 <td class="is-strong">{{ session.class_type_name }}</td>
                                 <td class="is-muted">{{ session.coach_name }}</td>
                                 <td class="is-muted">{{ session.branch_name }}</td>
                                 <td class="is-muted">{{ session.room_name }}</td>
+                                <td>
+                                    <span class="ym-fill" :class="fillTone(session)">
+                                        <span class="ym-fill-bar"><span :style="{ width: `${fillPercent(session)}%` }" /></span>
+                                        <span class="ym-fill-text">
+                                            {{ session.booked_count }}/{{ session.capacity }}
+                                            <template v-if="session.waitlist_count"> · +{{ session.waitlist_count }}</template>
+                                        </span>
+                                    </span>
+                                </td>
                                 <td>
                                     <span class="ym-tag" :class="`ym-tag--${statusTone[session.status] ?? 'neutral'}`">
                                         {{ statusLabel(session.status) }}
@@ -162,11 +251,16 @@ export default {
                                         {{ $t('operations.overridden') }}
                                     </span>
                                 </td>
-                                <td v-if="canManage" class="is-actions">
+                                <td class="is-actions">
                                     <div class="ym-row-actions">
+                                        <button type="button" class="ym-btn ym-btn--outline ym-btn--sm" @click.stop="openSession(session.id)">
+                                            {{ $t('operations.details') }}
+                                        </button>
                                         <Link
+                                            v-if="canManage"
                                             class="ym-btn ym-btn--outline ym-btn--sm"
                                             :href="route('operations.class-sessions.edit', session.id)"
+                                            @click.stop
                                         >
                                             {{ $t('operations.edit') }}
                                         </Link>
@@ -191,6 +285,7 @@ export default {
                             v-html="link.label"
                             :class="['ym-page-link', { 'ym-page-link--active': link.active, 'ym-page-link--disabled': !link.url }]"
                             preserve-scroll
+                            preserve-state
                         />
                     </div>
                 </div>
@@ -240,12 +335,14 @@ export default {
                         <thead>
                             <tr>
                                 <th>{{ $t('operations.dayOfWeek') }}</th>
-                                <th>{{ $t('operations.startTime') }}</th>
+                                <th>{{ $t('operations.time') }}</th>
                                 <th>{{ $t('operations.class') }}</th>
                                 <th>{{ $t('operations.coach') }}</th>
                                 <th>{{ $t('operations.branch') }}</th>
                                 <th>{{ $t('operations.room') }}</th>
                                 <th class="is-num">{{ $t('operations.capacity') }}</th>
+                                <th class="is-num">{{ $t('operations.upcomingSessionsCount') }}</th>
+                                <th>{{ $t('operations.generatedUntil') }}</th>
                                 <th>{{ $t('operations.status') }}</th>
                                 <th v-if="canManage" class="is-actions">{{ $t('operations.actions') }}</th>
                             </tr>
@@ -253,12 +350,17 @@ export default {
                         <tbody>
                             <tr v-for="schedule in schedules.data" :key="schedule.id">
                                 <td class="is-strong">{{ dayLabel(schedule.day_of_week) }}</td>
-                                <td class="ym-num">{{ schedule.start_time }}</td>
+                                <td class="ym-num">
+                                    {{ schedule.start_time }}-{{ schedule.end_time }}
+                                    <span class="is-muted">· {{ $t('member.durationMinutes', { count: schedule.duration_minutes }) }}</span>
+                                </td>
                                 <td>{{ schedule.class_type_name }}</td>
                                 <td class="is-muted">{{ schedule.coach_name }}</td>
                                 <td class="is-muted">{{ schedule.branch_name }}</td>
                                 <td class="is-muted">{{ schedule.room_name }}</td>
                                 <td class="is-num is-muted">{{ schedule.capacity }}</td>
+                                <td class="is-num">{{ schedule.upcoming_count }}</td>
+                                <td class="ym-num is-muted">{{ schedule.last_session_date ?? '-' }}</td>
                                 <td>
                                     <span class="ym-tag" :class="schedule.is_active ? 'ym-tag--ok' : 'ym-tag--neutral'">
                                         {{ schedule.is_active ? $t('operations.active') : $t('operations.inactive') }}
@@ -300,11 +402,109 @@ export default {
                             v-html="link.label"
                             :class="['ym-page-link', { 'ym-page-link--active': link.active, 'ym-page-link--disabled': !link.url }]"
                             preserve-scroll
+                            preserve-state
                         />
                     </div>
                 </div>
             </section>
         </template>
+
+        <Modal :show="!!detail" :title="detail?.class_type_name ?? $t('operations.sessionDetails')" @close="closeSession">
+            <div v-if="detail" class="ym-stack">
+                <p v-if="detailLoading" class="ym-note"><i class="bi bi-arrow-repeat ym-spin" /> {{ $t('common.loading') }}</p>
+                <p v-else-if="detailError" class="ym-callout ym-callout--danger">
+                    <i class="bi bi-exclamation-triangle" /> <span>{{ $t('operations.sessionLoadFailed') }}</span>
+                </p>
+                <template v-else>
+                    <dl class="ym-sd-facts">
+                        <div>
+                            <dt>{{ $t('operations.date') }}</dt>
+                            <dd>{{ detail.session_date }}, {{ detail.start_time }}-{{ detail.end_time }}</dd>
+                        </div>
+                        <div>
+                            <dt>{{ $t('operations.status') }}</dt>
+                            <dd>
+                                <span class="ym-tag" :class="`ym-tag--${statusTone[detail.status] ?? 'neutral'}`">{{ statusLabel(detail.status) }}</span>
+                                <span v-if="detail.is_overridden" class="ym-tag ym-tag--neutral ml-1">{{ $t('operations.overridden') }}</span>
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>{{ $t('operations.coach') }}</dt>
+                            <dd>{{ detail.coach_name }}</dd>
+                        </div>
+                        <div>
+                            <dt>{{ $t('operations.room') }}</dt>
+                            <dd>{{ detail.branch_name }} · {{ detail.room_name }}</dd>
+                        </div>
+                        <div>
+                            <dt>{{ $t('operations.booked') }}</dt>
+                            <dd>
+                                <span class="ym-fill" :class="fillTone(detail)">
+                                    <span class="ym-fill-bar"><span :style="{ width: `${fillPercent(detail)}%` }" /></span>
+                                    <span class="ym-fill-text">{{ detail.booked_count }}/{{ detail.capacity }}</span>
+                                </span>
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>{{ $t('operations.spotsLeft') }}</dt>
+                            <dd>{{ Math.max(0, detail.capacity - detail.booked_count) }}</dd>
+                        </div>
+                        <div>
+                            <dt>{{ $t('operations.waitlist') }}</dt>
+                            <dd>{{ detail.waitlist_count }}</dd>
+                        </div>
+                        <div>
+                            <dt>{{ $t('operations.sessionCode') }}</dt>
+                            <dd class="ym-num">{{ detail.reference }}</dd>
+                        </div>
+                    </dl>
+
+                    <div v-if="detail.roster">
+                        <p class="ym-label">{{ $t('operations.rosterTitle') }}</p>
+                        <ul v-if="detail.roster.length" class="ym-sd-roster">
+                            <li v-for="row in detail.roster" :key="row.id">
+                                <span>
+                                    {{ row.name }}
+                                    <span class="ym-sd-roster-ref">{{ row.reference }}</span>
+                                </span>
+                                <span>
+                                    <span v-if="row.attendance" class="ym-tag ym-tag--info mr-1">{{ attendanceLabel(row.attendance) }}</span>
+                                    <span class="ym-tag" :class="`ym-tag--${enrollmentTone[row.status] ?? 'neutral'}`">{{ enrollmentLabel(row.status) }}</span>
+                                </span>
+                            </li>
+                        </ul>
+                        <p v-else class="ym-note">{{ $t('operations.rosterEmpty') }}</p>
+                    </div>
+
+                    <div v-if="confirmingCancel" class="ym-callout ym-callout--danger">
+                        <i class="bi bi-exclamation-triangle" />
+                        <span>{{ $t('operations.confirmCancelSession', { count: detail.booked_count }) }}</span>
+                    </div>
+
+                    <div class="ym-sd-actions">
+                        <template v-if="confirmingCancel">
+                            <button type="button" class="ym-btn ym-btn--outline" :disabled="cancelling" @click="confirmingCancel = false">
+                                {{ $t('operations.keepSession') }}
+                            </button>
+                            <button type="button" class="ym-btn ym-btn--danger" :disabled="cancelling" @click="cancelSession">
+                                <i v-if="cancelling" class="bi bi-arrow-repeat ym-spin" /> {{ $t('operations.cancelSession') }}
+                            </button>
+                        </template>
+                        <template v-else>
+                            <button v-if="detail.endpoints.cancel" type="button" class="ym-btn ym-btn--danger-quiet" @click="confirmingCancel = true">
+                                {{ $t('operations.cancelSession') }}
+                            </button>
+                            <Link v-if="detail.endpoints.roster" :href="detail.endpoints.roster" class="ym-btn ym-btn--outline">
+                                <i class="bi bi-person-check" /> {{ $t('coach.openRoster') }}
+                            </Link>
+                            <Link v-if="detail.endpoints.edit" :href="detail.endpoints.edit" class="ym-btn ym-btn--primary">
+                                {{ $t('operations.edit') }}
+                            </Link>
+                        </template>
+                    </div>
+                </template>
+            </div>
+        </Modal>
 
         <Modal :show="!!pendingDeleteSchedule" :title="$t('operations.deleteScheduleTitle')" @close="pendingDeleteSchedule = null">
             <p class="ym-note">{{ $t('operations.confirmDeleteSchedule') }}</p>
