@@ -16,7 +16,6 @@ class SettingsController extends Controller
     private const KEYS = [
         'centre_name' => 'centre.name',
         'cancel_cutoff_hours' => 'booking.cancel_cutoff_hours',
-        'require_entitlement' => 'booking.require_entitlement',
         'default_locale' => 'centre.default_locale',
     ];
 
@@ -85,8 +84,6 @@ class SettingsController extends Controller
         return [
             'centre_name' => (string) Settings::get('centre.name', config('app.name')),
             'cancel_cutoff_hours' => (string) Settings::get('booking.cancel_cutoff_hours', config('enrollment.cancel_cutoff_hours')),
-            // '1'/'0', not a boolean: the save loop stringifies, and false would become ''.
-            'require_entitlement' => (string) (int) Settings::get('booking.require_entitlement', config('enrollment.require_entitlement')),
             'default_locale' => (string) Settings::get('centre.default_locale', 'en'),
         ];
     }

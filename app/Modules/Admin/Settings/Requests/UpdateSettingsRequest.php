@@ -16,7 +16,6 @@ class UpdateSettingsRequest extends FormRequest
         return [
             'centre_name' => ['required', 'string', 'max:120'],
             'cancel_cutoff_hours' => ['required', 'integer', 'min:0', 'max:168'],
-            'require_entitlement' => ['required', 'in:0,1'],
             'default_locale' => ['required', 'string', 'in:en,vi'],
         ];
     }
