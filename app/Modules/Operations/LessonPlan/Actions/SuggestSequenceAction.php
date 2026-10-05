@@ -57,12 +57,12 @@ class SuggestSequenceAction
         // a student field later. This is the whole of the privacy guarantee.
         $prompt = implode("\n", [
             'Class type: '.$inputs['class_type'],
-            'Level: '.$inputs['level'],
+            'Level: '.__('operations.level'.ucfirst($inputs['level'])),
             'Duration: '.$inputs['duration_minutes'].' minutes',
             'Objective: '.($inputs['objective'] !== '' ? $inputs['objective'] : 'general balanced practice'),
         ]);
 
-        $response = $this->client->generate(self::SYSTEM, self::SCHEMA, $prompt, self::FAKE);
+        $response = $this->client->generate(self::SYSTEM.GeminiClient::replyLanguage(), self::SCHEMA, $prompt, self::FAKE);
         $steps = $response['steps'] ?? null;
 
         if (! is_array($steps) || $steps === []) {

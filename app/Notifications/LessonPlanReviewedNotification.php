@@ -17,7 +17,7 @@ class LessonPlanReviewedNotification extends EventNotification
 
     public function toMail(object $notifiable): MailMessage
     {
-        $params = $this->params();
+        $params = $this->params() + ['status' => __('notifications.status.'.$this->lessonPlan->status)];
 
         return (new MailMessage)
             ->subject(__('notifications.lessonPlanReviewed.subject', $params))
@@ -27,14 +27,16 @@ class LessonPlanReviewedNotification extends EventNotification
 
     public function toArray(object $notifiable): array
     {
-        return $this->payload('notifications.lessonPlanReviewed.bell', $this->params(), $this->url());
+        // The bell renders in the reader's language later, so the outcome picks the key instead of a translated word.
+        $key = $this->lessonPlan->status === 'approved' ? 'bellApproved' : 'bellRejected';
+
+        return $this->payload('notifications.lessonPlanReviewed.'.$key, $this->params(), $this->url());
     }
 
     private function params(): array
     {
         return [
             'title' => $this->lessonPlan->title,
-            'status' => __('notifications.status.'.$this->lessonPlan->status),
             'reviewer' => $this->reviewer->name,
         ];
     }
