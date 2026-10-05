@@ -62,7 +62,7 @@ export default {
             <div class="ym-filter-band">
                 <FilterBar
                     v-model:search="filters.search"
-                    :search-placeholder="$t('operations.searchByName')"
+                    :search-placeholder="$t('operations.searchByNameOrReference')"
                     :count="filterCount"
                     :active="active"
                     @reset="reset"
@@ -84,6 +84,7 @@ export default {
                 <table class="ym-grid-table">
                     <thead>
                         <tr>
+                            <th>{{ $t('operations.bookingReference') }}</th>
                             <th>{{ $t('operations.student') }}</th>
                             <th>{{ $t('operations.class') }}</th>
                             <th>{{ $t('operations.coach') }}</th>
@@ -95,6 +96,7 @@ export default {
                     </thead>
                     <tbody>
                         <tr v-for="row in enrollments.data" :key="row.id">
+                            <td class="ym-num is-muted">{{ row.reference }}</td>
                             <td class="is-strong">{{ row.student_name }}</td>
                             <td>{{ row.class_type_name }}</td>
                             <td class="is-muted">{{ row.coach_name }}</td>
