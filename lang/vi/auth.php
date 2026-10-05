@@ -8,7 +8,7 @@ return [
     'username' => 'Tên đăng nhập',
     'email' => 'Email',
     'password' => 'Mật khẩu',
-    'confirmPassword' => 'Xác nhận Mật khẩu',
+    'confirmPassword' => 'Xác nhận mật khẩu',
     'role' => 'Vai trò',
     'login' => 'Đăng nhập',
     'register' => 'Đăng ký',

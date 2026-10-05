@@ -41,7 +41,8 @@ return [
         'subject' => 'Your lesson plan :title was :status',
         'line' => 'Your lesson plan :title was :status by :reviewer.',
         'action' => 'View the plan',
-        'bell' => ':title was :status',
+        'bellApproved' => ':title was approved',
+        'bellRejected' => ':title was rejected',
     ],
     'memberRegistered' => [
         'label' => 'New member registered',

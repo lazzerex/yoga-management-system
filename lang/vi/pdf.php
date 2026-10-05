@@ -3,7 +3,7 @@
 return [
     'generatedOn' => 'Xuất ngày :date',
 
-    'invoiceTitle' => 'Hóa đơn :number',
+    'invoiceTitle' => 'Hoá đơn :number',
     'invoiceStudent' => 'Học viên',
     'invoiceBranch' => 'Chi nhánh',
     'invoiceIssued' => 'Ngày lập',
@@ -24,7 +24,7 @@ return [
     'paymentMethod' => 'Hình thức',
     'paymentReference' => 'Tham chiếu',
     'paymentAmount' => 'Số tiền',
-    'paymentVoided' => 'Đã hủy',
+    'paymentVoided' => 'Đã huỷ',
 
     'status' => [
         'unpaid' => 'Chưa thanh toán',

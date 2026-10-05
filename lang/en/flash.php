@@ -31,6 +31,8 @@ return [
     'classScheduleUpdated' => 'Recurring template updated successfully.',
     'classScheduleDeleted' => 'Recurring template deleted.',
     'scheduleHasSessions' => 'Cannot delete a template that already has generated sessions.',
+    'classSessionCancelled' => 'Session cancelled. Booked members and the coach have been notified.',
+    'classSessionNotCancellable' => 'Only an upcoming scheduled session can be cancelled.',
     'classSessionUpdated' => 'Session updated successfully.',
     'sessionsGenerated' => 'Generated :count session(s).',
     'enrollmentBooked' => 'You are booked into this session.',

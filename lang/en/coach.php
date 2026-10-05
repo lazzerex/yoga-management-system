@@ -42,5 +42,8 @@ return [
     'followUpNoteAttendance' => 'Attendance down for 2 consecutive weeks',
     'followUpNoteShoulderMobility' => 'Requested support for shoulder mobility modifications',
     'followUpNoteIntermediate' => 'Interested in progressing to intermediate sequence',
+    'weekCalendarSub' => 'Every class you teach this week. Click a class to see its numbers and open the roster.',
+    'noClassesThisWeek' => 'No classes to teach this week.',
+    'openRoster' => 'Open roster',
     'studentsCount' => ':count students',
 ];
