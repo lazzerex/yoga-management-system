@@ -53,10 +53,23 @@ const copy = async () => {
     clearTimeout(copyTimer);
 
     try {
-        await navigator.clipboard.writeText(reviewAsText.value);
+        if (window.isSecureContext && navigator.clipboard) {
+            await navigator.clipboard.writeText(reviewAsText.value);
+        } else {
+            // The clipboard API is unavailable on a plain-http host.
+            const area = document.createElement('textarea');
+            area.value = reviewAsText.value;
+            area.setAttribute('readonly', '');
+            area.style.position = 'fixed';
+            area.style.opacity = '0';
+            document.body.appendChild(area);
+            area.select();
+            const copied = document.execCommand('copy');
+            area.remove();
+            if (!copied) throw new Error('copy');
+        }
         copyState.value = 'ok';
     } catch {
-        // Needs a secure context, so a plain-http host refuses it.
         copyState.value = 'fail';
     }
 
