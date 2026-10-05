@@ -15,7 +15,13 @@ const windowLabel = (entitlement) => {
     if (!entitlement.valid_until) return t('member.noExpiry');
     return entitlement.valid_from ? `${entitlement.valid_from} - ${entitlement.valid_until}` : entitlement.valid_until;
 };
-const current = props.entitlements[0] ?? null;
+
+const isSpent = (entitlement) => entitlement.sessions_remaining === 0;
+const usable = props.entitlements.filter((entitlement) => !isSpent(entitlement));
+const plans = [...usable, ...props.entitlements.filter(isSpent)];
+
+// Mirrors the booking rule: an unlimited pass is spent first, otherwise the soonest to expire.
+const current = usable.find((entitlement) => entitlement.sessions_remaining === null) ?? usable[0] ?? null;
 
 const statusTone = {
     paid: 'ok',
@@ -64,13 +70,19 @@ export default {
         </div>
 
         <section class="ym-card">
-            <ul v-if="entitlements.length" class="ym-timeline">
-                <li v-for="entitlement in entitlements" :key="entitlement.id" class="ym-timeline-item">
+            <ul v-if="plans.length" class="ym-timeline">
+                <li
+                    v-for="entitlement in plans"
+                    :key="entitlement.id"
+                    class="ym-timeline-item"
+                    :class="{ 'is-spent': isSpent(entitlement) }"
+                >
                     <span class="ym-timeline-mark"><i class="bi bi-patch-check" /></span>
                     <div class="ym-timeline-body">
                         <div class="ym-timeline-row">
                             <span class="ym-timeline-amount">{{ entitlement.description }}</span>
-                            <span class="ym-tag ym-tag--ok">{{ $t('operations.invoiceStatusPaid') }}</span>
+                            <span v-if="isSpent(entitlement)" class="ym-tag ym-tag--neutral">{{ $t('member.planUsedUp') }}</span>
+                            <span v-else class="ym-tag ym-tag--ok">{{ $t('member.planUsable') }}</span>
                         </div>
                         <p class="ym-timeline-meta">
                             {{ windowLabel(entitlement) }}
