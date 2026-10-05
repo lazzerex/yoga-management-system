@@ -32,6 +32,14 @@ class GeminiClient
             : (string) config('services.gemini.model');
     }
 
+    /** Appended to a system instruction so the reply reads in the viewer's language. */
+    public static function replyLanguage(): string
+    {
+        return app()->getLocale() === 'vi'
+            ? ' Write every piece of text, headings included, in natural Vietnamese, keeping asana names in their usual Sanskrit or English form.'
+            : ' Write every piece of text in English.';
+    }
+
     /**
      * @param  array<string, mixed>  $schema  an OpenAPI subset schema the reply must match
      * @param  array<string, mixed>  $fakeResponse  what the 'fake' driver returns, same shape
@@ -58,7 +66,7 @@ class GeminiClient
                     'contents' => [['parts' => $parts]],
                     'generationConfig' => [
                         'temperature' => 0.7,
-                        'maxOutputTokens' => 2048,
+                        'maxOutputTokens' => 4096,
                         'responseMimeType' => 'application/json',
                         'responseSchema' => $schema,
                     ],
