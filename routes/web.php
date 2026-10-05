@@ -56,6 +56,7 @@ Route::prefix('cms')->group(function () {
 
             Route::middleware('permission:operations.sessions.view')->group(function () {
                 Route::get('/academy', [ClassSessionController::class, 'index'])->name('academy');
+                Route::get('/class-sessions/{classSession}', [ClassSessionController::class, 'show'])->name('class-sessions.show');
             });
 
             Route::middleware('permission:operations.sessions.manage')->group(function () {
@@ -71,6 +72,7 @@ Route::prefix('cms')->group(function () {
                 Route::prefix('class-sessions')->name('class-sessions.')->group(function () {
                     Route::get('/{classSession}/edit', [ClassSessionController::class, 'edit'])->name('edit');
                     Route::patch('/{classSession}', [ClassSessionController::class, 'update'])->name('update');
+                    Route::post('/{classSession}/cancel', [ClassSessionController::class, 'cancel'])->name('cancel');
                 });
             });
 
