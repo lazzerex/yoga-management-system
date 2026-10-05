@@ -9,18 +9,11 @@ use Illuminate\Support\Collection;
 class EntitlementSet
 {
     /** @param Collection<int, InvoiceItem> $lines */
-    public function __construct(
-        private bool $enforced,
-        private Collection $lines,
-    ) {}
+    public function __construct(private Collection $lines) {}
 
     /** A lang key naming why this date cannot be booked, or null when it can. */
     public function check(string $sessionDate): ?string
     {
-        if (! $this->enforced) {
-            return null;
-        }
-
         if ($this->lines->isEmpty()) {
             return 'flash.enrollmentNoEntitlement';
         }
@@ -32,7 +25,6 @@ class EntitlementSet
         return $this->pick($sessionDate) === null ? 'flash.enrollmentEntitlementExhausted' : null;
     }
 
-    /** Ignores the setting on purpose: with the gate off a booking is still attributed to what paid for it. */
     public function pick(string $sessionDate): ?InvoiceItem
     {
         $covering = $this->covering($sessionDate);
