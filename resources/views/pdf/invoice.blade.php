@@ -37,7 +37,7 @@
         <tbody>
             @foreach ($invoice->items as $item)
                 <tr>
-                    <td>{{ $item->description }}</td>
+                    <td>{{ $item->label() }}</td>
                     <td class="num">{{ $item->quantity }}</td>
                     <td class="num">{{ $money($item->unit_price) }}</td>
                     <td class="num">{{ $money($item->line_total) }}</td>
