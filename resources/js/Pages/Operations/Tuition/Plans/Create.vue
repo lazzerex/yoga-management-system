@@ -25,6 +25,7 @@ const typeOptions = computed(() => props.options.types.map((type) => ({
 const form = useForm({
     branch_id: '',
     name: '',
+    name_vi: '',
     type: props.options.types[0],
     price_amount: '0',
     session_count: '',
@@ -60,6 +61,9 @@ export default {
                     <div class="ym-form-grid-2">
                         <Field :label="$t('operations.tuitionPlanName')" :error="form.errors.name">
                             <TextInput v-model="form.name" />
+                        </Field>
+                        <Field :label="$t('operations.tuitionPlanNameVi')" :error="form.errors.name_vi">
+                            <TextInput v-model="form.name_vi" />
                         </Field>
                         <Field :label="$t('operations.tuitionPlanType')" :error="form.errors.type">
                             <Select v-model="form.type" :options="typeOptions" />
