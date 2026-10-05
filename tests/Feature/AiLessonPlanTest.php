@@ -69,7 +69,7 @@ class AiLessonPlanTest extends TestCase
 
         $this->assertSame([
             'Class type: Vinyasa',
-            'Level: beginner',
+            'Level: Beginner',
             'Duration: 60 minutes',
             'Objective: Open the hips safely.',
         ], explode("\n", $prompt));
@@ -146,6 +146,20 @@ class AiLessonPlanTest extends TestCase
         // The reply must be asked for as JSON, or the model answers in Markdown.
         Http::assertSent(fn ($request) => $request->data()['generationConfig']['responseMimeType'] === 'application/json'
             && isset($request->data()['generationConfig']['responseSchema']));
+    }
+
+    public function test_a_vietnamese_viewer_asks_the_model_for_a_vietnamese_reply(): void
+    {
+        config(['services.gemini.driver' => 'gemini', 'services.gemini.key' => 'test-key']);
+        $this->fakeGemini(['steps' => [['name' => 'Tư thế núi', 'sanskrit' => 'Tadasana', 'duration' => '5 nhịp thở', 'cue' => 'Đứng thẳng.']]]);
+
+        [$user] = $this->coach();
+
+        $this->actingAs($user)->withCredentials()->withUnencryptedCookie('locale', 'vi')
+            ->postJson('/cms/operations/lesson-planning/suggest', $this->suggestPayload())
+            ->assertOk();
+
+        Http::assertSent(fn ($request) => str_contains($request->data()['systemInstruction']['parts'][0]['text'], 'Vietnamese'));
     }
 
     public function test_a_reply_that_is_not_json_is_treated_as_no_suggestion(): void

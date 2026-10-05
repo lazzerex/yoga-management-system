@@ -10,7 +10,6 @@ use App\Models\InvoiceItem;
 use App\Models\StudentProfile;
 use App\Models\TuitionPlan;
 use App\Models\User;
-use App\Support\Settings;
 use Database\Seeders\PermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -250,34 +249,6 @@ class EntitlementTest extends TestCase
             ->assertSessionHasErrors(['action' => __('flash.invoiceHasBookings')]);
     }
 
-    public function test_turning_the_requirement_off_lets_an_unpaid_member_book(): void
-    {
-        Settings::set('booking.require_entitlement', '0');
-
-        [$user] = $this->member();
-        $session = $this->upcomingSession();
-
-        $this->actingAs($user)
-            ->post("/cms/member/class-sessions/{$session->id}/enrollments")
-            ->assertSessionHasNoErrors();
-
-        $this->assertDatabaseHas('enrollments', ['invoice_item_id' => null, 'status' => 'booked']);
-    }
-
-    /** With the gate off a booking is still attributed to whatever paid for it. */
-    public function test_with_the_requirement_off_a_booking_still_spends_an_available_plan(): void
-    {
-        Settings::set('booking.require_entitlement', '0');
-
-        [$user, $student] = $this->member();
-        $line = $this->grantPlan($student, ['sessions_granted' => 3]);
-
-        $this->actingAs($user)->post("/cms/member/class-sessions/{$this->upcomingSession()->id}/enrollments");
-
-        $this->assertDatabaseHas('enrollments', ['invoice_item_id' => $line->id]);
-        $this->assertSame(2, $line->fresh()->sessionsRemaining());
-    }
-
     public function test_the_book_page_names_why_a_session_cannot_be_booked(): void
     {
         [$user] = $this->member();
@@ -333,6 +304,21 @@ class EntitlementTest extends TestCase
     }
 
     /** Defaults to an unlimited plan that is live today; overrides make the other shapes. */
+    public function test_a_plan_is_named_in_the_viewers_language(): void
+    {
+        [$user, $student] = $this->member();
+        $plan = TuitionPlan::factory()->create(['name' => 'Drop-in Class', 'name_vi' => 'Buổi lẻ']);
+        $this->grantPlan($student, ['tuition_plan_id' => $plan->id, 'description' => 'Drop-in Class']);
+
+        $this->actingAs($user)->withUnencryptedCookie('locale', 'vi')
+            ->get('/cms/member/book')
+            ->assertInertia(fn (Assert $page) => $page->where('entitlements.0.description', 'Buổi lẻ'));
+
+        $this->actingAs($user)->withUnencryptedCookie('locale', 'en')
+            ->get('/cms/member/book')
+            ->assertInertia(fn (Assert $page) => $page->where('entitlements.0.description', 'Drop-in Class'));
+    }
+
     private function grantPlan(StudentProfile $student, array $line = [], string $status = 'paid'): InvoiceItem
     {
         $invoice = Invoice::factory()->create([

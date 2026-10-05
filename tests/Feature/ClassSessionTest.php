@@ -7,7 +7,12 @@ use App\Models\ClassSchedule;
 use App\Models\ClassSession;
 use App\Models\ClassType;
 use App\Models\CoachProfile;
+use App\Models\Enrollment;
+use App\Models\Invoice;
+use App\Models\InvoiceItem;
 use App\Models\Room;
+use App\Models\StudentProfile;
+use App\Models\TuitionPlan;
 use App\Models\User;
 use App\Modules\Operations\ClassSchedule\Actions\UpdateClassScheduleAction;
 use Database\Seeders\PermissionSeeder;
@@ -139,6 +144,118 @@ class ClassSessionTest extends TestCase
         $session = ClassSession::factory()->create();
 
         $this->actingAs($coach)->get("/cms/operations/class-sessions/{$session->id}/edit")->assertForbidden();
+    }
+
+    public function test_session_detail_shows_the_roster_to_an_admin(): void
+    {
+        $session = ClassSession::factory()->create(['session_date' => now()->addDays(2)->toDateString()]);
+        $booked = Enrollment::factory()->create(['class_session_id' => $session->id, 'status' => 'booked']);
+        Enrollment::factory()->waitlisted()->create(['class_session_id' => $session->id]);
+
+        $this->actingAs($this->admin())
+            ->getJson("/cms/operations/class-sessions/{$session->id}")
+            ->assertOk()
+            ->assertJsonPath('booked_count', 1)
+            ->assertJsonPath('waitlist_count', 1)
+            ->assertJsonPath('roster.0.reference', $booked->reference())
+            ->assertJsonPath('endpoints.cancel', route('operations.class-sessions.cancel', $session));
+    }
+
+    public function test_session_detail_hides_the_roster_from_a_member_and_another_coach(): void
+    {
+        $session = ClassSession::factory()->create(['session_date' => now()->addDays(2)->toDateString()]);
+        Enrollment::factory()->create(['class_session_id' => $session->id, 'status' => 'booked']);
+
+        $member = User::factory()->create(['role' => 'member']);
+        $this->actingAs($member)->getJson("/cms/operations/class-sessions/{$session->id}")
+            ->assertOk()
+            ->assertJsonPath('roster', null)
+            ->assertJsonPath('endpoints.cancel', null);
+
+        $otherCoach = User::factory()->create(['role' => 'coach']);
+        CoachProfile::factory()->create(['user_id' => $otherCoach->id]);
+        $this->actingAs($otherCoach)->getJson("/cms/operations/class-sessions/{$session->id}")
+            ->assertJsonPath('roster', null);
+
+        $this->actingAs($session->coachProfile->user)->getJson("/cms/operations/class-sessions/{$session->id}")
+            ->assertJsonCount(1, 'roster');
+    }
+
+    public function test_cancelling_a_session_returns_the_plan_session_it_used(): void
+    {
+        $session = ClassSession::factory()->create(['session_date' => now()->addDays(2)->toDateString()]);
+        $student = StudentProfile::factory()->create();
+        $invoice = Invoice::factory()->create(['student_profile_id' => $student->id, 'status' => 'paid']);
+        $line = InvoiceItem::create([
+            'invoice_id' => $invoice->id,
+            'tuition_plan_id' => TuitionPlan::factory()->create()->id,
+            'description' => 'Pack',
+            'quantity' => 1,
+            'unit_price' => 0,
+            'line_total' => 0,
+            'valid_until' => now()->addMonth()->toDateString(),
+            'sessions_granted' => 5,
+        ]);
+        Enrollment::factory()->create([
+            'class_session_id' => $session->id,
+            'student_profile_id' => $student->id,
+            'invoice_item_id' => $line->id,
+            'status' => 'booked',
+        ]);
+        $this->assertSame(4, $line->fresh()->sessionsRemaining());
+
+        $this->actingAs($this->admin())
+            ->post("/cms/operations/class-sessions/{$session->id}/cancel")
+            ->assertSessionHasNoErrors();
+
+        $this->assertSame('cancelled', $session->fresh()->status);
+        $this->assertSame(5, $line->fresh()->sessionsRemaining());
+    }
+
+    public function test_a_past_session_cannot_be_cancelled_and_a_coach_cannot_cancel(): void
+    {
+        $past = ClassSession::factory()->create(['session_date' => now()->subDay()->toDateString()]);
+
+        $this->actingAs($this->admin())
+            ->post("/cms/operations/class-sessions/{$past->id}/cancel")
+            ->assertSessionHasErrors('action');
+        $this->assertSame('scheduled', $past->fresh()->status);
+
+        $upcoming = ClassSession::factory()->create(['session_date' => now()->addDay()->toDateString()]);
+        $this->actingAs(User::factory()->create(['role' => 'coach']))
+            ->post("/cms/operations/class-sessions/{$upcoming->id}/cancel")
+            ->assertForbidden();
+    }
+
+    public function test_academy_calendar_lists_the_sessions_of_the_requested_week(): void
+    {
+        $monday = now()->startOfWeek()->addWeek();
+        $inWeek = ClassSession::factory()->create(['session_date' => $monday->copy()->addDays(2)->toDateString()]);
+        ClassSession::factory()->create([
+            'session_date' => $monday->copy()->addDays(8)->toDateString(),
+            'branch_id' => $inWeek->branch_id,
+        ]);
+
+        $page = $this->actingAs($this->admin())
+            ->withUnencryptedCookie('branch_id', $inWeek->branch_id)
+            ->get('/cms/operations/academy?week='.$monday->toDateString())
+            ->viewData('page');
+
+        $this->assertSame($monday->toDateString(), $page['props']['week']);
+        $this->assertSame([$inWeek->id], collect($page['props']['calendar'])->pluck('id')->all());
+    }
+
+    public function test_academy_finds_sessions_by_part_of_their_code(): void
+    {
+        $wanted = ClassSession::factory()->create(['session_date' => now()->addDays(2)->toDateString()]);
+        ClassSession::factory()->count(2)->create(['session_date' => now()->addDays(2)->toDateString(), 'branch_id' => $wanted->branch_id]);
+
+        $page = $this->actingAs($this->admin())
+            ->withUnencryptedCookie('branch_id', $wanted->branch_id)
+            ->get('/cms/operations/academy?search='.substr($wanted->reference(), -2))
+            ->viewData('page');
+
+        $this->assertContains($wanted->reference(), collect($page['props']['sessions']['data'])->pluck('reference')->all());
     }
 
     private function admin(): User

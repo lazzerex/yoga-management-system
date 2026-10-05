@@ -161,6 +161,23 @@ class NotificationDispatchTest extends TestCase
         Notification::assertSentTo($coachUser, LessonPlanReviewedNotification::class);
     }
 
+    public function test_a_rejection_bell_stores_no_word_translated_in_the_reviewers_language(): void
+    {
+        $reviewer = $this->admin();
+        [$coachUser, $coachProfile] = $this->coach();
+        $plan = LessonPlan::factory()->create(['coach_profile_id' => $coachProfile->id, 'status' => 'pending']);
+
+        app()->setLocale('en');
+        app(ReviewLessonPlanAction::class)->execute($plan, ['action' => 'rejected', 'comment' => 'Too long'], $reviewer);
+
+        $data = $coachUser->notifications()->sole()->data;
+        $this->assertSame('notifications.lessonPlanReviewed.bellRejected', $data['message']);
+        $this->assertArrayNotHasKey('status', $data['params']);
+
+        app()->setLocale('vi');
+        $this->assertStringContainsString('bị từ chối duyệt', __($data['message'], $data['params']));
+    }
+
     public function test_a_new_registration_reaches_holders_of_the_user_permission(): void
     {
         Notification::fake();

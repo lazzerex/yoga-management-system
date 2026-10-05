@@ -304,7 +304,7 @@ class EnrollmentTest extends TestCase
         $this->assertNotNull($row['cancel_deadline']);
     }
 
-    public function test_book_page_lists_available_sessions_excluding_already_enrolled(): void
+    public function test_book_page_keeps_an_already_booked_session_and_marks_it_as_mine(): void
     {
         $session = ClassSession::factory()->create(['session_date' => now()->addDays(3)->toDateString()]);
         $otherSession = ClassSession::factory()->create([
@@ -319,9 +319,10 @@ class EnrollmentTest extends TestCase
             ->get('/cms/member/book')->viewData('page');
 
         $this->assertSame('Member/BookClass', $page['component']);
-        $availableIds = collect($page['props']['availableSessions'])->pluck('id')->all();
-        $this->assertNotContains($session->id, $availableIds);
-        $this->assertContains($otherSession->id, $availableIds);
+        $rows = collect($page['props']['availableSessions'])->keyBy('id');
+        $this->assertSame('booked', $rows[$session->id]['my_status']);
+        $this->assertNull($rows[$session->id]['block_reason']);
+        $this->assertNull($rows[$otherSession->id]['my_status']);
     }
 
     public function test_available_sessions_expose_capacity_and_waitlist_counts(): void
@@ -423,6 +424,36 @@ class EnrollmentTest extends TestCase
         $this->assertCount(1, $page['props']['enrollments']['data']);
     }
 
+    public function test_admin_finds_an_enrollment_by_its_booking_code(): void
+    {
+        $session = ClassSession::factory()->create(['session_date' => now()->addDays(3)->toDateString()]);
+        Enrollment::factory()->create(['class_session_id' => $session->id]);
+        $wanted = Enrollment::factory()->create(['class_session_id' => $session->id]);
+
+        $page = $this->actingAs($this->admin())
+            ->get('/cms/operations/enrollments?search='.$wanted->reference())
+            ->viewData('page');
+
+        $this->assertSame([$wanted->reference()], collect($page['props']['enrollments']['data'])->pluck('reference')->all());
+    }
+
+    public function test_admin_finds_enrollments_by_part_of_a_booking_or_session_code(): void
+    {
+        $session = ClassSession::factory()->create(['session_date' => now()->addDays(3)->toDateString()]);
+        $other = ClassSession::factory()->create(['session_date' => now()->addDays(3)->toDateString(), 'branch_id' => $session->branch_id]);
+        $first = Enrollment::factory()->create(['class_session_id' => $session->id]);
+        $second = Enrollment::factory()->create(['class_session_id' => $other->id]);
+
+        $codes = fn (string $search) => collect($this->actingAs($this->admin())
+            ->withUnencryptedCookie('branch_id', $session->branch_id)
+            ->get('/cms/operations/enrollments?search='.urlencode($search))
+            ->viewData('page')['props']['enrollments']['data'])->pluck('reference')->sort()->values()->all();
+
+        $this->assertSame([$first->reference()], $codes((string) $first->id));
+        $this->assertSame([$first->reference(), $second->reference()], $codes('BK-0000'));
+        $this->assertSame([$second->reference()], $codes($other->reference()));
+    }
+
     public function test_members_cannot_view_the_enrollments_oversight_page(): void
     {
         [$user] = $this->member();
@@ -430,21 +461,40 @@ class EnrollmentTest extends TestCase
         $this->actingAs($user)->get('/cms/operations/enrollments')->assertForbidden();
     }
 
-    public function test_member_my_schedule_page_shows_only_booked_sessions_within_the_next_week(): void
+    public function test_member_week_calendar_shows_booked_waitlisted_and_centre_cancelled_classes_of_the_requested_week(): void
     {
-        $bookedSession = ClassSession::factory()->create(['session_date' => now()->addDays(2)->toDateString()]);
-        $waitlistedSession = ClassSession::factory()->create(['session_date' => now()->addDays(2)->toDateString()]);
-        $farSession = ClassSession::factory()->create(['session_date' => now()->addDays(10)->toDateString()]);
+        $monday = now()->startOfWeek()->addWeek();
+        $bookedSession = ClassSession::factory()->create(['session_date' => $monday->copy()->addDay()->toDateString()]);
+        $waitlistedSession = ClassSession::factory()->create(['session_date' => $monday->copy()->addDays(2)->toDateString()]);
+        $cancelledClass = ClassSession::factory()->create(['session_date' => $monday->copy()->addDays(3)->toDateString(), 'status' => 'cancelled']);
+        $otherWeek = ClassSession::factory()->create(['session_date' => $monday->copy()->addDays(9)->toDateString()]);
         [$user, $studentProfile] = $this->member();
         Enrollment::factory()->create(['student_profile_id' => $studentProfile->id, 'class_session_id' => $bookedSession->id, 'status' => 'booked']);
         Enrollment::factory()->waitlisted()->create(['student_profile_id' => $studentProfile->id, 'class_session_id' => $waitlistedSession->id]);
-        Enrollment::factory()->create(['student_profile_id' => $studentProfile->id, 'class_session_id' => $farSession->id, 'status' => 'booked']);
+        Enrollment::factory()->create(['student_profile_id' => $studentProfile->id, 'class_session_id' => $cancelledClass->id, 'status' => 'booked']);
+        Enrollment::factory()->create(['student_profile_id' => $studentProfile->id, 'class_session_id' => $otherWeek->id, 'status' => 'booked']);
 
-        $page = $this->actingAs($user)->get('/cms/member/my-schedule')->viewData('page');
+        $page = $this->actingAs($user)
+            ->get('/cms/member/my-schedule?week='.$monday->copy()->addDays(4)->toDateString())
+            ->viewData('page');
 
-        $dates = collect($page['props']['sessions'])->pluck('session_date')->all();
-        $this->assertContains($bookedSession->session_date, $dates);
-        $this->assertCount(1, $dates);
+        $this->assertSame($monday->toDateString(), $page['props']['week']);
+        $this->assertSame(
+            [[$bookedSession->id, 'booked'], [$waitlistedSession->id, 'waitlisted'], [$cancelledClass->id, 'cancelled']],
+            collect($page['props']['sessions'])->map(fn ($s) => [$s['id'], $s['status']])->all(),
+        );
+    }
+
+    public function test_my_bookings_marks_a_class_the_centre_cancelled(): void
+    {
+        $session = ClassSession::factory()->create(['session_date' => now()->addDays(3)->toDateString(), 'status' => 'cancelled']);
+        [$user, $studentProfile] = $this->member();
+        Enrollment::factory()->create(['student_profile_id' => $studentProfile->id, 'class_session_id' => $session->id, 'status' => 'booked']);
+
+        $row = $this->actingAs($user)->get('/cms/member/my-classes')->viewData('page')['props']['myEnrollments'][0];
+
+        $this->assertSame('cancelled', $row['status']);
+        $this->assertFalse($row['can_cancel']);
     }
 
     public function test_coach_my_classes_page_shows_roster_counts_from_the_next_session(): void
@@ -492,9 +542,12 @@ class EnrollmentTest extends TestCase
         Enrollment::factory()->create(['class_session_id' => $session->id, 'status' => 'booked']);
         Enrollment::factory()->waitlisted()->create(['class_session_id' => $session->id]);
 
-        $page = $this->actingAs($coachUser)->get('/cms/coach/my-teaching-schedule')->viewData('page');
+        $page = $this->actingAs($coachUser)
+            ->get('/cms/coach/my-teaching-schedule?week='.$session->session_date)
+            ->viewData('page');
 
         $this->assertSame(1, $page['props']['sessions'][0]['students']);
+        $this->assertSame(1, $page['props']['sessions'][0]['waitlist_count']);
     }
 
     /** A member in good standing, so these tests stay about capacity, waitlist and cutoff. */

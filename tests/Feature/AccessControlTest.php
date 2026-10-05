@@ -26,6 +26,27 @@ class AccessControlTest extends TestCase
         $this->actingAs($user)->get('/cms/admin/users')->assertOk();
     }
 
+    public function test_signing_in_skips_an_intended_page_the_new_user_cannot_open(): void
+    {
+        $member = User::factory()->create(['role' => 'member']);
+
+        // A guest request for an admin page records it as the intended URL.
+        $this->get('/cms/admin/users')->assertRedirect('/cms/login');
+
+        $this->post('/cms/login', ['username' => $member->username, 'password' => 'password'])
+            ->assertRedirect('/cms/dashboard');
+    }
+
+    public function test_signing_in_still_follows_an_intended_page_the_user_can_open(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $this->get('/cms/admin/users')->assertRedirect('/cms/login');
+
+        $this->post('/cms/login', ['username' => $admin->username, 'password' => 'password'])
+            ->assertRedirect(url('/cms/admin/users'));
+    }
+
     public function test_admin_cannot_reach_the_users_page_once_the_permission_is_revoked(): void
     {
         $user = User::factory()->create(['role' => 'admin']);
