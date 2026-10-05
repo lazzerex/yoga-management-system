@@ -486,6 +486,10 @@
 
     .ym-timeline-item:last-child { border-bottom: 0; }
     .ym-timeline-item.is-void { background: #fdfbfb; }
+    .ym-timeline-item.is-spent { background: var(--u-surface-2); }
+    .ym-timeline-item.is-spent .ym-timeline-mark,
+    .ym-timeline-item.is-spent .ym-timeline-amount,
+    .ym-timeline-item.is-spent .ym-timeline-meta { color: var(--u-ink-4); filter: grayscale(1); opacity: 0.75; }
 
     .ym-timeline-mark {
         flex-shrink: 0;
@@ -1484,8 +1488,18 @@
         border-radius: var(--u-r-sm);
         background: var(--u-surface-2);
         font-size: 0.8rem;
+        line-height: 1.5;
         color: var(--u-ink-3);
     }
+
+    .ym-callout > .bi {
+        flex: none;
+        display: inline-flex;
+        align-items: center;
+        height: 1.5em;
+    }
+
+    .ym-callout > .bi::before { vertical-align: 0; }
 
     /* The shared form controls keep their markup; only their accent follows the page. */
     .ym-ui .ym-label {
@@ -1509,4 +1523,191 @@
     .ym-callout--warn   { background: var(--u-warn-soft);   border-color: #eedbb2; color: #8d5c11; }
     .ym-callout--danger { background: var(--u-danger-soft); border-color: #f0ccd1; color: #96323b; }
     .ym-callout--ok     { background: var(--u-brand-soft);  border-color: var(--u-brand-line); color: var(--u-brand-deep); }
+
+    /* Week calendar (Components/UI/WeekCalendar.vue) */
+
+    .ym-wcal { overflow: hidden; transition: opacity 160ms; }
+    .ym-wcal.is-loading { opacity: 0.6; pointer-events: none; }
+
+    .ym-wcal-bar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.6rem 1rem;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--u-line);
+    }
+
+    .ym-wcal-nav { display: flex; gap: 0.35rem; }
+    .ym-wcal-range { margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--u-ink); }
+
+    .ym-wcal-scroll { overflow-x: auto; }
+
+    .ym-wcal-grid {
+        display: grid;
+        grid-template-columns: 3.4rem repeat(7, minmax(7.5rem, 1fr));
+        min-width: 58rem;
+    }
+
+    .ym-wcal-corner,
+    .ym-wcal-head {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background: var(--u-surface-2);
+        border-bottom: 1px solid var(--u-line);
+    }
+
+    .ym-wcal-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+        gap: 0.35rem;
+        padding: 0.55rem 0.4rem;
+        border-left: 1px solid var(--u-line);
+        color: var(--u-ink-3);
+    }
+
+    .ym-wcal-wd { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+    .ym-wcal-dn { font-size: 1rem; font-weight: 700; color: var(--u-ink); }
+
+    .ym-wcal-head.is-today .ym-wcal-dn {
+        display: inline-grid;
+        place-items: center;
+        min-width: 1.7rem;
+        height: 1.7rem;
+        border-radius: 9999px;
+        background: var(--u-brand);
+        color: #fff;
+    }
+
+    .ym-wcal-hours { position: relative; }
+
+    .ym-wcal-hour {
+        display: block;
+        height: 3.4rem;
+        padding: 0 0.45rem;
+        transform: translateY(-0.45rem);
+        font-size: 0.66rem;
+        font-weight: 600;
+        color: var(--u-ink-4);
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .ym-wcal-hour:first-child { transform: none; }
+
+    .ym-wcal-col {
+        position: relative;
+        border-left: 1px solid var(--u-line);
+        background-image: linear-gradient(to bottom, var(--u-line) 1px, transparent 1px);
+        background-size: 100% var(--ym-hour);
+    }
+
+    .ym-wcal-col.is-today { background-color: color-mix(in srgb, var(--u-brand-soft) 60%, transparent); }
+
+    .ym-wcal-event {
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        gap: 0.1rem;
+        overflow: hidden;
+        padding: 0.3rem 0.4rem;
+        border: 1px solid color-mix(in srgb, var(--accent) 35%, #fff);
+        border-left: 3px solid var(--accent);
+        border-radius: 6px;
+        background: color-mix(in srgb, var(--accent) 12%, #fff);
+        color: var(--u-ink);
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+        transition: box-shadow 140ms, transform 140ms;
+    }
+
+    .ym-wcal-event:hover,
+    .ym-wcal-event:focus-visible {
+        z-index: 1;
+        box-shadow: 0 6px 16px rgba(22, 32, 43, 0.14);
+        transform: translateY(-1px);
+        outline: none;
+    }
+
+    .ym-wcal-event.is-cancelled { opacity: 0.55; background: #f3f4f6; border-left-color: #9aa3ae; }
+    .ym-wcal-event.is-cancelled .ym-wcal-title { text-decoration: line-through; }
+    .ym-wcal-event.is-waitlisted { background: var(--u-warn-soft); border-left-color: var(--u-warn); border-style: dashed solid dashed solid; }
+    .ym-wcal-event.is-done { opacity: 0.75; }
+
+    .ym-wcal-time { font-size: 0.66rem; font-weight: 700; color: var(--u-ink-3); font-variant-numeric: tabular-nums; }
+    .ym-wcal-title { font-size: 0.78rem; font-weight: 700; line-height: 1.2; }
+    .ym-wcal-meta { font-size: 0.68rem; color: var(--u-ink-3); line-height: 1.25; }
+
+    .ym-wcal-now {
+        position: absolute;
+        left: 0;
+        right: 0;
+        z-index: 1;
+        height: 2px;
+        background: var(--u-danger);
+        pointer-events: none;
+    }
+
+    .ym-wcal-now::before {
+        content: '';
+        position: absolute;
+        left: -4px;
+        top: -3px;
+        width: 8px;
+        height: 8px;
+        border-radius: 9999px;
+        background: var(--u-danger);
+    }
+
+    .ym-wcal-agenda { display: none; padding: 0.5rem 1rem 1rem; }
+    .ym-wcal-agenda-day { padding: 0.55rem 0; border-bottom: 1px solid var(--u-line); }
+    .ym-wcal-agenda-day:last-child { border-bottom: 0; }
+    .ym-wcal-agenda-head { margin: 0 0 0.4rem; font-size: 0.78rem; font-weight: 700; color: var(--u-ink-3); text-transform: capitalize; }
+    .ym-wcal-agenda-day.is-today .ym-wcal-agenda-head { color: var(--u-brand); }
+    .ym-wcal-agenda-empty { margin: 0; font-size: 0.78rem; color: var(--u-ink-4); }
+    .ym-wcal-event.is-flat { position: static; width: 100%; margin-top: 0.35rem; }
+
+    .ym-wcal-empty {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        margin: 0;
+        padding: 0.8rem 1rem;
+        border-top: 1px solid var(--u-line);
+        font-size: 0.82rem;
+        color: var(--u-ink-4);
+    }
+
+    @media (max-width: 640px) {
+        .ym-wcal-scroll { display: none; }
+        .ym-wcal-agenda { display: block; }
+    }
+
+    /* Session detail (Academy) */
+
+    .ym-sd-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem 1rem; margin: 0; }
+    .ym-sd-facts dt { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--u-ink-4); }
+    .ym-sd-facts dd { margin: 0.15rem 0 0; font-size: 0.86rem; font-weight: 600; color: var(--u-ink); }
+
+    .ym-fill { display: flex; align-items: center; gap: 0.5rem; min-width: 7rem; }
+    .ym-fill-bar { flex: 1; height: 0.35rem; border-radius: 9999px; background: var(--u-line); overflow: hidden; }
+    .ym-fill-bar > span { display: block; height: 100%; border-radius: 9999px; background: var(--u-brand); }
+    .ym-fill.is-full .ym-fill-bar > span { background: var(--u-danger); }
+    .ym-fill.is-high .ym-fill-bar > span { background: var(--u-warn); }
+    .ym-fill-text { font-size: 0.75rem; font-weight: 600; color: var(--u-ink-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+    .ym-sd-roster { margin: 0; padding: 0; list-style: none; max-height: 16rem; overflow-y: auto; border: 1px solid var(--u-line); border-radius: var(--u-r-sm); }
+    .ym-sd-roster li { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; padding: 0.45rem 0.7rem; font-size: 0.82rem; }
+    .ym-sd-roster li + li { border-top: 1px solid var(--u-line); }
+    .ym-sd-roster-ref { font-size: 0.7rem; color: var(--u-ink-4); font-variant-numeric: tabular-nums; }
+
+    .ym-sd-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: flex-end; }
+    .ym-sd-actions .ym-btn--danger-quiet { margin-right: auto; }
+
+    .ym-clickable-row { cursor: pointer; }
+    .ym-clickable-row:hover > td { background: var(--u-surface-2); }
 }

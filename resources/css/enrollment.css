@@ -517,11 +517,48 @@
         border-top: 1px solid var(--yb-line);
     }
 
+    .ym-detail-actions .ym-btn-outline,
+    .ym-detail-actions .ym-btn-danger {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.45rem 0.85rem;
+    }
+
+    .ym-detail-actions .ym-btn-cancel {
+        margin-left: auto;
+        background: #fff;
+        color: var(--ym-danger);
+    }
+
+    .ym-detail-actions .ym-btn-cancel:hover { background: #fdf2f3; }
+
+    .ym-detail-confirm {
+        margin-top: 1rem;
+        padding: 0.9rem 1rem;
+        border: 1px solid #f0ccd1;
+        border-radius: var(--yb-r-sm);
+        background: #fdf4f5;
+    }
+
     .ym-detail-confirm-q {
-        flex: 1 1 100%;
-        font-size: 0.8rem;
-        font-weight: 600;
-        color: var(--yb-ink);
+        margin: 0;
+        font-size: 0.86rem;
+        font-weight: 700;
+        color: #96323b;
+    }
+
+    .ym-detail-confirm-note {
+        margin: 0.25rem 0 0;
+        font-size: 0.78rem;
+        color: var(--yb-muted);
+    }
+
+    .ym-detail-confirm .ym-detail-actions {
+        justify-content: flex-end;
+        margin-top: 0.75rem;
+        padding-top: 0;
+        border-top: 0;
     }
 
     .ym-bk-when { display: flex; flex-direction: column; gap: 0.12rem; }
@@ -577,6 +614,10 @@
 
     .ym-bk-status.is-booked { color: #2d7e40; border-color: #b6e2c2; background: #eaf7ee; }
     .ym-bk-status.is-wait { color: #966311; border-color: #edd8a6; background: #fff4d8; }
+    .ym-bk-status.is-cancelled { color: #6b7280; border-color: #d9dde2; background: #f2f3f5; }
+    .ym-bk-row.is-class-cancelled { opacity: 0.6; }
+    .ym-bk-row.is-class-cancelled .ym-bk-name { text-decoration: line-through; }
+    .ym-detail-note.is-cancelled { background: #f2f3f5; border-color: #d9dde2; color: #4b5563; }
 
     .ym-bk-cancel {
         border: none;
@@ -897,6 +938,75 @@
 
     .ym-sc-cta.is-wait:hover { background: #fff7e9; border-color: var(--ym-warning); }
 
+    .ym-sc-cta.is-locked,
+    .ym-sc-cta.is-locked:hover {
+        gap: 0.35rem;
+        background: #f1f2f0;
+        border-color: #dcdfd9;
+        color: #7b8279;
+        cursor: not-allowed;
+    }
+
+    .ym-sc-cta.is-mine,
+    .ym-sc-cta.is-mine:hover {
+        gap: 0.3rem;
+        background: var(--yb-green-soft);
+        border-color: color-mix(in srgb, var(--yb-green) 40%, #fff);
+        color: var(--yb-green-deep);
+        cursor: default;
+    }
+
+    .ym-sc-block {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        margin: 0.65rem 0 0;
+        padding: 0.5rem 0.7rem;
+        border: 1px solid #f3c56b;
+        border-radius: var(--yb-r-sm);
+        background: #fff4dc;
+        color: #8a4b00;
+        font-size: 0.8rem;
+        font-weight: 650;
+        line-height: 1.4;
+    }
+
+    .ym-sc-block .bi { flex: none; font-size: 0.95rem; color: #e08a00; }
+
+    .ym-callout.ym-book-alert {
+        padding: 0.9rem 1rem;
+        border-color: #f3c56b;
+        background: #fff4dc;
+        color: #8a4b00;
+        font-size: 0.92rem;
+        font-weight: 650;
+    }
+
+    .ym-callout.ym-book-alert > .bi { font-size: 1.1rem; color: #e08a00; }
+
+    .ym-book-plans {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .ym-book-plan {
+        padding: 0.1rem 0.55rem;
+        border: 1px solid var(--u-brand-line);
+        border-radius: 9999px;
+        background: #fff;
+        font-weight: 650;
+    }
+
+    .ym-book-plan.is-spent {
+        border-color: #dcdfd9;
+        background: transparent;
+        color: #9aa097;
+        font-weight: 500;
+        text-decoration: line-through;
+    }
+
     /* Empty states */
 
     .ym-book-empty {
@@ -910,7 +1020,7 @@
     }
 
     .ym-book-empty--sm { padding: 1.8rem 1rem; }
-    .ym-book-empty i { font-size: 1.6rem; color: var(--yb-green); opacity: 0.7; }
+    .ym-book-empty > i { font-size: 1.6rem; color: var(--yb-green); opacity: 0.7; }
     .ym-book-empty p { margin: 0; font-size: 0.85rem; }
 
     /* Transitions */
