@@ -1,10 +1,6 @@
 # Yoga Management System
 
-<p align="center">
-
-<img width="703" height="355" alt="image-removebg-preview (4)" src="https://github.com/user-attachments/assets/7ab95c3b-a35b-4b73-8849-584c21489f09" />
-
-</p>
+<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Laravel_13-FF2D20?style=flat&logo=laravel&logoColor=white"/>
