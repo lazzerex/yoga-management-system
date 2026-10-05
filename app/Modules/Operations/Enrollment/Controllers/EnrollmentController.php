@@ -13,6 +13,7 @@ use App\Modules\Operations\Tuition\Actions\StudentEntitlementsAction;
 use App\Notifications\EnrollmentCancelledByStaffNotification;
 use App\Support\Settings;
 use App\Support\Table\SortsQueries;
+use App\Support\Week;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -61,12 +62,15 @@ class EnrollmentController extends Controller
             'myEnrollments' => $myEnrollments->map(function (Enrollment $e) use ($cutoffHours, $waitlistRanks) {
                 $session = $e->classSession;
                 $start = Carbon::parse($session->session_date.' '.$session->start_time);
+                $classCancelled = $session->status === 'cancelled';
 
                 return [
                     'id' => $e->id,
-                    'status' => $e->status,
+                    'reference' => $e->reference(),
+                    'session_reference' => $session->reference(),
+                    'status' => $classCancelled ? 'cancelled' : $e->status,
                     'waitlist_position' => $waitlistRanks->get($e->id),
-                    'can_cancel' => now()->addHours($cutoffHours)->lessThanOrEqualTo($start),
+                    'can_cancel' => ! $classCancelled && now()->addHours($cutoffHours)->lessThanOrEqualTo($start),
                     'cancel_deadline' => $start->copy()->subHours($cutoffHours)->toIso8601String(),
                     'enrolled_at' => $e->enrolled_at?->toIso8601String(),
                     'session_date' => $session->session_date,
@@ -99,10 +103,16 @@ class EnrollmentController extends Controller
         ResolveEntitlementAction $resolve,
         StudentEntitlementsAction $entitlements,
     ): Response {
-        // Resolved once, then asked about each session in memory.
-        $set = $resolve->forStudent($request->user()->studentProfile);
+        $studentProfile = $request->user()->studentProfile;
 
-        $availableSessions = $this->availableSessionsQuery($request)
+        // Resolved once, then asked about each session in memory.
+        $set = $resolve->forStudent($studentProfile);
+
+        $myStatuses = $studentProfile
+            ? Enrollment::where('student_profile_id', $studentProfile->id)->where('status', '!=', 'cancelled')->pluck('status', 'class_session_id')
+            : collect();
+
+        $availableSessions = $this->availableSessionsQuery($request, excludeEnrolled: false)
             ->with(['branch:id,name', 'room:id,name', 'classType:id,name', 'coachProfile.user:id,name'])
             ->withCount([
                 'enrollments as booked_count' => fn ($q) => $q->where('status', 'booked'),
@@ -128,19 +138,20 @@ class EnrollmentController extends Controller
                 'booked_count' => $s->booked_count,
                 'spots_left' => max(0, $s->capacity - $s->booked_count),
                 'waitlist_count' => $s->waitlist_count,
-                'block_reason' => $set->check($s->session_date),
+                'my_status' => $myStatuses->get($s->id),
+                'block_reason' => $myStatuses->has($s->id) ? null : $set->check($s->session_date),
                 'bookUrl' => route('member.enrollments.store', $s->id),
             ])->values(),
-            'entitlements' => $entitlements->execute($request->user()->studentProfile?->id),
+            'entitlements' => $entitlements->execute($studentProfile?->id),
         ]);
     }
 
-    private function availableSessionsQuery(Request $request)
+    private function availableSessionsQuery(Request $request, bool $excludeEnrolled = true)
     {
         $studentProfile = $request->user()->studentProfile;
         $branchId = $request->attributes->get('currentBranch')?->id;
 
-        $enrolledSessionIds = $studentProfile
+        $enrolledSessionIds = $studentProfile && $excludeEnrolled
             ? Enrollment::where('student_profile_id', $studentProfile->id)->where('status', '!=', 'cancelled')->pluck('class_session_id')
             : collect();
 
@@ -154,26 +165,42 @@ class EnrollmentController extends Controller
     public function mySchedule(Request $request): Response
     {
         $studentProfile = $request->user()->studentProfile;
+        $weekStart = Week::start($request->string('week')->toString());
 
-        $sessions = $studentProfile
-            ? ClassSession::with(['branch:id,name', 'room:id,name', 'classType:id,name'])
-                ->whereHas('enrollments', fn ($q) => $q->where('student_profile_id', $studentProfile->id)->where('status', 'booked'))
-                ->where('status', '!=', 'cancelled')
-                ->whereBetween('session_date', [now()->toDateString(), now()->addDays(6)->toDateString()])
-                ->orderBy('session_date')
-                ->orderBy('start_time')
+        $enrollments = $studentProfile
+            ? Enrollment::with([
+                'classSession.branch:id,name',
+                'classSession.room:id,name',
+                'classSession.classType:id,name',
+                'classSession.coachProfile.user:id,name',
+            ])
+                ->where('student_profile_id', $studentProfile->id)
+                ->whereIn('status', ['booked', 'waitlisted'])
+                ->whereHas('classSession', fn ($q) => $q
+                    ->whereBetween('session_date', [$weekStart->toDateString(), $weekStart->addDays(6)->toDateString()]))
                 ->get()
             : collect();
 
         return inertia('Member/MySchedule', [
-            'sessions' => $sessions->map(fn (ClassSession $s) => [
-                'session_date' => $s->session_date,
-                'start_time' => substr($s->start_time, 0, 5),
-                'end_time' => substr($s->end_time, 0, 5),
-                'class_type_name' => $s->classType->name,
-                'branch_name' => $s->branch->name,
-                'room_name' => $s->room->name,
-            ]),
+            'week' => $weekStart->toDateString(),
+            'sessions' => $enrollments->map(fn (Enrollment $e) => [
+                'id' => $e->classSession->id,
+                'reference' => $e->reference(),
+                'session_reference' => $e->classSession->reference(),
+                'status' => $e->classSession->status === 'cancelled' ? 'cancelled' : $e->status,
+                'session_date' => $e->classSession->session_date,
+                'start_time' => substr($e->classSession->start_time, 0, 5),
+                'end_time' => substr($e->classSession->end_time, 0, 5),
+                'class_type_id' => $e->classSession->class_type_id,
+                'class_type_name' => $e->classSession->classType->name,
+                'coach_name' => $e->classSession->coachProfile->user->name,
+                'branch_name' => $e->classSession->branch->name,
+                'room_name' => $e->classSession->room->name,
+            ])->sortBy(fn (array $s) => $s['session_date'].$s['start_time'])->values(),
+            'endpoints' => [
+                'index' => route('member.my-schedule'),
+                'bookings' => route('member.my-classes'),
+            ],
         ]);
     }
 
@@ -192,7 +219,15 @@ class EnrollmentController extends Controller
                 ->when($from, fn ($b) => $b->where('session_date', '>=', $from))
                 ->when($to, fn ($b) => $b->where('session_date', '<=', $to)))
             ->when(in_array($status, ['booked', 'waitlisted', 'cancelled'], true), fn ($q) => $q->where('status', $status))
-            ->when($search !== '', fn ($q) => $q->whereHas('studentProfile.user', fn ($u) => $u->where('name', 'like', "%{$search}%")));
+            ->when($search !== '', function ($q) use ($search) {
+                if ($digits = ClassSession::referenceDigits($search, requirePrefix: true)) {
+                    return $q->whereHas('classSession', fn ($s) => $s->whereReferenceContains($digits));
+                }
+
+                return ($digits = Enrollment::referenceDigits($search)) !== null
+                    ? $q->whereReferenceContains($digits)
+                    : $q->whereHas('studentProfile.user', fn ($u) => $u->where('name', 'like', "%{$search}%"));
+            });
 
         $sort = $this->applySort($query, $request, [
             'status' => ['booked', 'waitlisted', 'cancelled'],
@@ -204,6 +239,7 @@ class EnrollmentController extends Controller
         return inertia('Operations/Enrollments/Index', [
             'enrollments' => $enrollments->through(fn (Enrollment $e) => [
                 'id' => $e->id,
+                'reference' => $e->reference(),
                 'status' => $e->status,
                 'student_name' => $e->studentProfile->user->name,
                 'class_type_name' => $e->classSession->classType->name,

@@ -26,7 +26,7 @@ class TuitionPlanController extends Controller
         $status = $request->string('status')->toString();
 
         $query = TuitionPlan::with('branch:id,name')
-            ->when($search !== '', fn ($q) => $q->where('name', 'like', "%{$search}%"))
+            ->when($search !== '', fn ($q) => $q->where(fn ($q) => $q->where('name', 'like', "%{$search}%")->orWhere('name_vi', 'like', "%{$search}%")))
             ->when(in_array($type, TuitionPlan::TYPES, true), fn ($q) => $q->where('type', $type))
             ->when(in_array($status, ['active', 'inactive'], true), fn ($q) => $q->where('is_active', $status === 'active'));
 
@@ -79,6 +79,7 @@ class TuitionPlanController extends Controller
                 'id' => $tuitionPlan->id,
                 'branch_id' => $tuitionPlan->branch_id,
                 'name' => $tuitionPlan->name,
+                'name_vi' => $tuitionPlan->name_vi,
                 'type' => $tuitionPlan->type,
                 'price_amount' => $tuitionPlan->price_amount,
                 'session_count' => $tuitionPlan->session_count,
@@ -117,7 +118,7 @@ class TuitionPlanController extends Controller
     {
         return [
             'id' => $plan->id,
-            'name' => $plan->name,
+            'name' => $plan->localizedName(),
             'type' => $plan->type,
             'price_amount' => $plan->price_amount,
             'session_count' => $plan->session_count,

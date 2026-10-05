@@ -28,6 +28,7 @@ class StoreTuitionPlanRequest extends FormRequest
         return [
             'branch_id' => ['nullable', 'integer', Rule::exists(Branch::class, 'id')],
             'name' => ['required', 'string', 'max:255'],
+            'name_vi' => ['nullable', 'string', 'max:255'],
             'type' => ['required', Rule::in(TuitionPlan::TYPES)],
             'price_amount' => ['required', 'integer', 'min:0', 'max:9999999999'],
             'session_count' => ['nullable', 'integer', 'min:1', 'max:9999', 'required_if:type,pack'],

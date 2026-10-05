@@ -88,7 +88,8 @@ class InvoiceController extends Controller
                     ->map(fn (StudentProfile $profile) => ['id' => $profile->id, 'name' => $profile->user->name])
                     ->sortBy('name')->values(),
                 'branches' => Branch::active()->orderBy('name')->get(['id', 'name']),
-                'plans' => TuitionPlan::active()->orderBy('name')->get(['id', 'name', 'price_amount', 'type']),
+                'plans' => TuitionPlan::active()->orderBy('name')->get(['id', 'name', 'name_vi', 'price_amount', 'type'])
+                    ->map(fn (TuitionPlan $plan) => ['name' => $plan->localizedName()] + $plan->only(['id', 'price_amount', 'type'])),
             ],
             'selectedBranchId' => $request->attributes->get('currentBranch')?->id,
             'endpoints' => [
@@ -112,7 +113,7 @@ class InvoiceController extends Controller
         $invoice->load([
             'studentProfile.user:id,name',
             'branch:id,name',
-            'items',
+            'items.tuitionPlan:id,name,name_vi',
             'payments.recordedBy:id,name',
             'payments.voidedBy:id,name',
             'payments.media',
@@ -126,7 +127,7 @@ class InvoiceController extends Controller
                 'note' => $invoice->note,
                 'items' => $invoice->items->map(fn ($item) => [
                     'id' => $item->id,
-                    'description' => $item->description,
+                    'description' => $item->label(),
                     'quantity' => $item->quantity,
                     'unit_price' => $item->unit_price,
                     'line_total' => $item->line_total,
@@ -167,7 +168,7 @@ class InvoiceController extends Controller
     {
         abort_unless($this->canSee($request->user(), $invoice), 403);
 
-        $invoice->load(['studentProfile.user:id,name', 'branch:id,name', 'items', 'payments']);
+        $invoice->load(['studentProfile.user:id,name', 'branch:id,name', 'items.tuitionPlan:id,name,name_vi', 'payments']);
 
         return DocumentPdf::download(
             'pdf.invoice',
