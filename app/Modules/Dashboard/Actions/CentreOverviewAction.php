@@ -159,7 +159,7 @@ class CentreOverviewAction
                 ->sum('amount'),
             'collectedInWindow' => (int) $payments->sum('amount'),
             'outstanding' => (int) $open->sum(fn (Invoice $invoice) => $invoice->balance()),
-            'overdueCount' => $open->filter(fn (Invoice $invoice) => $invoice->due_date->isPast())->count(),
+            'overdueCount' => $open->filter(fn (Invoice $invoice) => $invoice->isOverdue())->count(),
             'months' => $monthKeys->all(),
             'series' => $branches->map(fn (Branch $branch) => [
                 'branch' => $branch->name,
