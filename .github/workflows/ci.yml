@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_sqlite, sqlite3, gd, zip
+          coverage: none
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: composer install --prefer-dist --no-interaction --no-progress
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm build
+
+      - run: cp .env.example .env && php artisan key:generate
+
+      - run: vendor/bin/pint --test
+
+      - run: php artisan test
