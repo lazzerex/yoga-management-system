@@ -981,14 +981,14 @@ const logout = () => {
                                     v-for="action in quickActions"
                                     :key="action.label"
                                     type="button"
-                                    class="ym-menu-item"
+                                    class="ym-menu-item ym-menu-item--stacked"
                                     @click="handleQuickAction(action)"
                                 >
                                     <span>{{ action.label }}</span>
                                     <small>{{ action.hint }}</small>
                                 </button>
 
-                                <button type="button" class="ym-menu-item ym-menu-item--danger" @click="logout">
+                                <button type="button" class="ym-menu-item ym-menu-item--stacked ym-menu-item--danger" @click="logout">
                                     <span>{{ $t('common.signOut') }}</span>
                                     <small>{{ $t('common.endSession') }}</small>
                                 </button>

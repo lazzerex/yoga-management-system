@@ -5,6 +5,7 @@ import { trans as t } from 'laravel-vue-i18n';
 import Checkbox from '@/Components/Form/Checkbox.vue';
 import Field from '@/Components/Form/Field.vue';
 import FileInput from '@/Components/Form/FileInput.vue';
+import TextArea from '@/Components/Form/TextArea.vue';
 import TextInput from '@/Components/Form/TextInput.vue';
 
 const props = defineProps({
@@ -12,9 +13,9 @@ const props = defineProps({
         type: Object,
         required: true,
     },
-    security: {
+    coachProfile: {
         type: Object,
-        required: true,
+        default: null,
     },
     loginStats: {
         type: Object,
@@ -67,6 +68,16 @@ const removeAvatar = () => {
     avatarForm.remove_avatar = true;
     submitAvatar();
 };
+
+const coachForm = useForm({
+    bio: props.coachProfile?.bio ?? '',
+    years_experience: props.coachProfile?.years_experience != null ? String(props.coachProfile.years_experience) : '',
+    certifications: props.coachProfile?.certifications ?? '',
+});
+
+const submitCoachProfile = () => coachForm.patch(props.endpoints.coachProfile, {
+    preserveScroll: true,
+});
 
 const submitAccount = () => accountForm.put(props.endpoints.account, {
     preserveScroll: true,
@@ -175,27 +186,39 @@ export default {
                     </div>
                 </section>
 
+                <section v-if="props.endpoints.coachProfile" class="ym-card">
+                    <div class="ym-card-head">
+                        <h2 class="ym-card-title">{{ $t('profile.coachProfile') }}</h2>
+                    </div>
+
+                    <form @submit.prevent="submitCoachProfile">
+                        <div class="ym-card-body">
+                            <div class="ym-form-grid-2">
+                                <Field class="ym-form-span" :label="$t('operations.bio')" :error="coachForm.errors.bio">
+                                    <TextArea v-model="coachForm.bio" :rows="4" />
+                                </Field>
+                                <Field :label="$t('operations.yearsExperience')" :error="coachForm.errors.years_experience">
+                                    <TextInput v-model="coachForm.years_experience" type="number" />
+                                </Field>
+                                <Field class="ym-form-span" :label="$t('operations.certifications')" :error="coachForm.errors.certifications">
+                                    <TextArea v-model="coachForm.certifications" :rows="3" />
+                                </Field>
+                            </div>
+                        </div>
+                        <div class="ym-form-foot">
+                            <button type="submit" class="ym-btn ym-btn--primary" :disabled="coachForm.processing">
+                                {{ $t('common.save') }}
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
                 <section class="ym-card">
                     <div class="ym-card-head">
                         <h2 class="ym-card-title">{{ $t('profile.securityAndAccess') }}</h2>
                     </div>
                     <div class="ym-card-body">
                         <div class="ym-figure-row">
-                            <div>
-                                <p class="ym-figure-label">{{ $t('profile.twoFactorAuth') }}</p>
-                                <p class="ym-figure-value">
-                                    <span class="ym-tag" :class="props.security.two_factor_enabled ? 'ym-tag--ok' : 'ym-tag--neutral'">
-                                        {{ props.security.two_factor_enabled ? $t('profile.enabled') : $t('profile.notEnabled') }}
-                                    </span>
-                                </p>
-                                <p class="ym-note mt-1">
-                                    {{
-                                        props.security.two_factor_enabled
-                                            ? $t('profile.confirmedAt', { date: props.security.two_factor_confirmed_at })
-                                            : $t('profile.enable2fa')
-                                    }}
-                                </p>
-                            </div>
                             <div>
                                 <p class="ym-figure-label">{{ $t('profile.totalSignIns') }}</p>
                                 <p class="ym-figure-value">{{ props.loginStats.total_sign_ins }}</p>
