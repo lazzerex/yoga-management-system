@@ -8,9 +8,11 @@ use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
 use App\Http\Responses\LoginResponse;
 use App\Http\Responses\LogoutResponse;
+use App\Models\User;
 use App\Support\LoginAttemptLogger;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -19,8 +21,6 @@ use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
 use Laravel\Fortify\Contracts\LogoutResponse as LogoutResponseContract;
 use Laravel\Fortify\Contracts\TwoFactorLoginResponse as TwoFactorLoginResponseContract;
 use Laravel\Fortify\Fortify;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -47,8 +47,17 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::loginView(fn () => inertia('Auth/Login', [
             'endpoints' => [
                 'login' => route('login'),
-                'register' => route('register',)
+                'register' => route('register'),
             ],
+            'status' => session('status'),
+        ]));
+        Fortify::requestPasswordResetLinkView(fn () => inertia('Auth/ForgotPassword', [
+            'status' => session('status'),
+        ]));
+        Fortify::confirmPasswordView(fn () => inertia('Auth/ConfirmPassword'));
+        Fortify::resetPasswordView(fn (Request $request) => inertia('Auth/ResetPassword', [
+            'token' => $request->route('token'),
+            'email' => (string) $request->query('email', ''),
         ]));
         Fortify::registerView(fn () => inertia('Auth/Register', [
             'endpoints' => [
