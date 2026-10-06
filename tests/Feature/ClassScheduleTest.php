@@ -117,6 +117,53 @@ class ClassScheduleTest extends TestCase
             ->assertSessionHasErrors('room_id');
     }
 
+    public function test_a_schedule_overlapping_another_in_the_same_room_is_rejected(): void
+    {
+        $branch = Branch::factory()->create();
+        $room = Room::factory()->create(['branch_id' => $branch->id, 'capacity' => 20]);
+        ClassSchedule::factory()->create([
+            'branch_id' => $branch->id,
+            'room_id' => $room->id,
+            'day_of_week' => 3,
+            'start_time' => '18:00',
+            'duration_minutes' => 60,
+        ]);
+
+        $this->actingAs($this->admin())
+            ->from('/cms/operations/class-schedules/create')
+            ->post('/cms/operations/class-schedules', $this->payload([
+                'branch_id' => $branch->id,
+                'room_id' => $room->id,
+                'day_of_week' => 3,
+                'start_time' => '18:30',
+            ]))
+            ->assertSessionHasErrors('room_id');
+    }
+
+    public function test_a_schedule_starting_when_another_ends_is_allowed(): void
+    {
+        $branch = Branch::factory()->create();
+        $room = Room::factory()->create(['branch_id' => $branch->id, 'capacity' => 20]);
+        ClassSchedule::factory()->create([
+            'branch_id' => $branch->id,
+            'room_id' => $room->id,
+            'day_of_week' => 3,
+            'start_time' => '18:00',
+            'duration_minutes' => 60,
+        ]);
+
+        $this->actingAs($this->admin())
+            ->post('/cms/operations/class-schedules', $this->payload([
+                'branch_id' => $branch->id,
+                'room_id' => $room->id,
+                'day_of_week' => 3,
+                'start_time' => '19:00',
+            ]))
+            ->assertSessionHasNoErrors();
+
+        $this->assertSame(2, ClassSchedule::where('room_id', $room->id)->count());
+    }
+
     public function test_admin_can_delete_a_class_schedule_without_sessions(): void
     {
         $schedule = ClassSchedule::factory()->create();

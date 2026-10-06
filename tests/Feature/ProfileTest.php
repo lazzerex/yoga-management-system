@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\ClassType;
 use App\Models\CoachProfile;
 use App\Models\LoginLog;
 use App\Models\User;
@@ -73,7 +74,6 @@ class ProfileTest extends TestCase
             'username' => 'arimorgan',
             'email' => 'ari@example.com',
             'role' => 'coach',
-            'two_factor_confirmed_at' => now()->subDay(),
         ]);
 
         LoginLog::create([
@@ -93,10 +93,53 @@ class ProfileTest extends TestCase
             ->where('profile.username', 'arimorgan')
             ->where('profile.email', 'ari@example.com')
             ->where('profile.role', 'coach')
-            ->where('security.two_factor_enabled', true)
             ->where('loginStats.total_sign_ins', 1)
             ->has('recentLogins', 1)
         );
+    }
+
+    public function test_a_coach_updates_their_own_coach_profile(): void
+    {
+        $user = User::factory()->create(['role' => 'coach']);
+        $profile = CoachProfile::factory()->create(['user_id' => $user->id, 'bio' => 'Old bio']);
+        $profile->classTypes()->sync([ClassType::factory()->create()->id]);
+
+        $this->actingAs($user)
+            ->patch('/cms/coach/profile', [
+                'bio' => 'Hatha and Yin for beginners.',
+                'years_experience' => 7,
+                'certifications' => 'RYT-500',
+                'class_type_ids' => [],
+                'is_active' => false,
+            ])
+            ->assertSessionHasNoErrors();
+
+        $profile->refresh();
+        $this->assertSame('Hatha and Yin for beginners.', $profile->bio);
+        $this->assertSame(7, $profile->years_experience);
+        $this->assertSame('RYT-500', $profile->certifications);
+        $this->assertTrue($profile->is_active);
+        $this->assertCount(1, $profile->classTypes);
+    }
+
+    public function test_the_profile_page_offers_the_coach_form_only_to_a_coach(): void
+    {
+        $coach = User::factory()->create(['role' => 'coach']);
+        CoachProfile::factory()->create(['user_id' => $coach->id]);
+        $member = User::factory()->create(['role' => 'member']);
+
+        $this->actingAs($coach)->get('/cms/profile')
+            ->assertInertia(fn (Assert $page) => $page->whereNot('endpoints.coachProfile', null));
+
+        $this->actingAs($member)->get('/cms/profile')
+            ->assertInertia(fn (Assert $page) => $page->where('endpoints.coachProfile', null));
+    }
+
+    public function test_a_member_cannot_reach_the_coach_profile_update(): void
+    {
+        $this->actingAs(User::factory()->create(['role' => 'member']))
+            ->patch('/cms/coach/profile', ['bio' => 'x'])
+            ->assertForbidden();
     }
 
     public function test_guest_is_redirected_from_profile_page(): void

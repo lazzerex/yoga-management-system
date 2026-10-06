@@ -342,6 +342,24 @@ class AttendanceTest extends TestCase
         $this->assertCount(0, $props['attendanceRates']);
     }
 
+    public function test_reports_keep_the_selected_month_late_in_a_long_month(): void
+    {
+        $this->travelTo(now()->setDate(2026, 10, 31));
+
+        $admin = $this->admin();
+        $session = ClassSession::factory()->create(['session_date' => '2026-09-15']);
+        $enrollment = Enrollment::factory()->create(['class_session_id' => $session->id]);
+        StudentAttendance::factory()->create(['enrollment_id' => $enrollment->id]);
+
+        $response = $this->actingAs($admin)
+            ->withUnencryptedCookie('branch_id', (string) $session->branch_id)
+            ->get('/cms/operations/attendance/reports?month=2026-09');
+        $props = $response->getOriginalContent()->getData()['page']['props'];
+
+        $this->assertSame('2026-09', $props['month']);
+        $this->assertCount(1, $props['attendanceRates']);
+    }
+
     private function coach(): array
     {
         $user = User::factory()->create(['role' => 'coach']);

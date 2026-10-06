@@ -3,7 +3,9 @@
 namespace Tests\Feature;
 
 use App\Models\AuditLog;
+use App\Models\ClassSchedule;
 use App\Models\CoachProfile;
+use App\Models\Enrollment;
 use App\Models\StudentProfile;
 use App\Models\User;
 use Database\Seeders\PermissionSeeder;
@@ -18,10 +20,11 @@ class DeleteGuardTest extends TestCase
 
     protected string $seeder = PermissionSeeder::class;
 
-    public function test_a_user_with_a_coach_profile_cannot_be_deleted(): void
+    public function test_a_coach_with_schedules_cannot_be_deleted(): void
     {
         $coach = User::factory()->create(['role' => 'coach']);
-        CoachProfile::factory()->create(['user_id' => $coach->id]);
+        $profile = CoachProfile::factory()->create(['user_id' => $coach->id]);
+        ClassSchedule::factory()->create(['coach_profile_id' => $profile->id]);
 
         $this->actingAs($this->admin())
             ->from('/cms/admin/users')
@@ -31,10 +34,11 @@ class DeleteGuardTest extends TestCase
         $this->assertDatabaseHas('users', ['id' => $coach->id]);
     }
 
-    public function test_a_user_with_a_student_profile_cannot_be_deleted(): void
+    public function test_a_member_with_bookings_cannot_be_deleted(): void
     {
         $member = User::factory()->create(['role' => 'member']);
-        StudentProfile::factory()->create(['user_id' => $member->id]);
+        $profile = StudentProfile::factory()->create(['user_id' => $member->id]);
+        Enrollment::factory()->create(['student_profile_id' => $profile->id]);
 
         $this->actingAs($this->admin())
             ->from('/cms/admin/users')
@@ -47,7 +51,8 @@ class DeleteGuardTest extends TestCase
     public function test_a_blocked_delete_does_not_write_an_audit_entry(): void
     {
         $member = User::factory()->create(['role' => 'member']);
-        StudentProfile::factory()->create(['user_id' => $member->id]);
+        $profile = StudentProfile::factory()->create(['user_id' => $member->id]);
+        Enrollment::factory()->create(['student_profile_id' => $profile->id]);
 
         $this->actingAs($this->admin())
             ->from('/cms/admin/users')
@@ -99,6 +104,19 @@ class DeleteGuardTest extends TestCase
         $this->assertNotNull($log);
         $this->assertSame($admin->id, $log->causer_id);
         $this->assertSame('member', $log->meta['role']);
+    }
+
+    public function test_a_user_whose_profile_has_no_history_is_deleted_with_it(): void
+    {
+        $coach = User::factory()->create(['role' => 'coach']);
+        $profile = CoachProfile::factory()->create(['user_id' => $coach->id]);
+
+        $this->actingAs($this->admin())
+            ->delete("/cms/admin/users/{$coach->id}")
+            ->assertSessionHasNoErrors();
+
+        $this->assertDatabaseMissing('users', ['id' => $coach->id]);
+        $this->assertDatabaseMissing('coach_profiles', ['id' => $profile->id]);
     }
 
     private function admin(): User

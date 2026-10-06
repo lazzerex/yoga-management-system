@@ -93,4 +93,31 @@ class SessionGenerationTest extends TestCase
             'session_date' => now()->toDateString(),
         ]);
     }
+
+    public function test_generation_skips_a_slot_that_overlaps_an_existing_session_for_the_same_coach(): void
+    {
+        $coach = CoachProfile::factory()->create();
+
+        $schedule = ClassSchedule::factory()->create([
+            'coach_profile_id' => $coach->id,
+            'day_of_week' => now()->dayOfWeek,
+            'start_time' => '18:30',
+            'duration_minutes' => 60,
+        ]);
+
+        ClassSession::factory()->create([
+            'coach_profile_id' => $coach->id,
+            'session_date' => now()->toDateString(),
+            'start_time' => '18:00:00',
+            'end_time' => '19:00:00',
+            'status' => 'scheduled',
+        ]);
+
+        app(GenerateClassSessionsAction::class)->execute();
+
+        $this->assertDatabaseMissing('class_sessions', [
+            'class_schedule_id' => $schedule->id,
+            'session_date' => now()->toDateString(),
+        ]);
+    }
 }

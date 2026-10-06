@@ -15,6 +15,7 @@ use App\Models\StudentProfile;
 use App\Models\TuitionPlan;
 use App\Models\User;
 use App\Modules\Operations\ClassSchedule\Actions\UpdateClassScheduleAction;
+use Carbon\Carbon;
 use Database\Seeders\PermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -95,6 +96,81 @@ class ClassSessionTest extends TestCase
             ->assertSessionHasErrors('room_id');
 
         $this->assertSame($roomA->id, $target->fresh()->room_id);
+    }
+
+    public function test_reassigning_a_session_into_an_overlapping_room_slot_is_rejected(): void
+    {
+        $branch = Branch::factory()->create();
+        $roomA = Room::factory()->create(['branch_id' => $branch->id, 'capacity' => 20]);
+        $roomB = Room::factory()->create(['branch_id' => $branch->id, 'capacity' => 20]);
+
+        ClassSession::factory()->create([
+            'branch_id' => $branch->id,
+            'room_id' => $roomB->id,
+            'session_date' => '2026-09-07',
+            'start_time' => '18:00:00',
+            'end_time' => '19:00:00',
+        ]);
+        $target = ClassSession::factory()->create([
+            'branch_id' => $branch->id,
+            'room_id' => $roomA->id,
+            'session_date' => '2026-09-07',
+            'start_time' => '18:30:00',
+            'end_time' => '19:30:00',
+        ]);
+
+        $this->actingAs($this->admin())
+            ->patch("/cms/operations/class-sessions/{$target->id}", [
+                'room_id' => $roomB->id,
+                'coach_profile_id' => $target->coach_profile_id,
+                'capacity' => $target->capacity,
+                'status' => 'scheduled',
+            ])
+            ->assertSessionHasErrors('room_id');
+    }
+
+    public function test_changing_a_schedules_weekday_moves_its_open_sessions(): void
+    {
+        $monday = now()->next(Carbon::MONDAY);
+        $schedule = ClassSchedule::factory()->create(['day_of_week' => 1, 'start_time' => '18:00', 'duration_minutes' => 60]);
+        $open = ClassSession::factory()->create([
+            'class_schedule_id' => $schedule->id,
+            'branch_id' => $schedule->branch_id,
+            'room_id' => $schedule->room_id,
+            'coach_profile_id' => $schedule->coach_profile_id,
+            'session_date' => $monday->toDateString(),
+        ]);
+        $booked = ClassSession::factory()->create([
+            'class_schedule_id' => $schedule->id,
+            'branch_id' => $schedule->branch_id,
+            'room_id' => $schedule->room_id,
+            'coach_profile_id' => $schedule->coach_profile_id,
+            'session_date' => $monday->copy()->addWeek()->toDateString(),
+        ]);
+        Enrollment::factory()->create(['class_session_id' => $booked->id, 'status' => 'booked']);
+
+        app(UpdateClassScheduleAction::class)->execute($schedule, [
+            'branch_id' => $schedule->branch_id,
+            'room_id' => $schedule->room_id,
+            'class_type_id' => $schedule->class_type_id,
+            'coach_profile_id' => $schedule->coach_profile_id,
+            'day_of_week' => 3,
+            'start_time' => '18:00',
+            'duration_minutes' => 60,
+            'capacity' => $schedule->capacity,
+            'is_active' => true,
+        ]);
+
+        $this->assertDatabaseMissing('class_sessions', ['id' => $open->id]);
+        $this->assertDatabaseHas('class_sessions', ['id' => $booked->id]);
+
+        $upcoming = ClassSession::where('class_schedule_id', $schedule->id)
+            ->where('session_date', '>=', now()->toDateString())
+            ->whereKeyNot($booked->id)
+            ->pluck('session_date');
+
+        $this->assertNotEmpty($upcoming);
+        $this->assertTrue($upcoming->every(fn ($date) => Carbon::parse($date)->dayOfWeek === 3));
     }
 
     public function test_updating_a_schedule_cascades_to_future_unoverridden_sessions(): void

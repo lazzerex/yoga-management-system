@@ -158,6 +158,17 @@ class DashboardTest extends TestCase
         $this->assertCount(6, $props['analytics']['money']['months']);
     }
 
+    public function test_the_overview_does_not_count_an_invoice_due_today_as_overdue(): void
+    {
+        $branch = Branch::factory()->create();
+        $this->invoice($branch, 500000)->update(['due_date' => today()]);
+        $this->invoice($branch, 500000)->update(['due_date' => today()->subDay()]);
+
+        $money = $this->props($this->admin(), '/cms/dashboard?view=overview')['analytics']['money'];
+
+        $this->assertSame(1, $money['overdueCount']);
+    }
+
     public function test_an_admin_without_the_tuition_permission_sees_an_overview_without_money(): void
     {
         $admin = $this->admin();
