@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Modules\Admin\User\Actions\CreateUserAction;
 use App\Modules\Admin\User\Actions\DeleteUserAction;
+use App\Modules\Admin\User\Actions\SyncUserProfileAction;
 use App\Modules\Admin\User\Actions\UpdateUserAction;
 use App\Modules\Admin\User\Actions\UpdateUserRoleAction;
 use App\Modules\Admin\User\Requests\StoreUserRequest;
@@ -134,7 +135,7 @@ class UserController extends Controller
         return back()->with('success', ['key' => 'flash.roleUpdated', 'params' => ['name' => $user->name]]);
     }
 
-    public function destroy(Request $request, User $user, DeleteUserAction $action): RedirectResponse
+    public function destroy(Request $request, User $user, DeleteUserAction $action, SyncUserProfileAction $profiles): RedirectResponse
     {
         // Validation errors, not flash: a flash redirect reads as success and closes the dialog.
         if ($request->user()?->is($user)) {
@@ -145,13 +146,11 @@ class UserController extends Controller
             $this->deleteBlocked('flash.lastAdminRequired');
         }
 
-        if ($user->coachProfile) {
-            $this->deleteBlocked('flash.cannotDeleteUserHasCoachProfile');
-        }
-
-        if ($user->studentProfile) {
-            $this->deleteBlocked('flash.cannotDeleteUserHasStudentProfile');
-        }
+        match ($profiles->profileWithHistory($user)) {
+            'coach' => $this->deleteBlocked('flash.cannotDeleteUserHasCoachProfile'),
+            'member' => $this->deleteBlocked('flash.cannotDeleteUserHasStudentProfile'),
+            default => null,
+        };
 
         $name = $user->name;
         $action->execute($user, $request->user());

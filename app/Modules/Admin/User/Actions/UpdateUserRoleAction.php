@@ -3,30 +3,28 @@
 namespace App\Modules\Admin\User\Actions;
 
 use App\Models\User;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\DB;
 
 class UpdateUserRoleAction
 {
-    public function __construct(private AuditUserAction $audit) {}
+    public function __construct(
+        private AuditUserAction $audit,
+        private SyncUserProfileAction $profiles,
+    ) {}
 
-    public function execute(User $user, string $role, ?User $actor): void {
+    public function execute(User $user, string $role, ?User $actor): void
+    {
         $oldRole = $user->role;
 
-        if ($oldRole !== $role) {
-            if ($oldRole === 'coach' && $user->coachProfile()->exists()) {
-                throw ValidationException::withMessages([
-                    'role' => __('flash.cannotChangeRoleHasCoachProfile'),
-                ]);
-            }
+        $this->profiles->ensureRoleCanChange($user, $role);
 
-            if ($oldRole === 'member' && $user->studentProfile()->exists()) {
-                throw ValidationException::withMessages([
-                    'role' => __('flash.cannotChangeRoleHasStudentProfile'),
-                ]);
-            }
-        }
+        DB::transaction(function () use ($user, $role, $oldRole) {
+            $user->update(['role' => $role]);
 
-        $user->update(['role' => $role]);
+            if ($oldRole !== $role) {
+                $this->profiles->execute($user);
+            }
+        });
 
         $this->audit->execute($actor, 'assign_role', $user, [
             'from' => $oldRole,
