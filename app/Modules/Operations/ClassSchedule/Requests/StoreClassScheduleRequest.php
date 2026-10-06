@@ -5,6 +5,7 @@ namespace App\Modules\Operations\ClassSchedule\Requests;
 use App\Models\ClassSchedule;
 use App\Models\CoachProfile;
 use App\Models\Room;
+use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreClassScheduleRequest extends FormRequest
@@ -55,7 +56,7 @@ class StoreClassScheduleRequest extends FormRequest
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
-            if ($this->hasConflict()) {
+            if ($validator->errors()->isEmpty() && $this->hasConflict()) {
                 $validator->errors()->add('room_id', __('operations.scheduleConflict'));
             }
         });
@@ -63,11 +64,18 @@ class StoreClassScheduleRequest extends FormRequest
 
     protected function hasConflict(): bool
     {
+        $start = Carbon::parse($this->start_time);
+        $end = $start->copy()->addMinutes((int) $this->duration_minutes);
+
         return ClassSchedule::active()
             ->where('day_of_week', $this->day_of_week)
-            ->where('start_time', $this->start_time)
             ->when($this->route('classSchedule'), fn ($q, $self) => $q->whereKeyNot($self))
             ->where(fn ($q) => $q->where('room_id', $this->room_id)->orWhere('coach_profile_id', $this->coach_profile_id))
-            ->exists();
+            ->get(['start_time', 'duration_minutes'])
+            ->contains(function (ClassSchedule $other) use ($start, $end) {
+                $otherStart = Carbon::parse($other->start_time);
+
+                return $otherStart->lt($end) && $otherStart->copy()->addMinutes($other->duration_minutes)->gt($start);
+            });
     }
 }

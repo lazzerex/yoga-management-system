@@ -67,7 +67,8 @@ class UpdateClassSessionRequest extends FormRequest
 
         return ClassSession::where('status', 'scheduled')
             ->where('session_date', $session->session_date)
-            ->where('start_time', $session->start_time)
+            ->where('start_time', '<', $session->end_time)
+            ->where('end_time', '>', $session->start_time)
             ->whereKeyNot($session)
             ->where(fn ($q) => $q->where('room_id', $this->room_id)->orWhere('coach_profile_id', $this->coach_profile_id))
             ->exists();
