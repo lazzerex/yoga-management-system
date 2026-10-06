@@ -194,7 +194,7 @@ class AttendanceController extends Controller
         $user = $request->user();
         $branchId = $request->attributes->get('currentBranch')?->id;
         $month = $this->resolveMonth($request->string('month')->toString());
-        $start = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
+        $start = Carbon::createFromFormat('!Y-m', $month)->startOfMonth();
         $end = $start->copy()->endOfMonth();
 
         $coachScopeId = $user->can('operations.attendance.manage.any') ? null : $user->coachProfile?->id;
@@ -269,7 +269,7 @@ class AttendanceController extends Controller
     private function resolveMonth(string $value): string
     {
         try {
-            return Carbon::createFromFormat('Y-m', $value)->format('Y-m');
+            return Carbon::createFromFormat('!Y-m', $value)->format('Y-m');
         } catch (\Throwable) {
             return now()->format('Y-m');
         }

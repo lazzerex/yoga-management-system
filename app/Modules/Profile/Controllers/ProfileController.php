@@ -5,6 +5,7 @@ namespace App\Modules\Profile\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Modules\Profile\Requests\UpdateAvatarRequest;
+use App\Modules\Profile\Requests\UpdateOwnCoachProfileRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -43,10 +44,7 @@ class ProfileController extends Controller
                 'role' => $user->role,
                 'joined_at' => $user->created_at?->format('Y-m-d H:i'),
             ],
-            'security' => [
-                'two_factor_enabled' => $user->two_factor_confirmed_at !== null,
-                'two_factor_confirmed_at' => $user->two_factor_confirmed_at?->format('Y-m-d H:i'),
-            ],
+            'coachProfile' => $user->coachProfile?->only(['bio', 'years_experience', 'certifications']),
             'loginStats' => [
                 'total_sign_ins' => $user->login_logs_count,
                 'last_login_at' => $user->last_login_at
@@ -60,6 +58,7 @@ class ProfileController extends Controller
                 'avatar' => route('cms.profile.avatar'),
                 'account' => route('user-profile-information.update'),
                 'notificationPreferences' => route('cms.profile.notification-preferences'),
+                'coachProfile' => $user->coachProfile && $user->can('coach.dashboard.view') ? route('coach.profile.update') : null,
             ],
         ]);
     }
@@ -114,6 +113,17 @@ class ProfileController extends Controller
     private function activeChannels(array $event): array
     {
         return array_intersect_key($event['channels'], array_flip(config('notifications.channels')));
+    }
+
+    public function updateCoachProfile(UpdateOwnCoachProfileRequest $request): RedirectResponse
+    {
+        $coachProfile = $request->user()->coachProfile;
+
+        abort_unless($coachProfile, 404);
+
+        $coachProfile->update($request->validated());
+
+        return back()->with('success', ['key' => 'flash.coachProfileUpdated', 'params' => ['name' => $request->user()->name]]);
     }
 
     public function updateAvatar(UpdateAvatarRequest $request): RedirectResponse
