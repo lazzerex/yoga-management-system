@@ -2,17 +2,13 @@
 
 return [
     'myProfile' => 'Hồ sơ của tôi',
+    'coachProfile' => 'Hồ sơ giáo viên',
     'username' => 'Tên đăng nhập',
     'fullName' => 'Họ và tên',
     'role' => 'Vai trò',
     'email' => 'Email',
     'notSet' => 'Chưa có',
     'securityAndAccess' => 'Bảo mật và truy cập',
-    'twoFactorAuth' => 'Xác thực hai lớp',
-    'enabled' => 'Đã bật',
-    'notEnabled' => 'Chưa bật',
-    'confirmedAt' => 'Xác nhận lúc :date',
-    'enable2fa' => 'Bật xác thực hai lớp để bảo vệ tài khoản tốt hơn',
     'totalSignIns' => 'Tổng số lần đăng nhập',
     'last' => 'Lần cuối',
     'noSignInsYet' => 'Chưa có lần đăng nhập nào',

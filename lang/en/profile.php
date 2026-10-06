@@ -2,17 +2,13 @@
 
 return [
     'myProfile' => 'My Profile',
+    'coachProfile' => 'Coach profile',
     'username' => 'Username',
     'fullName' => 'Full Name',
     'role' => 'Role',
     'email' => 'Email',
     'notSet' => 'Not set',
     'securityAndAccess' => 'Security and Access',
-    'twoFactorAuth' => 'Two-Factor Authentication',
-    'enabled' => 'Enabled',
-    'notEnabled' => 'Not Enabled',
-    'confirmedAt' => 'Confirmed :date',
-    'enable2fa' => 'Enable 2FA to improve account security',
     'totalSignIns' => 'Total Sign-ins',
     'last' => 'Last',
     'noSignInsYet' => 'No sign-ins yet',
