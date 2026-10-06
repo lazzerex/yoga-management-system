@@ -9,6 +9,7 @@ use TorMorten\Eventy\Facades\Events as Eventy;
 class MenuRegistry
 {
     protected array $items = [];
+
     protected bool $hooked = false;
 
     /** @param AppMenuItem[] $items */
@@ -50,13 +51,13 @@ class MenuRegistry
     protected function mapItem(array $item, ?Authenticatable $user): array
     {
         return [
-            'href'      => $item['href'],
-            'labelKey'  => $item['label'],
-            'icon'      => $item['icon'],
+            'href' => $item['href'],
+            'labelKey' => $item['label'],
+            'icon' => $item['icon'],
             'iconColor' => $item['iconColor'],
-            'badgeKey'  => $item['badge'],
+            'badgeKey' => $item['badge'],
             'separator' => $item['separatorBefore'],
-            'children'  => collect($item['children'])
+            'children' => collect($item['children'])
                 ->filter(fn (array $child): bool => $this->isVisible($child, $user))
                 ->sortBy('position')
                 ->values()

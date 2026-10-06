@@ -1,8 +1,13 @@
 <?php
 
+use App\Modules\Admin\Providers\AdminServiceProvider;
+use App\Modules\Operations\Providers\OperationsServiceProvider;
+use App\Providers\AppServiceProvider;
+use App\Providers\FortifyServiceProvider;
+
 return [
-    App\Providers\AppServiceProvider::class,
-    App\Providers\FortifyServiceProvider::class,
-    App\Modules\Admin\Providers\AdminServiceProvider::class,
-    App\Modules\Operations\Providers\OperationsServiceProvider::class,
+    AppServiceProvider::class,
+    FortifyServiceProvider::class,
+    AdminServiceProvider::class,
+    OperationsServiceProvider::class,
 ];

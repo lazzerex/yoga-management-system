@@ -5,14 +5,23 @@ namespace App\Support\Menu;
 class AppMenuItem
 {
     protected string $label;
+
     protected ?string $href;
+
     protected ?string $icon = null;
+
     protected string $iconColor = '#666666';
+
     protected string $group = 'nav.main';
+
     protected string|array|null $permissions = null;
+
     protected int $order = 100;
+
     protected ?string $badge = null;
+
     protected bool $nolink = false;
+
     protected bool $separatorBefore = false;
 
     /** @var AppMenuItem[] */
@@ -20,7 +29,7 @@ class AppMenuItem
 
     public static function make(string $label, ?string $href = null): static
     {
-        $item = new static();
+        $item = new static;
         $item->label = $label;
         $item->href = $href;
 
@@ -94,17 +103,17 @@ class AppMenuItem
     public function toArray(): array
     {
         return [
-            'href'            => $this->nolink ? null : $this->href,
-            'label'           => $this->label,
-            'icon'            => $this->icon,
-            'iconColor'       => $this->iconColor,
-            'group'           => $this->group,
-            'permissions'     => $this->permissions,
-            'position'        => $this->order,
-            'badge'           => $this->badge,
-            'nolink'          => $this->nolink,
+            'href' => $this->nolink ? null : $this->href,
+            'label' => $this->label,
+            'icon' => $this->icon,
+            'iconColor' => $this->iconColor,
+            'group' => $this->group,
+            'permissions' => $this->permissions,
+            'position' => $this->order,
+            'badge' => $this->badge,
+            'nolink' => $this->nolink,
             'separatorBefore' => $this->separatorBefore,
-            'children'        => array_map(fn (AppMenuItem $child) => $child->toArray(), $this->children),
+            'children' => array_map(fn (AppMenuItem $child) => $child->toArray(), $this->children),
         ];
     }
 }

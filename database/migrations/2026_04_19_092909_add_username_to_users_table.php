@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -22,7 +22,7 @@ return new class extends Migration
             $i = 1;
 
             while (DB::table('users')->where('username', $username)->where('id', '!=', $user->id)->exists()) {
-                $username = $base . $i++;
+                $username = $base.$i++;
             }
 
             DB::table('users')->where('id', $user->id)->update(['username' => $username]);
@@ -32,7 +32,6 @@ return new class extends Migration
             $table->string('username')->unique()->nullable(false)->change();
         });
     }
-
 
     /**
      * Reverse the migrations.

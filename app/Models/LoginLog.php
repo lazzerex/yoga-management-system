@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class LoginLog extends Model
 {
     public const STATUS_SUCCESS = 'success';
+
     public const STATUS_FAILED = 'failed';
 
     public $timestamps = false;

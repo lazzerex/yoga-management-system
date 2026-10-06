@@ -29,7 +29,7 @@ class LoginLogController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('ip_address', 'like', "%{$search}%")
-                  ->orWhere('attempted_identifier', 'like', "%{$search}%");
+                    ->orWhere('attempted_identifier', 'like', "%{$search}%");
             });
         }
 
@@ -66,7 +66,7 @@ class LoginLogController extends Controller
 
     public function export(): StreamedResponse
     {
-        $filename = 'login-logs-' . now()->format('Y-m-d') . '.csv';
+        $filename = 'login-logs-'.now()->format('Y-m-d').'.csv';
 
         return response()->streamDownload(function () {
             $handle = fopen('php://output', 'w');

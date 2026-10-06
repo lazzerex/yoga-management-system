@@ -7,13 +7,15 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
-class StoreUserRequest extends FormRequest 
+class StoreUserRequest extends FormRequest
 {
-    public function authorize(): bool {
+    public function authorize(): bool
+    {
         return true;
     }
 
-    public function rules(): array {
+    public function rules(): array
+    {
         return [
             'name' => ['required', 'string', 'max:255'],
             'username' => ['required', 'string', 'max:255', 'alpha_dash', Rule::unique(User::class, 'username')],

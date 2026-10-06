@@ -7,13 +7,15 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
-class UpdateUserRequest extends FormRequest 
+class UpdateUserRequest extends FormRequest
 {
-    public function authorize(): bool {
+    public function authorize(): bool
+    {
         return true;
     }
 
-    public function rules(): array {
+    public function rules(): array
+    {
         $userId = $this->route('user')?->id;
 
         return [
