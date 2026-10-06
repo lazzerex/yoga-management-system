@@ -248,6 +248,7 @@ Route::prefix('cms')->group(function () {
         Route::middleware('permission:coach.dashboard.view')->prefix('coach')->name('coach.')->group(function () {
             Route::get('/my-classes', [ClassSessionController::class, 'myClasses'])->name('my-classes');
             Route::get('/my-teaching-schedule', [ClassSessionController::class, 'myTeachingSchedule'])->name('my-teaching-schedule');
+            Route::patch('/profile', [ProfileController::class, 'updateCoachProfile'])->name('profile.update');
         });
 
         Route::prefix('admin')->name('admin.')->group(function () {
