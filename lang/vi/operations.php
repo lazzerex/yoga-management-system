@@ -336,7 +336,7 @@ return [
     'aiSeveritynote' => 'Lưu ý nhỏ',
     'aiSeveritywarn' => 'Cần sửa',
     'aiGradeTitle' => 'Điểm chuỗi asana',
-    'aiGradeAdvisory' => 'Chỉ mang tính tham khảo. Không tính vào quyết định duyệt.',
+    'aiGradeAdvisory' => 'Chỉ mang tính tham khảo.',
     'aiCopyReview' => 'Sao chép',
     'aiCopied' => 'Đã sao chép',
     'aiCopyFailed' => 'Sao chép thất bại',

@@ -758,7 +758,7 @@ const logout = () => {
 
         <div ref="topbarRef" class="ym-appbar">
             <div class="ym-brand">
-                <p class="ym-brand-mark">YM</p>
+                <p class="ym-brand-mark">GPC</p>
                 <div class="ym-brand-text">
                     <p class="ym-brand-title">{{ $t('layout.brand.title') }}</p>
                 </div>

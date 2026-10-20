@@ -147,7 +147,7 @@ const check = async () => {
                 <span>{{ $t('operations.aiCheckNote') }}</span>
             </p>
 
-            <p class="ym-ai-sub">{{ $t('operations.aiCheckIntro') }}</p>
+            <!-- <p class="ym-ai-sub">{{ $t('operations.aiCheckIntro') }}</p> -->
 
             <div v-if="images.length" class="ym-ai-optin">
                 <div class="ym-ai-optin-row">
